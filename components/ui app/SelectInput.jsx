@@ -23,7 +23,7 @@ function SelectInput({
         {icon && icon}
         <div className="flex-1 space-y-2">
           <Select
-            className="text-[#677185]"
+            className="text-[#677185] "
             onValueChange={onChange}
             onOpenChange={onBlur}
             name={name}

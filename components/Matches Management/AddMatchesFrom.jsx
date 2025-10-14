@@ -13,12 +13,15 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect } from "react";
 import DatePicker from "../ui app/DatePicker";
+import Date from "../icons/Date";
 const validateSchema = Yup.object({
   champion: Yup.string().required("Required"),
   game: Yup.string().required("Required"),
   team1: Yup.string().required("Required"),
   team2: Yup.string().required("Required"),
   match_state: Yup.string().required("Required"),
+  time: Yup.string().required("Required"),
+  date: Yup.string().required("Required"),
 });
 function AddMatchesFrom() {
   const formik = useFormik({
@@ -28,6 +31,8 @@ function AddMatchesFrom() {
       team1: "",
       team2: "",
       match_state: "",
+      time: "",
+      date: "",
     },
     validationSchema: validateSchema,
     onSubmit: (values) => {
@@ -132,7 +137,43 @@ function AddMatchesFrom() {
       </FormSection>
       <FormSection>
         <FormRow>
-          <DatePicker formik={formik} label={"Match Date"} />
+          <DatePicker
+            placeholder={"dd/mm/yyyy"}
+            formik={formik}
+            label={"Match Date"}
+            icon={
+              <Date
+                height="35"
+                width="35"
+                className={"fill-[#677185] "}
+                color={"text-[#677185]"}
+              />
+            }
+          />
+          <InputApp
+            label={"time"}
+            name={"time"}
+            type={"time"}
+            placeholder={"dd/mm/yyyy"}
+            className=" border-0 focus:outline-none "
+            backGroundColor={"bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            icon={
+              <TeamsManagement
+                height="35"
+                width="35"
+                className={"fill-[#677185] "}
+                color={"text-[#677185]"}
+              />
+            }
+            error={
+              formik?.errors?.time && formik?.touched?.time
+                ? formik?.errors?.time
+                : ""
+            }
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+          />
         </FormRow>
       </FormSection>
       <FormSection>
@@ -159,13 +200,16 @@ function AddMatchesFrom() {
         />
       </FormSection>
 
-      <Button
-        className={
-          " text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
-        }
-      >
-        Submit
-      </Button>
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          className={
+            " text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
+          }
+        >
+          Submit
+        </Button>
+      </div>
     </form>
   );
 }

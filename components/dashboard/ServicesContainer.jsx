@@ -10,47 +10,47 @@ import ServiceItem from "./ServiceItem";
 const links = [
   {
     title: "Matches Management",
-    href: "/matches-management",
+    href: "/matches-management/add",
     description:
       "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links",
     icon: <MatchesManagement />,
   },
   {
     title: "Players",
-    href: "/players",
+    href: "/player-management/add",
     description:
       "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos",
     icon: <Player />,
   },
   {
     title: "Teams Management",
-    href: "/teams-management",
+    href: "/teams-management/add",
     description: "Add Team: Name, Country, Linked Players, Logo/Images",
     icon: <TeamsManagement />,
   },
   {
     title: "Games Management",
-    href: "/games-management",
+    href: "/games-management/add",
     description: "go to Games Sectoin to Add Game: Name + Icon",
     icon: <GamesManagement />,
   },
   {
     title: "News & Updates",
-    href: "/games-management",
+    href: "/games-management/add",
     description:
       "Go to news Sectoin to Add News: Title, Description, Image/Video, Author",
     icon: <News />,
   },
   {
     title: "Users",
-    href: "/users",
+    href: "/users/add",
     description:
       "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
     icon: <User />,
   },
   {
     title: "Support Center",
-    href: "/support-center",
+    href: "/support-center/add",
     description:
       "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos",
     icon: <SupportCenter />,
