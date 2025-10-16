@@ -11,6 +11,7 @@ import FormRow from "../ui app/FormRow";
 import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
 import SelectInput from "../ui app/SelectInput";
+import { Button } from "../ui/button";
 
 const validateSchema = Yup.object({
   name: Yup.string().required("Required"),
@@ -146,6 +147,16 @@ function AddPlayerFrom() {
           />
         </FormRow>
       </FormSection>
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          className={
+            " text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
+          }
+        >
+          Submit
+        </Button>
+      </div>
     </form>
   );
 }

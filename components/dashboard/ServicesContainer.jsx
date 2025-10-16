@@ -64,7 +64,7 @@ function ServicesContainer() {
           key={link.title}
           title={link.title}
           icon={link.icon}
-          href={`/dashboard/${link.href}`}
+          href={`/dashboard${link.href}`}
           description={link.description}
         />
       ))}

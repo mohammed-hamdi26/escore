@@ -123,3 +123,24 @@
 .icon-transition {
   @apply text-[#289546] transition-colors duration-300 group-hover:text-white;
 }
+
+/* thead {
+  background-color: transparent !important;
+  border-radius: 1000px !important;
+  border-bottom: none;
+  overflow: hidden;
+  -webkit-border-radius: 1000px !important;
+  -moz-border-radius: 1000px !important;
+  -ms-border-radius: 1000px !important;
+  -o-border-radius: 1000px !important;
+}
+th {
+  border-bottom: none;
+  padding: 20px 60px;
+  background-color: transparent !important;
+}
+
+td {
+  border-bottom: 0.5px solid #313a5f !important;
+  padding: 18px 60px;
+} */
