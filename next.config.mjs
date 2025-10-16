@@ -8,6 +8,11 @@ const nextConfig = {
         destination: "/dashboard/:slug/add",
         permanent: true,
       },
+      {
+        source: "/",
+        destination: "/dashboard",
+        permanent: true,
+      },
     ];
   },
 };
