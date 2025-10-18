@@ -1,5 +1,4 @@
 import Table from "@/components/ui app/Table";
-
 import { Button } from "@/components/ui/button";
 
 async function getData() {
@@ -7,50 +6,35 @@ async function getData() {
   return [
     {
       // id: "728ed52f",
-      team: "Team ",
-      country: "USA",
+      team1: "logo",
     },
     {
       // id: "728ed52f",
-      team: "Team ",
-      country: "USA",
+      team1: "logo",
     },
     {
       // id: "728ed52f",
-      team: "Team ",
-      country: "USA",
+      team1: "logo",
     },
     {
       // id: "728ed52f",
-      team: "Team ",
-      country: "USA",
+      team1: "logo",
     },
     // ...
   ];
 }
-const columns = [
-  { id: "team", header: "Team " },
-  { id: "country", header: "Country" },
-];
+const columns = [{ id: "game", header: "Game" }];
 
-export default async function page() {
+async function page() {
   const data = await getData();
-
   return (
-    <div className="">
+    <div>
       <Table
-        grid_cols="grid-cols-[0.5fr_0.5fr_2fr]"
+        grid_cols="grid-cols-[0.5fr_2fr]"
         data={data}
         columns={[...columns]}
       >
         <>
-          <Button
-            className={
-              "bg-green-primary rounded-full min-w-[100px] cursor-pointer"
-            }
-          >
-            Edit
-          </Button>
           <Button
             className={"bg-red-800 rounded-full min-w-[100px] cursor-pointer"}
           >
@@ -61,3 +45,5 @@ export default async function page() {
     </div>
   );
 }
+
+export default page;

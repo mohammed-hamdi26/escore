@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source:
-          "/dashboard/:slug(\\matches-management|player-management|teams-management|games-management|users|support-center)",
+          "/dashboard/:slug(\\matches-management|player-management|teams-management|games-management|support-center)",
         destination: "/dashboard/:slug/add",
         permanent: true,
       },

@@ -1,8 +1,6 @@
-// "use client";
-
 import LinksButtons from "@/components/ui app/LinksButtons";
 
-export default function MatchesManagementLayout({ children }) {
+function layout({ children }) {
   return (
     <>
       <LinksButtons />
@@ -10,3 +8,5 @@ export default function MatchesManagementLayout({ children }) {
     </>
   );
 }
+
+export default layout;
