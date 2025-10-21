@@ -42,7 +42,7 @@ function SideNavBar() {
   return (
     <nav
       className={
-        "bg-linear-to-b from-[#00000005] to-[#24397b14]  py-16 w-[270px] border border-white rounded-2xl min-h-full  "
+        "bg-linear-to-b from-[#00000005] to-[#24397b14]  py-16 w-[270px] border border-white rounded-2xl min-h-[calc(100vh-200px)]  "
       }
     >
       <HeaderSideNavBar />

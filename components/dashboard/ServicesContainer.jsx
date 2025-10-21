@@ -36,14 +36,14 @@ const links = [
   },
   {
     title: "News & Updates",
-    href: "/games-management/add",
+    href: "/news/add",
     description:
       "Go to news Sectoin to Add News: Title, Description, Image/Video, Author",
     icon: <News />,
   },
   {
     title: "Users",
-    href: "/users/add",
+    href: "/users/",
     description:
       "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
     icon: <User />,

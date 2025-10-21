@@ -1,11 +1,28 @@
 import Link from "next/link";
+import { cloneElement } from "react";
 
-function NavItem({ icon, label, href }) {
+function NavItem({ icon, label, href, isActive }) {
   return (
-    <li>
+    <li className="group">
       <Link href={href} className="flex items-center gap-2  rounded-full  ">
-        <span className="px-2.5 py-2.5 rounded-lg bg-[#262C3D33] ">{icon}</span>{" "}
-        <p className="text-lg font-semibold ">{label}</p>
+        <span
+          className={`px-2.5 py-2.5 rounded-lg ${
+            isActive ? "bg-green-primary" : "bg-[#262C3D33]"
+          } group-hover:bg-green-primary transition-colors duration-500`}
+        >
+          {cloneElement(icon, {
+            className: `${
+              isActive ? "fill-white" : "fill-[#667085]"
+            } group-hover:fill-white transition-colors duration-500`,
+          })}
+        </span>{" "}
+        <p
+          className={`text-lg font-semibold ${
+            isActive ? "text-white" : "text-[#667085]"
+          } group-hover:text-white transition-colors duration-500 `}
+        >
+          {label}
+        </p>
       </Link>
     </li>
   );
