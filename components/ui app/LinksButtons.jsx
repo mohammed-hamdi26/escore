@@ -11,10 +11,10 @@ function LinksButtons() {
       <Link href={pathname.replace("edit", "add")}>
         <Button
           // disabled={pathname.includes("add")}
-          className={`text-white text-center min-w-[100px] mr-4 px-5 py-2 rounded-lg ${
+          className={`text-white  text-center min-w-[100px] mr-4 px-5 py-2 rounded-lg ${
             pathname.includes("add")
               ? "bg-green-primary cursor-not-allowed "
-              : "bg-[#10131D] cursor-pointer"
+              : "bg-[#F5F6F8]  dark:bg-[#10131D] text-black dark:text-white cursor-pointer"
           }  disabled:opacity-50`}
         >
           Add New
@@ -26,7 +26,7 @@ function LinksButtons() {
           className={` text-white text-center min-w-[100px] px-5 py-2 rounded-lg ${
             pathname.includes("edit")
               ? "bg-green-primary disabled:cursor-not-allowed "
-              : "bg-[#10131D] cursor-pointer"
+              : "bg-[#F5F6F8] dark:bg-[#10131D] text-black dark:text-white cursor-pointer"
           }   disabled:opacity-50`}
         >
           Edit

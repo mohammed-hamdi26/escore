@@ -3,14 +3,54 @@ import { ToggleGroupItem } from "@radix-ui/react-toggle-group";
 import { ToggleGroup } from "../ui/toggle-group";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useLayoutEffect, useState } from "react";
+import { Button } from "../ui/button";
 
 function ToggleThemeMode() {
   const { setTheme, theme } = useTheme();
+  const [mode, setMode] = useState(null);
 
   const classNameToggleItem =
-    "data-[state=on]:bg-green-primary text-[#677185] dark:text-white   flex justify-center items-center size-10 rounded-full cursor-pointer";
+    "  dark:text-white   flex justify-center items-center size-10 rounded-full cursor-pointer    ";
+
   return (
-    <ToggleGroup type="single" spacing={4}>
+    <div className="flex items-center gap-4">
+      <Button
+        onClick={() => setTheme("light")}
+        className={
+          `${
+            theme === "light"
+              ? "bg-green-primary text-white hover:bg-green-primary"
+              : "bg-transparent text-[#677185] hover:bg-green-primary/50"
+          } ` + classNameToggleItem
+        }
+      >
+        <Sun />
+      </Button>
+
+      <Button
+        onClick={() => setTheme("dark")}
+        className={
+          `${
+            theme === "dark"
+              ? "bg-green-primary text-white hover:bg-green-primary"
+              : "bg-transparent text-[#677185] hover:bg-green-primary/50"
+          } ` + classNameToggleItem
+        }
+      >
+        <Moon />
+      </Button>
+    </div>
+  );
+}
+
+{
+  /* <ToggleGroup
+      className={"justify-self-end"}
+      defaultValue={mode}
+      type="single"
+      spacing={4}
+    >
       <ToggleGroupItem
         defaultValue={"light"}
         className={
@@ -36,8 +76,6 @@ function ToggleThemeMode() {
       >
         <Moon className="" />
       </ToggleGroupItem>
-    </ToggleGroup>
-  );
+    </ToggleGroup> */
 }
-
 export default ToggleThemeMode;

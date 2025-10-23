@@ -18,13 +18,15 @@ function BackPage() {
       {/* <Link href={pathname.split("/").slice(0, 3).join("/")}> */}
       <Button
         onClick={() => router.push("/dashboard")}
-        className="bg-[linear-gradient(180deg,rgba(58,70,157,0.1)_0%,rgba(40,149,70,0.1)_100%)] cursor-pointer size-9 rounded-full flex justify-center items-center backdrop-blur-2xl "
+        className="bg-green-primary/10 dark:bg-[linear-gradient(180deg,rgba(58,70,157,0.1)_0%,rgba(40,149,70,0.1)_100%)] cursor-pointer size-9 rounded-full flex justify-center items-center backdrop-blur-2xl "
       >
-        <ArrowLeft />
+        <ArrowLeft className="text-green-primary dark:text-white" />
       </Button>
       {/* </Link> */}
 
-      <p className="capitalize text-lg font-normal">{GetTitlePage(pathname)}</p>
+      <p className="capitalize text-lg font-normal text-green-primary dark:text-white">
+        {GetTitlePage(pathname)}
+      </p>
     </div>
   );
 }

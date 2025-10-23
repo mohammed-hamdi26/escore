@@ -4,11 +4,11 @@ function Table({ columns, data, children, grid_cols, showHeader = true }) {
       {showHeader && (
         <TableHeader>
           <TableRow
-            className={`px-16 grid gap-8 ${grid_cols} bg-[#384E9733] rounded-full`}
+            className={`px-16 grid gap-8 ${grid_cols} bg-[#F5F6F8] dark:bg-[#384E9733] rounded-full`}
           >
             {columns.map((column) => (
               <TableHeaderRow
-                className="py-4 text-sm text-start"
+                className="py-4 text-sm text-start text-[#677185] dark:text-white"
                 key={column.id}
               >
                 {column.header}
@@ -21,7 +21,7 @@ function Table({ columns, data, children, grid_cols, showHeader = true }) {
         {data ? (
           data.map((row, index) => (
             <TableRow
-              className={`px-16 py-2 grid gap-8 ${grid_cols}  border-b border-[#313A5F] `}
+              className={`px-16 py-2 grid gap-8 ${grid_cols} text-[#677185] dark:text-white  border-b border-[#313A5F] `}
               key={index}
             >
               {Object.values(row).map((value) => (

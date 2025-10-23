@@ -46,13 +46,15 @@ export default async function page() {
         <>
           <Button
             className={
-              "bg-green-primary rounded-full min-w-[100px] cursor-pointer"
+              "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
             }
           >
             Edit
           </Button>
           <Button
-            className={"bg-red-800 rounded-full min-w-[100px] cursor-pointer"}
+            className={
+              "text-white bg-red-800 rounded-full min-w-[100px] cursor-pointer"
+            }
           >
             Delete
           </Button>
