@@ -18,8 +18,8 @@ function NavItem({ icon, label, href, isActive }) {
         </span>{" "}
         <p
           className={`text-lg font-semibold ${
-            isActive ? "text-white" : "text-[#667085]"
-          } group-hover:text-white transition-colors duration-500 `}
+            isActive ? "text-[#677185] dark:text-white" : "text-[#667085]"
+          } dark:group-hover:text-white transition-colors duration-500 `}
         >
           {label}
         </p>

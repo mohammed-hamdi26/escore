@@ -17,7 +17,7 @@ function BackPage() {
     <div className="flex items-center gap-3">
       {/* <Link href={pathname.split("/").slice(0, 3).join("/")}> */}
       <Button
-        onClick={() => router.back()}
+        onClick={() => router.push("/dashboard")}
         className="bg-[linear-gradient(180deg,rgba(58,70,157,0.1)_0%,rgba(40,149,70,0.1)_100%)] cursor-pointer size-9 rounded-full flex justify-center items-center backdrop-blur-2xl "
       >
         <ArrowLeft />

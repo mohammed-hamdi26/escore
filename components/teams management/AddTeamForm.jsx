@@ -38,7 +38,7 @@ function AddTeamForm() {
             type={"text"}
             placeholder={"Enter Team Name"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<UserCardIcon color={"text-[#677185]"} />}
             error={formik.touched.name && formik.errors.name}
@@ -52,7 +52,7 @@ function AddTeamForm() {
             type={"text"}
             placeholder={"Enter Country Name"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <CountryIcon
@@ -74,7 +74,7 @@ function AddTeamForm() {
             type={""}
             placeholder={"Upload Team Logo"}
             className="p-0 border-0 focus:outline-none  "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <TeamsManagement

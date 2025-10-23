@@ -8,7 +8,7 @@ function InputApp({
   onChange,
   className = "",
   placeholder,
-  backGroundColor = "text-white",
+  backGroundColor = "bg-white",
   textColor = "text-[#4F555A]",
   icon,
   error,
@@ -16,7 +16,9 @@ function InputApp({
 }) {
   return (
     <div className="flex-1">
-      {label && <Label className={"mb-4"}>{label}</Label>}
+      {label && (
+        <Label className={"mb-4 text-[#677185] dark:text-white"}>{label}</Label>
+      )}
       <div className="flex items-center gap-4 ">
         {icon && icon}
         <div className="flex-1 space-y-2">

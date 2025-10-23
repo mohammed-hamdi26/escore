@@ -18,7 +18,7 @@ function SelectInput({
 }) {
   return (
     <div className="flex-1">
-      {label && <Label className={"mb-4"}>{label}</Label>}
+      {label && <Label className={"mb-4 text-[#677185]"}>{label}</Label>}
       <div className="flex items-center gap-4 mt-4 ">
         {icon && icon}
         <div className="flex-1 space-y-2">
@@ -28,7 +28,9 @@ function SelectInput({
             onOpenChange={onBlur}
             name={name}
           >
-            <SelectTrigger className={" bg-[#0F1017] border-0 p-6 "}>
+            <SelectTrigger
+              className={" bg-dashboard-box  dark:bg-[#0F1017] border-0 p-6 "}
+            >
               <SelectValue
                 placeholder={placeholder}
                 className="text-[#677185]"

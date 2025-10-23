@@ -30,7 +30,7 @@ function AddGamesForm() {
             type={"text"}
             placeholder={"Enter Game Name"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <GamesManagement

@@ -11,7 +11,7 @@ function LinksButtons() {
       <Link href={pathname.replace("edit", "add")}>
         <Button
           // disabled={pathname.includes("add")}
-          className={` text-center min-w-[100px] mr-4 px-5 py-2 rounded-lg ${
+          className={`text-white text-center min-w-[100px] mr-4 px-5 py-2 rounded-lg ${
             pathname.includes("add")
               ? "bg-green-primary cursor-not-allowed "
               : "bg-[#10131D] cursor-pointer"
@@ -23,7 +23,7 @@ function LinksButtons() {
       <Link href={pathname.replace("add", "edit")}>
         <Button
           // disabled={pathname.includes("edit")}
-          className={`text-center min-w-[100px] px-5 py-2 rounded-lg ${
+          className={` text-white text-center min-w-[100px] px-5 py-2 rounded-lg ${
             pathname.includes("edit")
               ? "bg-green-primary disabled:cursor-not-allowed "
               : "bg-[#10131D] cursor-pointer"

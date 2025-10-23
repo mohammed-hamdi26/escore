@@ -43,7 +43,7 @@ function PersonMessage({ info }) {
 }
 function SendMessageInput() {
   return (
-    <div className="bg-[#0F1017] p-4">
+    <div className="bg-dashboard-box  dark:bg-[#0F1017] p-4">
       <div className="flex items-center justify-between bg-[#10131D] py-4 px-2.5 gap-4 rounded-xl">
         <Input
           className={"  border-none"}

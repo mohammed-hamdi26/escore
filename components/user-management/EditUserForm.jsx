@@ -35,7 +35,7 @@ function EditUserForm() {
             type={"text"}
             placeholder={"Edit User Name"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<UserCardIcon color={"text-[#677185]"} />}
             error={formik.touched.name && formik.errors.name}
@@ -49,7 +49,7 @@ function EditUserForm() {
             type={"email"}
             placeholder={"Edit Email"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <EmailIcon
@@ -71,7 +71,7 @@ function EditUserForm() {
             type={"password"}
             placeholder={"Edit Password"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <PasswordIcon

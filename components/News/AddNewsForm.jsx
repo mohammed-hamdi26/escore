@@ -45,8 +45,8 @@ function AddNewsForm() {
             label={"Title"}
             type={"text"}
             placeholder={"Enter Title"}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            className="border-0 focus:outline-none    "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<Title color={"text-[#677185]"} />}
             error={formik.touched.title && formik.errors.title}
@@ -59,7 +59,7 @@ function AddNewsForm() {
             type={"text"}
             placeholder={"Enter The Writer Name"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<Writer color={"text-[#677185]"} />}
             error={formik.touched.writer && formik.errors.writer}
@@ -92,7 +92,7 @@ function AddNewsForm() {
             type={"text"}
             placeholder={"Enter Description"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <Date className={"fill-[#677185]"} color={"text-[#677185]"} />

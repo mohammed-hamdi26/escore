@@ -10,7 +10,9 @@ function DatePicker({ label, formik, placeholder, icon }) {
 
   return (
     <div className=" flex flex-col flex-1">
-      {label && <Label className={"mb-4"}>{label}</Label>}
+      {label && (
+        <Label className={"mb-4 text-[#677185] dark:text-white"}>{label}</Label>
+      )}
       <div className="flex items-center gap-4  ">
         {icon && icon}
         <div className="flex-1 space-y-2">
@@ -24,7 +26,7 @@ function DatePicker({ label, formik, placeholder, icon }) {
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="min-w-48 justify-between font-normal border-0 bg-[#0F1017] p-6 cursor-pointer "
+                className="min-w-48 justify-between font-normal border-0 bg-dashboard-box  dark:bg-[#0F1017] p-6 cursor-pointer "
               >
                 {formik.values.date
                   ? new Date(formik.values.date).toLocaleDateString()

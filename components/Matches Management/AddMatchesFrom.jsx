@@ -50,7 +50,7 @@ function AddMatchesFrom() {
           type={"text"}
           placeholder={"Write Champion Name"}
           className="border-0 focus:outline-none "
-          backGroundColor={"bg-[#0F1017]"}
+          backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
           textColor="text-[#677185]"
           icon={<Champion color={"text-[#677185]"} />}
           error={
@@ -66,7 +66,7 @@ function AddMatchesFrom() {
           type={"text"}
           placeholder={"Write Game Name"}
           className="border-0 focus:outline-none "
-          backGroundColor={"bg-[#0F1017]"}
+          backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
           textColor="text-[#677185]"
           icon={
             <GamesManagement
@@ -91,7 +91,7 @@ function AddMatchesFrom() {
             type={"text"}
             placeholder={"Write Team Name"}
             className=" border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <TeamsManagement
@@ -115,7 +115,7 @@ function AddMatchesFrom() {
             type={"text"}
             placeholder={"Write Game Name"}
             className=" border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <TeamsManagement
@@ -156,7 +156,7 @@ function AddMatchesFrom() {
             type={"time"}
             placeholder={"dd/mm/yyyy"}
             className=" border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <TeamsManagement

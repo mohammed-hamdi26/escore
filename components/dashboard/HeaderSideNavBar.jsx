@@ -8,7 +8,9 @@ function HeaderSideNavBar() {
         <Image alt="avatar" src={avatar} fill className="object-cover" />{" "}
       </div>
       <div className="text-white capitalize">
-        <h3 className="text-lg ">ahmed</h3>
+        <h3 className="text-lg text-[#677185] dark:text-white font-bold ">
+          ahmed
+        </h3>
         <p className="text-sm text-[#667085]">admin</p>
       </div>
     </div>

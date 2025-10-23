@@ -48,7 +48,7 @@ function AddPlayerFrom() {
             type={"text"}
             placeholder={"Enter Player Name"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<UserCardIcon color={"text-[#677185]"} />}
             error={
@@ -65,7 +65,7 @@ function AddPlayerFrom() {
             type={"text"}
             placeholder={"Enter Player Age"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <AgeIcon className="fill-[#677185]" color={"text-[#677185]"} />
@@ -128,7 +128,7 @@ function AddPlayerFrom() {
             label={"Player Picture"}
             placeholder={"Select Team Player Belong To"}
             className="border-0 focus:outline-none "
-            backGroundColor={"bg-[#0F1017]"}
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
               <Player
