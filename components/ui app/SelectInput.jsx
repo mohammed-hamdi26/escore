@@ -29,7 +29,9 @@ function SelectInput({
             name={name}
           >
             <SelectTrigger
-              className={" bg-dashboard-box  dark:bg-[#0F1017] border-0 p-6 "}
+              className={
+                " bg-dashboard-box w-full  dark:bg-[#0F1017] border-0 p-6 "
+              }
             >
               <SelectValue
                 placeholder={placeholder}

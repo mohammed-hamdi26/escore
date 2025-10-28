@@ -16,14 +16,17 @@ const users = [
   },
   { label: "Creator", icon: <CreatorUserIcon /> },
 ];
-function UsersContainer() {
+function UsersContainer({ formik }) {
   const [selectedUser, setSelectedUser] = useState("admin");
   return (
     <ul className="flex flex-col gap-4 min-w-[200px]">
       {users.map((user) => (
         <UserItem
           selectedUser={selectedUser}
-          onClick={() => setSelectedUser(user.label.toLowerCase())}
+          onClick={() => {
+            setSelectedUser(user.label.toLowerCase());
+            formik.setFieldValue("role", user.label.toLowerCase());
+          }}
           key={user.label}
           icon={user.icon}
           label={user.label}

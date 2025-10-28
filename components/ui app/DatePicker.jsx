@@ -1,11 +1,11 @@
 import { Label } from "@radix-ui/react-label";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar } from "../ui/calendar";
-// import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
+
 import { Button } from "../ui/button";
 import { useState } from "react";
 
-function DatePicker({ label, formik, placeholder, icon }) {
+function DatePicker({ label, name, formik, placeholder, icon }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -23,13 +23,13 @@ function DatePicker({ label, formik, placeholder, icon }) {
               // if(open)
             }}
           >
-            <PopoverTrigger asChild>
+            <PopoverTrigger className="w-full" asChild>
               <Button
                 variant="outline"
-                className="min-w-48 justify-between font-normal border-0 bg-dashboard-box  dark:bg-[#0F1017] p-6 cursor-pointer "
+                className="min-w-48 justify-between font-normal border-0 bg-dashboard-box hover:bg-dashboard-box  text-[#677185] dark:bg-[#0F1017] p-6 cursor-pointer "
               >
-                {formik.values.date
-                  ? new Date(formik.values.date).toLocaleDateString()
+                {formik.values[name]
+                  ? new Date(formik.values[name]).toLocaleDateString()
                   : placeholder}
               </Button>
             </PopoverTrigger>
@@ -38,13 +38,11 @@ function DatePicker({ label, formik, placeholder, icon }) {
                 disabled={{
                   before: new Date(),
                 }}
-                selected={formik.values.date}
+                selected={formik.values[name]}
                 onSelect={(date) => {
-                  console.log(date);
-                  formik.setFieldValue("date", date);
+                  formik.setFieldValue(name, date);
                   setOpen(false);
-                  formik.setFieldTouched("date", true);
-                  console.log(formik.values);
+                  formik.setFieldTouched(name, true);
                 }}
                 mode="single"
                 captionLayout="dropdown"

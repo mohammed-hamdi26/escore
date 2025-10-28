@@ -18,7 +18,7 @@ function page() {
       >
         <Button
           className={
-            "bg-green-primary rounded-full min-w-[100px] cursor-pointer"
+            "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
           }
         >
           Edit

@@ -19,7 +19,9 @@ async function page() {
     <div>
       <Table showHeader={false} grid_cols="grid-cols-[0.5fr_2fr]" data={data}>
         <Button
-          className={"bg-red-800 rounded-full min-w-[100px] cursor-pointer"}
+          className={
+            "text-white   bg-red-800 rounded-full min-w-[100px] cursor-pointer"
+          }
         >
           Delete
         </Button>

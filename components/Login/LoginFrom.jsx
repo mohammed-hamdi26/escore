@@ -1,31 +1,15 @@
 "use client";
 
+import { login } from "@/app/_Lib/actions";
 import { useFormik } from "formik";
-import * as Yup from "yup";
-import InputApp from "../ui app/InputApp";
-import logoImage from "../../public/images/logo.png";
 import Image from "next/image";
-import { Button } from "../ui/button";
 import Link from "next/link";
-function LoginFrom() {
-  const validationSchema = Yup.object({
-    email: Yup.string().email("Invalid email address").required("Required"),
-    password: Yup.string().required("Required"),
-  });
-
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-    },
-    validationSchema: Yup.object({
-      email: Yup.string().email("Invalid email address").required("Required"),
-      password: Yup.string().required("Required"),
-    }),
-    onSubmit: (values) => {
-      console.log(values);
-    },
-  });
+import * as Yup from "yup";
+import logoImage from "../../public/images/logo.png";
+import InputApp from "../ui app/InputApp";
+import { Button } from "../ui/button";
+import toast from "react-hot-toast";
+function LoginFrom({ formik }) {
   return (
     <div className="flex flex-[0.5] flex-col ">
       <Image
@@ -35,11 +19,20 @@ function LoginFrom() {
         height={40}
         className="mb-12"
       />
-      <form className="flex flex-col gap-5">
-        <InputApp
+      <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
+        {/* <InputApp
           placeholder={"Your Email"}
           name="email"
           type="email"
+          error={formik.touched.email && formik.errors.email}
+          onChange={formik.handleChange}
+          className="max-w-[400px]"
+        /> */}
+        <InputApp
+          placeholder={"username"}
+          name="username"
+          type="text"
+          error={formik.touched.username && formik.errors.username}
           onChange={formik.handleChange}
           className="max-w-[400px]"
         />
@@ -47,6 +40,7 @@ function LoginFrom() {
           placeholder={"Password"}
           name="password"
           type="password"
+          error={formik.touched.password && formik.errors.password}
           onChange={formik.handleChange}
           className="max-w-[400px]"
         />
@@ -56,7 +50,11 @@ function LoginFrom() {
         >
           Forgot Password ?
         </Link>
-        <Button className="max-w-[400px] bg-green-primary cursor-pointer hover:bg-green-primary/80 rounded-[10px] p-6">
+        <Button
+          disabled={formik.isSubmitting || !formik.isValid || formik.errors}
+          type="submit"
+          className="max-w-[400px] font-bold text-lg text-white bg-green-primary cursor-pointer hover:bg-green-primary/80 rounded-[10px] p-6 disabled:bg-gray-600 disabled:cursor-not-allowed"
+        >
           Sign In
         </Button>
       </form>

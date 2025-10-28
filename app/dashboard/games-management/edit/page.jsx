@@ -34,16 +34,31 @@ async function page() {
         data={data}
         columns={[...columns]}
       >
-        <>
-          <Button
-            className={"bg-red-800 rounded-full min-w-[100px] cursor-pointer"}
-          >
-            Delete
-          </Button>
-        </>
+        <Table.Row grid_cols="grid-cols-[0.5fr_2fr]">
+          <Table.Cell>Game 1</Table.Cell>
+          <Table.Cell>
+            <div className="flex justify-end gap-4">
+              <Button
+                className={
+                  "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
+                }
+              >
+                Edit
+              </Button>
+            </div>
+          </Table.Cell>
+        </Table.Row>
       </Table>
     </div>
   );
 }
-
+//  <>
+//           <Button
+//             className={
+//               "text-white bg-red-800 rounded-full min-w-[100px] cursor-pointer"
+//             }
+//           >
+//             Delete
+//           </Button>
+//         </>
 export default page;

@@ -49,7 +49,7 @@ function AddGamesForm() {
         <Button
           type="submit"
           className={
-            " text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
+            "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
           Submit

@@ -13,8 +13,8 @@ function LinksButtons() {
           // disabled={pathname.includes("add")}
           className={`text-white  text-center min-w-[100px] mr-4 px-5 py-2 rounded-lg ${
             pathname.includes("add")
-              ? "bg-green-primary cursor-not-allowed "
-              : "bg-[#F5F6F8]  dark:bg-[#10131D] text-black dark:text-white cursor-pointer"
+              ? "bg-green-primary cursor-not-allowed hover:bg-green-primary "
+              : "bg-[#F5F6F8]  dark:bg-[#10131D] text-black dark:text-white cursor-pointer hover:bg-green-primary/50 hover:text-white"
           }  disabled:opacity-50`}
         >
           Add New
@@ -25,8 +25,8 @@ function LinksButtons() {
           // disabled={pathname.includes("edit")}
           className={` text-white text-center min-w-[100px] px-5 py-2 rounded-lg ${
             pathname.includes("edit")
-              ? "bg-green-primary disabled:cursor-not-allowed "
-              : "bg-[#F5F6F8] dark:bg-[#10131D] text-black dark:text-white cursor-pointer"
+              ? "bg-green-primary disabled:cursor-not-allowed hover:bg-green-primary "
+              : "bg-[#F5F6F8] dark:bg-[#10131D] text-black dark:text-white cursor-pointer hover:bg-green-primary/50 hover:text-white"
           }   disabled:opacity-50`}
         >
           Edit
