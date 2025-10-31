@@ -8,13 +8,14 @@ import {
 import { Label } from "@radix-ui/react-label";
 function SelectInput({
   placeholder,
-  options,
+  options = [],
   label,
   icon,
   error,
   name,
   onBlur,
   onChange,
+  value,
 }) {
   return (
     <div className="flex-1">
@@ -27,6 +28,7 @@ function SelectInput({
             onValueChange={onChange}
             onOpenChange={onBlur}
             name={name}
+            value={value}
           >
             <SelectTrigger
               className={

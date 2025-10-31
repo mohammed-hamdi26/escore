@@ -4,6 +4,7 @@ import { Calendar } from "../ui/calendar";
 
 import { Button } from "../ui/button";
 import { useState } from "react";
+import { format } from "date-fns";
 
 function DatePicker({ label, name, formik, placeholder, icon }) {
   const [open, setOpen] = useState(false);
@@ -40,7 +41,7 @@ function DatePicker({ label, name, formik, placeholder, icon }) {
                 }}
                 selected={formik.values[name]}
                 onSelect={(date) => {
-                  formik.setFieldValue(name, date);
+                  formik.setFieldValue(name, format(date, "yyyy-MM-dd"));
                   setOpen(false);
                   formik.setFieldTouched(name, true);
                 }}

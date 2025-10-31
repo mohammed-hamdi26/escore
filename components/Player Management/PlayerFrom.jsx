@@ -15,6 +15,8 @@ import { Button } from "../ui/button";
 import DatePicker from "../ui app/DatePicker";
 import FileInput from "../ui app/FileInput";
 
+import toast from "react-hot-toast";
+
 const validateSchema = Yup.object({
   firstName: Yup.string().required("Required"),
   lastName: Yup.string().required("Required"),
@@ -23,8 +25,8 @@ const validateSchema = Yup.object({
 
   photo: Yup.string().required("Required"),
   photoDark: Yup.string().required("Required"),
-  images: Yup.array().required("Required"),
-  imagesDark: Yup.array().required("Required"),
+  // images: Yup.array().required("Required"),
+  // imagesDark: Yup.array().required("Required"),
   socialLinks: Yup.string().required("Required"),
   totalEarnings: Yup.number().min(0).required("Required"),
   mainGame: Yup.string().required("Required"),
@@ -32,35 +34,67 @@ const validateSchema = Yup.object({
   games: Yup.array().required("Required"),
 });
 
-function AddPlayerFrom({ data }) {
+function PlayerFrom({
+  countries,
+  player,
+  submit,
+  formType = "add",
+  successMessage,
+}) {
   const formik = useFormik({
     initialValues: {
-      firstName: "",
-      lastName: "",
-      birthDate: "",
-      nationality: "",
+      firstName: player?.firstName || "",
+      lastName: player?.lastName || "",
+      birthDate: player?.birthDate || "",
+      nationality: player?.nationality || "",
 
-      photo: "",
-      photoDark: "",
-      images: "",
-      imagesDark: "",
-      socialLinks: "",
-      totalEarnings: 0,
-      mainGame: "",
-      teams: [],
-      games: [],
+      photo: player?.photo || "mo",
+      photoDark: player?.photoDark || "mo",
+      images: player?.images || "mo",
+      imagesDark: player?.imagesDark || "mo",
+      socialLinks: player?.socialLinks || "",
+      totalEarnings: player?.totalEarnings || 0,
+      mainGame: player?.mainGame || "",
+      teams: player?.teams || [],
+      games: player?.games || [],
     },
     validationSchema: validateSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      let dataValues = player ? { id: player.id, ...values } : values;
+      // dataValues = {
+      //   ...dataValues,
+      //   players: dataValues.players.map((player) => {
+      //     return { id: JSON.parse(player).value };
+      //   }),
+      //   news: dataValues.news.map((news) => {
+      //     return { id: JSON.parse(news).value };
+      //   }),
+      //   teams: dataValues.teams.map((team) => {
+      //     return { id: JSON.parse(team).value };
+      //   }),
+      //   tournaments: dataValues.tournaments.map((tournament) => {
+      //     return { id: JSON.parse(tournament).value };
+      //   }),
+      // };
+      try {
+        await submit(dataValues);
+        formType === "add" && formik.resetForm();
+        toast.success(successMessage);
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message);
+      }
     },
   });
-  console.log(formik.errors, formik.isSubmitting);
+
+  console.log(formik.errors);
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
         <FormRow>
           <InputApp
+            value={formik.values.firstName}
             onChange={formik.handleChange}
             label={"First Name"}
             name={"firstName"}
@@ -78,6 +112,7 @@ function AddPlayerFrom({ data }) {
             onBlur={formik.handleBlur}
           />
           <InputApp
+            value={formik.values.lastName}
             onChange={formik.handleChange}
             label={"Last Name"}
             name={"lastName"}
@@ -103,6 +138,7 @@ function AddPlayerFrom({ data }) {
         <FormRow>
           <DatePicker
             name={"birthDate"}
+            value={formik.values.birthDate}
             formik={formik}
             label={"Birth Date"}
             icon={
@@ -111,7 +147,7 @@ function AddPlayerFrom({ data }) {
             placeholder={"Select Birth Date"}
           />
           <SelectInput
-            options={data?.countries || []}
+            options={countries?.countries || []}
             name={"nationality"}
             label={"Nationality"}
             placeholder={"Select Nationality Player Belong To"}
@@ -122,11 +158,12 @@ function AddPlayerFrom({ data }) {
               />
             }
             onChange={(value) => formik.setFieldValue("nationality", value)}
+            value={formik.values.nationality}
           />
         </FormRow>
       </FormSection>
 
-      <FormSection>
+      {/* <FormSection>
         <FormRow>
           <InputApp
             type={"text"}
@@ -191,13 +228,14 @@ function AddPlayerFrom({ data }) {
             limitFiles={4}
           />
         </FormRow>
-      </FormSection>
+      </FormSection> */}
 
       <FormSection>
         <FormRow>
           <InputApp
             type={"text"}
             name={"socialLinks"}
+            value={formik.values.socialLinks}
             label={"Social Links"}
             placeholder={"Enter Social Links"}
             className="border-0 focus:outline-none "
@@ -215,6 +253,7 @@ function AddPlayerFrom({ data }) {
           <InputApp
             name={"totalEarnings"}
             type={"number"}
+            value={formik.values.totalEarnings}
             label={"Total Earnings"}
             placeholder={"Enter Total Earnings"}
             className="border-0 focus:outline-none "
@@ -234,6 +273,7 @@ function AddPlayerFrom({ data }) {
           <InputApp
             name={"mainGame"}
             type={"text"}
+            value={formik.values.mainGame}
             label={"Main Game"}
             placeholder={"Enter Main Game"}
             className="border-0 focus:outline-none "
@@ -253,17 +293,17 @@ function AddPlayerFrom({ data }) {
 
       <div className="flex justify-end">
         <Button
-          disabled={formik.isSubmitting || !formik.errors}
+          disabled={formik.isSubmitting}
           type="submit"
           className={
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          Submit
+          {formType === "add" ? "Submit" : "Edit"}
         </Button>
       </div>
     </form>
   );
 }
 
-export default AddPlayerFrom;
+export default PlayerFrom;

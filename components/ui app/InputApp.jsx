@@ -13,6 +13,7 @@ function InputApp({
   icon,
   error,
   onBlur,
+  value,
 }) {
   return (
     <div className="flex-1">
@@ -23,6 +24,7 @@ function InputApp({
         {icon && icon}
         <div className="flex-1 space-y-2">
           <Input
+            value={value}
             onBlur={onBlur}
             placeholder={placeholder}
             className={

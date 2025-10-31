@@ -6,9 +6,10 @@ import Link from "next/link";
 
 function LinksButtons() {
   const pathname = usePathname();
+
   return (
     <div className="flex mb-8">
-      <Link href={pathname.replace("edit", "add")}>
+      <Link href={pathname.slice(0, pathname.lastIndexOf("edit")) + "add"}>
         <Button
           // disabled={pathname.includes("add")}
           className={`text-white  text-center min-w-[100px] mr-4 px-5 py-2 rounded-lg ${
@@ -20,7 +21,7 @@ function LinksButtons() {
           Add New
         </Button>
       </Link>
-      <Link href={pathname.replace("add", "edit")}>
+      <Link href={pathname.slice(0, pathname.lastIndexOf("add")) + "edit"}>
         <Button
           // disabled={pathname.includes("edit")}
           className={` text-white text-center min-w-[100px] px-5 py-2 rounded-lg ${

@@ -1,7 +1,8 @@
-import AddGamesForm from "@/components/games-management/AddGamesForm";
+import { addGame } from "@/app/_Lib/actions";
+import GamesForm from "@/components/games-management/GamesForm";
 
 function page() {
-  return <AddGamesForm />;
+  return <GamesForm submitFunction={addGame} />;
 }
 
 export default page;

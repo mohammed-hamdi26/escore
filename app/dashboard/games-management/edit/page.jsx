@@ -1,53 +1,42 @@
+import { getGames } from "@/app/_Lib/gamesApi";
 import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
+import { id } from "date-fns/locale";
+import Link from "next/link";
 
-async function getData() {
-  // Fetch data from your API here.
-  return [
-    {
-      // id: "728ed52f",
-      team1: "logo",
-    },
-    {
-      // id: "728ed52f",
-      team1: "logo",
-    },
-    {
-      // id: "728ed52f",
-      team1: "logo",
-    },
-    {
-      // id: "728ed52f",
-      team1: "logo",
-    },
-    // ...
-  ];
-}
-const columns = [{ id: "game", header: "Game" }];
+const columns = [
+  { id: "game", header: "Game" },
+  { id: "description", header: "description" },
+];
 
 async function page() {
-  const data = await getData();
+  const data = await getGames();
   return (
     <div>
       <Table
-        grid_cols="grid-cols-[0.5fr_2fr]"
+        grid_cols="grid-cols-[0.5fr_0.5fr_2fr]"
         data={data}
         columns={[...columns]}
       >
-        <Table.Row grid_cols="grid-cols-[0.5fr_2fr]">
-          <Table.Cell>Game 1</Table.Cell>
-          <Table.Cell>
-            <div className="flex justify-end gap-4">
-              <Button
-                className={
-                  "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
-                }
-              >
-                Edit
-              </Button>
-            </div>
-          </Table.Cell>
-        </Table.Row>
+        {data.map((game) => (
+          <Table.Row key={game.id} grid_cols="grid-cols-[0.5fr_0.5fr_2fr]">
+            <Table.Cell> {game.name}</Table.Cell>
+            <Table.Cell> {game.description}</Table.Cell>
+            <Table.Cell>
+              <div className="flex justify-end gap-4">
+                <Link href={`/dashboard/games-management/edit/${game.id}`}>
+                  <Button
+                    className={
+                      "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
+                    }
+                  >
+                    Edit
+                  </Button>
+                </Link>
+              </div>
+            </Table.Cell>
+          </Table.Row>
+        ))}
       </Table>
     </div>
   );
