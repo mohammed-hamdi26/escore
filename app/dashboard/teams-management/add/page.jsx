@@ -1,7 +1,16 @@
-import AddTeamForm from "@/components/teams management/AddTeamForm";
+import { addTeam } from "@/app/_Lib/actions";
+import { getCountries } from "@/app/_Lib/countriesApi";
+import TeamForm from "@/components/teams management/TeamForm";
 
-function page() {
-  return <AddTeamForm />;
+async function page() {
+  const countries = await getCountries();
+  return (
+    <TeamForm
+      submit={addTeam}
+      countries={countries}
+      successMessage="Team added successfully"
+    />
+  );
 }
 
 export default page;

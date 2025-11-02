@@ -48,9 +48,32 @@ export async function addGame(gameData) {
 export async function updateGame(gameData) {
   try {
     const res = await apiClient.put(`/games/${gameData.id}`, gameData);
+    revalidatePath(`/dashboard/games-management/edit/${gameData.id}`);
     return res.data;
   } catch (e) {
     console.log(e.response);
     throw new Error("Error in updating game");
+  }
+}
+
+// Teams Actions
+export async function addTeam(teamData) {
+  try {
+    const res = await apiClient.post("/teams", teamData);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in adding team");
+  }
+}
+
+export async function updateTeam(teamData) {
+  try {
+    const res = await apiClient.put(`/teams/${teamData.id}`, teamData);
+    revalidatePath(`/dashboard/teams-management/edit/${teamData.id}`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in updating team");
   }
 }

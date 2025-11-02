@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@radix-ui/react-label";
+import { Label } from "../ui/label";
 function SelectInput({
   placeholder,
   options = [],
@@ -19,12 +19,14 @@ function SelectInput({
 }) {
   return (
     <div className="flex-1">
-      {label && <Label className={"mb-4 text-[#677185]"}>{label}</Label>}
+      {label && (
+        <Label className={" text-[#677185] dark:text-white"}>{label}</Label>
+      )}
       <div className="flex items-center gap-4 mt-4 ">
         {icon && icon}
         <div className="flex-1 space-y-2">
           <Select
-            className="text-[#677185] "
+            className="text-[#677185] p-6 "
             onValueChange={onChange}
             onOpenChange={onBlur}
             name={name}
