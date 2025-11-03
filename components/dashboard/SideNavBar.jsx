@@ -40,14 +40,16 @@ const links = [
 
 function SideNavBar() {
   return (
-    <nav
-      className={
-        "bg-dashboard-box dark:bg-linear-to-b dark:from-[#00000005] dark:to-[#24397b14]    py-16 w-[270px]  rounded-2xl min-h-[calc(100vh-200px)]  "
-      }
-    >
-      <HeaderSideNavBar />
-      <NavItems />
-    </nav>
+    <div className="  w-[270px] ">
+      <nav
+        className={
+          " bg-dashboard-box dark:bg-linear-to-b dark:from-[#00000005] dark:to-[#24397b14] flex flex-col justify-center   py-16 w-[270px]  rounded-2xl min-h-[calc(100vh-155px)]  "
+        }
+      >
+        <HeaderSideNavBar />
+        <NavItems />
+      </nav>
+    </div>
   );
 }
 

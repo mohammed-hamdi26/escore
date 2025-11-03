@@ -9,7 +9,7 @@ import { Button } from "../ui/button";
 function ToggleThemeMode() {
   const { setTheme, theme } = useTheme();
   const [mode, setMode] = useState(null);
-
+  console.log(localStorage.getItem("theme"));
   const classNameToggleItem =
     "  dark:text-white   flex justify-center items-center size-10 rounded-full cursor-pointer    ";
 

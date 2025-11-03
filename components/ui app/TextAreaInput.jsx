@@ -10,6 +10,7 @@ function TextAreaInput({
   onBlur,
   onChange,
   value,
+  name,
 }) {
   return (
     <div className="flex flex-col flex-1 gap-4">
@@ -20,6 +21,7 @@ function TextAreaInput({
         )}
       </div>
       <Textarea
+        name={name}
         value={value}
         onBlur={onBlur}
         onChange={onChange}
