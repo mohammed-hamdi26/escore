@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import BackPage from "../ui app/BackPage";
 import ToggleThemeMode from "../ui app/ToggleThemeMode";
 import EscoreLogo from "./EscoreLogo";

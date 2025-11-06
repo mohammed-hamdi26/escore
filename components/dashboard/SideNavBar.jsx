@@ -1,19 +1,10 @@
+"use client";
+import { useTranslations } from "next-intl";
 import { Sidebar, SidebarHeader, SidebarProvider } from "../ui/sidebar";
 
 import HeaderSideNavBar from "./HeaderSideNavBar";
 import NavItems from "./NavItems";
-const links = [
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: "",
-  },
-  {
-    title: "Logout",
-    href: "/logout",
-    icon: "",
-  },
-];
+
 // function SideNavBar() {
 //   return (
 //     <SidebarProvider>
@@ -39,6 +30,7 @@ const links = [
 // }
 
 function SideNavBar() {
+  const t = useTranslations("nav");
   return (
     <div className="  w-[270px] ">
       <nav
@@ -46,8 +38,8 @@ function SideNavBar() {
           " bg-dashboard-box dark:bg-linear-to-b dark:from-[#00000005] dark:to-[#24397b14] flex flex-col justify-center   py-16 w-[270px]  rounded-2xl min-h-[calc(100vh-155px)]  "
         }
       >
-        <HeaderSideNavBar />
-        <NavItems />
+        <HeaderSideNavBar t={t} />
+        <NavItems t={t} />
       </nav>
     </div>
   );

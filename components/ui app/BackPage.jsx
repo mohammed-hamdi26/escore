@@ -1,12 +1,14 @@
 "use client";
 import { ArrowBigLeft, ArrowLeft } from "lucide-react";
 import { Button } from "../ui/button";
-import { usePathname, useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 function BackPage() {
   const router = useRouter();
   const pathname = usePathname();
+
   function GetTitlePage(pathname) {
     const arr = pathname.split("/");
 

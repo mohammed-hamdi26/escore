@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "Settings": "Settings",
+    "admin": "Admin"
+  },
+  "Dashboard": {
+    "Matches Management": {
+      "title": "Matches Management",
+      "description": "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links"
+    },
+
+    "Players": {
+      "title": "Players",
+      "description": "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos"
+    },
+    "Teams Management": {
+      "title": "Teams Management",
+      "description": "Add Team: Name, Country, Linked Players, Logo/Images"
+    },
+
+    "Games Management": {
+      "title": "Games Management",
+      "description": "go to Games Section to Add Game: Name + Icon"
+    },
+
+    "News & Updates": {
+      "title": "News & Updates",
+      "description": "Go to news Section to Add News: Title, Description, Image/Video, Author"
+    },
+
+    "Users": {
+      "title": "Users",
+      "description": "Go to user Section to view Users , Edit email and password , see favorite teams for each user"
+    },
+    "Support Center": {
+      "title": "Support Center",
+      "description": "Go to Support Center to view user messages and reply to them"
+    }
+  }
+}

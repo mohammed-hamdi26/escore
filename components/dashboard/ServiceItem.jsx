@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+
 function ServiceItem({ title, icon, href, description }) {
   return (
     <Link

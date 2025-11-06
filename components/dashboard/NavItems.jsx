@@ -10,7 +10,7 @@ const pages = [
     href: "/dashboard/settings",
   },
 ];
-function NavItems() {
+function NavItems({ t }) {
   const pathname = usePathname();
   return (
     <ul className="w-[140px] mx-auto">
@@ -19,7 +19,7 @@ function NavItems() {
           isActive={pathname === page.href}
           key={page.title}
           icon={page.icon}
-          label={page.title}
+          label={t(page.title)}
           href={page.href}
         />
       ))}

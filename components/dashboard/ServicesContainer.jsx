@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import GamesManagement from "../icons/GamesManagement";
 import MatchesManagement from "../icons/MatchesManagement";
 import News from "../icons/News";
@@ -51,21 +52,22 @@ const links = [
   {
     title: "Support Center",
     href: "/support-center/add",
-    description:
-      "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos",
+    description: "Go to Support Center to view user messages and reply to them",
     icon: <SupportCenter />,
   },
 ];
-function ServicesContainer() {
+async function ServicesContainer() {
+  const t = await getTranslations("Dashboard");
+
   return (
     <div className="grid grid-rows-2 grid-cols-4 gap-5 h-full ">
       {links.map((link) => (
         <ServiceItem
           key={link.title}
-          title={link.title}
+          title={t(`${link.title}.title`)}
           icon={link.icon}
           href={`/dashboard${link.href}`}
-          description={link.description}
+          description={t(`${link.title}.description`)}
         />
       ))}
     </div>
