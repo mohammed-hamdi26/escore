@@ -1,8 +1,4 @@
 {
-  "nav": {
-    "Settings": "Settings",
-    "admin": "Admin"
-  },
   "Dashboard": {
     "Matches Management": {
       "title": "Matches Management",
@@ -36,5 +32,118 @@
       "title": "Support Center",
       "description": "Go to Support Center to view user messages and reply to them"
     }
+  },
+  "nav": {
+    "Settings": "Settings",
+    "admin": "Admin"
+  },
+  "topNav": {
+    "player management": "Player Management",
+    "teams management": "Teams Management"
+  },
+  "buttonLinks": {
+    "add new": "Add New",
+    "edit": "Edit"
+  },
+  "playerForm": {
+    "First Name": "First Name",
+    "Enter Player First Name": "Enter Player First Name",
+    "Last Name": "Last Name",
+    "Enter Player Last Name": "Enter Player Last Name",
+    "Birth Date": "Birth Date",
+    "Select Birth Date": "Select Birth Date",
+    "Nationality": "Nationality",
+    "Select Nationality Player Belong To": "Select Nationality Player Belong To",
+    "Social Links": "Social Links",
+    "Enter Social Links": "Enter Social Links",
+    "Main Game": "Main Game",
+    "Enter Main Game": "Enter Main Game",
+    "Total Earnings": "Total Earnings",
+    "Enter Total Earnings": "Enter Total Earnings",
+    "Submit": "Submit",
+    "Edit": "Edit"
+  },
+  "TeamForm": {
+    "Name": "Name",
+    "Enter Team Name": "Enter Team Name",
+    "Country": "Country",
+    "Select Country": "Select Country",
+    "Region": "Region",
+    "Enter Region Name": "Enter Region Name",
+    "Players": "Players",
+    "Select Players": "Select Players",
+    "logo": "Logo",
+    "Upload Team Logo": "Upload Team Logo",
+    "logo (Dark)": "Logo (Dark)",
+    "Upload Dark Team Logo": "Upload Dark Team Logo",
+    "Founded Date": "Founded Date",
+    "Select Founded Date": "Select Founded Date",
+    "Description": "Description",
+    "Enter Team Description": "Enter Team Description",
+    "Submit": "Submit"
+  },
+  "TeamsTable": {
+    "Game Name": "Name",
+    "Country": "Country",
+    "Founded": "Founded",
+    "Description": "Description"
+  },
+  "GameForm": {
+    "Game Name": "Name",
+    "Enter Game Name": "Enter Game Name",
+    "Description": "Description",
+    "Enter Description": "Enter Description",
+    "Icon": "Icon",
+    "Upload Game Icon": "Upload Game Icon",
+    "Icon (Dark)": "Icon (Dark)",
+    "Upload Dark Game Icon": "Upload Dark Game Icon",
+    "Submit": "Submit",
+    "Edit": "Edit",
+    "Players": "Players",
+    "Teams": "Teams",
+    "Tournaments": "Tournaments"
+  },
+  "GamesTable": {
+    "Game": "Game",
+    "Name": "Name",
+    "Description": "Description"
+  },
+  "NewsForm": {
+    "Title": "Title",
+    "Enter Title": "Enter Title",
+    "Content": "Content",
+    "Enter Content": "Enter Content",
+    "Summary": "Summary",
+    "Enter Summary": "Enter Summary",
+    "Image": "Image",
+    "Enter Image URL": "Enter Image URL",
+    "Image Dark": "Image Dark",
+    "Enter Dark Mode Image URL": "Enter Dark Mode Image URL",
+    "Video URL": "Video URL",
+    "Enter Video URL": "Enter Video URL",
+    "Publish Date": "Publish Date",
+    "Select Publish Date": "Select Publish Date",
+    "Author Name": "Author Name",
+    "Enter Author Name": "Enter Author Name",
+    "Author Picture": "Author Picture",
+    "Enter Author Picture URL": "Enter Author Picture URL",
+    "Author Profile": "Author Profile",
+    "Enter Author Profile URL": "Enter Author Profile URL",
+    "External URL": "External URL",
+    "Enter External URL": "Enter External URL",
+    "Status": "Status",
+    "Select Status": "Select Status",
+    "News Type": "News Type",
+    "Select News Type": "Select News Type",
+    "Submitting...": "Submitting...",
+    "Submit": "Submit",
+    "Edit": "Edit",
+    "Draft": "Draft",
+    "Published": "Published",
+    "Archived": "Archived",
+    "General News": "General News",
+    "Regular News": "Regular News",
+    "Feature": "Feature",
+    "Analysis": "Analysis"
   }
 }

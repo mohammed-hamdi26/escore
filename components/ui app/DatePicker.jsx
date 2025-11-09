@@ -42,6 +42,7 @@ function DatePicker({ label, name, formik, placeholder, icon }) {
                 selected={formik.values[name]}
                 onSelect={(date) => {
                   formik.setFieldValue(name, format(date, "yyyy-MM-dd"));
+                  // formik.setFieldValue(name, date);
                   setOpen(false);
                   formik.setFieldTouched(name, true);
                 }}

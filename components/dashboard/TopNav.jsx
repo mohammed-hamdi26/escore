@@ -2,6 +2,7 @@ import { Link } from "@/i18n/navigation";
 import BackPage from "../ui app/BackPage";
 import ToggleThemeMode from "../ui app/ToggleThemeMode";
 import EscoreLogo from "./EscoreLogo";
+import LocaleChange from "../ui app/LocaleChange";
 
 function TopNav() {
   return (
@@ -11,7 +12,10 @@ function TopNav() {
       </Link>
       <div className="flex items-center  justify-between flex-1 ">
         <BackPage />
-        <ToggleThemeMode />
+        <div className={`flex in-ltr:ml-auto rtl:mr-auto items-center gap-6`}>
+          <ToggleThemeMode />
+          <LocaleChange />
+        </div>
       </div>
     </div>
   );

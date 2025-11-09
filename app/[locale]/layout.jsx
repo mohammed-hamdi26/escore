@@ -30,7 +30,7 @@ export default async function RootLayout({ children, params }) {
     notFound();
   }
   return (
-    <html dir={locale === "ar" ? "rtl" : "ltr"}>
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased  dark:bg-background transition-colors duration-300 text-white`}
       >

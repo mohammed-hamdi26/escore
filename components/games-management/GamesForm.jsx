@@ -13,6 +13,7 @@ import UserCardIcon from "../icons/UserCardIcon";
 
 import toast from "react-hot-toast";
 import ListInput from "../ui app/ListInput";
+import { useTranslations } from "next-intl";
 const validationSchema = yup.object({
   name: yup.string().required("Name is required"),
   icon: yup.string().required("Icon is required"),
@@ -30,6 +31,8 @@ function GamesForm({
   errorMessage,
   typeForm = "add",
 }) {
+  const t = useTranslations("GameForm");
+
   const formik = useFormik({
     initialValues: {
       name: data?.name || "",
@@ -77,10 +80,10 @@ function GamesForm({
           <InputApp
             value={formik.values.name}
             onChange={formik.handleChange}
-            label={"Game Name"}
+            label={t("Game Name")}
             name={"name"}
             type={"text"}
-            placeholder={"Enter Game Name"}
+            placeholder={t("Enter Game Name")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -98,10 +101,10 @@ function GamesForm({
           <InputApp
             value={formik.values.description}
             onChange={formik.handleChange}
-            label={"Description"}
+            label={t("Description")}
             name={"description"}
             type={"text"}
-            placeholder={"Enter Description"}
+            placeholder={t("Enter Description")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -123,10 +126,10 @@ function GamesForm({
           <InputApp
             value={formik.values.icon}
             onChange={formik.handleChange}
-            label={"Icon"}
+            label={t("Icon")}
             name={"icon"}
             type={"text"}
-            placeholder={"upload icon"}
+            placeholder={t("Upload Game Icon")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -144,10 +147,10 @@ function GamesForm({
           <InputApp
             value={formik.values.iconDark}
             onChange={formik.handleChange}
-            label={"Icon (dark)"}
+            label={t("Icon (Dark)")}
             name={"iconDark"}
             type={"text"}
-            placeholder={"upload icon (dark)"}
+            placeholder={t("Upload Dark Game Icon")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -167,34 +170,34 @@ function GamesForm({
       <FormSection>
         <FormRow>
           <ListInput
-            label={"Players"}
+            label={t("Players")}
             name={"players"}
             options={[
               { value: 1, name: "Player 1" },
               { value: 2, name: "Player 2" },
             ]}
             formik={formik}
-            placeholder={"Players"}
+            placeholder={t("Players")}
           />
           <ListInput
-            label={"Teams"}
+            label={t("Teams")}
             name={"teams"}
             options={[
               { value: 1, name: "Team 1" },
               { value: 2, name: "Team 2" },
             ]}
             formik={formik}
-            placeholder={"Teams"}
+            placeholder={t("Teams")}
           />
           <ListInput
-            label={"Tournaments"}
+            label={t("Tournaments")}
             name={"tournaments"}
             options={[
               { value: 1, name: "Tournament 1" },
               { value: 2, name: "Tournament 2" },
             ]}
             formik={formik}
-            placeholder={"Tournaments"}
+            placeholder={t("Tournaments")}
           />
         </FormRow>
       </FormSection>
@@ -206,7 +209,7 @@ function GamesForm({
           }
           disabled={!formik.isValid || formik.isSubmitting}
         >
-          {typeForm === "add" ? "Add" : "Edit"}
+          {typeForm === "add" ? t("Submit") : t("Edit")}
         </Button>
       </div>
     </form>

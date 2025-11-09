@@ -1,7 +1,8 @@
-import { getTeams } from "@/app/_Lib/teamsApi";
+import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { getTranslations } from "next-intl/server";
 
 const columns = [
   { id: "name", header: "Name" },
@@ -10,12 +11,15 @@ const columns = [
 ];
 
 async function page() {
-  const teams = await getTeams();
+  const t = await getTranslations("TeamsTable");
+  // const teams = await getTeams();
+  const teams = [];
   return (
     <div>
       <Table
         grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
         columns={[...columns]}
+        t={t}
       >
         {teams.map((team) => (
           <Table.Row

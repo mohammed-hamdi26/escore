@@ -4,10 +4,12 @@ import { Button } from "../ui/button";
 // import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 function BackPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations("topNav");
 
   function GetTitlePage(pathname) {
     const arr = pathname.split("/");
@@ -22,13 +24,13 @@ function BackPage() {
         onClick={() => router.push("/dashboard")}
         className="bg-green-primary/10 dark:bg-[linear-gradient(180deg,rgba(58,70,157,0.1)_0%,rgba(40,149,70,0.1)_100%)] cursor-pointer size-9 rounded-full flex justify-center items-center backdrop-blur-2xl "
       >
-        <ArrowLeft className="text-green-primary dark:text-white" />
+        <ArrowLeft className="text-green-primary dark:text-white rtl:rotate-180" />
       </Button>
       {/* </Link> */}
 
-      <p className="capitalize text-lg font-normal text-green-primary dark:text-white">
-        {GetTitlePage(pathname)}
-      </p>
+      {/* <p className="capitalize text-lg font-normal text-green-primary dark:text-white">
+        {t(GetTitlePage(pathname))}
+      </p> */}
     </div>
   );
 }

@@ -77,3 +77,25 @@ export async function updateTeam(teamData) {
     throw new Error("Error in updating team");
   }
 }
+
+// News Actions
+export async function addNews(newsData) {
+  try {
+    const res = await apiClient.post("/news", newsData);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in adding news");
+  }
+}
+
+export async function editNews(newsData) {
+  try {
+    const res = await apiClient.put(`/news/${newsData.id}`, newsData);
+    revalidatePath(`/dashboard/news/edit/${newsData.id}`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in updating news");
+  }
+}

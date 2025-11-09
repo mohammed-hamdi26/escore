@@ -16,6 +16,7 @@ import DatePicker from "../ui app/DatePicker";
 import FileInput from "../ui app/FileInput";
 
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 const validateSchema = Yup.object({
   firstName: Yup.string().required("Required"),
@@ -27,12 +28,14 @@ const validateSchema = Yup.object({
   photoDark: Yup.string().required("Required"),
   // images: Yup.array().required("Required"),
   // imagesDark: Yup.array().required("Required"),
-  socialLinks: Yup.string().required("Required"),
+  // socialLinks: Yup.string().required("Required"),
   totalEarnings: Yup.number().min(0).required("Required"),
   mainGame: Yup.string().required("Required"),
   teams: Yup.array().required("Required"),
   games: Yup.array().required("Required"),
 });
+
+const initialValues = {};
 
 function PlayerFrom({
   countries,
@@ -41,22 +44,35 @@ function PlayerFrom({
   formType = "add",
   successMessage,
 }) {
+  const t = useTranslations("playerForm");
+
   const formik = useFormik({
     initialValues: {
-      firstName: player?.firstName || "",
-      lastName: player?.lastName || "",
-      birthDate: player?.birthDate || "",
-      nationality: player?.nationality || "",
+      firstName: player?.firstName || "a",
+      lastName: player?.lastName || "name",
+      birthDate: player?.birthDate || "2000-01-01",
+      nationality: player?.nationality || "country",
 
       photo: player?.photo || "mo",
       photoDark: player?.photoDark || "mo",
       images: player?.images || "mo",
       imagesDark: player?.imagesDark || "mo",
-      socialLinks: player?.socialLinks || "",
+      socialLink: player?.socialLinks || "link",
       totalEarnings: player?.totalEarnings || 0,
-      mainGame: player?.mainGame || "",
+      mainGame: player?.mainGame || "game",
+      numberOfAchievements: 0,
+      marketValue: 152,
+      worldRanking: 100,
+      numberOfFollowers: 200,
+      subscribed: true,
+      country: null,
       teams: player?.teams || [],
       games: player?.games || [],
+      tournaments: player?.tournaments || [],
+      news: player?.news || [],
+      lineups: player?.lineups || [],
+      favoriteCharacters: player?.favoriteCharacters || [],
+      socialLinks: player?.socialLinks || [],
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
@@ -76,6 +92,7 @@ function PlayerFrom({
       //     return { id: JSON.parse(tournament).value };
       //   }),
       // };
+      console.log(dataValues);
       try {
         await submit(dataValues);
         formType === "add" && formik.resetForm();
@@ -96,10 +113,10 @@ function PlayerFrom({
           <InputApp
             value={formik.values.firstName}
             onChange={formik.handleChange}
-            label={"First Name"}
+            label={t("First Name")}
             name={"firstName"}
             type={"text"}
-            placeholder={"Enter Player First Name"}
+            placeholder={t("Enter Player First Name")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -114,10 +131,10 @@ function PlayerFrom({
           <InputApp
             value={formik.values.lastName}
             onChange={formik.handleChange}
-            label={"Last Name"}
+            label={t("Last Name")}
             name={"lastName"}
             type={"text"}
-            placeholder={"Enter Player Last Name"}
+            placeholder={t("Enter Player Last Name")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -140,17 +157,17 @@ function PlayerFrom({
             name={"birthDate"}
             value={formik.values.birthDate}
             formik={formik}
-            label={"Birth Date"}
+            label={t("Birth Date")}
             icon={
               <AgeIcon className="fill-[#677185]" color={"text-[#677185]"} />
             }
-            placeholder={"Select Birth Date"}
+            placeholder={t("Select Birth Date")}
           />
           <SelectInput
             options={countries?.countries || []}
             name={"nationality"}
-            label={"Nationality"}
-            placeholder={"Select Nationality Player Belong To"}
+            label={t("Nationality")}
+            placeholder={t("Select Nationality Player Belong To")}
             icon={
               <CountryIcon
                 color={"text-[#677185]"}
@@ -234,17 +251,17 @@ function PlayerFrom({
         <FormRow>
           <InputApp
             type={"text"}
-            name={"socialLinks"}
-            value={formik.values.socialLinks}
-            label={"Social Links"}
-            placeholder={"Enter Social Links"}
+            name={"socialLink"}
+            value={formik.values.socialLink}
+            label={t("Social Links")}
+            placeholder={t("Enter Social Links")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<UserCardIcon color={"text-[#677185]"} />}
             error={
-              formik?.errors?.socialLinks && formik?.touched?.socialLinks
-                ? formik.errors.socialLinks
+              formik?.errors?.socialLink && formik?.touched?.socialLink
+                ? formik.errors.socialLink
                 : ""
             }
             onBlur={formik.handleBlur}
@@ -254,8 +271,8 @@ function PlayerFrom({
             name={"totalEarnings"}
             type={"number"}
             value={formik.values.totalEarnings}
-            label={"Total Earnings"}
-            placeholder={"Enter Total Earnings"}
+            label={t("Total Earnings")}
+            placeholder={t("Enter Total Earnings")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -274,8 +291,8 @@ function PlayerFrom({
             name={"mainGame"}
             type={"text"}
             value={formik.values.mainGame}
-            label={"Main Game"}
-            placeholder={"Enter Main Game"}
+            label={t("Main Game")}
+            placeholder={t("Enter Main Game")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -299,7 +316,7 @@ function PlayerFrom({
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          {formType === "add" ? "Submit" : "Edit"}
+          {formType === "add" ? t("Submit") : "Edit"}
         </Button>
       </div>
     </form>

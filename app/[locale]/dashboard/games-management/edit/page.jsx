@@ -1,24 +1,28 @@
-import { getGames } from "@/app/_Lib/gamesApi";
+import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
 import { id } from "date-fns/locale";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 const columns = [
   { id: "game", header: "Game" },
-  { id: "description", header: "description" },
+  { id: "description", header: "Description" },
 ];
 
 async function page() {
-  const data = await getGames();
+  // const data = await getGames();
+  const t = await getTranslations("GamesTable");
+  const games = [];
   return (
     <div>
       <Table
+        t={t}
         grid_cols="grid-cols-[0.5fr_0.5fr_2fr]"
-        data={data}
+        data={games}
         columns={[...columns]}
       >
-        {data.map((game) => (
+        {games.map((game) => (
           <Table.Row key={game.id} grid_cols="grid-cols-[0.5fr_0.5fr_2fr]">
             <Table.Cell> {game.name}</Table.Cell>
             <Table.Cell> {game.description}</Table.Cell>

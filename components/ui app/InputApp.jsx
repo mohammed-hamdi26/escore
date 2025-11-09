@@ -14,9 +14,10 @@ function InputApp({
   error,
   onBlur,
   value,
+  flexGrow = "flex-1",
 }) {
   return (
-    <div className="flex-1">
+    <div className={flexGrow}>
       {label && (
         <Label className={"mb-4 text-[#677185] dark:text-white"}>{label}</Label>
       )}

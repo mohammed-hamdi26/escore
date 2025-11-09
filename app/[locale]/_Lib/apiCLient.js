@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "https://423d4c25bb99.ngrok-free.app/api",
+  baseURL: "https://22dcd90dba0c.ngrok-free.app/api",
   headers: {
     "Content-Type": "application/json",
     Authorization:
-      "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc2NDI2MDM2NSwiYXV0aCI6IlJPTEVfQURNSU4gUk9MRV9VU0VSIiwiaWF0IjoxNzYxNjY4MzY1LCJ1c2VySWQiOjF9.yyeM4NDT-SCaekKfQ3kVLa7ft9hgXrA5WWXV8gUTWalEaLxTa9U5uETmaxZsMKrLiexk6Ln6qQH25vbsG3vWDw",
+      "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc2NTIzMzMxMSwiYXV0aCI6IlJPTEVfQURNSU4gUk9MRV9VU0VSIiwiaWF0IjoxNzYyNjQxMzExLCJ1c2VySWQiOjF9.rGHxRTMtYmKfbTS2oBD04qyF4A0ZzUwouacKAaz3gHrOU8f1x3aThO1vdIk2NoHigBO_GszoI2eJ9BF7ZbrN0A",
   },
 });
 export default apiClient;

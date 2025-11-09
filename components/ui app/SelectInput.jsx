@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "../ui/label";
 function SelectInput({
+  t,
   placeholder,
   options = [],
   label,
@@ -26,7 +27,7 @@ function SelectInput({
         {icon && icon}
         <div className="flex-1 space-y-2">
           <Select
-            className="text-[#677185] p-6 "
+            className=" text-[#677185] p-6 "
             onValueChange={onChange}
             onOpenChange={onBlur}
             name={name}
@@ -45,7 +46,7 @@ function SelectInput({
             <SelectContent>
               {options.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                  {t ? t(option.label) : option.label}
                 </SelectItem>
               ))}
             </SelectContent>

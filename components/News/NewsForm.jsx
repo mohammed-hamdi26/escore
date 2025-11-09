@@ -16,6 +16,8 @@ import { Link, Newspaper, Play } from "lucide-react";
 import User from "../icons/User";
 import TeamsManagement from "../icons/TeamsManagement";
 import { Button } from "../ui/button";
+import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 const validationSchema = yup.object({
   title: yup.string().required("Required"),
@@ -31,45 +33,61 @@ const validationSchema = yup.object({
   externalUrl: yup.string(),
   status: yup.string(),
   newsType: yup.string(),
-  players: yup.string(),
-  transfers: yup.string(),
+  // players: yup.string(),
+  // transfers: yup.string(),
 });
-function AddNewsForm({ formType }) {
-  const initialValues = {
-    title: "",
-    content: "",
-    summary: "",
-    image: "",
-    imageDark: "",
-    videoUrl: "",
-    publishDate: "",
-    authorName: "",
-    authorPicture: "",
-    authorProfile: "",
-    externalUrl: "",
-    status: "",
-    newsType: "",
-    players: "",
-    transfers: "",
-  };
+
+const initialValues = {
+  title: "",
+  content: "",
+  summary: "",
+  image: "",
+  imageDark: "",
+  videoUrl: "",
+  publishDate: "",
+  authorName: "",
+  authorPicture: "",
+  authorProfile: "",
+  externalUrl: "",
+  status: "",
+  newsType: "",
+  players: [],
+  transfers: [],
+  notify: true,
+};
+
+function NewsForm({ formType = "add", submit, newData }) {
+  const t = useTranslations("NewsForm");
+
   const formik = useFormik({
     initialValues,
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      const dataValues = newData ? { id: newData.id, ...values } : values;
+
+      try {
+        await submit(dataValues);
+        toast.success(
+          formType === "add"
+            ? "News added successfully"
+            : "News updated successfully"
+        );
+      } catch (error) {
+        toast.error(error.message || "An error occurred");
+      }
     },
   });
   const statusOptions = [
-    { value: "draft", label: "Draft" },
-    { value: "published", label: "Published" },
-    { value: "archived", label: "Archived" },
+    { value: "DRAFT", label: "Draft" },
+    { value: "PUBLISHED", label: "Published" },
+    { value: "ARCHIVED", label: "Archived" },
   ];
 
   const newsTypeOptions = [
-    { value: "breaking", label: "Breaking News" },
-    { value: "regular", label: "Regular News" },
-    { value: "feature", label: "Feature" },
-    { value: "analysis", label: "Analysis" },
+    { value: "GENERAL", label: "General News" },
+    { value: "REGULAR", label: "Regular News" },
+    { value: "FEATURE", label: "Feature" },
+    { value: "ANALYSIS", label: "Analysis" },
   ];
 
   return (
@@ -79,9 +97,9 @@ function AddNewsForm({ formType }) {
           <InputApp
             name={"title"}
             onChange={formik.handleChange}
-            label={"Title"}
+            label={t("Title")}
             type={"text"}
-            placeholder={"Enter Title"}
+            placeholder={t("Enter Title")}
             value={formik.values.title}
             className="border-0 focus:outline-none"
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -97,8 +115,8 @@ function AddNewsForm({ formType }) {
             name="content"
             onChange={formik.handleChange}
             value={formik.values.content}
-            label={"Content"}
-            placeholder={"Enter Content"}
+            label={t("Content")}
+            placeholder={t("Enter Content")}
             className="border-0 focus:outline-none"
             icon={
               <Description
@@ -113,8 +131,8 @@ function AddNewsForm({ formType }) {
             name="summary"
             onChange={formik.handleChange}
             value={formik.values.summary}
-            label={"Summary"}
-            placeholder={"Enter Summary"}
+            label={t("Summary")}
+            placeholder={t("Enter Summary")}
             className="border-0 focus:outline-none"
             icon={
               <Description
@@ -134,9 +152,9 @@ function AddNewsForm({ formType }) {
           <InputApp
             name={"image"}
             onChange={formik.handleChange}
-            label={"Image"}
-            type={"url"}
-            placeholder={"Enter Image URL"}
+            label={t("Image")}
+            type={"text"}
+            placeholder={t("Enter Image URL")}
             value={formik.values.image}
             className="border-0 focus:outline-none"
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -148,9 +166,9 @@ function AddNewsForm({ formType }) {
           <InputApp
             name={"imageDark"}
             onChange={formik.handleChange}
-            label={"Image Dark"}
-            type={"url"}
-            placeholder={"Enter Dark Mode Image URL"}
+            label={t("Image Dark")}
+            type={"text"}
+            placeholder={t("Enter Dark Mode Image URL")}
             value={formik.values.imageDark}
             className="border-0 focus:outline-none"
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -164,9 +182,9 @@ function AddNewsForm({ formType }) {
           <InputApp
             name={"videoUrl"}
             onChange={formik.handleChange}
-            label={"Video URL"}
-            type={"url"}
-            placeholder={"Enter Video URL"}
+            label={t("Video URL")}
+            type={"text"}
+            placeholder={t("Enter Video URL")}
             value={formik.values.videoUrl}
             className="border-0 focus:outline-none"
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -183,9 +201,9 @@ function AddNewsForm({ formType }) {
         <FormRow>
           <DatePicker
             formik={formik}
-            name={"publishDate"}
-            label={"Publish Date"}
-            placeholder={"Select Publish Date"}
+            name={t("publishDate")}
+            label={t("Publish Date")}
+            placeholder={t("Select Publish Date")}
             icon={
               <Date className={"fill-[#677185]"} color={"text-[#677185]"} />
             }
@@ -199,9 +217,9 @@ function AddNewsForm({ formType }) {
           <InputApp
             name={"authorName"}
             onChange={formik.handleChange}
-            label={"Author Name"}
+            label={t("Author Name")}
             type={"text"}
-            placeholder={"Enter Author Name"}
+            placeholder={t("Enter Author Name")}
             value={formik.values.authorName}
             className="border-0 focus:outline-none"
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -220,9 +238,9 @@ function AddNewsForm({ formType }) {
           <InputApp
             name={"authorPicture"}
             onChange={formik.handleChange}
-            label={"Author Picture"}
-            type={"url"}
-            placeholder={"Enter Author Picture URL"}
+            label={t("Author Picture")}
+            type={"text"}
+            placeholder={t("Enter Author Picture URL")}
             value={formik.values.authorPicture}
             className="border-0 focus:outline-none"
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -236,9 +254,9 @@ function AddNewsForm({ formType }) {
           <InputApp
             name={"authorProfile"}
             onChange={formik.handleChange}
-            label={"Author Profile"}
-            type={"url"}
-            placeholder={"Enter Author Profile URL"}
+            label={t("Author Profile")}
+            type={"text"}
+            placeholder={t("Enter Author Profile URL")}
             value={formik.values.authorProfile}
             className="border-0 focus:outline-none"
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -256,9 +274,9 @@ function AddNewsForm({ formType }) {
           <InputApp
             name={"externalUrl"}
             onChange={formik.handleChange}
-            label={"External URL"}
-            type={"url"}
-            placeholder={"Enter External URL"}
+            label={t("External URL")}
+            type={"text"}
+            placeholder={t("Enter External URL")}
             value={formik.values.externalUrl}
             className="border-0 focus:outline-none"
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -274,21 +292,23 @@ function AddNewsForm({ formType }) {
       <FormSection>
         <FormRow>
           <SelectInput
+            t={t}
             name={"status"}
             onChange={(value) => formik.setFieldValue("status", value)}
             value={formik.values.status}
-            label={"Status"}
-            placeholder={"Select Status"}
+            label={t("Status")}
+            placeholder={t("Select Status")}
             options={statusOptions}
             error={formik.touched.status && formik.errors.status}
             onBlur={() => formik.setFieldTouched("status", true)}
           />
           <SelectInput
+            t={t}
             name={"newsType"}
             onChange={(value) => formik.setFieldValue("newsType", value)}
             value={formik.values.newsType}
-            label={"News Type"}
-            placeholder={"Select News Type"}
+            label={t("News Type")}
+            placeholder={t("Select News Type")}
             options={newsTypeOptions}
             error={formik.touched.newsType && formik.errors.newsType}
             onBlur={() => formik.setFieldTouched("newsType", true)}
@@ -300,7 +320,7 @@ function AddNewsForm({ formType }) {
       </FormSection>
 
       {/* Related Content */}
-      <FormSection>
+      {/* <FormSection>
         <FormRow>
           <TextAreaInput
             name="players"
@@ -337,7 +357,7 @@ function AddNewsForm({ formType }) {
             onBlur={formik.handleBlur}
           />
         </FormRow>
-      </FormSection>
+      </FormSection> */}
 
       <div className="flex justify-end">
         <Button
@@ -348,14 +368,14 @@ function AddNewsForm({ formType }) {
           }
         >
           {formik.isSubmitting
-            ? "Submitting..."
+            ? t("Submitting...")
             : formType === "add"
-            ? "Submit"
-            : "Edit"}
+            ? t("Submit")
+            : t("Edit")}
         </Button>
       </div>
     </form>
   );
 }
 
-export default AddNewsForm;
+export default NewsForm;

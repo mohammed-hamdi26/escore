@@ -1,4 +1,4 @@
-function Table({ columns, children, grid_cols, showHeader = true }) {
+function Table({ t, columns, children, grid_cols, showHeader = true }) {
   return (
     <>
       <table className="w-full">
@@ -12,7 +12,7 @@ function Table({ columns, children, grid_cols, showHeader = true }) {
                   className="py-4 text-sm text-start text-[#677185] dark:text-white"
                   key={column.id}
                 >
-                  {column.header}
+                  {t ? t(column.header) : column.header}
                 </TableHeaderRow>
               ))}
             </TableRow>

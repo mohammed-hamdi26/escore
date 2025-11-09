@@ -14,7 +14,7 @@ function ToggleThemeMode() {
     "  dark:text-white   flex justify-center items-center size-10 rounded-full cursor-pointer    ";
 
   return (
-    <div className="flex ml-auto items-center gap-4">
+    <div className="flex  rtl:mr-auto items-center gap-4">
       <Button
         onClick={() => setTheme("light")}
         className={

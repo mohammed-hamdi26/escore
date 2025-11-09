@@ -16,6 +16,7 @@ import SelectInput from "../ui app/SelectInput";
 import TextAreaInput from "../ui app/TextAreaInput";
 import { Button } from "../ui/button";
 import CountryIcon from "../icons/CountryIcon";
+import { useTranslations } from "use-intl";
 
 const validationSchema = yup.object({
   name: yup.string().required("Required"),
@@ -34,6 +35,7 @@ function TeamFrom({
   countries,
   formType = "add",
 }) {
+  const t = useTranslations("TeamForm");
   const formik = useFormik({
     initialValues: {
       name: team?.name || "",
@@ -66,10 +68,10 @@ function TeamFrom({
           <InputApp
             value={formik?.values?.name}
             onChange={formik.handleChange}
-            label={"Name"}
+            label={t("Name")}
             name={"name"}
             type={"text"}
-            placeholder={"Enter Team Name"}
+            placeholder={t("Enter Team Name")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -90,8 +92,8 @@ function TeamFrom({
             }
             options={countries?.countries || []}
             name={"country"}
-            label={"Country"}
-            placeholder={"Select Country"}
+            label={t("Country")}
+            placeholder={t("Select Country")}
             error={formik.touched.country && formik.errors.country}
             // onBlur={formik.handleBlur}
             onChange={(value) => formik.setFieldValue("country", value)}
@@ -99,10 +101,10 @@ function TeamFrom({
           <InputApp
             value={formik?.values?.region}
             onChange={formik.handleChange}
-            label={"Region"}
+            label={t("Region")}
             name={"region"}
             type={"text"}
-            placeholder={"Enter Region Name"}
+            placeholder={t("Enter Region Name")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -119,15 +121,15 @@ function TeamFrom({
           <InputApp
             value={formik?.values?.logo}
             onChange={formik.handleChange}
-            label={"logo"}
+            label={t("logo")}
             name={"logo"}
             type={""}
-            placeholder={"Upload Team Logo"}
+            placeholder={t("Upload Team Logo")}
             className="p-0 border-0 focus:outline-none  "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={
-              <TeamsManagement
+              <ImageIcon
                 className={"fill-[#677185]"}
                 color={"text-[#677185]"}
               />
@@ -138,10 +140,10 @@ function TeamFrom({
           <InputApp
             value={formik?.values?.logoDark}
             onChange={formik.handleChange}
-            label={"Logo (Dark)"}
+            label={t("logo (Dark)")}
             name={"logoDark"}
             type={""}
-            placeholder={"Upload Team Logo Dark"}
+            placeholder={t("Upload Dark Team Logo")}
             className="p-0 border-0 focus:outline-none  "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -161,9 +163,9 @@ function TeamFrom({
           value={formik?.values?.foundedDate}
           formik={formik}
           name={"foundedDate"}
-          label={"Founded Date"}
+          label={t("Founded Date")}
           type={"text"}
-          placeholder={"Enter Founded Date"}
+          placeholder={t("Select Founded Date")}
           className="border-0 focus:outline-none "
           icon={
             <Date
@@ -176,8 +178,8 @@ function TeamFrom({
         <TextAreaInput
           value={formik?.values?.description}
           name={"description"}
-          label={"Description"}
-          placeholder={"Enter Description"}
+          label={t("Description")}
+          placeholder={t("Enter Team Description")}
           className="border-0 focus:outline-none "
           icon={
             <Description
