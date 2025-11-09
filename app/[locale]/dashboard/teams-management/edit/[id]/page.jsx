@@ -1,6 +1,6 @@
-import { updateTeam } from "@/app/_Lib/actions";
-import { getCountries } from "@/app/_Lib/countriesApi";
-import { getTeam } from "@/app/_Lib/teamsApi";
+import { updateTeam } from "@/app/[locale]/_Lib/actions";
+import { getCountries } from "@/app/[locale]/_Lib/countriesApi";
+import { getTeam } from "@/app/[locale]/_Lib/teamsApi";
 import TeamForm from "@/components/teams management/TeamForm";
 
 export default async function page({ params }) {

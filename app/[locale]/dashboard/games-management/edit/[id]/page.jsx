@@ -1,5 +1,5 @@
-import { updateGame } from "@/app/_Lib/actions";
-import { getGame } from "@/app/_Lib/gamesApi";
+import { updateGame } from "@/app/[locale]/_Lib/actions";
+import { getGame } from "@/app/[locale]/_Lib/gamesApi";
 import GamesForm from "@/components/games-management/GamesForm";
 
 async function page({ params }) {

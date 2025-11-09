@@ -1,6 +1,6 @@
 "use client";
 
-import { login } from "@/app/_Lib/actions";
+import { login } from "@/app/[locale]/_Lib/actions";
 import { useFormik } from "formik";
 import Image from "next/image";
 import Link from "next/link";
