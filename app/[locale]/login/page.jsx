@@ -1,8 +1,8 @@
 import BlurCircle from "@/components/Login/BlurCircle";
 import FormContainer from "@/components/Login/FormContainer";
 import Logo from "@/components/Login/Logo";
-import logoImageTop from "../../public/images/Login/Layer_1.png";
-import logoImageBottom from "../../public/images/Login/Layer_2.png";
+import logoImageTop from "@/public/images/Login/Layer_1.png";
+import logoImageBottom from "@/public/images/Login/Layer_2.png";
 
 export default function page() {
   return (
