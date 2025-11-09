@@ -17,22 +17,35 @@ import FileInput from "../ui app/FileInput";
 
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import ListInput from "../ui app/ListInput";
 
 const validateSchema = Yup.object({
   firstName: Yup.string().required("Required"),
   lastName: Yup.string().required("Required"),
+
   birthDate: Yup.string().required("Required"),
   nationality: Yup.string().required("Required"),
-
   photo: Yup.string().required("Required"),
   photoDark: Yup.string().required("Required"),
+
   // images: Yup.array().required("Required"),
   // imagesDark: Yup.array().required("Required"),
   // socialLinks: Yup.string().required("Required"),
+
   totalEarnings: Yup.number().min(0).required("Required"),
   mainGame: Yup.string().required("Required"),
+  numberOfAchievements: Yup.number().min(0).required("Required"),
+
   teams: Yup.array().required("Required"),
   games: Yup.array().required("Required"),
+  tournaments: Yup.array().required("Required"),
+  news: Yup.array().required("Required"),
+  worldRanking: Yup.number().min(1).required("Required"),
+  marketValue: Yup.number().min(0).required("Required"),
+  numberOfFollowers: Yup.number().min(0).required("Required"),
+  subscribed: Yup.boolean().required("Required"),
+  lineups: Yup.array().required("Required"),
+  favoriteCharacters: Yup.array().required("Required"),
 });
 
 const initialValues = {};
@@ -60,6 +73,7 @@ function PlayerFrom({
       socialLink: player?.socialLinks || "link",
       totalEarnings: player?.totalEarnings || 0,
       mainGame: player?.mainGame || "game",
+
       numberOfAchievements: 0,
       marketValue: 152,
       worldRanking: 100,
@@ -111,8 +125,9 @@ function PlayerFrom({
       <FormSection>
         <FormRow>
           <InputApp
-            value={formik.values.firstName}
-            onChange={formik.handleChange}
+            // value={formik.values.firstName}
+            // onChange={formik.handleChange}
+            // onChange={(e)=>}
             label={t("First Name")}
             name={"firstName"}
             type={"text"}
@@ -126,11 +141,14 @@ function PlayerFrom({
                 ? formik.errors.firstName
                 : ""
             }
-            onBlur={formik.handleBlur}
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              formik.setFieldValue("firstName", e.target.value.trim());
+            }}
           />
           <InputApp
-            value={formik.values.lastName}
-            onChange={formik.handleChange}
+            // value={formik.values.lastName}
+            // onChange={formik.handleChange}
             label={t("Last Name")}
             name={"lastName"}
             type={"text"}
@@ -149,7 +167,10 @@ function PlayerFrom({
                 ? formik.errors.lastName
                 : ""
             }
-            onBlur={formik.handleBlur}
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              formik.setFieldValue("lastName", e.target.value.trim());
+            }}
           />
         </FormRow>
         <FormRow>
@@ -250,27 +271,9 @@ function PlayerFrom({
       <FormSection>
         <FormRow>
           <InputApp
-            type={"text"}
-            name={"socialLink"}
-            value={formik.values.socialLink}
-            label={t("Social Links")}
-            placeholder={t("Enter Social Links")}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            icon={<UserCardIcon color={"text-[#677185]"} />}
-            error={
-              formik?.errors?.socialLink && formik?.touched?.socialLink
-                ? formik.errors.socialLink
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-          />
-          <InputApp
             name={"totalEarnings"}
             type={"number"}
-            value={formik.values.totalEarnings}
+            // value={formik.values.totalEarnings}
             label={t("Total Earnings")}
             placeholder={t("Enter Total Earnings")}
             className="border-0 focus:outline-none "
@@ -282,16 +285,24 @@ function PlayerFrom({
                 ? formik.errors.totalEarnings
                 : ""
             }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              formik.setFieldValue("totalEarnings", e.target.value.trim());
+            }}
+            // onChange={formik.handleChange}
           />
-        </FormRow>
-        <FormRow>
-          <InputApp
+
+          <SelectInput
             name={"mainGame"}
             type={"text"}
             value={formik.values.mainGame}
             label={t("Main Game")}
+            t={t}
+            options={[
+              { value: "game1", label: "Game 1" },
+              { value: "game2", label: "Game 2" },
+            ]}
+            onChange={(value) => formik.setFieldValue("mainGame", value)}
             placeholder={t("Enter Main Game")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -302,10 +313,192 @@ function PlayerFrom({
                 ? formik.errors.mainGame
                 : ""
             }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
+            // onBlur={formik.handleBlur}
+            // onChange={formik.handleChange}
           />
         </FormRow>
+      </FormSection>
+
+      <FormSection>
+        <FormRow>
+          <InputApp
+            name={"numberOfAchievements"}
+            type={"text"}
+            // value={formik.values.numberOfAchievements}
+            label={t("Number Of Achievements")}
+            placeholder={t("Enter Number Of Achievements")}
+            className="border-0 focus:outline-none "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            error={
+              formik?.errors?.numberOfAchievements &&
+              formik?.touched?.numberOfAchievements
+                ? formik.errors.numberOfAchievements
+                : ""
+            }
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              formik.setFieldValue(
+                "numberOfAchievements",
+                e.target.value.trim()
+              );
+            }}
+            // onChange={formik.handleChange}
+          />
+          <InputApp
+            name={"worldRanking"}
+            type={"text"}
+            // value={formik.values.worldRanking}
+            label={t("World Ranking")}
+            placeholder={t("Enter World Ranking")}
+            className="border-0 focus:outline-none "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            error={
+              formik?.errors?.worldRanking && formik?.touched?.worldRanking
+                ? formik.errors.worldRanking
+                : ""
+            }
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              formik.setFieldValue("worldRanking", e.target.value.trim());
+            }}
+            // onChange={formik.handleChange}
+          />
+        </FormRow>
+        <FormRow>
+          <InputApp
+            name={"marketValue"}
+            type={"text"}
+            // value={formik.values.marketValue}
+            label={t("Market Value")}
+            placeholder={t("Enter Market Value")}
+            className="border-0 focus:outline-none "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            error={
+              formik?.errors?.marketValue && formik?.touched?.marketValue
+                ? formik.errors.marketValue
+                : ""
+            }
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              formik.setFieldValue("marketValue", e.target.value.trim());
+            }}
+            onChange={formik.handleChange}
+          />
+          <InputApp
+            name={"numberOfFollowers"}
+            type={"text"}
+            // value={formik.values.numberOfFollowers}
+            label={t("Number Of Followers")}
+            placeholder={t("Enter Number Of Followers")}
+            className="border-0 focus:outline-none "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            error={
+              formik?.errors?.numberOfFollowers &&
+              formik?.touched?.numberOfFollowers
+                ? formik.errors.numberOfFollowers
+                : ""
+            }
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              formik.setFieldValue("numberOfFollowers", e.target.value.trim());
+            }}
+            // onChange={formik.handleChange}
+          />
+        </FormRow>
+      </FormSection>
+
+      <FormSection>
+        <FormRow>
+          <ListInput
+            name={"teams"}
+            formik={formik}
+            error={
+              formik?.errors?.teams && formik?.touched?.teams
+                ? formik.errors.teams
+                : ""
+            }
+            placeholder={t("Enter Teams")}
+            options={[
+              { value: "1", name: "Team 1" },
+              { value: "2", name: "Team 2" },
+            ]}
+            initialData={formik?.values?.teams}
+            label={t("Teams")}
+          />
+          <ListInput
+            name={"games"}
+            formik={formik}
+            error={
+              formik?.errors?.games && formik?.touched?.games
+                ? formik.errors.games
+                : ""
+            }
+            placeholder={t("Enter Games")}
+            options={[
+              { value: "1", name: "Game 1" },
+              { value: "2", name: "Game 2" },
+            ]}
+            initialData={formik?.values?.games}
+            label={t("Games")}
+          />
+        </FormRow>
+        <FormRow>
+          <ListInput
+            name={"tournaments"}
+            formik={formik}
+            error={
+              formik?.errors?.tournaments && formik?.touched?.tournaments
+                ? formik.errors.tournaments
+                : ""
+            }
+            placeholder={t("Enter Tournaments")}
+            options={[
+              { value: "1", name: "Tournament 1" },
+              { value: "2", name: "Tournament 2" },
+            ]}
+            initialData={formik?.values?.tournaments}
+            label={t("Tournaments")}
+          />
+          <ListInput
+            name={"news"}
+            formik={formik}
+            error={
+              formik?.errors?.news && formik?.touched?.news
+                ? formik.errors.news
+                : ""
+            }
+            placeholder={t("Enter News")}
+            options={[
+              { value: "1", name: "News 1" },
+              { value: "2", name: "News 2" },
+            ]}
+            initialData={formik?.values?.news}
+            label={t("News")}
+          />
+        </FormRow>
+        <SelectInput
+          name={"selected"}
+          value={formik.values.selected}
+          type={"text"}
+          label={t("Selected")}
+          t={t}
+          options={[
+            { value: "yes", label: "Yes" },
+            { value: "no", label: "No" },
+          ]}
+          onChange={(value) => formik.setFieldValue("selected", value)}
+          placeholder={t("Select Selected")}
+          className="border-0 focus:outline-none "
+          error={
+            formik?.errors?.selected && formik?.touched?.selected
+              ? formik.errors.selected
+              : ""
+          }
+        />
       </FormSection>
 
       <div className="flex justify-end">

@@ -18,6 +18,10 @@ function SelectInput({
   onChange,
   value,
 }) {
+  // const mappedOptions = options.map((option) => ({
+  //   label: option?.name ? option?.name : option?.label,
+  //   value: option?.value,
+  // }));
   return (
     <div className="flex-1">
       {label && (
@@ -45,8 +49,8 @@ function SelectInput({
             </SelectTrigger>
             <SelectContent>
               {options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {t ? t(option.label) : option.label}
+                <SelectItem key={option?.value} value={option?.value}>
+                  {t ? t(option?.label) : option?.label}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -1,5 +1,6 @@
 import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import PlayersTable from "@/components/Player Management/PlayersTable";
+import Loading from "@/components/ui app/Loading";
 import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -25,14 +26,18 @@ const columns = [
 ];
 async function page({ searchParams }) {
   const { search } = await searchParams;
-  console.log("search params in player management edit page", search);
+
   const players = await getPlayers({
     "firstName.contains": search || "",
     "lastName.contains": search || "",
   });
   // const players = [];
 
-  return <PlayersTable search={search} players={players} columns={columns} />;
+  return (
+    <Suspense fallback={<Loading />}>
+      <PlayersTable search={search} players={players} columns={columns} />
+    </Suspense>
+  );
 }
 
 export default page;

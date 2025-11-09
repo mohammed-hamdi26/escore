@@ -3,13 +3,16 @@ import { Link } from "@/i18n/navigation";
 import Table from "../ui app/Table";
 import { Button } from "../ui/button";
 import FilterPlayers from "./FilterPlayers";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 
 function PlayersTable({ players, columns, search }) {
   return (
     <div className="space-y-8">
       <FilterPlayers search={search} />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense
+        name="Players Table"
+        fallback={<div>Loading players table...</div>}
+      >
         <Table
           columns={columns}
           grid_cols={"grid-cols-[1fr_0.5fr_0.5fr_0.5fr_2fr]"}
