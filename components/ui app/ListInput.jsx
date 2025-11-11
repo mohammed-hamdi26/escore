@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import SelectInput from "./SelectInput";
 import { Button } from "../ui/button";
 import { Delete, DeleteIcon, X } from "lucide-react";
+import { string } from "yup";
 
 function ListInput({
   placeholder,
@@ -14,6 +15,7 @@ function ListInput({
   onChange,
   formik,
   initialData = [],
+  typeForm = "add",
 }) {
   const [selectedData, setSelectedData] = useState(initialData);
 
@@ -22,7 +24,13 @@ function ListInput({
       <SelectInput
         placeholder={placeholder}
         options={options
-          .filter((item) => !selectedData.includes(JSON.stringify(item)))
+          .filter((item) =>
+            typeForm === "add"
+              ? !selectedData.includes(JSON.stringify(item))
+              : !selectedData.find(
+                  (selectedItem) => selectedItem.value === item.value
+                )
+          )
           .map((item) => {
             return { value: JSON.stringify(item), label: item.name };
           })}
@@ -36,14 +44,17 @@ function ListInput({
           formik.setFieldValue(name, [...selectedData, value]);
         }}
       />
-      <div className="flex gap-4">
-        {selectedData.map((item, index) => {
+      <div className="grid grid-cols-2 gap-4">
+        {formik.values[name].map((item, index) => {
           return (
             <div
-              className="bg-dashboard-box w-fit  dark:bg-[#0F1017] rounded-lg p-3 flex items-center gap-4"
+              className="bg-dashboard-box   dark:bg-[#0F1017] rounded-lg p-3 w-full flex justify-between items-center gap-4"
               key={index}
             >
-              <p>{JSON.parse(item).name}</p>
+              <p>
+                {" "}
+                {typeof item === "string" ? JSON.parse(item).name : item.name}
+              </p>
 
               <X
                 className="hover:text-red-500 transition-colors duration-300 cursor-pointer"

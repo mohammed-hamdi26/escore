@@ -60,7 +60,7 @@ async function ServicesContainer() {
   const t = await getTranslations("Dashboard");
 
   return (
-    <div className="grid grid-rows-2 grid-cols-4 gap-5 h-full ">
+    <div className="grid lg:grid-rows-2  lg:grid-cols-4 gap-5 h-full ">
       {links.map((link) => (
         <ServiceItem
           key={link.title}

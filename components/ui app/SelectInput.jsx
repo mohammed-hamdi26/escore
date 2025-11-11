@@ -50,7 +50,7 @@ function SelectInput({
             <SelectContent>
               {options.map((option) => (
                 <SelectItem key={option?.value} value={option?.value}>
-                  {t ? t(option?.label) : option?.label}
+                  {option?.label}
                 </SelectItem>
               ))}
             </SelectContent>

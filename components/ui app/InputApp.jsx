@@ -25,7 +25,9 @@ function InputApp({
         {icon && icon}
         <div className="flex-1 space-y-2">
           <Input
+            // initialValue={"hallo"}
             value={value}
+            defaultValue={value}
             onBlur={onBlur}
             placeholder={placeholder}
             className={

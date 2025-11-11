@@ -13,7 +13,7 @@ const columns = [
 async function page() {
   // const data = await getGames();
   const t = await getTranslations("GamesTable");
-  const games = [];
+  const games = await getGames();
   return (
     <div>
       <Table

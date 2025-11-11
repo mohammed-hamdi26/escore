@@ -12,8 +12,8 @@ const columns = [
 
 async function page() {
   const t = await getTranslations("TeamsTable");
-  // const teams = await getTeams();
-  const teams = [];
+  const teams = await getTeams();
+
   return (
     <div>
       <Table
@@ -26,9 +26,9 @@ async function page() {
             key={team.id}
             grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
           >
-            <Table.Cell>{team.name}</Table.Cell>
-            <Table.Cell>{team.country}</Table.Cell>
-            <Table.Cell>{team.description}</Table.Cell>
+            <Table.Cell>{team?.name}</Table.Cell>
+            <Table.Cell>{team?.region}</Table.Cell>
+            <Table.Cell>{team?.description}</Table.Cell>
             <Table.Cell>
               <div className="flex justify-end gap-4">
                 <Link href={`/dashboard/teams-management/edit/${team.id}`}>

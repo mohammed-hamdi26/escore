@@ -1,17 +1,25 @@
 import { editPlayer } from "@/app/[locale]/_Lib/actions";
 import { getCountries } from "@/app/[locale]/_Lib/countriesApi";
+import { getGames } from "@/app/[locale]/_Lib/gamesApi";
+import { getNews } from "@/app/[locale]/_Lib/newsApi";
 import { getPlayer } from "@/app/[locale]/_Lib/palyerApi";
+import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import PlayerFrom from "@/components/Player Management/PlayerFrom";
 
 async function page({ params }) {
   const id = await params.id;
-  const [countries, player] = await Promise.all([
-    getCountries(),
-    getPlayer(id),
-  ]);
-  console.log(player);
+  const [countries, player, newsOptions, teamsOptions, gamesOptions] =
+    await Promise.all([
+      getCountries(),
+      getPlayer(id),
+      getNews(),
+      getTeams(),
+      getGames(),
+    ]);
+
   return (
     <PlayerFrom
+      OptionsData={{ newsOptions, teamsOptions, gamesOptions }}
       submit={editPlayer}
       countries={countries}
       player={player}

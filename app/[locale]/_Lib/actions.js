@@ -1,6 +1,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import apiClient from "./apiCLient";
+import axios from "axios";
 
 // login
 export async function login(userData) {
@@ -97,5 +98,21 @@ export async function editNews(newsData) {
   } catch (e) {
     console.log(e.response);
     throw new Error("Error in updating news");
+  }
+}
+
+export async function uploadPhoto(formData) {
+  console.log(formData.get("file"));
+  try {
+    const url = await apiClient.post("/files/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return url.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("error in upload");
   }
 }

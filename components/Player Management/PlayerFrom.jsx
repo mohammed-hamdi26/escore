@@ -18,6 +18,8 @@ import FileInput from "../ui app/FileInput";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import ListInput from "../ui app/ListInput";
+import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 const validateSchema = Yup.object({
   firstName: Yup.string().required("Required"),
@@ -48,37 +50,43 @@ const validateSchema = Yup.object({
   favoriteCharacters: Yup.array().required("Required"),
 });
 
-const initialValues = {};
-
 function PlayerFrom({
   countries,
   player,
   submit,
   formType = "add",
   successMessage,
+  OptionsData: {
+    newsOptions,
+    teamsOptions,
+    gamesOptions,
+    tournamentsOptions,
+  } = {},
 }) {
   const t = useTranslations("playerForm");
+  const router = useRouter();
+  const pathname = usePathname();
 
   const formik = useFormik({
     initialValues: {
-      firstName: player?.firstName || "a",
-      lastName: player?.lastName || "name",
-      birthDate: player?.birthDate || "2000-01-01",
-      nationality: player?.nationality || "country",
+      firstName: player?.firstName || "",
+      lastName: player?.lastName || "",
+      birthDate: player?.birthDate || "",
+      nationality: player?.nationality || "",
 
-      photo: player?.photo || "mo",
-      photoDark: player?.photoDark || "mo",
-      images: player?.images || "mo",
-      imagesDark: player?.imagesDark || "mo",
-      socialLink: player?.socialLinks || "link",
+      photo: player?.photo || "",
+      photoDark: player?.photoDark || "",
+      images: player?.images || "",
+      imagesDark: player?.imagesDark || "",
+      socialLink: player?.socialLink || "",
       totalEarnings: player?.totalEarnings || 0,
-      mainGame: player?.mainGame || "game",
+      mainGame: player?.mainGame || " ",
 
       numberOfAchievements: 0,
-      marketValue: 152,
-      worldRanking: 100,
-      numberOfFollowers: 200,
-      subscribed: true,
+      marketValue: 0,
+      worldRanking: 1,
+      numberOfFollowers: 0,
+      subscribed: false,
       country: null,
       teams: player?.teams || [],
       games: player?.games || [],
@@ -91,25 +99,25 @@ function PlayerFrom({
     validationSchema: validateSchema,
     onSubmit: async (values) => {
       let dataValues = player ? { id: player.id, ...values } : values;
-      // dataValues = {
-      //   ...dataValues,
-      //   players: dataValues.players.map((player) => {
-      //     return { id: JSON.parse(player).value };
-      //   }),
-      //   news: dataValues.news.map((news) => {
-      //     return { id: JSON.parse(news).value };
-      //   }),
-      //   teams: dataValues.teams.map((team) => {
-      //     return { id: JSON.parse(team).value };
-      //   }),
-      //   tournaments: dataValues.tournaments.map((tournament) => {
-      //     return { id: JSON.parse(tournament).value };
-      //   }),
-      // };
+      dataValues = {
+        ...dataValues,
+        games: dataValues.games.map((game) => {
+          return { id: +JSON.parse(game).value };
+        }),
+        news: dataValues.news.map((news) => {
+          return { id: +JSON.parse(news).value };
+        }),
+        teams: dataValues.teams.map((team) => {
+          return { id: +JSON.parse(team).value };
+        }),
+        tournaments: dataValues.tournaments.map((tournament) => {
+          return { id: +JSON.parse(tournament).value };
+        }),
+      };
       console.log(dataValues);
       try {
         await submit(dataValues);
-        formType === "add" && formik.resetForm();
+        router.refresh();
         toast.success(successMessage);
       } catch (error) {
         console.log(error);
@@ -119,15 +127,13 @@ function PlayerFrom({
   });
 
   console.log(formik.errors);
-
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
         <FormRow>
           <InputApp
-            // value={formik.values.firstName}
-            // onChange={formik.handleChange}
-            // onChange={(e)=>}
+            value={formik.values.firstName}
+            onChange={formik.handleChange}
             label={t("First Name")}
             name={"firstName"}
             type={"text"}
@@ -141,14 +147,14 @@ function PlayerFrom({
                 ? formik.errors.firstName
                 : ""
             }
-            onBlur={(e) => {
-              formik.handleBlur(e);
-              formik.setFieldValue("firstName", e.target.value.trim());
-            }}
+            // onBlur={(e) => {
+            //   formik.handleBlur(e);
+            //   formik.setFieldValue("firstName", e.target.value.trim());
+            // }}
           />
           <InputApp
-            // value={formik.values.lastName}
-            // onChange={formik.handleChange}
+            value={formik.values.lastName}
+            onChange={formik.handleChange}
             label={t("Last Name")}
             name={"lastName"}
             type={"text"}
@@ -167,10 +173,11 @@ function PlayerFrom({
                 ? formik.errors.lastName
                 : ""
             }
-            onBlur={(e) => {
-              formik.handleBlur(e);
-              formik.setFieldValue("lastName", e.target.value.trim());
-            }}
+            onBlur={formik.handleBlur}
+            // onBlur={(e) => {
+            //   formik.handleBlur(e);
+            //   formik.setFieldValue("lastName", e.target.value.trim());
+            // }}
           />
         </FormRow>
         <FormRow>
@@ -201,7 +208,7 @@ function PlayerFrom({
         </FormRow>
       </FormSection>
 
-      {/* <FormSection>
+      <FormSection>
         <FormRow>
           <InputApp
             type={"text"}
@@ -252,7 +259,9 @@ function PlayerFrom({
             onChange={formik.handleChange}
           />
         </FormRow>
-        <FormRow>
+      </FormSection>
+      {/* <FormRow>
+
           <FileInput
             label={"Player Images"}
             formik={formik}
@@ -273,7 +282,7 @@ function PlayerFrom({
           <InputApp
             name={"totalEarnings"}
             type={"number"}
-            // value={formik.values.totalEarnings}
+            value={formik.values.totalEarnings}
             label={t("Total Earnings")}
             placeholder={t("Enter Total Earnings")}
             className="border-0 focus:outline-none "
@@ -285,11 +294,12 @@ function PlayerFrom({
                 ? formik.errors.totalEarnings
                 : ""
             }
-            onBlur={(e) => {
-              formik.handleBlur(e);
-              formik.setFieldValue("totalEarnings", e.target.value.trim());
-            }}
-            // onChange={formik.handleChange}
+            // onBlur={(e) => {
+            //   formik.handleBlur(e);
+            //   formik.setFieldValue("totalEarnings", e.target.value.trim());
+            // }}
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
           />
 
           <SelectInput
@@ -324,7 +334,7 @@ function PlayerFrom({
           <InputApp
             name={"numberOfAchievements"}
             type={"text"}
-            // value={formik.values.numberOfAchievements}
+            value={formik.values.numberOfAchievements}
             label={t("Number Of Achievements")}
             placeholder={t("Enter Number Of Achievements")}
             className="border-0 focus:outline-none "
@@ -336,19 +346,20 @@ function PlayerFrom({
                 ? formik.errors.numberOfAchievements
                 : ""
             }
-            onBlur={(e) => {
-              formik.handleBlur(e);
-              formik.setFieldValue(
-                "numberOfAchievements",
-                e.target.value.trim()
-              );
-            }}
-            // onChange={formik.handleChange}
+            // onBlur={(e) => {
+            //   formik.handleBlur(e);
+            //   formik.setFieldValue(
+            //     "numberOfAchievements",
+            //     e.target.value.trim()
+            //   );
+            // }}
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
           />
           <InputApp
             name={"worldRanking"}
             type={"text"}
-            // value={formik.values.worldRanking}
+            value={formik.values.worldRanking}
             label={t("World Ranking")}
             placeholder={t("Enter World Ranking")}
             className="border-0 focus:outline-none "
@@ -359,18 +370,19 @@ function PlayerFrom({
                 ? formik.errors.worldRanking
                 : ""
             }
-            onBlur={(e) => {
-              formik.handleBlur(e);
-              formik.setFieldValue("worldRanking", e.target.value.trim());
-            }}
-            // onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            // onBlur={(e) => {
+            //   formik.handleBlur(e);
+            //   formik.setFieldValue("worldRanking", e.target.value.trim());
+            // }}
+            onChange={formik.handleChange}
           />
         </FormRow>
         <FormRow>
           <InputApp
             name={"marketValue"}
             type={"text"}
-            // value={formik.values.marketValue}
+            value={formik.values.marketValue}
             label={t("Market Value")}
             placeholder={t("Enter Market Value")}
             className="border-0 focus:outline-none "
@@ -381,16 +393,17 @@ function PlayerFrom({
                 ? formik.errors.marketValue
                 : ""
             }
-            onBlur={(e) => {
-              formik.handleBlur(e);
-              formik.setFieldValue("marketValue", e.target.value.trim());
-            }}
+            onBlur={formik.handleBlur}
+            // onBlur={(e) => {
+            //   formik.handleBlur(e);
+            //   formik.setFieldValue("marketValue", e.target.value.trim());
+            // }}
             onChange={formik.handleChange}
           />
           <InputApp
             name={"numberOfFollowers"}
             type={"text"}
-            // value={formik.values.numberOfFollowers}
+            value={formik.values.numberOfFollowers}
             label={t("Number Of Followers")}
             placeholder={t("Enter Number Of Followers")}
             className="border-0 focus:outline-none "
@@ -402,11 +415,12 @@ function PlayerFrom({
                 ? formik.errors.numberOfFollowers
                 : ""
             }
-            onBlur={(e) => {
-              formik.handleBlur(e);
-              formik.setFieldValue("numberOfFollowers", e.target.value.trim());
-            }}
-            // onChange={formik.handleChange}
+            // onBlur={(e) => {
+            //   formik.handleBlur(e);
+            //   formik.setFieldValue("numberOfFollowers", e.target.value.trim());
+            // }}
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
           />
         </FormRow>
       </FormSection>
@@ -422,11 +436,16 @@ function PlayerFrom({
                 : ""
             }
             placeholder={t("Enter Teams")}
-            options={[
-              { value: "1", name: "Team 1" },
-              { value: "2", name: "Team 2" },
-            ]}
-            initialData={formik?.values?.teams}
+            options={mappedArrayToSelectOptions(
+              teamsOptions || [],
+              "name",
+              "id"
+            )}
+            initialData={mappedArrayToSelectOptions(
+              formik?.values?.teams,
+              "name",
+              "id"
+            )}
             label={t("Teams")}
           />
           <ListInput
@@ -438,11 +457,16 @@ function PlayerFrom({
                 : ""
             }
             placeholder={t("Enter Games")}
-            options={[
-              { value: "1", name: "Game 1" },
-              { value: "2", name: "Game 2" },
-            ]}
-            initialData={formik?.values?.games}
+            options={mappedArrayToSelectOptions(
+              gamesOptions || [],
+              "name",
+              "id"
+            )}
+            initialData={mappedArrayToSelectOptions(
+              formik?.values?.games,
+              "name",
+              "id"
+            )}
             label={t("Games")}
           />
         </FormRow>
@@ -472,11 +496,16 @@ function PlayerFrom({
                 : ""
             }
             placeholder={t("Enter News")}
-            options={[
-              { value: "1", name: "News 1" },
-              { value: "2", name: "News 2" },
-            ]}
-            initialData={formik?.values?.news}
+            options={mappedArrayToSelectOptions(
+              newsOptions || [],
+              "title",
+              "id"
+            )}
+            initialData={mappedArrayToSelectOptions(
+              formik?.values?.news,
+              "title",
+              "id"
+            )}
             label={t("News")}
           />
         </FormRow>
