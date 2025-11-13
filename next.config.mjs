@@ -14,7 +14,7 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: "/:slug(\\en|ar)",
+        source: "/:slug(en|ar)",
         destination: "/:slug/dashboard",
         permanent: true,
       },

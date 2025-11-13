@@ -1,6 +1,4 @@
 "use client";
-import { ToggleGroupItem } from "@radix-ui/react-toggle-group";
-import { ToggleGroup } from "../ui/toggle-group";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useLayoutEffect, useState } from "react";
@@ -9,7 +7,13 @@ import { Button } from "../ui/button";
 function ToggleThemeMode() {
   const { setTheme, theme } = useTheme();
   const [mode, setMode] = useState(null);
-  console.log(localStorage.getItem("theme"));
+
+  useLayoutEffect(() => {
+    if (typeof window !== "undefined") {
+      console.log(localStorage.getItem("theme"));
+    }
+  }, []);
+
   const classNameToggleItem =
     "  dark:text-white   flex justify-center items-center size-10 rounded-full cursor-pointer    ";
 
