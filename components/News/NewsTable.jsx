@@ -1,0 +1,72 @@
+"use client";
+import { deleteNew } from "@/app/[locale]/_Lib/actions";
+import { getNews } from "@/app/[locale]/_Lib/newsApi";
+
+import Table from "@/components/ui app/Table";
+import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
+import { format } from "date-fns";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import toast from "react-hot-toast";
+function NewsTable({ news, columns }) {
+  const t = useTranslations();
+  const [isLoading, setIsLoading] = useState(false);
+  return (
+    <div>
+      <Table
+        // showHeader={false}
+        data={news}
+        grid_cols={"grid-cols-[0.5fr_0.5fr_0.5fr_0.5fr_2fr]"}
+        columns={columns}
+      >
+        {news.map((newsItem) => (
+          <Table.Row
+            grid_cols={"grid-cols-[0.5fr_0.5fr_0.5fr_0.5fr_2fr]"}
+            key={newsItem.id}
+          >
+            <Table.Cell>{newsItem.title}</Table.Cell>
+            <Table.Cell>{newsItem.authorName}</Table.Cell>
+            <Table.Cell>
+              {format(newsItem.publishDate, "yyyy-MM-dd")}
+            </Table.Cell>
+            <Table.Cell></Table.Cell>
+            <Table.Cell className="flex gap-4 justify-end">
+              <Link href={`/dashboard/news/edit/${newsItem.id}`}>
+                <Button
+                  disabled={isLoading}
+                  className={
+                    "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
+                  }
+                >
+                  {t("Edit")}
+                </Button>
+              </Link>
+              <Button
+                disabled={isLoading}
+                className={
+                  "text-white bg-red-800 rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
+                }
+                onClick={async () => {
+                  try {
+                    setIsLoading(true);
+                    await deleteNew(newsItem.id);
+                    toast.success("The New is Deleted");
+                  } catch (e) {
+                    toast.error("error in Delete");
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+              >
+                {t("Delete")}
+              </Button>
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table>
+    </div>
+  );
+}
+
+export default NewsTable;

@@ -20,6 +20,16 @@ const nextConfig = {
       },
     ];
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "db8f573bab41.ngrok-free.app",
+        // port: "8000",
+        // pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default withNextIntl(nextConfig);

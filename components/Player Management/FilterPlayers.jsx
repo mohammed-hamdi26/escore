@@ -5,6 +5,7 @@ import InputApp from "../ui app/InputApp";
 
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
+import SelectSizeRows from "../ui app/SelectSizeRows";
 
 function FilterPlayers({ search }) {
   const [searchTerm, setSearchTerm] = useState(search || "");
@@ -29,24 +30,8 @@ function FilterPlayers({ search }) {
         className="w-[200px] "
         flexGrow="flex-0"
       />
-      <FilterItem
-        onClick={() => {
-          const params = new URLSearchParams(searchParams);
-          params.set("filter", "team");
-          router.replace(`${pathname}?${params.toString()}`);
-        }}
-      >
-        Filter by Team
-      </FilterItem>
-      <FilterItem
-        onClick={() => {
-          const params = new URLSearchParams(searchParams);
-          params.set("filter", "country");
-          router.replace(`${pathname}?${params.toString()}`);
-        }}
-      >
-        Filter by Country
-      </FilterItem>
+
+      <SelectSizeRows />
     </div>
   );
 }

@@ -18,6 +18,7 @@ import TeamsManagement from "../icons/TeamsManagement";
 import { Button } from "../ui/button";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import FileInput from "../ui app/FileInput";
 
 const validationSchema = yup.object({
   title: yup.string().required("Required"),
@@ -80,16 +81,16 @@ function NewsForm({ formType = "add", submit, newData }) {
   const statusOptions = [
     { value: "DRAFT", label: "Draft" },
     { value: "PUBLISHED", label: "Published" },
-    { value: "ARCHIVED", label: "Archived" },
+    { value: "SCHEDULED", label: "Scheduled" },
   ];
 
   const newsTypeOptions = [
     { value: "GENERAL", label: "General News" },
-    { value: "REGULAR", label: "Regular News" },
-    { value: "FEATURE", label: "Feature" },
-    { value: "ANALYSIS", label: "Analysis" },
+    { value: "TRANSFER", label: "Transfer News" },
+    { value: "MATCH_RECAP", label: "Match Recap" },
+    { value: "TRENDING", label: "Trending" },
   ];
-
+  console.log(formik.values);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>
@@ -149,33 +150,19 @@ function NewsForm({ formType = "add", submit, newData }) {
       {/* Media */}
       <FormSection>
         <FormRow>
-          <InputApp
+          <FileInput
+            formik={formik}
             name={"image"}
-            onChange={formik.handleChange}
             label={t("Image")}
-            type={"text"}
             placeholder={t("Enter Image URL")}
-            value={formik.values.image}
-            className="border-0 focus:outline-none"
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
             icon={<ImageIcon />}
-            error={formik.touched.image && formik.errors.image}
-            onBlur={formik.handleBlur}
           />
-          <InputApp
+          <FileInput
+            formik={formik}
             name={"imageDark"}
-            onChange={formik.handleChange}
             label={t("Image Dark")}
-            type={"text"}
             placeholder={t("Enter Dark Mode Image URL")}
-            value={formik.values.imageDark}
-            className="border-0 focus:outline-none"
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
             icon={<ImageIcon />}
-            error={formik.touched.imageDark && formik.errors.imageDark}
-            onBlur={formik.handleBlur}
           />
         </FormRow>
         <FormRow>
@@ -201,7 +188,7 @@ function NewsForm({ formType = "add", submit, newData }) {
         <FormRow>
           <DatePicker
             formik={formik}
-            name={t("publishDate")}
+            name={"publishDate"}
             label={t("Publish Date")}
             placeholder={t("Select Publish Date")}
             icon={
@@ -235,19 +222,12 @@ function NewsForm({ formType = "add", submit, newData }) {
             error={formik.touched.authorName && formik.errors.authorName}
             onBlur={formik.handleBlur}
           />
-          <InputApp
+          <FileInput
             name={"authorPicture"}
-            onChange={formik.handleChange}
+            formik={formik}
             label={t("Author Picture")}
-            type={"text"}
             placeholder={t("Enter Author Picture URL")}
-            value={formik.values.authorPicture}
-            className="border-0 focus:outline-none"
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
             icon={<ImageIcon />}
-            error={formik.touched.authorPicture && formik.errors.authorPicture}
-            onBlur={formik.handleBlur}
           />
         </FormRow>
         <FormRow>
@@ -318,46 +298,6 @@ function NewsForm({ formType = "add", submit, newData }) {
           />
         </FormRow>
       </FormSection>
-
-      {/* Related Content */}
-      {/* <FormSection>
-        <FormRow>
-          <TextAreaInput
-            name="players"
-            onChange={formik.handleChange}
-            value={formik.values.players}
-            label={"Players"}
-            placeholder={"Enter Players (comma separated)"}
-            className="border-0 focus:outline-none"
-            icon={
-              <TeamsManagement
-                width={31}
-                height={31}
-                className={"fill-[#677185]"}
-                color={"text-[#677185]"}
-              />
-            }
-            error={formik.touched.players && formik.errors.players}
-            onBlur={formik.handleBlur}
-          />
-          <TextAreaInput
-            name="transfers"
-            onChange={formik.handleChange}
-            value={formik.values.transfers}
-            label={"Transfers"}
-            placeholder={"Enter Transfers (comma separated)"}
-            className="border-0 focus:outline-none"
-            icon={
-              <Description
-                className={"fill-[#677185]"}
-                color={"text-[#677185]"}
-              />
-            }
-            error={formik.touched.transfers && formik.errors.transfers}
-            onBlur={formik.handleBlur}
-          />
-        </FormRow>
-      </FormSection> */}
 
       <div className="flex justify-end">
         <Button

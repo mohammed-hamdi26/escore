@@ -1,7 +1,7 @@
 function Table({ t, columns, children, grid_cols, showHeader = true }) {
   return (
     <>
-      <table className="w-full">
+      <table className="w-full h-[10px] overflow-hidden">
         {showHeader && (
           <TableHeader>
             <TableRow

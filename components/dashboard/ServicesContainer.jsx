@@ -7,6 +7,7 @@ import SupportCenter from "../icons/SuppotCenter";
 import TeamsManagement from "../icons/TeamsManagement";
 import User from "../icons/User";
 import ServiceItem from "./ServiceItem";
+import Champion from "../icons/Champion";
 
 const links = [
   {
@@ -15,6 +16,13 @@ const links = [
     description:
       "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links",
     icon: <MatchesManagement />,
+  },
+  {
+    title: "Tournaments Management",
+    href: "/tournaments-management/add",
+    description:
+      "Go to Tournaments Section to Add Tournament: Name, Champion, Start Date, End Date, Teams, Players",
+    icon: <Champion width="57" height="56" className={"text-green-primary"} />,
   },
   {
     title: "Players",

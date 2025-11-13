@@ -17,29 +17,34 @@ function SelectInput({
   onBlur,
   onChange,
   value,
+  disabled,
+  flexGrow = "flex-1",
 }) {
   // const mappedOptions = options.map((option) => ({
   //   label: option?.name ? option?.name : option?.label,
   //   value: option?.value,
   // }));
   return (
-    <div className="flex-1">
+    <div className={`${flexGrow}`}>
       {label && (
-        <Label className={" text-[#677185] dark:text-white"}>{label}</Label>
+        <Label className={" text-[#677185] dark:text-white mb-4"}>
+          {label}
+        </Label>
       )}
-      <div className="flex items-center gap-4 mt-4 ">
+      <div className="flex items-center gap-4  ">
         {icon && icon}
         <div className="flex-1 space-y-2">
           <Select
-            className=" text-[#677185] p-6 "
+            className="text-black  dark:text-[#677185] p-6 "
             onValueChange={onChange}
             onOpenChange={onBlur}
             name={name}
             value={value}
+            disabled={disabled}
           >
             <SelectTrigger
               className={
-                " bg-dashboard-box w-full  dark:bg-[#0F1017] border-0 p-6 "
+                " bg-dashboard-box w-full text-black dark:text-[#677185]  dark:bg-[#0F1017] border-0 p-6 "
               }
             >
               <SelectValue
@@ -50,7 +55,7 @@ function SelectInput({
             <SelectContent>
               {options.map((option) => (
                 <SelectItem key={option?.value} value={option?.value}>
-                  {option?.label}
+                  {option?.label || option?.name}
                 </SelectItem>
               ))}
             </SelectContent>

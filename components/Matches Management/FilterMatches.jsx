@@ -4,6 +4,8 @@ import DatePicker from "../ui app/DatePicker";
 import FilterDatePicker from "../ui app/FilterDatePicker";
 import { format } from "date-fns";
 import { useSearchParams } from "next/navigation";
+import SelectInput from "../ui app/SelectInput";
+import SelectSizeRows from "../ui app/SelectSizeRows";
 
 function FilterMatches() {
   const searchParams = new useSearchParams();
@@ -11,7 +13,7 @@ function FilterMatches() {
   const pathname = usePathname();
 
   return (
-    <div className="flex gap-4">
+    <div className="flex items-center gap-4">
       <FilterItem
         onClick={() => {
           const params = new URLSearchParams(searchParams);
@@ -43,6 +45,8 @@ function FilterMatches() {
           router.replace(`${pathname}?${params.toString()}`);
         }}
       />
+
+      <SelectSizeRows />
     </div>
   );
 }

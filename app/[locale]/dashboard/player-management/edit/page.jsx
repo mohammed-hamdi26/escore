@@ -25,11 +25,12 @@ const columns = [
   },
 ];
 async function page({ searchParams }) {
-  const { search } = await searchParams;
+  const { search, size } = await searchParams;
 
   const players = await getPlayers({
     "firstName.contains": search || "",
     "lastName.contains": search || "",
+    size: size || 20,
   });
   // const players = [];
 
