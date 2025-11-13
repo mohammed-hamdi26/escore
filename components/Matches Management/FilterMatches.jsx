@@ -14,25 +14,7 @@ function FilterMatches() {
 
   return (
     <div className="flex items-center gap-4">
-      <FilterItem
-        onClick={() => {
-          const params = new URLSearchParams(searchParams);
-          params.set("filter", "team");
-          router.replace(`${pathname}?${params.toString()}`);
-        }}
-      >
-        Filter by Team
-      </FilterItem>
-      <FilterItem
-        onClick={() => {
-          const params = new URLSearchParams(searchParams);
-          params.set("filter", "country");
-          router.replace(`${pathname}?${params.toString()}`);
-        }}
-      >
-        Filter by Country
-      </FilterItem>
-      <FilterDatePicker
+      {/* <FilterDatePicker
         onRemoveDate={() => {
           const params = new URLSearchParams(searchParams);
           params.delete("date");
@@ -44,7 +26,7 @@ function FilterMatches() {
           params.set("date", format(date, "yyyy-MM-dd"));
           router.replace(`${pathname}?${params.toString()}`);
         }}
-      />
+      /> */}
 
       <SelectSizeRows />
     </div>

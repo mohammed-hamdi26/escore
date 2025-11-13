@@ -121,7 +121,7 @@ export async function deleteNew(id) {
   const locale = await getLocale();
   console.log(id);
   try {
-    const res = await apiClient.delete(`/games/${id}`);
+    const res = await apiClient.delete(`/news/${id}`);
     revalidatePath(`/${locale}/dashboard/news/edit`);
     return res.data;
   } catch (e) {
@@ -142,5 +142,44 @@ export async function uploadPhoto(formData) {
   } catch (e) {
     console.log(e.response);
     throw new Error("error in upload");
+  }
+}
+
+// tournaments
+
+export async function addTournament(tournamentData) {
+  try {
+    const res = await apiClient.post("/tournaments", tournamentData);
+    console.log(res.data);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in adding tournament");
+  }
+}
+
+export async function editTournament(tournamentData) {
+  try {
+    const res = await apiClient.put(
+      `/tournaments/${tournamentData.id}`,
+      tournamentData
+    );
+    revalidatePath(`/dashboard/news/edit/${tournamentData.id}`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in updating tournaments");
+  }
+}
+export async function deleteTournament(id) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.delete(`/tournaments/${id}`);
+    revalidatePath(`/${locale}/dashboard/news/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("error in Delete tournament");
   }
 }

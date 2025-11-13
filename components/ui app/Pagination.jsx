@@ -10,14 +10,15 @@ export default function Pagination() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [page, setPage] = useState(searchParams.page || 1);
+
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   return (
     <div className="flex justify-between items-center">
       <Button
         disabled={page <= 1}
         onClick={() => {
           const params = new URLSearchParams(searchParams);
-          params.set("page", page + 1);
+          params.set("page", page - 1);
           setPage(page - 1);
           router.replace(`${pathname}?${params.toString()}`);
         }}

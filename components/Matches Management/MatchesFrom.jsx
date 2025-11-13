@@ -14,6 +14,7 @@ import * as Yup from "yup";
 import Date from "../icons/Date";
 import DatePicker from "../ui app/DatePicker";
 import TextAreaInput from "../ui app/TextAreaInput";
+import toast from "react-hot-toast";
 const validateSchema = Yup.object({
   matchDate: Yup.date()
     .typeError("Invalid date format")
@@ -22,7 +23,7 @@ const validateSchema = Yup.object({
   matchTime: Yup.string().required("Match time is required"),
 
   matchType: Yup.string()
-    .oneOf(["SOLO", "DUO", "TEAM"], "Invalid match type")
+    .oneOf(["PLAYER", "TEAM"], "Invalid match type")
     .required("Match type is required"),
 
   status: Yup.string()
@@ -53,12 +54,19 @@ const validateSchema = Yup.object({
 
   stage: Yup.string().nullable(),
 });
-function MatchesFrom({ teamsOptions, gamesOptions, tournamentsOptions }) {
+function MatchesFrom({
+  teamsOptions,
+  gamesOptions,
+  tournamentsOptions,
+  submit,
+  match,
+  formType = "add",
+}) {
   const formik = useFormik({
     initialValues: {
       matchDate: "",
       matchTime: "",
-      matchType: "Player",
+      matchType: "PLAYER",
       status: "UPCOMING",
       seriesFormat: "",
       venueType: "ONLINE",
@@ -67,7 +75,7 @@ function MatchesFrom({ teamsOptions, gamesOptions, tournamentsOptions }) {
       summary: "",
       venue: "",
       streamUrl: "",
-      vodUrl: "",
+      // vodUrl: "",
       stage: "",
       tournament: {},
       winningTeam: "",
@@ -78,18 +86,42 @@ function MatchesFrom({ teamsOptions, gamesOptions, tournamentsOptions }) {
       },
     },
     validationSchema: validateSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      let dataValues = match ? { id: match.id, ...values } : values;
+
+      dataValues = {
+        ...dataValues,
+        games: { id: dataValues.games },
+        teams: [{ id: dataValues.teams.team1 }, { id: dataValues.teams.team2 }],
+        tournament: { id: dataValues.tournament },
+        winningTeam: null,
+        seriesFormat: "BO3",
+        stage: "Quarterfinals",
+      };
+
+      console.log(dataValues);
+      try {
+        await submit(dataValues);
+        formType === "add" && formik.resetForm();
+        toast.success(
+          formType === "add" ? "The match Added" : "The Match Edited"
+        );
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message);
+      }
     },
   });
 
   const matchTypeOptions = [
-    { value: "Player", label: "Player" },
-    { value: "Team", label: "Team" },
+    { value: "PLAYER", label: "Player" },
+    { value: "TEAM", label: "Team" },
   ];
   const matchStateOptions = [
-    { value: "ENDED", label: "ENDED" },
+    { value: "FINISHED", label: "FINISHED" },
     { value: "UPCOMING", label: "UPCOMING" },
+    { value: "LIVE", label: "LIVE" },
+    { value: "CANCELLED", label: "CANCELLED" },
   ];
   const tournamentOptions = [
     { value: "tournament 1", label: "tournament 1" },
@@ -100,14 +132,19 @@ function MatchesFrom({ teamsOptions, gamesOptions, tournamentsOptions }) {
     { value: "OFFLINE", label: "OFFLINE" },
   ];
 
-  console.log(formik.errors);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
         <FormRow>
           <SelectInput
-            options={tournamentOptions}
-            onChange={(value) => formik.setFieldValue("tournament", value)}
+            options={mappedArrayToSelectOptions(
+              tournamentsOptions,
+              "name",
+              "id"
+            )}
+            onChange={(value) =>
+              formik.setFieldValue("tournament", Number(value))
+            }
             value={formik.values.tournament}
             label={"Tournaments"}
             name={"tournament"}
@@ -412,7 +449,7 @@ function MatchesFrom({ teamsOptions, gamesOptions, tournamentsOptions }) {
             onChange={formik.handleChange}
             value={formik.values.streamUrl}
           />
-          <InputApp
+          {/* <InputApp
             label={"VOD URL"}
             name={"vodUrl"}
             type={"text"}
@@ -428,7 +465,7 @@ function MatchesFrom({ teamsOptions, gamesOptions, tournamentsOptions }) {
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             value={formik.values.vodUrl}
-          />
+          /> */}
         </FormRow>
         <TextAreaInput
           label={"Summary"}

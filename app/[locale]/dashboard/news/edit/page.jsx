@@ -9,8 +9,9 @@ const columns = [
   { id: "date", header: "Date" },
   { id: "link", header: "Link" },
 ];
-async function page() {
-  const news = await getNews();
+async function page({ searchParams }) {
+  const { size, page } = await searchParams;
+  const news = await getNews({ size, page });
 
   return <NewsTable news={news} columns={columns} />;
 }

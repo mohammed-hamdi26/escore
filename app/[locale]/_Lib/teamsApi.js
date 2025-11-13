@@ -1,8 +1,12 @@
 import apiClient from "./apiCLient";
 
-export async function getTeams() {
+export async function getTeams(searchParams = {}) {
+  const searchParamsString = Object.entries(searchParams)
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join("&");
+
   try {
-    const res = await apiClient.get("/teams");
+    const res = await apiClient.get(`/teams?${searchParamsString}`);
     return res.data;
   } catch (e) {
     console.log(e);

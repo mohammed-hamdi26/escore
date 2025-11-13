@@ -8,12 +8,16 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import GamesFilter from "./GamesFilter";
+import Pagination from "../ui app/Pagination";
 
 function GamesTable({ games, columns }) {
   const t = useTranslations("GamesTable");
   const [isLoading, setIsLoading] = useState(false);
+
   return (
-    <div>
+    <div className="space-y-8">
+      <GamesFilter />
       <Table
         t={t}
         grid_cols="grid-cols-[0.5fr_0.5fr_2fr]"
@@ -70,6 +74,7 @@ function GamesTable({ games, columns }) {
           </Table.Row>
         ))}
       </Table>
+      <Pagination />
     </div>
   );
 }

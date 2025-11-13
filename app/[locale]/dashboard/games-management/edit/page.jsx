@@ -6,8 +6,10 @@ const columns = [
   { id: "description", header: "Description" },
 ];
 
-async function page() {
-  const games = await getGames();
+async function page({ searchParams }) {
+  const { size, page } = await searchParams;
+  console.log(size);
+  const games = await getGames({ size, page });
 
   return <GamesTable games={games} columns={columns} />;
 }
