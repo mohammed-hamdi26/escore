@@ -6,9 +6,10 @@ import Image from "next/image";
 import InputApp from "./InputApp";
 import apiClient from "@/app/[locale]/_Lib/apiCLient";
 import { uploadPhoto } from "@/app/[locale]/_Lib/actions";
-import { Button } from "../ui/button";
+
 import toast from "react-hot-toast";
 import { useFormik } from "formik";
+import { ArrowUp, ChevronDown, ChevronUp, X } from "lucide-react";
 
 const { Input } = require("../ui/input");
 const { Label } = require("../ui/label");
@@ -28,7 +29,6 @@ function FileInput({
   async function handleAddFile(e) {
     if (e.target.files && e.target.files.length > 0) {
       setFiles(e.target.files[0]);
-      formik.setFieldValue(name, e.target.files[0]);
     }
   }
   console.log(name);
@@ -44,32 +44,45 @@ function FileInput({
           {...props}
         />
         {file && (
-          <Button
-            type="button"
-            onClick={async () => {
-              try {
-                const formData = new FormData();
-                formData.append("file", file);
-                const url = await uploadPhoto(formData);
-                setUrl(`https://db8f573bab41.ngrok-free.app${url}`);
-                formik.setFieldValue(
-                  name,
-                  `https://db8f573bab41.ngrok-free.app${url}`
-                );
-                toast.success("uploaded Photo");
-                return url;
-              } catch (e) {
-                console.log(e);
-                toast.error("error");
-              }
-            }}
-          >
-            Upload
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <PreviewImage file={file} />
+            {
+              <Button
+                className={"bg-green-primary hover:bg-green-primary/70 "}
+                onClick={async () => {
+                  try {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    const url = await uploadPhoto(formData);
+                    setUrl(`https://b1fd0acd5715.ngrok-free.app${url}`);
+                    formik.setFieldValue(
+                      name,
+                      `https://b1fd0acd5715.ngrok-free.app${url}`
+                    );
+                    toast.success("uploaded Photo");
+                    return url;
+                  } catch (e) {
+                    console.log(e);
+                    toast.error("error");
+                  }
+                }}
+              >
+                <ChevronUp />
+              </Button>
+            }
+            <Button
+              className={"bg-red-700 hover:bg-red-700/70 "}
+              onClick={() => {
+                setFiles(null);
+              }}
+            >
+              <X />
+            </Button>
+          </div>
         )}
 
         <InputApp
-          value={url}
+          value={formik.values?.[name]}
           onChange={formik.handleChange}
           // name={"logo"}
           name={name}
@@ -103,21 +116,28 @@ function UploadFile({ name, handleAddFile, ...props }) {
   );
 }
 
-function PreviewImage({ files }) {
+function PreviewImage({ file }) {
   return (
-    <div className="grid grid-cols-4 gap-4">
-      {files.map((file, index) => (
-        <div className="relative size-10 overflow-hidden rounded-full ">
-          <Image
-            fill
-            alt="file"
-            className=" object-cover"
-            key={index}
-            src={URL.createObjectURL(file)}
-          />
-        </div>
-      ))}
+    <div className="relative size-10 overflow-hidden rounded-full">
+      <Image
+        fill
+        alt="file"
+        className=" object-cover"
+        src={URL.createObjectURL(file)}
+      />
     </div>
+  );
+}
+
+function Button({ children, className, onClick }) {
+  return (
+    <button
+      className={` text-white rounded-full size-8 flex justify-center items-center transition duration-300 cursor-pointer ${className} `}
+      type="button"
+      onClick={onClick}
+    >
+      {children}
+    </button>
   );
 }
 export default FileInput;

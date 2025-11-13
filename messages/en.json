@@ -4,7 +4,10 @@
       "title": "Matches Management",
       "description": "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links"
     },
-
+    "Tournaments Management": {
+      "title": "Tournaments Management",
+      "description": "Go to Tournaments Section to Add Tournament: Name, Champion, Start Date, End Date, Teams, Players"
+    },
     "Players": {
       "title": "Players",
       "description": "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos"
@@ -143,7 +146,9 @@
     "Game Name": "Name",
     "Country": "Country",
     "Founded": "Founded",
-    "Description": "Description"
+    "Description": "Description",
+    "Delete": "Delete",
+    "Edit": "Edit"
   },
   "GameForm": {
     "Game Name": "Name",
@@ -163,7 +168,9 @@
   "GamesTable": {
     "Game": "Game",
     "Name": "Name",
-    "Description": "Description"
+    "Description": "Description",
+    "Delete": "Delete",
+    "Edit": "Edit"
   },
   "NewsForm": {
     "Title": "Title",
@@ -201,6 +208,10 @@
     "General News": "General News",
     "Regular News": "Regular News",
     "Feature": "Feature",
-    "Analysis": "Analysis"
+    "Analysis": "Analysis",
+    "Scheduled": "Scheduled",
+    "Transfer News": "Transfer News",
+    "Match Recap": "Match Recap",
+    "Trending": "Trending"
   }
 }

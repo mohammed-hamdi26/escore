@@ -27,7 +27,7 @@ function InputApp({
           <Input
             // initialValue={"hallo"}
             value={value}
-            defaultValue={value}
+            // defaultValue={value}
             onBlur={onBlur}
             placeholder={placeholder}
             className={

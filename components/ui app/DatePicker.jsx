@@ -41,7 +41,7 @@ function DatePicker({ label, name, formik, placeholder, icon }) {
                 }}
                 selected={formik.values[name]}
                 onSelect={(date) => {
-                  formik.setFieldValue(name, format(date, "yyyy-MM-dd"));
+                  formik.setFieldValue(name, date);
                   // formik.setFieldValue(name, date);
                   setOpen(false);
                   formik.setFieldTouched(name, true);
@@ -51,11 +51,9 @@ function DatePicker({ label, name, formik, placeholder, icon }) {
               />
             </PopoverContent>
           </Popover>
-          {formik?.errors?.date &&
-            formik?.touched?.date &&
-            formik?.values?.date && (
-              <p className="text-red-600">{formik?.errors?.date}</p>
-            )}
+          {formik?.errors?.[name] && formik?.touched?.[name] && (
+            <p className="text-red-600">{formik?.errors?.[name]}</p>
+          )}
         </div>
       </div>
     </div>

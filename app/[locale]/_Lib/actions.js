@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import apiClient from "./apiCLient";
 import axios from "axios";
+import { getLocale } from "next-intl/server";
 
 // login
 export async function login(userData) {
@@ -26,9 +27,12 @@ export async function addPlayer(playerData) {
   }
 }
 export async function editPlayer(playerData) {
+  const locale = await getLocale();
   try {
     const res = await apiClient.put(`/players/${playerData.id}`, playerData);
-    revalidatePath(`/dashboard/player-management/edit/${playerData.id}`);
+    revalidatePath(
+      `${locale}/dashboard/player-management/edit/${playerData.id}`
+    );
     return res.data;
   } catch (e) {
     console.log(e.response);
@@ -54,6 +58,18 @@ export async function updateGame(gameData) {
   } catch (e) {
     console.log(e.response);
     throw new Error("Error in updating game");
+  }
+}
+export async function deleteGame(id) {
+  const locale = await getLocale();
+  console.log(id);
+  try {
+    const res = await apiClient.delete(`/games/${id}`);
+    revalidatePath(`/${locale}/dashboard/games-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("error in Delete");
   }
 }
 
@@ -83,6 +99,7 @@ export async function updateTeam(teamData) {
 export async function addNews(newsData) {
   try {
     const res = await apiClient.post("/news", newsData);
+    console.log(res.data);
     return res.data;
   } catch (e) {
     console.log(e.response);
@@ -100,9 +117,20 @@ export async function editNews(newsData) {
     throw new Error("Error in updating news");
   }
 }
+export async function deleteNew(id) {
+  const locale = await getLocale();
+  console.log(id);
+  try {
+    const res = await apiClient.delete(`/games/${id}`);
+    revalidatePath(`/${locale}/dashboard/news/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("error in Delete");
+  }
+}
 
 export async function uploadPhoto(formData) {
-  console.log(formData.get("file"));
   try {
     const url = await apiClient.post("/files/upload", formData, {
       headers: {

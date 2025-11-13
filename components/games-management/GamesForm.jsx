@@ -14,6 +14,7 @@ import UserCardIcon from "../icons/UserCardIcon";
 import toast from "react-hot-toast";
 import ListInput from "../ui app/ListInput";
 import { useTranslations } from "next-intl";
+import FileInput from "../ui app/FileInput";
 const validationSchema = yup.object({
   name: yup.string().required("Name is required"),
   icon: yup.string().required("Icon is required"),
@@ -47,32 +48,34 @@ function GamesForm({
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       let dataValues = data ? { id: data.id, ...values } : values;
-      dataValues = {
-        ...dataValues,
-        players: dataValues.players.map((player) => {
-          return { id: JSON.parse(player).value };
-        }),
-        news: dataValues.news.map((news) => {
-          return { id: JSON.parse(news).value };
-        }),
-        teams: dataValues.teams.map((team) => {
-          return { id: JSON.parse(team).value };
-        }),
-        tournaments: dataValues.tournaments.map((tournament) => {
-          return { id: JSON.parse(tournament).value };
-        }),
-      };
-      console.log(dataValues);
+      // dataValues = {
+      //   ...dataValues,
+      //   players: dataValues.players.map((player) => {
+      //     return { id: JSON.parse(player).value };
+      //   }),
+      //   news: dataValues.news.map((news) => {
+      //     return { id: JSON.parse(news).value };
+      //   }),
+      //   teams: dataValues.teams.map((team) => {
+      //     return { id: JSON.parse(team).value };
+      //   }),
+      //   tournaments: dataValues.tournaments.map((tournament) => {
+      //     return { id: JSON.parse(tournament).value };
+      //   }),
+      // };
+
       try {
         const res = await submitFunction(dataValues);
-        console.log(res);
-        toast.success(successMessage);
+        typeForm === "add" && formik.resetForm();
+        toast.success(
+          typeForm === "add" ? "The Game is Added" : "The Game Is Edited"
+        );
       } catch (error) {
         toast.error(error.message);
       }
     },
   });
-
+  console.log(formik.errors, formik.isValid);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>
@@ -123,16 +126,11 @@ function GamesForm({
       </FormSection>
       <FormSection>
         <FormRow>
-          <InputApp
-            value={formik.values.icon}
-            onChange={formik.handleChange}
+          <FileInput
             label={t("Icon")}
             name={"icon"}
-            type={"text"}
             placeholder={t("Upload Game Icon")}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
+            formik={formik}
             icon={
               <ImageIcon
                 width="40"
@@ -141,19 +139,12 @@ function GamesForm({
                 color={"text-[#677185]"}
               />
             }
-            error={formik.touched.icon && formik.errors.icon}
-            onBlur={formik.handleBlur}
           />
-          <InputApp
-            value={formik.values.iconDark}
-            onChange={formik.handleChange}
+          <FileInput
             label={t("Icon (Dark)")}
             name={"iconDark"}
-            type={"text"}
             placeholder={t("Upload Dark Game Icon")}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
+            formik={formik}
             icon={
               <ImageIcon
                 width="40"
@@ -162,12 +153,10 @@ function GamesForm({
                 color={"text-[#677185]"}
               />
             }
-            error={formik.touched.iconDark && formik.errors.iconDark}
-            onBlur={formik.handleBlur}
           />
         </FormRow>
       </FormSection>
-      <FormSection>
+      {/* <FormSection>
         <FormRow>
           <ListInput
             label={t("Players")}
@@ -200,7 +189,7 @@ function GamesForm({
             placeholder={t("Tournaments")}
           />
         </FormRow>
-      </FormSection>
+      </FormSection> */}
       <div className="flex justify-end">
         <Button
           type="submit"

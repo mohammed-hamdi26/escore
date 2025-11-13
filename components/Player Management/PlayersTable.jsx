@@ -4,6 +4,7 @@ import Table from "../ui app/Table";
 import { Button } from "../ui/button";
 import FilterPlayers from "./FilterPlayers";
 import { Suspense, lazy } from "react";
+import Pagination from "../ui app/Pagination";
 
 function PlayersTable({ players, columns, search }) {
   return (
@@ -53,6 +54,8 @@ function PlayersTable({ players, columns, search }) {
           ))}
         </Table>
       </Suspense>
+
+      <Pagination />
     </div>
   );
 }
