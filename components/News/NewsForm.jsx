@@ -1,22 +1,21 @@
 "use client";
 import { useFormik } from "formik";
+import { Link, Newspaper, Play } from "lucide-react";
+import toast from "react-hot-toast";
 import * as yup from "yup";
 import Date from "../icons/Date";
 import Description from "../icons/Description";
-import Title from "../icons/Title";
-import Writer from "../icons/Writer";
 import ImageIcon from "../icons/ImageIcon";
+import Title from "../icons/Title";
+import User from "../icons/User";
+import Writer from "../icons/Writer";
 import DatePicker from "../ui app/DatePicker";
 import FormRow from "../ui app/FormRow";
 import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
-import TextAreaInput from "../ui app/TextAreaInput";
 import SelectInput from "../ui app/SelectInput";
-import { Link, Newspaper, Play } from "lucide-react";
-import User from "../icons/User";
-import TeamsManagement from "../icons/TeamsManagement";
+import TextAreaInput from "../ui app/TextAreaInput";
 import { Button } from "../ui/button";
-import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import FileInput from "../ui app/FileInput";
 
@@ -63,7 +62,7 @@ function NewsForm({ formType = "add", submit, newData }) {
   const formik = useFormik({
     initialValues,
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       const dataValues = newData ? { id: newData.id, ...values } : values;
 
       try {
@@ -274,7 +273,7 @@ function NewsForm({ formType = "add", submit, newData }) {
           <SelectInput
             t={t}
             name={"status"}
-            onChange={(value) => formik.setFieldValue("status", value)}
+            onChange={value => formik.setFieldValue("status", value)}
             value={formik.values.status}
             label={t("Status")}
             placeholder={t("Select Status")}
@@ -285,7 +284,7 @@ function NewsForm({ formType = "add", submit, newData }) {
           <SelectInput
             t={t}
             name={"newsType"}
-            onChange={(value) => formik.setFieldValue("newsType", value)}
+            onChange={value => formik.setFieldValue("newsType", value)}
             value={formik.values.newsType}
             label={t("News Type")}
             placeholder={t("Select News Type")}
@@ -308,7 +307,7 @@ function NewsForm({ formType = "add", submit, newData }) {
           }
         >
           {formik.isSubmitting
-            ? t("Submitting...")
+            ? t("Submitting__")
             : formType === "add"
             ? t("Submit")
             : t("Edit")}
