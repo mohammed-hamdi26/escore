@@ -3,23 +3,20 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import AgeIcon from "../icons/AgeIcon";
 import CountryIcon from "../icons/CountryIcon";
-import GamesManagement from "../icons/GamesManagement";
 import Player from "../icons/Player";
-import TeamsManagement from "../icons/TeamsManagement";
 import UserCardIcon from "../icons/UserCardIcon";
+import DatePicker from "../ui app/DatePicker";
 import FormRow from "../ui app/FormRow";
 import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
 import SelectInput from "../ui app/SelectInput";
 import { Button } from "../ui/button";
-import DatePicker from "../ui app/DatePicker";
-import FileInput from "../ui app/FileInput";
 
-import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
-import ListInput from "../ui app/ListInput";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import toast from "react-hot-toast";
+import ListInput from "../ui app/ListInput";
 
 const validateSchema = Yup.object({
   firstName: Yup.string().required("Required"),
@@ -97,36 +94,36 @@ function PlayerFrom({
       socialLinks: player?.socialLinks || [],
     },
     validationSchema: validateSchema,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       let dataValues = player ? { id: player.id, ...values } : values;
       dataValues = {
         ...dataValues,
-        games: dataValues.games.map((game) => {
+        games: dataValues.games.map(game => {
           return { id: +JSON.parse(game).value };
         }),
-        news: dataValues.news.map((news) => {
+        news: dataValues.news.map(news => {
           return { id: +JSON.parse(news).value };
         }),
-        teams: dataValues.teams.map((team) => {
+        teams: dataValues.teams.map(team => {
           return { id: +JSON.parse(team).value };
         }),
-        tournaments: dataValues.tournaments.map((tournament) => {
+        tournaments: dataValues.tournaments.map(tournament => {
           return { id: +JSON.parse(tournament).value };
         }),
       };
-      console.log(dataValues);
+      // console.log(dataValues);
       try {
         await submit(dataValues);
         router.refresh();
         toast.success(successMessage);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         toast.error(error.message);
       }
     },
   });
 
-  console.log(formik.errors);
+  // console.log(formik.errors);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
@@ -202,7 +199,7 @@ function PlayerFrom({
                 className={"fill-[#677185]"}
               />
             }
-            onChange={(value) => formik.setFieldValue("nationality", value)}
+            onChange={value => formik.setFieldValue("nationality", value)}
             value={formik.values.nationality}
           />
         </FormRow>
@@ -312,7 +309,7 @@ function PlayerFrom({
               { value: "game1", label: "Game 1" },
               { value: "game2", label: "Game 2" },
             ]}
-            onChange={(value) => formik.setFieldValue("mainGame", value)}
+            onChange={value => formik.setFieldValue("mainGame", value)}
             placeholder={t("Enter Main Game")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -519,7 +516,7 @@ function PlayerFrom({
             { value: "yes", label: "Yes" },
             { value: "no", label: "No" },
           ]}
-          onChange={(value) => formik.setFieldValue("selected", value)}
+          onChange={value => formik.setFieldValue("selected", value)}
           placeholder={t("Select Selected")}
           className="border-0 focus:outline-none "
           error={

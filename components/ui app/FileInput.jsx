@@ -1,15 +1,12 @@
 "use client";
+import { uploadPhoto } from "@/app/[locale]/_Lib/actions";
+import Image from "next/image";
 import { useState } from "react";
 import ImageIcon from "../icons/ImageIcon";
-import { fi } from "date-fns/locale";
-import Image from "next/image";
 import InputApp from "./InputApp";
-import apiClient from "@/app/[locale]/_Lib/apiCLient";
-import { uploadPhoto } from "@/app/[locale]/_Lib/actions";
 
+import { ChevronUp, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { useFormik } from "formik";
-import { ArrowUp, ChevronDown, ChevronUp, X } from "lucide-react";
 
 const { Input } = require("../ui/input");
 const { Label } = require("../ui/label");
@@ -31,7 +28,7 @@ function FileInput({
       setFiles(e.target.files[0]);
     }
   }
-  console.log(name);
+  // console.log(name);
 
   return (
     <div className="flex-1">
@@ -62,7 +59,7 @@ function FileInput({
                     toast.success("uploaded Photo");
                     return url;
                   } catch (e) {
-                    console.log(e);
+                    // console.log(e);
                     toast.error("error");
                   }
                 }}

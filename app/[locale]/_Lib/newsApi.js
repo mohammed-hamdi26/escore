@@ -5,7 +5,7 @@ export async function getNews() {
     const res = await apiClient.get("/news");
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in fetching news");
   }
 }

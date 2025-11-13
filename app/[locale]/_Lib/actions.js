@@ -1,8 +1,7 @@
 "use server";
+import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import apiClient from "./apiCLient";
-import axios from "axios";
-import { getLocale } from "next-intl/server";
 
 // login
 export async function login(userData) {
@@ -10,19 +9,19 @@ export async function login(userData) {
     const res = await apiClient.post("/authenticate", userData);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in login");
   }
 }
 
 // player actions
 export async function addPlayer(playerData) {
-  console.log(playerData);
+   // console.log(playerData);
   try {
     const res = await apiClient.post("/players", playerData);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in adding player");
   }
 }
@@ -35,7 +34,7 @@ export async function editPlayer(playerData) {
     );
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in updating player");
   }
 }
@@ -45,7 +44,7 @@ export async function addGame(gameData) {
     const res = await apiClient.post("/games", gameData);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in adding game");
   }
 }
@@ -56,19 +55,19 @@ export async function updateGame(gameData) {
     revalidatePath(`/dashboard/games-management/edit/${gameData.id}`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in updating game");
   }
 }
 export async function deleteGame(id) {
   const locale = await getLocale();
-  console.log(id);
+  // console.log(id);
   try {
     const res = await apiClient.delete(`/games/${id}`);
     revalidatePath(`/${locale}/dashboard/games-management/edit`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("error in Delete");
   }
 }
@@ -79,7 +78,7 @@ export async function addTeam(teamData) {
     const res = await apiClient.post("/teams", teamData);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in adding team");
   }
 }
@@ -90,7 +89,7 @@ export async function updateTeam(teamData) {
     revalidatePath(`/dashboard/teams-management/edit/${teamData.id}`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in updating team");
   }
 }
@@ -99,10 +98,10 @@ export async function updateTeam(teamData) {
 export async function addNews(newsData) {
   try {
     const res = await apiClient.post("/news", newsData);
-    console.log(res.data);
+    // console.log(res.data);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in adding news");
   }
 }
@@ -113,19 +112,19 @@ export async function editNews(newsData) {
     revalidatePath(`/dashboard/news/edit/${newsData.id}`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in updating news");
   }
 }
 export async function deleteNew(id) {
   const locale = await getLocale();
-  console.log(id);
+  // console.log(id);
   try {
     const res = await apiClient.delete(`/games/${id}`);
     revalidatePath(`/${locale}/dashboard/news/edit`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("error in Delete");
   }
 }
@@ -140,7 +139,7 @@ export async function uploadPhoto(formData) {
 
     return url.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("error in upload");
   }
 }

@@ -5,8 +5,8 @@ export async function getTeams() {
     const res = await apiClient.get("/teams");
     return res.data;
   } catch (e) {
-    console.log(e);
-    console.log(e.response);
+    // console.log(e);
+    // console.log(e.response);
     throw new Error("Failed to get teams");
   }
 }
@@ -16,7 +16,7 @@ export async function getTeam(id) {
     const res = await apiClient.get(`/teams/${id}`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Failed to get team");
   }
 }

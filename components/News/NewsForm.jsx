@@ -1,6 +1,7 @@
 "use client";
 import { useFormik } from "formik";
 import { Link, Newspaper, Play } from "lucide-react";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 import Date from "../icons/Date";
@@ -10,14 +11,13 @@ import Title from "../icons/Title";
 import User from "../icons/User";
 import Writer from "../icons/Writer";
 import DatePicker from "../ui app/DatePicker";
+import FileInput from "../ui app/FileInput";
 import FormRow from "../ui app/FormRow";
 import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
 import SelectInput from "../ui app/SelectInput";
 import TextAreaInput from "../ui app/TextAreaInput";
 import { Button } from "../ui/button";
-import { useTranslations } from "next-intl";
-import FileInput from "../ui app/FileInput";
 
 const validationSchema = yup.object({
   title: yup.string().required("Required"),
@@ -89,7 +89,7 @@ function NewsForm({ formType = "add", submit, newData }) {
     { value: "MATCH_RECAP", label: "Match Recap" },
     { value: "TRENDING", label: "Trending" },
   ];
-  console.log(formik.values);
+  // console.log(formik.values);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>

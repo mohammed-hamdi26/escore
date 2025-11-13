@@ -1,17 +1,16 @@
 "use client";
 import { useFormik } from "formik";
-import React from "react";
 import * as yup from "yup";
-import InputApp from "../ui app/InputApp";
-import FormSection from "../ui app/FormSection";
-import FormRow from "../ui app/FormRow";
-import { Button } from "../ui/button";
-import TextAreaInput from "../ui app/TextAreaInput";
-import DatePicker from "../ui app/DatePicker";
 import Date from "../icons/Date";
-import SelectInput from "../ui app/SelectInput";
-import FileInput from "../ui app/FileInput";
 import ImageIcon from "../icons/ImageIcon";
+import DatePicker from "../ui app/DatePicker";
+import FileInput from "../ui app/FileInput";
+import FormRow from "../ui app/FormRow";
+import FormSection from "../ui app/FormSection";
+import InputApp from "../ui app/InputApp";
+import SelectInput from "../ui app/SelectInput";
+import TextAreaInput from "../ui app/TextAreaInput";
+import { Button } from "../ui/button";
 
 const validateSchema = yup.object({
   name: yup.string().required("Tournament name is required"),
@@ -84,12 +83,12 @@ export default function TournamentsForm() {
       description: "",
     },
     validationSchema: validateSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: values => {
+      // console.log(values);
     },
   });
 
-  console.log(formik.errors);
+  // console.log(formik.errors);
 
   const statusOptions = [
     { value: "UPCOMING", label: "Upcoming" },
@@ -156,7 +155,7 @@ export default function TournamentsForm() {
           />
           <SelectInput
             options={statusOptions}
-            onChange={(value) => formik.setFieldValue("status", value)}
+            onChange={value => formik.setFieldValue("status", value)}
             value={formik.values.status}
             label={"Status"}
             name={"status"}
