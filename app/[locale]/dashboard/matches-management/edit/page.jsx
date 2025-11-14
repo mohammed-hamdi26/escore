@@ -12,7 +12,7 @@ const columns = [
 ];
 
 export default async function page({ searchParams }) {
-  const { size, date, page } = await searchParams;
+  const { size, page } = await searchParams;
   const matches = await getMatches({ size, page });
 
   return <MatchesTable matches={matches} columns={columns} />;
