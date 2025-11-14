@@ -17,7 +17,7 @@ import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-function DeleteLanguageButton({ code, onDelete }) {
+export default function DeleteDialog({ code, onDelete }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -76,4 +76,3 @@ function DeleteLanguageButton({ code, onDelete }) {
   );
 }
 
-export default DeleteLanguageButton;
