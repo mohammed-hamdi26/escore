@@ -4,7 +4,9 @@ import FormRow from "@/components/ui app/FormRow";
 import FormSection from "@/components/ui app/FormSection";
 import InputApp from "@/components/ui app/InputApp";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "@/i18n/navigation";
 import { useFormik } from "formik";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 
@@ -22,6 +24,7 @@ export default function LanguageForm({
   language = undefined,
   code = undefined,
 }) {
+  const router = useRouter();
   const formik = useFormik({
     initialValues: {
       code: language?.code || "",
@@ -34,6 +37,7 @@ export default function LanguageForm({
         ? Object.values(language.dictionary)[0] || ""
         : "",
     },
+    enableReinitialize: true,
     validationSchema: validationSchema,
     onSubmit: async values => {
       // Log raw form values
@@ -53,20 +57,37 @@ export default function LanguageForm({
       try {
         if (formType === "add") {
           await addLanguage(dataValues);
+          formik.resetForm();
+          toast.success(successMessage);
+          router.push("/dashboard/settings/language");
         } else if (formType === "update") {
           await updateLanguage(code, dataValues);
+          toast.success(successMessage);
+          router.push("/dashboard/settings/language");
         }
-
-        if (formType === "add") {
-          formik.resetForm();
-        }
-
-        toast.success(successMessage);
       } catch (error) {
         toast.error(error.message || "An error occurred");
       }
     },
   });
+
+  // Update form values when language prop changes
+  useEffect(() => {
+    if (language && formType === "update") {
+      formik.setValues({
+        code: language?.code || "",
+        name: language?.name || "",
+        name_local: language?.name_local || "",
+        word: language?.dictionary
+          ? Object.keys(language.dictionary)[0] || ""
+          : "",
+        value: language?.dictionary
+          ? Object.values(language.dictionary)[0] || ""
+          : "",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language, formType]);
 
   return (
     <form className="space-y-8" onSubmit={formik.handleSubmit}>

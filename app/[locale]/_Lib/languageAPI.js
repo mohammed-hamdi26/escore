@@ -28,3 +28,13 @@ export async function updateLanguage(code,language_data) {
     throw error;
   }
 }
+
+export async function getSpecificLanguage(code) {
+  try {
+    const response = await axios.get(`${BASE_URL}/languages/${code}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to get language:', error);
+    throw error;
+  }
+}

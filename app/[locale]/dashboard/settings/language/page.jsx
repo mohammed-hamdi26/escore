@@ -10,6 +10,9 @@ const columns = [
   { id: "name_local", header: "Local name" },
 ];
 
+// Force dynamic rendering to ensure fresh data after updates
+export const dynamic = "force-dynamic";
+
 export default async function LanguagePage() {
   const { data: languages } = await getLanguages();
   return (
@@ -45,7 +48,14 @@ export default async function LanguagePage() {
                       Dictionary
                     </Button>
                   </Link>
-                  <Link href={`/dashboard/settings/language/edit-page`}>
+                  <Link
+                    href={{
+                      pathname: `/dashboard/settings/language/edit-language`,
+                      query: {
+                        lang: lang?.code,
+                      },
+                    }}
+                  >
                     <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
                       Edit
                     </Button>
