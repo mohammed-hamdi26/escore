@@ -17,7 +17,7 @@ import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-export default function DeleteDialog({ code, onDelete }) {
+export default function LanguageDeleteDialog({ code, onDelete }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 

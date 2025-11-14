@@ -28,6 +28,16 @@ export async function updateWord(code, word, translation) {
   }
 }
 
+export async function getSpecificWordTranslation(code,word) {
+  try {
+    const response = await axios.get(`${BASE_URL}/languages/${code}/dictionary/${word}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to get word translation:', error);
+    throw error;
+  }
+}
+
 export async function deleteWord(code,word) {
   try {
     const response = await axios.delete(`${BASE_URL}/languages/${code}/dictionary/${word}`);

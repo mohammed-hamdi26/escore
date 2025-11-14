@@ -1,5 +1,5 @@
 import { getLanguages } from "@/app/[locale]/_Lib/languageAPI";
-import LanguagesTable from "./_components/LanguagesTable";
+import LanguagesTable from './_components/language/LanguagesTable';
 
 export const dynamic = "force-dynamic";
 

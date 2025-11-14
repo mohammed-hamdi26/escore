@@ -1,12 +1,11 @@
 "use client";
-
 import { getLanguages } from "@/app/[locale]/_Lib/languageAPI";
 import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { useState } from "react";
-import DeleteDialog from "./DeleteDialog";
 import LanguageDialog from "./LanguageDialog";
+import LanguageDeleteDialog from './LanguageDeleteDialog';
 
 const columns = [
   { id: "code", header: "Code" },
@@ -81,7 +80,7 @@ function LanguagesTable({ initialLanguages }) {
                     languageCode={lang.code}
                     onSuccess={handleLanguageAddedOrUpdated}
                   />
-                  <DeleteDialog
+                  <LanguageDeleteDialog
                     code={lang.code}
                     onDelete={handleLanguageDeleted}
                   />
