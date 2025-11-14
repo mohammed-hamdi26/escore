@@ -1,4 +1,4 @@
-import { addTournament } from "@/app/[locale]/_Lib/actions";
+import { addMatch, addTournament } from "@/app/[locale]/_Lib/actions";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
@@ -12,7 +12,7 @@ async function page() {
   ]);
   return (
     <MatchesFrom
-      submit={addTournament}
+      submit={addMatch}
       gamesOptions={gamesOptions}
       teamsOptions={teamsOptions}
       tournamentsOptions={tournamentsOptions}

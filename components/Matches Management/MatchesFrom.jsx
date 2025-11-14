@@ -23,7 +23,7 @@ const validateSchema = Yup.object({
   matchTime: Yup.string().required("Match time is required"),
 
   matchType: Yup.string()
-    .oneOf(["PLAYER", "TEAM"], "Invalid match type")
+    .oneOf(["SOLO", "TEAM"], "Invalid match type")
     .required("Match type is required"),
 
   status: Yup.string()
@@ -66,7 +66,7 @@ function MatchesFrom({
     initialValues: {
       matchDate: "",
       matchTime: "",
-      matchType: "PLAYER",
+      matchType: "SOLO",
       status: "UPCOMING",
       seriesFormat: "",
       venueType: "ONLINE",
@@ -91,12 +91,11 @@ function MatchesFrom({
 
       dataValues = {
         ...dataValues,
+
         games: { id: dataValues.games },
         teams: [{ id: dataValues.teams.team1 }, { id: dataValues.teams.team2 }],
         tournament: { id: dataValues.tournament },
         winningTeam: null,
-        seriesFormat: "BO3",
-        stage: "Quarterfinals",
       };
 
       console.log(dataValues);
@@ -114,7 +113,7 @@ function MatchesFrom({
   });
 
   const matchTypeOptions = [
-    { value: "PLAYER", label: "Player" },
+    { value: "SOLO", label: "Solo" },
     { value: "TEAM", label: "Team" },
   ];
   const matchStateOptions = [
@@ -123,9 +122,10 @@ function MatchesFrom({
     { value: "LIVE", label: "LIVE" },
     { value: "CANCELLED", label: "CANCELLED" },
   ];
-  const tournamentOptions = [
-    { value: "tournament 1", label: "tournament 1" },
-    { value: "tournament 2", label: "tournament 2" },
+  const seriesFormatOptions = [
+    { value: "BO1", label: "BO1" },
+    { value: "BO3", label: "BO3" },
+    { value: "BO5", label: "BO5" },
   ];
   const venueTypeOptions = [
     { value: "ONLINE", label: "ONLINE" },
@@ -288,22 +288,19 @@ function MatchesFrom({
             }
             // onBlur={formik.handleBlur}
           />
-          <InputApp
-            label={"Stage"}
-            value={formik.values.stage}
-            onChange={formik.handleChange}
-            name={"stage"}
-            type={"text"}
-            placeholder={"Enter Stage"}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
+          <SelectInput
+            options={seriesFormatOptions}
+            onChange={(value) => formik.setFieldValue("seriesFormat", value)}
+            value={formik.values.seriesFormat}
+            label={"Series Format"}
+            name={"seriesFormat"}
+            placeholder={"Select Series Format"}
             error={
-              formik?.errors?.stage && formik?.touched?.stage
-                ? formik?.errors?.stage
+              formik?.errors?.status && formik?.touched?.status
+                ? formik.errors.status
                 : ""
             }
-            onBlur={formik.handleBlur}
+            // onBlur={formik.handleBlur}
           />
         </FormRow>
       </FormSection>
@@ -346,6 +343,23 @@ function MatchesFrom({
             value={formik.values.player2Score}
           />
         </FormRow>
+        <InputApp
+          label={"Stage"}
+          value={formik.values.stage}
+          onChange={formik.handleChange}
+          name={"stage"}
+          type={"text"}
+          placeholder={"Enter Stage"}
+          className=" border-0 focus:outline-none "
+          backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+          textColor="text-[#677185]"
+          error={
+            formik?.errors?.stage && formik?.touched?.stage
+              ? formik?.errors?.stage
+              : ""
+          }
+          onBlur={formik.handleBlur}
+        />
       </FormSection>
 
       <FormSection>

@@ -15,7 +15,13 @@ const links = [
     description:
       "Go to Tournaments Section to Add Tournament: Name, Champion, Start Date, End Date, Teams, Players",
 
-    icon: <Champion width="57" height="56" className={"text-green-primary"} />,
+    icon: (
+      <Champion
+        width="57"
+        height="56"
+        className={"text-green-primary icon-transition"}
+      />
+    ),
   },
   {
     title: "Matches Management",
