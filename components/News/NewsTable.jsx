@@ -9,11 +9,14 @@ import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import NewFilter from "./NewFilter";
+import Pagination from "../ui app/Pagination";
 function NewsTable({ news, columns }) {
   const t = useTranslations();
   const [isLoading, setIsLoading] = useState(false);
   return (
-    <div>
+    <div className="space-y-8">
+      <NewFilter />
       <Table
         // showHeader={false}
         data={news}
@@ -65,6 +68,7 @@ function NewsTable({ news, columns }) {
           </Table.Row>
         ))}
       </Table>
+      <Pagination />
     </div>
   );
 }

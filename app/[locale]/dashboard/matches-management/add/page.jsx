@@ -1,14 +1,22 @@
+import { addTournament } from "@/app/[locale]/_Lib/actions";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
+import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import MatchesFrom from "@/components/Matches Management/MatchesFrom";
 
 async function page() {
-  const [teamsOptions, gamesOptions] = await Promise.all([
+  const [teamsOptions, gamesOptions, tournamentsOptions] = await Promise.all([
     getTeams(),
     getGames(),
+    getTournaments(),
   ]);
   return (
-    <MatchesFrom gamesOptions={gamesOptions} teamsOptions={teamsOptions} />
+    <MatchesFrom
+      submit={addTournament}
+      gamesOptions={gamesOptions}
+      teamsOptions={teamsOptions}
+      tournamentsOptions={tournamentsOptions}
+    />
   );
 }
 

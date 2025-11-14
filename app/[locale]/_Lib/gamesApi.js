@@ -1,8 +1,12 @@
 import apiClient from "./apiCLient";
 
-export async function getGames() {
+export async function getGames(searchParams) {
+  const searchParamsString = Object.entries(searchParams)
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join("&");
+  console.log("searchParamsString in getPlayers", searchParamsString);
   try {
-    const res = await apiClient.get("/games");
+    const res = await apiClient.get(`/games?${searchParamsString}`);
     return res.data;
   } catch (e) {
     // console.log(e.response);

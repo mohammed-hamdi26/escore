@@ -1,13 +1,22 @@
 import ServicesContainer from "@/components/dashboard/ServicesContainer";
-import SettingsIcon from '@/components/dashboard/SettingsIcon';
-import GamesManagement from '@/components/icons/GamesManagement';
-import MatchesManagement from '@/components/icons/MatchesManagement';
-import News from '@/components/icons/News';
-import Player from '@/components/icons/Player';
-import SupportCenter from '@/components/icons/SuppotCenter';
-import TeamsManagement from '@/components/icons/TeamsManagement';
-import User from '@/components/icons/User';
+import SettingsIcon from "@/components/dashboard/SettingsIcon";
+import Champion from "@/components/icons/Champion";
+import GamesManagement from "@/components/icons/GamesManagement";
+import MatchesManagement from "@/components/icons/MatchesManagement";
+import News from "@/components/icons/News";
+import Player from "@/components/icons/Player";
+import SupportCenter from "@/components/icons/SuppotCenter";
+import TeamsManagement from "@/components/icons/TeamsManagement";
+import User from "@/components/icons/User";
 const links = [
+  {
+    title: "Tournaments Management",
+    href: "/tournaments-management/add",
+    description:
+      "Go to Tournaments Section to Add Tournament: Name, Champion, Start Date, End Date, Teams, Players",
+
+    icon: <Champion width="57" height="56" className={"text-green-primary"} />,
+  },
   {
     title: "Matches Management",
     href: "/matches-management/add",
@@ -28,6 +37,7 @@ const links = [
     description: "Add Team: Name, Country, Linked Players, Logo/Images",
     icon: <TeamsManagement />,
   },
+
   {
     title: "Games Management",
     href: "/games-management/add",
@@ -58,9 +68,9 @@ const links = [
     title: "Settings",
     href: "/settings",
     description: "Manage your preferences and account configuration settings.",
-    icon: <SettingsIcon width='41' height='49' className="icon-transition" />,
+    icon: <SettingsIcon width="41" height="49" className="icon-transition" />,
   },
-]
+];
 export default function page() {
   return <ServicesContainer links={links} />;
 }

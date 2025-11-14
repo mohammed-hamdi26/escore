@@ -1,16 +1,17 @@
 "use client";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import Date from "../icons/Date";
-import ImageIcon from "../icons/ImageIcon";
-import DatePicker from "../ui app/DatePicker";
-import FileInput from "../ui app/FileInput";
-import FormRow from "../ui app/FormRow";
-import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
-import SelectInput from "../ui app/SelectInput";
-import TextAreaInput from "../ui app/TextAreaInput";
+import FormSection from "../ui app/FormSection";
+import FormRow from "../ui app/FormRow";
 import { Button } from "../ui/button";
+import TextAreaInput from "../ui app/TextAreaInput";
+import DatePicker from "../ui app/DatePicker";
+import Date from "../icons/Date";
+import SelectInput from "../ui app/SelectInput";
+import FileInput from "../ui app/FileInput";
+import ImageIcon from "../icons/ImageIcon";
+import toast from "react-hot-toast";
 
 const validateSchema = yup.object({
   name: yup.string().required("Tournament name is required"),
@@ -65,7 +66,11 @@ const validateSchema = yup.object({
   description: yup.string().required("Description is required"),
 });
 
-export default function TournamentsForm() {
+export default function TournamentsForm({
+  tournament,
+  submit,
+  formType = "add",
+}) {
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -83,8 +88,20 @@ export default function TournamentsForm() {
       description: "",
     },
     validationSchema: validateSchema,
-    onSubmit: values => {
-      // console.log(values);
+    onSubmit: async (values) => {
+      let dataValues = tournament ? { id: player.id, ...values } : values;
+
+      console.log(dataValues);
+      try {
+        await submit(dataValues);
+        formType === "add" && formik.resetForm();
+        toast.success(
+          formType === "add" ? "The Tournament Added" : "The Tournament Edited"
+        );
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message);
+      }
     },
   });
 
