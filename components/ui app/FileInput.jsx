@@ -9,7 +9,7 @@ import { uploadPhoto } from "@/app/[locale]/_Lib/actions";
 
 import toast from "react-hot-toast";
 import { useFormik } from "formik";
-import { ArrowUp, ChevronDown, ChevronUp, X } from "lucide-react";
+import { ArrowUp, ChevronDown, ChevronUp, icons, X } from "lucide-react";
 
 const { Input } = require("../ui/input");
 const { Label } = require("../ui/label");
@@ -39,6 +39,7 @@ function FileInput({
       <div className="flex justify-between items-center gap-4    ">
         {/* {file && <PreviewImage files={file} />} */}
         <UploadFile
+          icon={icon}
           name={`${name}-file`}
           handleAddFile={handleAddFile}
           {...props}
@@ -97,11 +98,11 @@ function FileInput({
   );
 }
 
-function UploadFile({ name, handleAddFile, ...props }) {
+function UploadFile({ name, handleAddFile, icon, ...props }) {
   return (
     <>
       <Label className={"cursor-pointer"} htmlFor={name}>
-        <ImageIcon />
+        {icon ? icon : <ImageIcon />}
       </Label>
       <Input
         onChange={handleAddFile}

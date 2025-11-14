@@ -5,8 +5,12 @@ import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import TeamsFilter from "./TeamsFilter";
 import Pagination from "../ui app/Pagination";
+import { deleteTeam } from "@/app/[locale]/_Lib/actions";
+import { useState } from "react";
+import toast from "react-hot-toast";
 export default function TeamsTable({ teams, columns }) {
   const t = useTranslations("TeamsTable");
+  const [isLoading, setIsLoading] = useState(false);
   return (
     <div className="space-y-8">
       <TeamsFilter />
@@ -23,14 +27,32 @@ export default function TeamsTable({ teams, columns }) {
             <Table.Cell>{team?.name}</Table.Cell>
             <Table.Cell>{team?.region}</Table.Cell>
             <Table.Cell>{team?.description}</Table.Cell>
-            <Table.Cell>
-              <div className="flex justify-end gap-4">
-                <Link href={`/dashboard/teams-management/edit/${team.id}`}>
-                  <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
-                    Edit
-                  </Button>
-                </Link>
-              </div>
+            <Table.Cell className="flex justify-end gap-4">
+              <Link href={`/dashboard/teams-management/edit/${team.id}`}>
+                <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
+                  {t("Edit")}
+                </Button>
+              </Link>
+
+              <Button
+                disabled={isLoading}
+                className={
+                  "text-white bg-red-800 rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
+                }
+                onClick={async () => {
+                  try {
+                    setIsLoading(true);
+                    await deleteTeam(team.id);
+                    toast.success("The Game is Deleted");
+                  } catch (e) {
+                    toast.error("error in Delete");
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+              >
+                {t("Delete")}
+              </Button>
             </Table.Cell>
           </Table.Row>
         ))}

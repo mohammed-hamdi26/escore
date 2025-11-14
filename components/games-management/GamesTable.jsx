@@ -10,6 +10,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import GamesFilter from "./GamesFilter";
 import Pagination from "../ui app/Pagination";
+import imageLogo from "@/public/images/a-flat-vector-lettermark-logo-design-sho_M1U1HI8tTvOIgjZLmcU6eg_gSbp1v7WSyql-yuko9RTsQ-removebg-preview.png";
 
 function GamesTable({ games, columns }) {
   const t = useTranslations("GamesTable");
@@ -20,21 +21,14 @@ function GamesTable({ games, columns }) {
       <GamesFilter />
       <Table
         t={t}
-        grid_cols="grid-cols-[0.5fr_0.5fr_2fr]"
+        grid_cols="grid-cols-[1fr_0.5fr_2fr]"
         data={games}
         columns={[...columns]}
       >
         {games.map((game) => (
-          <Table.Row key={game.id} grid_cols="grid-cols-[0.5fr_0.5fr_2fr]">
+          <Table.Row key={game.id} grid_cols="grid-cols-[1fr_0.5fr_2fr]">
             <Table.Cell className="flex items-center gap-2">
-              <Image
-                src={
-                  "https://db8f573bab41.ngrok-free.app/api/files/download/15a9e280-3225-4ec1-83c1-6204c48364a0uiux.png"
-                }
-                width={20}
-                height={20}
-                alt=""
-              />
+              <Image src={imageLogo} width={40} height={40} alt="" />
               {game.name}
             </Table.Cell>
             <Table.Cell> {game.description}</Table.Cell>

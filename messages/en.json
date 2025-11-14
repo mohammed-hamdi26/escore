@@ -62,7 +62,11 @@
   },
   "topNav": {
     "player management": "Player Management",
-    "teams management": "Teams Management"
+    "teams management": "Teams Management",
+    "games management": "Games Management",
+    "news": "News",
+    "tournaments management": "Tournaments Management",
+    "matches management": "Matches Management"
   },
   "buttonLinks": {
     "add new": "Add New",

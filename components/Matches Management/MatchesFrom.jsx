@@ -62,27 +62,28 @@ function MatchesFrom({
   match,
   formType = "add",
 }) {
+  console.log(match);
   const formik = useFormik({
     initialValues: {
-      matchDate: "",
-      matchTime: "",
-      matchType: "SOLO",
-      status: "UPCOMING",
-      seriesFormat: "",
-      venueType: "ONLINE",
-      player1Score: 0,
-      player2Score: 0,
-      summary: "",
-      venue: "",
-      streamUrl: "",
+      matchDate: match?.matchDate || "",
+      matchTime: match?.matchTime || "",
+      matchType: match?.matchType || "SOLO",
+      status: match?.status || "UPCOMING",
+      seriesFormat: match?.seriesFormat || "",
+      venueType: match?.venueType || "ONLINE",
+      player1Score: match?.player1Score || 0,
+      player2Score: match?.player2Score || 0,
+      summary: match?.summary || "",
+      venue: match?.venue || "",
+      streamUrl: match?.streamUrl || "",
       // vodUrl: "",
-      stage: "",
-      tournament: {},
-      winningTeam: "",
-      games: {},
+      stage: match?.stage || "",
+      tournament: match?.tournament?.id || {},
+      winningTeam: match?.winningTeam || null,
+      games: match?.games?.id || {},
       teams: {
-        team1: null,
-        team2: null,
+        team1: match?.teams[0]?.id || null,
+        team2: match?.teams[1]?.id || null,
       },
     },
     validationSchema: validateSchema,
@@ -506,7 +507,13 @@ function MatchesFrom({
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          Submit
+          {formik.isSubmitting
+            ? formType === "add"
+              ? "Adding..."
+              : "Editing..."
+            : formType === "add"
+            ? "Add Match"
+            : "Edit Match"}
         </Button>
       </div>
     </form>

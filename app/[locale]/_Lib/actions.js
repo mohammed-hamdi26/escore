@@ -39,6 +39,18 @@ export async function editPlayer(playerData) {
     throw new Error("Error in updating player");
   }
 }
+export async function deletePlayer(id) {
+  const locale = await getLocale();
+  console.log(id);
+  try {
+    const res = await apiClient.delete(`/players/${id}`);
+    revalidatePath(`${locale}/dashboard/player-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("error in Delete");
+  }
+}
 // games actions
 export async function addGame(gameData) {
   try {
@@ -51,6 +63,7 @@ export async function addGame(gameData) {
 }
 
 export async function updateGame(gameData) {
+  const locale = await getLocale();
   try {
     const res = await apiClient.put(`/games/${gameData.id}`, gameData);
     revalidatePath(`/${locale}/dashboard/games-management/edit/${gameData.id}`);
@@ -85,13 +98,28 @@ export async function addTeam(teamData) {
 }
 
 export async function updateTeam(teamData) {
+  const locale = await getLocale();
+  console.log(teamData);
   try {
     const res = await apiClient.put(`/teams/${teamData.id}`, teamData);
     revalidatePath(`/${locale}/dashboard/teams-management/edit/${teamData.id}`);
+    console.log(res.data);
     return res.data;
   } catch (e) {
     console.log(e.response);
     throw new Error("Error in updating team");
+  }
+}
+export async function deleteTeam(id) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.delete(`/teams/${id}`);
+    revalidatePath(`/${locale}/dashboard/teams-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("error in Delete");
   }
 }
 
@@ -214,8 +242,8 @@ export async function deleteMatch(id) {
   const locale = await getLocale();
   console.log(id);
   try {
-    const res = await apiClient.delete(`/games/${id}`);
-    revalidatePath(`/${locale}/dashboard/games-management/edit`);
+    const res = await apiClient.delete(`/matches/${id}`);
+    revalidatePath(`/${locale}/dashboard/matches-management/edit`);
     return res.data;
   } catch (e) {
     console.log(e.response);

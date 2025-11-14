@@ -3,10 +3,17 @@ import { Link } from "@/i18n/navigation";
 import Table from "../ui app/Table";
 import { Button } from "../ui/button";
 import FilterPlayers from "./FilterPlayers";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useState } from "react";
 import Pagination from "../ui app/Pagination";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import imageIcon from "@/public/images/a-flat-vector-lettermark-logo-design-sho_M1U1HI8tTvOIgjZLmcU6eg_gSbp1v7WSyql-yuko9RTsQ-removebg-preview.png";
+import toast from "react-hot-toast";
+import { deletePlayer } from "@/app/[locale]/_Lib/actions";
 
 function PlayersTable({ players, columns, search }) {
+  const t = useTranslations("PlayersTable");
+  const [isLoading, setIsLoading] = useState(false);
   return (
     <div className="space-y-8">
       <FilterPlayers search={search} />
@@ -27,7 +34,9 @@ function PlayersTable({ players, columns, search }) {
               <Table.Cell>
                 {player.firstName} {player.lastName}
               </Table.Cell>
-              <Table.Cell>{player.photo}</Table.Cell>
+              <Table.Cell>
+                <Image src={imageIcon} width={40} height={40} />
+              </Table.Cell>
               <Table.Cell>{player.birthDate}</Table.Cell>
               <Table.Cell>{player.nationality}</Table.Cell>
               <Table.Cell>
@@ -42,11 +51,23 @@ function PlayersTable({ players, columns, search }) {
                     </Button>
                   </Link>
                   <Button
+                    disabled={isLoading}
                     className={
-                      "text-white bg-red-800 rounded-full min-w-[100px] cursor-pointer"
+                      "text-white bg-red-800 rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
                     }
+                    onClick={async () => {
+                      try {
+                        setIsLoading(true);
+                        await deletePlayer(player.id);
+                        toast.success("The Player is Deleted");
+                      } catch (e) {
+                        toast.error("error in Delete");
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
                   >
-                    Delete
+                    {t("Delete")}
                   </Button>
                 </div>
               </Table.Cell>

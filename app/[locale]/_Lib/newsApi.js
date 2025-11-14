@@ -13,3 +13,13 @@ export async function getNews(searchParams = {}) {
     throw new Error("Error in fetching news");
   }
 }
+
+export async function getNew(id) {
+  try {
+    const res = await apiClient.get(`/news/${id}`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Failed to get News");
+  }
+}

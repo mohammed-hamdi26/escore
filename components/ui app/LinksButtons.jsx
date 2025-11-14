@@ -13,7 +13,7 @@ function LinksButtons() {
     <div className="flex gap-4  mb-8">
       <Link href={pathname.slice(0, pathname.lastIndexOf("edit")) + "add"}>
         <Button
-          // disabled={pathname.includes("add")}
+          disabled={pathname.includes("add")}
           className={`text-white  text-center min-w-[100px]  px-5 py-2 rounded-lg ${
             pathname.includes("add")
               ? "bg-green-primary cursor-not-allowed hover:bg-green-primary "
@@ -25,7 +25,7 @@ function LinksButtons() {
       </Link>
       <Link href={pathname.slice(0, pathname.lastIndexOf("add")) + "edit"}>
         <Button
-          // disabled={pathname.includes("edit")}
+          disabled={pathname.includes("edit")}
           className={` text-white text-center min-w-[100px] px-5 py-2 rounded-lg ${
             pathname.includes("edit")
               ? "bg-green-primary disabled:cursor-not-allowed hover:bg-green-primary "

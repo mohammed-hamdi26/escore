@@ -33,23 +33,23 @@
       "description": "اذهب إلى مركز الدعم لعرض رسائل المستخدمين والرد عليهم"
     },
     "Settings": {
-      "title":"الإعدادات",
+      "title": "الإعدادات",
       "description": "غيّر المظهر واللغة لتخصيص تجربتك."
     },
     "Languages": {
-      "title":"اللغة",
+      "title": "اللغة",
       "description": "تعديل اللغات المدعومة"
     },
     "Appearance": {
-      "title":"المظهر",
+      "title": "المظهر",
       "description": "تعديل المظهر والالوان"
     },
     "About": {
-      "title":"حول",
+      "title": "حول",
       "description": "تعديل صفحة معلومات حول التطبيق"
     },
     "Privacy and Policy": {
-      "title":"السياسات والخصوصية",
+      "title": "السياسات والخصوصية",
       "description": "تعديل السياسات والخصوصية"
     }
   },
@@ -59,7 +59,11 @@
   },
   "topNav": {
     "player management": "إدارة اللاعبين",
-    "teams management": "إدارة الفرق"
+    "teams management": "إدارة الفرق",
+    "games management": "إدارة الألعاب",
+    "news": "الأخبار",
+    "tournaments management": "إدارة البطولات",
+    "matches management": "إدارة المباريات"
   },
   "buttonLinks": {
     "add new": "إضافة جديد",
