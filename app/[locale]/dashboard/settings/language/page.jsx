@@ -1,16 +1,8 @@
 import { getLanguages } from "@/app/[locale]/_Lib/languageAPI";
-import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-// import DeleteLanguageButton from './_components/DeleteButton';
+import LanguagesTable from "./_components/LanguagesTable";
 
-const columns = [
-  { id: "code", header: "Code" },
-  { id: "name", header: "Name" },
-  { id: "name_local", header: "Local name" },
-];
-
-// Force dynamic rendering to ensure fresh data after updates
 export const dynamic = "force-dynamic";
 
 export default async function LanguagePage() {
@@ -29,43 +21,7 @@ export default async function LanguagePage() {
         </Link>
       </div>
       <div>
-        <Table
-          grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
-          columns={[...columns]}
-        >
-          {languages.map(lang => (
-            <Table.Row
-              key={lang.code}
-              grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
-            >
-              <Table.Cell>{lang?.code}</Table.Cell>
-              <Table.Cell>{lang?.name}</Table.Cell>
-              <Table.Cell>{lang?.name_local}</Table.Cell>
-              <Table.Cell>
-                <div className="flex justify-end gap-4">
-                  <Link href={`/dashboard/settings/language/${lang?.code}`}>
-                    <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
-                      Dictionary
-                    </Button>
-                  </Link>
-                  <Link
-                    href={{
-                      pathname: `/dashboard/settings/language/edit-language`,
-                      query: {
-                        lang: lang?.code,
-                      },
-                    }}
-                  >
-                    <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
-                      Edit
-                    </Button>
-                  </Link>
-                  {/* <DeleteLanguageButton code={lang.code}/> */}
-                </div>
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table>
+        <LanguagesTable initialLanguages={languages} />
       </div>
     </>
   );

@@ -38,3 +38,13 @@ export async function getSpecificLanguage(code) {
     throw error;
   }
 }
+
+export async function deleteLanguage(code) {
+  try {
+    const response = await axios.delete(`${BASE_URL}/languages/${code}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to delete language:', error);
+    throw error;
+  }
+}
