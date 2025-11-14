@@ -17,3 +17,14 @@ export async function addLanguage(language_data) {
     throw error;
   }
 }
+
+export async function updateLanguage(code,language_data) {
+  try {
+    const response = await axios.put(`${BASE_URL}/languages/${code}`, language_data);
+    console.log('Language updated:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to update language:', error);
+    throw error;
+  }
+}
