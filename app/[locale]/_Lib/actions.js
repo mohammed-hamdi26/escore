@@ -159,6 +159,7 @@ export async function addTournament(tournamentData) {
 }
 
 export async function editTournament(tournamentData) {
+  const locale = await getLocale();
   try {
     const res = await apiClient.put(
       `/tournaments/${tournamentData.id}`,
