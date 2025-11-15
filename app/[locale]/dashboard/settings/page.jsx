@@ -12,7 +12,7 @@ const links = [
   },
   {
     title: "Appearance",
-    href: "/settings/appearance",
+    href: "/settings/apperance",
     description: "update and modify global appearance",
     icon: <User />,
   },
