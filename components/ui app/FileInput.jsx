@@ -7,8 +7,6 @@ import InputApp from "./InputApp";
 
 import { ChevronUp, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { useFormik } from "formik";
-import { ArrowUp, ChevronDown, ChevronUp, icons, X } from "lucide-react";
 
 const { Input } = require("../ui/input");
 const { Label } = require("../ui/label");
