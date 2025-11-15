@@ -66,7 +66,7 @@ const links = [
   },
   {
     title: "Support Center",
-    href: "/support-center/add",
+    href: "/support-center",
     description: "Go to Support Center to view user messages and reply to them",
     icon: <SupportCenter />,
   },

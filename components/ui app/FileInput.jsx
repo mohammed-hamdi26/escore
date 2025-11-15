@@ -34,16 +34,15 @@ function FileInput({
   // console.log(name);
 
   return (
-    <div className={flexGrow}>
+    <div className={flexGrow + " "}>
       {label && (
         <Label className={"text-[#677185] dark:text-white mb-4"}>{label}</Label>
       )}
       <div
-        className={`flex ${
+        className={`flex    ${
           typeFile === "image" ? "justify-between" : ""
-        }  items-center gap-4`}
+        } gap-4`}
       >
-        {/* {file && <PreviewImage files={file} />} */}
         <UploadFile
           icon={icon}
           name={`${name}-file`}

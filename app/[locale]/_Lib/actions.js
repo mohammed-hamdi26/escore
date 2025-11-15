@@ -269,3 +269,13 @@ export async function addFavoriteCharacter(characterData) {
     throw new Error("Error in adding favorite character");
   }
 }
+
+export async function addAward(awardData) {
+  try {
+    const res = await apiClient.post("/achievements", awardData);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in adding favorite game");
+  }
+}
