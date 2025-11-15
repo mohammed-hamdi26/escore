@@ -1,25 +1,23 @@
 "use client";
+import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { useFormik } from "formik";
 import { TreePalm } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslations } from "use-intl";
 import * as yup from "yup";
 import Date from "../icons/Date";
 import Description from "../icons/Description";
 import ImageIcon from "../icons/ImageIcon";
-import TeamsManagement from "../icons/TeamsManagement";
 import UserCardIcon from "../icons/UserCardIcon";
 import DatePicker from "../ui app/DatePicker";
+import FileInput from "../ui app/FileInput";
 import FormRow from "../ui app/FormRow";
 import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
+import ListInput from "../ui app/ListInput";
 import SelectInput from "../ui app/SelectInput";
 import TextAreaInput from "../ui app/TextAreaInput";
 import { Button } from "../ui/button";
-import CountryIcon from "../icons/CountryIcon";
-import { useTranslations } from "use-intl";
-import ListInput from "../ui app/ListInput";
-import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
-import FileInput from "../ui app/FileInput";
 
 const validationSchema = yup.object({
   name: yup.string().required("Required"),
@@ -72,7 +70,7 @@ function TeamForm({
       news: team?.news || [],
     },
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       let dataValues = team ? { id: team.id, ...values } : values;
 
       dataValues = {
@@ -104,20 +102,20 @@ function TeamForm({
         }),
       };
 
-      console.log("data", dataValues);
+      // console.log("data", dataValues);
       try {
         const res = await submit(dataValues);
 
         formType === "add" && formik.resetForm();
         toast.success(successMessage);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         toast.error(error.message);
       }
     },
   });
-  console.log("formik ", formik.values);
-  console.log("formik errors", formik.errors);
+  // console.log("formik ", formik.values);
+  // console.log("formik errors", formik.errors);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>
@@ -252,11 +250,11 @@ function TeamForm({
               : ""
           }
           // onBlur={formik.handleBlur}
-          onBlur={(e) => {
+          onBlur={e => {
             formik.handleBlur(e);
             formik.setFieldValue("description", e.target.value.trim());
           }}
-          onChange={(e) => {
+          onChange={e => {
             formik.setFieldValue("description", e.target.value);
           }}
         />
@@ -359,7 +357,7 @@ function TeamForm({
         <FormRow>
           <SelectInput
             value={formik.values.subscribe}
-            onChange={(value) => {
+            onChange={value => {
               formik.setFieldValue("subscribe", value);
             }}
             // onChange={formik.handleChange}
@@ -374,7 +372,7 @@ function TeamForm({
           />
           <SelectInput
             // value={formik?.values?.captain}
-            onChange={(value) => {
+            onChange={value => {
               formik.setFieldValue("captain", value);
             }}
             label={t("Captain")}

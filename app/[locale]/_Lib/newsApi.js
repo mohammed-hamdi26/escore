@@ -9,7 +9,7 @@ export async function getNews(searchParams = {}) {
     const res = await apiClient.get(`/news?${searchParamsString}`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Error in fetching news");
   }
 }

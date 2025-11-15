@@ -1,26 +1,19 @@
-import ServicesContainer from '@/components/dashboard/ServicesContainer';
-import SettingsIcon from '@/components/dashboard/SettingsIcon';
-import GamesManagement from '@/components/icons/GamesManagement';
-import MatchesManagement from '@/components/icons/MatchesManagement';
-import News from '@/components/icons/News';
-import Player from '@/components/icons/Player';
-import SupportCenter from '@/components/icons/SuppotCenter';
-import TeamsManagement from '@/components/icons/TeamsManagement';
-import User from '@/components/icons/User';
+import ServicesContainer from "@/components/dashboard/ServicesContainer";
+import SettingsIcon from "@/components/dashboard/SettingsIcon";
+import News from "@/components/icons/News";
+import SupportCenter from "@/components/icons/SuppotCenter";
+import User from "@/components/icons/User";
 const links = [
-  
   {
     title: "Languages",
-    href: "/settings/languages",
-    description:
-      "update and modify supported languages",
+    href: "/settings/language",
+    description: "update and modify supported languages",
     icon: <News />,
   },
   {
     title: "Appearance",
     href: "/settings/appearance",
-    description:
-      "update and modify global appearance",
+    description: "update and modify global appearance",
     icon: <User />,
   },
   {
@@ -33,11 +26,11 @@ const links = [
     title: "Privacy and Policy",
     href: "/settings/privacy",
     description: "Manage your privacy and Policy configuration settings.",
-    icon: <SettingsIcon width='41' height='49' className="icon-transition" />,
+    icon: <SettingsIcon width="41" height="49" className="icon-transition" />,
   },
-]
+];
 function page() {
-  return <ServicesContainer links={links}/> ;
+  return <ServicesContainer links={links} />;
 }
 
 export default page;

@@ -1,19 +1,16 @@
 "use client";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import Description from "../icons/Description";
 import GamesManagement from "../icons/GamesManagement";
-import FormSection from "../ui app/FormSection";
+import ImageIcon from "../icons/ImageIcon";
 import FormRow from "../ui app/FormRow";
+import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
 import { Button } from "../ui/button";
-import Description from "../icons/Description";
-import ImageIcon from "../icons/ImageIcon";
-import News from "../icons/News";
-import UserCardIcon from "../icons/UserCardIcon";
 
-import toast from "react-hot-toast";
-import ListInput from "../ui app/ListInput";
 import { useTranslations } from "next-intl";
+import toast from "react-hot-toast";
 import FileInput from "../ui app/FileInput";
 const validationSchema = yup.object({
   name: yup.string().required("Name is required"),
@@ -46,7 +43,7 @@ function GamesForm({
       tournaments: data?.tournaments || [],
     },
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       let dataValues = data ? { id: data.id, ...values } : values;
       // dataValues = {
       //   ...dataValues,
@@ -75,7 +72,7 @@ function GamesForm({
       }
     },
   });
-  console.log(formik.errors, formik.isValid);
+  // console.log(formik.errors, formik.isValid);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>

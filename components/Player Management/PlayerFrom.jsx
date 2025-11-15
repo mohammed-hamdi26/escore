@@ -3,23 +3,20 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import AgeIcon from "../icons/AgeIcon";
 import CountryIcon from "../icons/CountryIcon";
-import GamesManagement from "../icons/GamesManagement";
 import Player from "../icons/Player";
-import TeamsManagement from "../icons/TeamsManagement";
 import UserCardIcon from "../icons/UserCardIcon";
+import DatePicker from "../ui app/DatePicker";
 import FormRow from "../ui app/FormRow";
 import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
 import SelectInput from "../ui app/SelectInput";
 import { Button } from "../ui/button";
-import DatePicker from "../ui app/DatePicker";
-import FileInput from "../ui app/FileInput";
 
-import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
-import ListInput from "../ui app/ListInput";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import toast from "react-hot-toast";
+import ListInput from "../ui app/ListInput";
 
 const validateSchema = Yup.object({
   firstName: Yup.string().required("Required"),
@@ -97,7 +94,7 @@ function PlayerFrom({
       socialLinks: player?.socialLinks || [],
     },
     validationSchema: validateSchema,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       let dataValues = player ? { id: player.id, ...values } : values;
 
       dataValues = {
@@ -130,13 +127,13 @@ function PlayerFrom({
             })) ??
           [],
       };
-      console.log(dataValues);
+      // console.log(dataValues);
       try {
         await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(successMessage);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         toast.error(error.message);
       }
     },
@@ -218,7 +215,7 @@ function PlayerFrom({
                 className={"fill-[#677185]"}
               />
             }
-            onChange={(value) => formik.setFieldValue("nationality", value)}
+            onChange={value => formik.setFieldValue("nationality", value)}
             value={formik.values.nationality}
           />
         </FormRow>
@@ -515,7 +512,7 @@ function PlayerFrom({
             { value: "yes", label: "Yes" },
             { value: "no", label: "No" },
           ]}
-          onChange={(value) => formik.setFieldValue("selected", value)}
+          onChange={value => formik.setFieldValue("selected", value)}
           placeholder={t("Select Selected")}
           className="border-0 focus:outline-none "
           error={

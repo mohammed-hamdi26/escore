@@ -1,12 +1,12 @@
 "use client";
-import * as yup from "yup";
 import { useFormik } from "formik";
-import FormSection from "../ui app/FormSection";
-import FormRow from "../ui app/FormRow";
-import InputApp from "../ui app/InputApp";
-import UserCardIcon from "../icons/UserCardIcon";
+import * as yup from "yup";
 import EmailIcon from "../icons/EmailIcon";
 import PasswordIcon from "../icons/PasswordIcon";
+import UserCardIcon from "../icons/UserCardIcon";
+import FormRow from "../ui app/FormRow";
+import FormSection from "../ui app/FormSection";
+import InputApp from "../ui app/InputApp";
 const validationSchema = yup.object({
   name: yup.string().required("Required"),
   email: yup.string().email("Invalid email address").required("Required"),
@@ -20,8 +20,8 @@ function EditUserForm() {
       password: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: values => {
+      // console.log(values);
     },
   });
   return (

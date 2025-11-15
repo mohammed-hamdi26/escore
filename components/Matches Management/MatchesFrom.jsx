@@ -159,7 +159,7 @@ function MatchesFrom({
           />
           <SelectInput
             options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
-            onChange={(value) => formik.setFieldValue("games", Number(value))}
+            onChange={value => formik.setFieldValue("games", Number(value))}
             value={formik.values.games}
             label={"Game"}
             name={"games"}
@@ -180,12 +180,12 @@ function MatchesFrom({
             name={"team"}
             options={mappedArrayToSelectOptions(
               teamsOptions.filter(
-                (team) => team.id !== formik.values?.teams?.team2
+                team => team.id !== formik.values?.teams?.team2
               ),
               "name",
               "id"
             )}
-            onChange={(value) =>
+            onChange={value =>
               formik.setFieldValue("teams.team1", Number(value))
             }
             value={formik.values.teams.team1}
@@ -211,12 +211,12 @@ function MatchesFrom({
             name={"teams.team2"}
             options={mappedArrayToSelectOptions(
               teamsOptions.filter(
-                (team) => team.id !== formik.values?.teams?.team1
+                team => team.id !== formik.values?.teams?.team1
               ),
               "name",
               "id"
             )}
-            onChange={(value) =>
+            onChange={value =>
               formik.setFieldValue("teams.team2", Number(value))
             }
             value={formik.values?.teams?.team2}
@@ -241,7 +241,7 @@ function MatchesFrom({
             name={"winningTeam"}
             options={mappedArrayToSelectOptions(
               teamsOptions.filter(
-                (team) =>
+                team =>
                   (team.id === formik.values?.teams?.team1) |
                   (team.id === formik.values?.teams?.team2)
               ),
@@ -249,7 +249,7 @@ function MatchesFrom({
               "id"
             )}
             disabled={!formik.values.teams.team1 || !formik.values.teams.team2}
-            onChange={(value) =>
+            onChange={value =>
               formik.setFieldValue("winningTeam", Number(value))
             }
             value={formik.values.winningTeam}
@@ -260,7 +260,7 @@ function MatchesFrom({
         <FormRow>
           <SelectInput
             options={matchTypeOptions}
-            onChange={(value) => formik.setFieldValue("matchType", value)}
+            onChange={value => formik.setFieldValue("matchType", value)}
             value={formik.values.matchType}
             label={"Match Type"}
             name={"matchType"}
@@ -276,7 +276,7 @@ function MatchesFrom({
 
           <SelectInput
             options={matchStateOptions}
-            onChange={(value) => formik.setFieldValue("status", value)}
+            onChange={value => formik.setFieldValue("status", value)}
             value={formik.values.status}
             label={"Match State"}
             name={"status"}
@@ -368,7 +368,7 @@ function MatchesFrom({
           <SelectInput
             label={"Venue Type"}
             options={venueTypeOptions}
-            onChange={(value) => formik.setFieldValue("venueType", value)}
+            onChange={value => formik.setFieldValue("venueType", value)}
             value={formik.values.venueType}
             error={
               formik?.errors?.venueType && formik?.touched?.venueType
@@ -377,7 +377,7 @@ function MatchesFrom({
             }
             icon={<MapPin className="text-[#677185]" height={35} width={35} />}
             name={"venueType"}
-            onBlur={(open) => {
+            onBlur={open => {
               if (!open) formik.setFieldTouched("venueType", true);
             }}
           />

@@ -1,6 +1,5 @@
 "use client";
 import { useFormik } from "formik";
-import React from "react";
 import * as yup from "yup";
 import InputApp from "../ui app/InputApp";
 import FormSection from "../ui app/FormSection";
@@ -108,7 +107,7 @@ export default function TournamentsForm({
     },
   });
 
-  console.log(formik.errors);
+  // console.log(formik.errors);
 
   const statusOptions = [
     { value: "UPCOMING", label: "Upcoming" },
@@ -175,7 +174,7 @@ export default function TournamentsForm({
           />
           <SelectInput
             options={statusOptions}
-            onChange={(value) => formik.setFieldValue("status", value)}
+            onChange={value => formik.setFieldValue("status", value)}
             value={formik.values.status}
             label={"Status"}
             name={"status"}

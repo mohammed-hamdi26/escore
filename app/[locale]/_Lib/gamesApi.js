@@ -9,7 +9,7 @@ export async function getGames(searchParams = {}) {
     const res = await apiClient.get(`/games?${searchParamsString}`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Failed to get games");
   }
 }
@@ -19,7 +19,7 @@ export async function getGame(id) {
     const res = await apiClient.get(`/games/${id}`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
+    // console.log(e.response);
     throw new Error("Failed to get game");
   }
 }
