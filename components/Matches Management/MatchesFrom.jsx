@@ -23,7 +23,7 @@ const validateSchema = Yup.object({
   matchTime: Yup.string().required("Match time is required"),
 
   matchType: Yup.string()
-    .oneOf(["PLAYER", "TEAM"], "Invalid match type")
+    .oneOf(["SOLO", "TEAM"], "Invalid match type")
     .required("Match type is required"),
 
   status: Yup.string()
@@ -62,27 +62,28 @@ function MatchesFrom({
   match,
   formType = "add",
 }) {
+  console.log(match);
   const formik = useFormik({
     initialValues: {
-      matchDate: "",
-      matchTime: "",
-      matchType: "PLAYER",
-      status: "UPCOMING",
-      seriesFormat: "",
-      venueType: "ONLINE",
-      player1Score: 0,
-      player2Score: 0,
-      summary: "",
-      venue: "",
-      streamUrl: "",
+      matchDate: match?.matchDate || "",
+      matchTime: match?.matchTime || "",
+      matchType: match?.matchType || "SOLO",
+      status: match?.status || "UPCOMING",
+      seriesFormat: match?.seriesFormat || "",
+      venueType: match?.venueType || "ONLINE",
+      player1Score: match?.player1Score || 0,
+      player2Score: match?.player2Score || 0,
+      summary: match?.summary || "",
+      venue: match?.venue || "",
+      streamUrl: match?.streamUrl || "",
       // vodUrl: "",
-      stage: "",
-      tournament: {},
-      winningTeam: "",
-      games: {},
+      stage: match?.stage || "",
+      tournament: match?.tournament?.id || {},
+      winningTeam: match?.winningTeam || null,
+      games: match?.games?.id || {},
       teams: {
-        team1: null,
-        team2: null,
+        team1: match?.teams[0]?.id || null,
+        team2: match?.teams[1]?.id || null,
       },
     },
     validationSchema: validateSchema,
@@ -91,12 +92,11 @@ function MatchesFrom({
 
       dataValues = {
         ...dataValues,
+
         games: { id: dataValues.games },
         teams: [{ id: dataValues.teams.team1 }, { id: dataValues.teams.team2 }],
         tournament: { id: dataValues.tournament },
         winningTeam: null,
-        seriesFormat: "BO3",
-        stage: "Quarterfinals",
       };
 
       console.log(dataValues);
@@ -114,7 +114,7 @@ function MatchesFrom({
   });
 
   const matchTypeOptions = [
-    { value: "PLAYER", label: "Player" },
+    { value: "SOLO", label: "Solo" },
     { value: "TEAM", label: "Team" },
   ];
   const matchStateOptions = [
@@ -123,9 +123,10 @@ function MatchesFrom({
     { value: "LIVE", label: "LIVE" },
     { value: "CANCELLED", label: "CANCELLED" },
   ];
-  const tournamentOptions = [
-    { value: "tournament 1", label: "tournament 1" },
-    { value: "tournament 2", label: "tournament 2" },
+  const seriesFormatOptions = [
+    { value: "BO1", label: "BO1" },
+    { value: "BO3", label: "BO3" },
+    { value: "BO5", label: "BO5" },
   ];
   const venueTypeOptions = [
     { value: "ONLINE", label: "ONLINE" },
@@ -288,22 +289,19 @@ function MatchesFrom({
             }
             // onBlur={formik.handleBlur}
           />
-          <InputApp
-            label={"Stage"}
-            value={formik.values.stage}
-            onChange={formik.handleChange}
-            name={"stage"}
-            type={"text"}
-            placeholder={"Enter Stage"}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
+          <SelectInput
+            options={seriesFormatOptions}
+            onChange={(value) => formik.setFieldValue("seriesFormat", value)}
+            value={formik.values.seriesFormat}
+            label={"Series Format"}
+            name={"seriesFormat"}
+            placeholder={"Select Series Format"}
             error={
-              formik?.errors?.stage && formik?.touched?.stage
-                ? formik?.errors?.stage
+              formik?.errors?.status && formik?.touched?.status
+                ? formik.errors.status
                 : ""
             }
-            onBlur={formik.handleBlur}
+            // onBlur={formik.handleBlur}
           />
         </FormRow>
       </FormSection>
@@ -346,6 +344,23 @@ function MatchesFrom({
             value={formik.values.player2Score}
           />
         </FormRow>
+        <InputApp
+          label={"Stage"}
+          value={formik.values.stage}
+          onChange={formik.handleChange}
+          name={"stage"}
+          type={"text"}
+          placeholder={"Enter Stage"}
+          className=" border-0 focus:outline-none "
+          backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+          textColor="text-[#677185]"
+          error={
+            formik?.errors?.stage && formik?.touched?.stage
+              ? formik?.errors?.stage
+              : ""
+          }
+          onBlur={formik.handleBlur}
+        />
       </FormSection>
 
       <FormSection>
@@ -492,7 +507,13 @@ function MatchesFrom({
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          Submit
+          {formik.isSubmitting
+            ? formType === "add"
+              ? "Adding..."
+              : "Editing..."
+            : formType === "add"
+            ? "Add Match"
+            : "Edit Match"}
         </Button>
       </div>
     </form>

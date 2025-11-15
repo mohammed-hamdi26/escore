@@ -39,6 +39,18 @@ export async function editPlayer(playerData) {
     throw new Error("Error in updating player");
   }
 }
+export async function deletePlayer(id) {
+  const locale = await getLocale();
+  console.log(id);
+  try {
+    const res = await apiClient.delete(`/players/${id}`);
+    revalidatePath(`${locale}/dashboard/player-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("error in Delete");
+  }
+}
 // games actions
 export async function addGame(gameData) {
   try {
@@ -51,9 +63,10 @@ export async function addGame(gameData) {
 }
 
 export async function updateGame(gameData) {
+  const locale = await getLocale();
   try {
     const res = await apiClient.put(`/games/${gameData.id}`, gameData);
-    revalidatePath(`/dashboard/games-management/edit/${gameData.id}`);
+    revalidatePath(`/${locale}/dashboard/games-management/edit/${gameData.id}`);
     return res.data;
   } catch (e) {
     console.log(e.response);
@@ -85,13 +98,28 @@ export async function addTeam(teamData) {
 }
 
 export async function updateTeam(teamData) {
+  const locale = await getLocale();
+  console.log(teamData);
   try {
     const res = await apiClient.put(`/teams/${teamData.id}`, teamData);
-    revalidatePath(`/dashboard/teams-management/edit/${teamData.id}`);
+    revalidatePath(`/${locale}/dashboard/teams-management/edit/${teamData.id}`);
+    console.log(res.data);
     return res.data;
   } catch (e) {
     console.log(e.response);
     throw new Error("Error in updating team");
+  }
+}
+export async function deleteTeam(id) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.delete(`/teams/${id}`);
+    revalidatePath(`/${locale}/dashboard/teams-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("error in Delete");
   }
 }
 
@@ -110,7 +138,7 @@ export async function addNews(newsData) {
 export async function editNews(newsData) {
   try {
     const res = await apiClient.put(`/news/${newsData.id}`, newsData);
-    revalidatePath(`/dashboard/news/edit/${newsData.id}`);
+    revalidatePath(`/${locale}/dashboard/news/edit/${newsData.id}`);
     return res.data;
   } catch (e) {
     console.log(e.response);
@@ -159,12 +187,13 @@ export async function addTournament(tournamentData) {
 }
 
 export async function editTournament(tournamentData) {
+  const locale = await getLocale();
   try {
     const res = await apiClient.put(
       `/tournaments/${tournamentData.id}`,
       tournamentData
     );
-    revalidatePath(`/dashboard/news/edit/${tournamentData.id}`);
+    revalidatePath(`/${locale}/dashboard/news/edit/${tournamentData.id}`);
     return res.data;
   } catch (e) {
     console.log(e.response);
@@ -181,5 +210,43 @@ export async function deleteTournament(id) {
   } catch (e) {
     console.log(e.response);
     throw new Error("error in Delete tournament");
+  }
+}
+
+// matches
+
+export async function addMatch(matchData) {
+  try {
+    const res = await apiClient.post("/matches", matchData);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in adding game");
+  }
+}
+
+export async function updateMatch(matchData) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(`/games/${matchData.id}`, matchData);
+    revalidatePath(
+      `/${locale}/dashboard/matches-management/edit/${matchData.id}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in updating game");
+  }
+}
+export async function deleteMatch(id) {
+  const locale = await getLocale();
+  console.log(id);
+  try {
+    const res = await apiClient.delete(`/matches/${id}`);
+    revalidatePath(`/${locale}/dashboard/matches-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("error in Delete");
   }
 }

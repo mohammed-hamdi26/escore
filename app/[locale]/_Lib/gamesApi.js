@@ -1,7 +1,7 @@
 import apiClient from "./apiCLient";
 
-export async function getGames(searchParams) {
-  const searchParamsString = Object.entries(searchParams)
+export async function getGames(searchParams = {}) {
+  const searchParamsString = Object?.entries(searchParams)
     .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
     .join("&");
   console.log("searchParamsString in getPlayers", searchParamsString);

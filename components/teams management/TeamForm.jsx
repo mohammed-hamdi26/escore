@@ -74,16 +74,33 @@ function TeamForm({
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       let dataValues = team ? { id: team.id, ...values } : values;
+
       dataValues = {
         ...dataValues,
         games: dataValues.games.map((game) => {
-          return { id: +JSON.parse(game).value };
+          console.log(game);
+          return {
+            id:
+              typeof game === "string"
+                ? +JSON.parse(game).value
+                : game.value || game.id,
+          };
         }),
         news: dataValues.news.map((news) => {
-          return { id: +JSON.parse(news).value };
+          return {
+            id:
+              typeof news === "string"
+                ? +JSON.parse(news).value
+                : news.value || news.id,
+          };
         }),
-        players: dataValues.news.map((news) => {
-          return { id: +JSON.parse(news).value };
+        players: dataValues.players.map((player) => {
+          return {
+            id:
+              typeof player === "string"
+                ? +JSON.parse(player).value
+                : player.value || player.id,
+          };
         }),
       };
 
@@ -397,7 +414,7 @@ function TeamForm({
               "id"
             )}
             initialData={mappedArrayToSelectOptions(
-              formik?.values?.games,
+              formik?.values?.players,
               "firstName",
               "id"
             )}
@@ -458,7 +475,7 @@ function TeamForm({
 
       <div className="flex justify-end">
         <Button
-          disabled={formik.isSubmitting}
+          disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
           className={
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"

@@ -192,13 +192,19 @@ function GamesForm({
       </FormSection> */}
       <div className="flex justify-end">
         <Button
+          disabled={!formik.isValid || formik.isSubmitting}
           type="submit"
           className={
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
-          disabled={!formik.isValid || formik.isSubmitting}
         >
-          {typeForm === "add" ? t("Submit") : t("Edit")}
+          {formik.isSubmitting
+            ? typeForm === "add"
+              ? "Adding..."
+              : "Editing..."
+            : typeForm === "add"
+            ? "Add Game"
+            : "Edit Game"}
         </Button>
       </div>
     </form>

@@ -62,11 +62,12 @@ function NewsForm({ formType = "add", submit, newData }) {
   const formik = useFormik({
     initialValues,
     validationSchema: validationSchema,
-    onSubmit: async values => {
+    onSubmit: async (values) => {
       const dataValues = newData ? { id: newData.id, ...values } : values;
 
       try {
         await submit(dataValues);
+        formType === "add" && formik.resetForm();
         toast.success(
           formType === "add"
             ? "News added successfully"
@@ -273,7 +274,7 @@ function NewsForm({ formType = "add", submit, newData }) {
           <SelectInput
             t={t}
             name={"status"}
-            onChange={value => formik.setFieldValue("status", value)}
+            onChange={(value) => formik.setFieldValue("status", value)}
             value={formik.values.status}
             label={t("Status")}
             placeholder={t("Select Status")}
@@ -284,7 +285,7 @@ function NewsForm({ formType = "add", submit, newData }) {
           <SelectInput
             t={t}
             name={"newsType"}
-            onChange={value => formik.setFieldValue("newsType", value)}
+            onChange={(value) => formik.setFieldValue("newsType", value)}
             value={formik.values.newsType}
             label={t("News Type")}
             placeholder={t("Select News Type")}
