@@ -16,7 +16,7 @@ export async function login(userData) {
 
 // player actions
 export async function addPlayer(playerData) {
-   // console.log(playerData);
+  // console.log(playerData);
   try {
     const res = await apiClient.post("/players", playerData);
     return res.data;
@@ -247,5 +247,25 @@ export async function deleteMatch(id) {
   } catch (e) {
     console.log(e.response);
     throw new Error("error in Delete");
+  }
+}
+
+export async function addLink(linkData) {
+  try {
+    const res = await apiClient.post("/social-links", linkData);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in adding link");
+  }
+}
+
+export async function addFavoriteCharacter(characterData) {
+  try {
+    const res = await apiClient.post("/favorite-characters", characterData);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in adding favorite character");
   }
 }

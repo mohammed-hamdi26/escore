@@ -8,6 +8,8 @@ import Pagination from "../ui app/Pagination";
 import { deleteTeam } from "@/app/[locale]/_Lib/actions";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import DropMenu from "../ui app/DropMenu";
+import { EllipsisVertical, Link2 } from "lucide-react";
 export default function TeamsTable({ teams, columns }) {
   const t = useTranslations("TeamsTable");
   const [isLoading, setIsLoading] = useState(false);
@@ -53,6 +55,23 @@ export default function TeamsTable({ teams, columns }) {
               >
                 {t("Delete")}
               </Button>
+              <DropMenu
+                menuTrigger={<EllipsisVertical />}
+                menuContent={[
+                  {
+                    id: "links",
+                    menuItem: (
+                      <Link
+                        href={`/dashboard/teams-management/links/${team.id}`}
+                        className="flex items-center gap-2"
+                      >
+                        <Link2 />
+                        <span>Links</span>
+                      </Link>
+                    ),
+                  },
+                ]}
+              />
             </Table.Cell>
           </Table.Row>
         ))}
