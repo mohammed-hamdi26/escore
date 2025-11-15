@@ -96,25 +96,41 @@ function PlayerFrom({
     validationSchema: validateSchema,
     onSubmit: async values => {
       let dataValues = player ? { id: player.id, ...values } : values;
+
       dataValues = {
         ...dataValues,
-        games: dataValues.games.map(game => {
-          return { id: +JSON.parse(game).value };
-        }),
-        news: dataValues.news.map(news => {
-          return { id: +JSON.parse(news).value };
-        }),
-        teams: dataValues.teams.map(team => {
-          return { id: +JSON.parse(team).value };
-        }),
-        tournaments: dataValues.tournaments.map(tournament => {
-          return { id: +JSON.parse(tournament).value };
-        }),
+
+        games:
+          (dataValues?.games &&
+            dataValues?.games?.map((game) => {
+              return { id: +JSON.parse(game).value };
+            })) ??
+          [],
+        news:
+          (dataValues?.news &&
+            dataValues?.news?.map((news) => {
+              return { id: +JSON.parse(news).value };
+            })) ??
+          [],
+
+        teams:
+          (dataValues?.teams &&
+            dataValues?.teams?.map((team) => {
+              return { id: +JSON.parse(team).value };
+            })) ??
+          [],
+
+        tournaments:
+          (dataValues?.tournaments &&
+            dataValues?.tournaments?.map((tournament) => {
+              return { id: +JSON.parse(tournament).value };
+            })) ??
+          [],
       };
       // console.log(dataValues);
       try {
         await submit(dataValues);
-        router.refresh();
+        formType === "add" && formik.resetForm();
         toast.success(successMessage);
       } catch (error) {
         // console.log(error);
@@ -123,7 +139,7 @@ function PlayerFrom({
     },
   });
 
-  // console.log(formik.errors);
+  console.log(formik.errors, formik.dirty, formik.isValid);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
@@ -207,14 +223,12 @@ function PlayerFrom({
 
       <FormSection>
         <FormRow>
-          <InputApp
+          <FileInput
+            formik={formik}
             type={"text"}
             name={"photo"}
             label={"Player Photo"}
             placeholder={"Enter Player Photo"}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
             icon={
               <Player
                 width="40"
@@ -223,22 +237,13 @@ function PlayerFrom({
                 className={"fill-[#677185]"}
               />
             }
-            error={
-              formik?.errors?.photo && formik?.touched?.photo
-                ? formik.errors.photo
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
           />
-          <InputApp
+          <FileInput
+            formik={formik}
             type={"text"}
             name={"photoDark"}
             label={"Player Photo Dark"}
             placeholder={"Enter Player Photo Dark"}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
             icon={
               <Player
                 width="40"
@@ -247,13 +252,6 @@ function PlayerFrom({
                 className={"fill-[#677185]"}
               />
             }
-            error={
-              formik?.errors?.photoDark && formik?.touched?.photoDark
-                ? formik.errors.photoDark
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
           />
         </FormRow>
       </FormSection>
@@ -305,11 +303,8 @@ function PlayerFrom({
             value={formik.values.mainGame}
             label={t("Main Game")}
             t={t}
-            options={[
-              { value: "game1", label: "Game 1" },
-              { value: "game2", label: "Game 2" },
-            ]}
-            onChange={value => formik.setFieldValue("mainGame", value)}
+            options={mappedArrayToSelectOptions(gamesOptions, "name", "name")}
+            onChange={(value) => formik.setFieldValue("mainGame", value)}
             placeholder={t("Enter Main Game")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
@@ -477,10 +472,11 @@ function PlayerFrom({
                 : ""
             }
             placeholder={t("Enter Tournaments")}
-            options={[
-              { value: "1", name: "Tournament 1" },
-              { value: "2", name: "Tournament 2" },
-            ]}
+            options={mappedArrayToSelectOptions(
+              tournamentsOptions || [],
+              "name",
+              "id"
+            )}
             initialData={formik?.values?.tournaments}
             label={t("Tournaments")}
           />

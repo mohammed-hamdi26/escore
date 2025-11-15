@@ -16,3 +16,13 @@ export async function getMatches(searchParams = {}) {
     throw new Error("Error in get Matches");
   }
 }
+
+export async function getMatch(id) {
+  try {
+    const res = await apiClient.get(`/matches/${id}`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Failed to get Match");
+  }
+}

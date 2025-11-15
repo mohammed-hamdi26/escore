@@ -6,6 +6,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "../ui/label";
+import Image from "next/image";
+import imagePhoto from "@/public/images/a-flat-vector-lettermark-logo-design-sho_M1U1HI8tTvOIgjZLmcU6eg_gSbp1v7WSyql-yuko9RTsQ-removebg-preview.png";
 function SelectInput({
   t,
   placeholder,
@@ -54,7 +56,12 @@ function SelectInput({
             </SelectTrigger>
             <SelectContent>
               {options.map((option) => (
-                <SelectItem key={option?.value} value={option?.value}>
+                <SelectItem
+                  className={"flex gap-4"}
+                  key={option?.value}
+                  value={option?.value}
+                >
+                  <Image src={imagePhoto} width={50} height={50} alt="" />{" "}
                   {option?.label || option?.name}
                 </SelectItem>
               ))}

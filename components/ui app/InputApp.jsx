@@ -20,12 +20,15 @@ function InputApp({
   return (
     <div className={flexGrow}>
       {label && (
-        <Label className={"mb-4 text-[#677185] dark:text-white"}>{label}</Label>
+        <Label htmlFor={name} className={"mb-4 text-[#677185] dark:text-white"}>
+          {label}
+        </Label>
       )}
       <div className="flex items-center gap-4 ">
         {icon && icon}
         <div className="flex-1 space-y-2">
           <Input
+            id={name}
             // initialValue={"hallo"}
             value={value}
             // defaultValue={value}

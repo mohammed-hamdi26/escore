@@ -73,25 +73,27 @@ export default function TournamentsForm({
 }) {
   const formik = useFormik({
     initialValues: {
-      name: "",
-      organizer: "",
-      startDate: "",
-      endDate: "",
-      venue: "",
-      prizePool: 0,
-      status: "UPCOMING",
-      logo: "",
-      logoDark: "",
-      winningPoints: 0,
-      losingPoints: 0,
-      drawPoints: 0,
-      description: "",
+      name: tournament?.name || "",
+      organizer: tournament?.organizer || "",
+      startDate: tournament?.startDate || "",
+      endDate: tournament?.endDate || "",
+      venue: tournament?.venue || "",
+      prizePool: tournament?.prizePool || 0,
+      status: tournament?.status || "UPCOMING",
+      logo: tournament?.logo || "",
+      logoDark: tournament?.logoDark || "",
+      winningPoints: tournament?.winningPoints || 0,
+      losingPoints: tournament?.losingPoints || 0,
+      drawPoints: tournament?.drawPoints || 0,
+      description: tournament?.description || "",
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
-      let dataValues = tournament ? { id: player.id, ...values } : values;
+      let dataValues = tournament ? { id: tournament.id, ...values } : values;
+      dataValues.country = {
+        id: 1051,
+      };
 
-      console.log(dataValues);
       try {
         await submit(dataValues);
         formType === "add" && formik.resetForm();
@@ -337,12 +339,15 @@ export default function TournamentsForm({
 
       <div className="flex justify-end">
         <Button
+          disabled={!formik.isValid || formik.isSubmitting}
           type="submit"
           className={
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          Submit
+          {formik.isSubmitting &&
+            (formType === "add" ? "Adding..." : "Editing...")}
+          {!formik.isSubmitting && formType === "add" ? "Add" : "Edit"}
         </Button>
       </div>
     </form>
