@@ -11,7 +11,7 @@ import imageIcon from "@/public/images/a-flat-vector-lettermark-logo-design-sho_
 import toast from "react-hot-toast";
 import { deletePlayer } from "@/app/[locale]/_Lib/actions";
 import DropMenu from "../ui app/DropMenu";
-import { EllipsisVertical, Heart, Link2 } from "lucide-react";
+import { Award, EllipsisVertical, Heart, Link2 } from "lucide-react";
 
 function PlayersTable({ players, columns, search }) {
   const t = useTranslations("PlayersTable");
@@ -91,10 +91,22 @@ function PlayersTable({ players, columns, search }) {
                         menuItem: (
                           <Link
                             href={`/dashboard/player-management/favorites-characters/${player.id}`}
-                            className="flex items-center gap-2"
+                            className="flex  items-center gap-2 flex-1"
                           >
                             <Heart />
                             <span>Favorites characters</span>
+                          </Link>
+                        ),
+                      },
+                      {
+                        id: "awards",
+                        menuItem: (
+                          <Link
+                            href={`/dashboard/player-management/awards/${player.id}`}
+                            className="flex items-center gap-2"
+                          >
+                            <Award />
+                            <span>Awards</span>
                           </Link>
                         ),
                       },

@@ -16,7 +16,10 @@ function DropMenu({ menuTrigger, menuContent = [] }) {
       <DropdownMenuContent align="start" className="w-34">
         <DropdownMenuGroup>
           {menuContent.map((item, index) => (
-            <DropdownMenuItem key={item.id}> {item.menuItem}</DropdownMenuItem>
+            <DropdownMenuItem className={"cursor-pointer"} key={item.id}>
+              {" "}
+              {item.menuItem}
+            </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
       </DropdownMenuContent>
