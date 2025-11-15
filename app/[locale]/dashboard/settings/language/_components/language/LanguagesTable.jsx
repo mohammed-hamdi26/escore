@@ -23,7 +23,6 @@ function LanguagesTable({ initialLanguages }) {
   };
 
   const handleLanguageAddedOrUpdated = async () => {
-    // Refresh the languages list from the API
     try {
       const { data: updatedLanguages } = await getLanguages();
       setLanguages(updatedLanguages);
