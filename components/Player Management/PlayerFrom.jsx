@@ -17,6 +17,7 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import ListInput from "../ui app/ListInput";
+import FileInput from "../ui app/FileInput";
 
 const validateSchema = Yup.object({
   firstName: Yup.string().required("Required"),
@@ -94,7 +95,7 @@ function PlayerFrom({
       socialLinks: player?.socialLinks || [],
     },
     validationSchema: validateSchema,
-    onSubmit: async values => {
+    onSubmit: async (values) => {
       let dataValues = player ? { id: player.id, ...values } : values;
 
       dataValues = {
@@ -215,7 +216,7 @@ function PlayerFrom({
                 className={"fill-[#677185]"}
               />
             }
-            onChange={value => formik.setFieldValue("nationality", value)}
+            onChange={(value) => formik.setFieldValue("nationality", value)}
             value={formik.values.nationality}
           />
         </FormRow>
@@ -512,7 +513,7 @@ function PlayerFrom({
             { value: "yes", label: "Yes" },
             { value: "no", label: "No" },
           ]}
-          onChange={value => formik.setFieldValue("selected", value)}
+          onChange={(value) => formik.setFieldValue("selected", value)}
           placeholder={t("Select Selected")}
           className="border-0 focus:outline-none "
           error={

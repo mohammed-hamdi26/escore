@@ -33,7 +33,15 @@ async function page({ searchParams }) {
     size: size || 20,
     page,
   });
-  // const players = [];
+  // const players = [
+  //   {
+  //     id: 1,
+  //     firstName: "Bilibili",
+  //     lastName: "Bilibili",
+  //     birthDate: "2000-01-01",
+  //     nationality: "Saudi Arabia",
+  //   },
+  // ];
 
   return (
     <Suspense fallback={<Loading />}>

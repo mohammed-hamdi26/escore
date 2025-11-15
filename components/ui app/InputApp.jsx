@@ -15,6 +15,7 @@ function InputApp({
   onBlur,
   value,
   flexGrow = "flex-1",
+  hidden = false,
   disabled = false,
 }) {
   return (
@@ -29,7 +30,6 @@ function InputApp({
         <div className="flex-1 space-y-2">
           <Input
             id={name}
-            // initialValue={"hallo"}
             value={value}
             // defaultValue={value}
             onBlur={onBlur}
@@ -42,6 +42,7 @@ function InputApp({
             name={name}
             onChange={onChange}
             disabled={disabled}
+            hidden={hidden}
           />
           {error && <p className="text-red-600">* {error}</p>}
         </div>

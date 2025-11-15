@@ -1,6 +1,6 @@
 function FormRow({ children }) {
   return (
-    <div className="flex flex-col  md:flex-row justify-between gap-24">
+    <div className="flex flex-col  md:flex-row md:justify-between md:items-center gap-24">
       {children}
     </div>
   );

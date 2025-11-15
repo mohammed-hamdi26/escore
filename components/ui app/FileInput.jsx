@@ -18,6 +18,9 @@ function FileInput({
   formik,
   name,
   placeholder,
+  disabled,
+  typeFile = "image",
+  flexGrow = "flex-1",
   ...props
 }) {
   const [file, setFiles] = useState(null);
@@ -31,9 +34,15 @@ function FileInput({
   // console.log(name);
 
   return (
-    <div className="flex-1">
-      <Label className={"text-[#677185] dark:text-white mb-4"}>{label}</Label>
-      <div className="flex justify-between items-center gap-4    ">
+    <div className={flexGrow}>
+      {label && (
+        <Label className={"text-[#677185] dark:text-white mb-4"}>{label}</Label>
+      )}
+      <div
+        className={`flex ${
+          typeFile === "image" ? "justify-between" : ""
+        }  items-center gap-4`}
+      >
         {/* {file && <PreviewImage files={file} />} */}
         <UploadFile
           icon={icon}
@@ -42,10 +51,11 @@ function FileInput({
           {...props}
         />
         {file && (
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex  items-center gap-2">
             <PreviewImage file={file} />
             {
               <Button
+                disabled={disabled}
                 className={"bg-green-primary hover:bg-green-primary/70 "}
                 onClick={async () => {
                   try {
@@ -83,12 +93,15 @@ function FileInput({
           value={formik.values?.[name]}
           onChange={formik.handleChange}
           // name={"logo"}
+
+          hidden={typeFile !== "image" ? true : false}
           name={name}
           type={"text"}
           placeholder={placeholder}
-          className="p-0 border-0 focus:outline-none  "
+          className={`p-0 border-0 focus:outline-none `}
           backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
           textColor="text-[#677185]"
+          flexGrow={flexGrow}
         />
       </div>
     </div>

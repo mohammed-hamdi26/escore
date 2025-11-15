@@ -10,6 +10,8 @@ import Image from "next/image";
 import imageIcon from "@/public/images/a-flat-vector-lettermark-logo-design-sho_M1U1HI8tTvOIgjZLmcU6eg_gSbp1v7WSyql-yuko9RTsQ-removebg-preview.png";
 import toast from "react-hot-toast";
 import { deletePlayer } from "@/app/[locale]/_Lib/actions";
+import DropMenu from "../ui app/DropMenu";
+import { EllipsisVertical, Heart, Link2 } from "lucide-react";
 
 function PlayersTable({ players, columns, search }) {
   const t = useTranslations("PlayersTable");
@@ -69,6 +71,35 @@ function PlayersTable({ players, columns, search }) {
                   >
                     {t("Delete")}
                   </Button>
+                  <DropMenu
+                    menuTrigger={<EllipsisVertical />}
+                    menuContent={[
+                      {
+                        id: "links",
+                        menuItem: (
+                          <Link
+                            href={`/dashboard/player-management/links/${player.id}`}
+                            className="flex items-center gap-2"
+                          >
+                            <Link2 />
+                            <span>Links</span>
+                          </Link>
+                        ),
+                      },
+                      {
+                        id: "favorites characters",
+                        menuItem: (
+                          <Link
+                            href={`/dashboard/player-management/favorites-characters/${player.id}`}
+                            className="flex items-center gap-2"
+                          >
+                            <Heart />
+                            <span>Favorites characters</span>
+                          </Link>
+                        ),
+                      },
+                    ]}
+                  />
                 </div>
               </Table.Cell>
             </Table.Row>
