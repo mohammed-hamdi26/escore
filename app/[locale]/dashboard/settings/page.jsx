@@ -24,7 +24,7 @@ const links = [
   },
   {
     title: "Privacy and Policy",
-    href: "/settings/privacy",
+    href: "/settings/privacy-policy",
     description: "Manage your privacy and Policy configuration settings.",
     icon: <SettingsIcon width="41" height="49" className="icon-transition" />,
   },
