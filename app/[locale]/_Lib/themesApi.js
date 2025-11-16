@@ -9,3 +9,14 @@ export async function getAllThemes() {
     throw new Error("error while fetcing themes");
   }
 }
+
+export async function addTheme(theme) {
+  try {
+    const res = await axios.post("https://testsapis.pythonanywhere.com/api/v1/themes",theme);
+    console.log("theme added" , res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Failed to add theme",error);
+    throw error
+  }
+}

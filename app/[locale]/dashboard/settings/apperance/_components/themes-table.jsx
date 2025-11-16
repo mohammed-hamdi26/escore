@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import Table from "@/components/ui app/Table";
 import { cn } from "@/lib/utils";
+import ThemeForm from './theme-form';
+import ThemeDialog from './theme-dialog';
 
 const columns = [
   { id: "color-code", header: "Color Code" },
@@ -13,7 +15,6 @@ const columns = [
 ];
 function ThemesTable({ initialThemes }) {
   const [themes, setThemes] = useState(initialThemes || []);
-  console.log(initialThemes)
   async function handleAddOrUpdateTheme() {
     try {
       const { data: themes } = await getAllThemes();
@@ -25,13 +26,14 @@ function ThemesTable({ initialThemes }) {
   return (
     <>
       <div className='mb-5'>
-        <Button
-          className={
-            "text-white  text-center min-w-[100px]  px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80 transition-all duration-300"
-          }
-        >
-          Add new color
-        </Button>
+        <ThemeDialog trigger={
+            <Button className="text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80 transition-all duration-300">
+              Add new theme
+            </Button>
+          } 
+          formType='add'
+          onSucess={handleAddOrUpdateTheme}
+          />
       </div>
       <div>
         {!themes || themes.length === 0 ? (
