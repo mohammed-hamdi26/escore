@@ -37,7 +37,6 @@ function LinksPageContainer({
           />
         </DialogContent>
       </Dialog>
-      <LinksContainer links={links} />
     </div>
   );
 }

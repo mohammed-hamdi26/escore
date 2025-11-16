@@ -8,7 +8,11 @@ import { useTranslations } from "next-intl";
 function LinksButtons() {
   const pathname = usePathname();
   const t = useTranslations("buttonLinks");
-  if (pathname.includes("links") || pathname.includes("favorites-characters"))
+  if (
+    pathname.includes("links") ||
+    pathname.includes("favorites-characters") ||
+    pathname.includes("awards")
+  )
     return null;
 
   return (

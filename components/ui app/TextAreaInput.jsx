@@ -11,6 +11,7 @@ function TextAreaInput({
   onChange,
   value,
   name,
+  disabled,
 }) {
   return (
     <div className="flex flex-col flex-1 gap-4">
@@ -29,6 +30,7 @@ function TextAreaInput({
         className={
           className + " bg-dashboard-box  dark:bg-[#0F1017] border-0 p-6 "
         }
+        disabled={disabled}
       />
       {error && <p className="text-red-600">* {error}</p>}
     </div>
