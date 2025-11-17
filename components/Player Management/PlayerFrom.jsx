@@ -228,8 +228,8 @@ function PlayerFrom({
             formik={formik}
             type={"text"}
             name={"photo"}
-            label={"Player Photo"}
-            placeholder={"Enter Player Photo"}
+            label={t("Player Photo")}
+            placeholder={t("Enter Player Photo")}
             icon={
               <Player
                 width="40"
@@ -243,8 +243,8 @@ function PlayerFrom({
             formik={formik}
             type={"text"}
             name={"photoDark"}
-            label={"Player Photo Dark"}
-            placeholder={"Enter Player Photo Dark"}
+            label={t("Player Photo Dark")}
+            placeholder={t("Enter Player Photo Dark")}
             icon={
               <Player
                 width="40"
@@ -256,22 +256,6 @@ function PlayerFrom({
           />
         </FormRow>
       </FormSection>
-      {/* <FormRow>
-
-          <FileInput
-            label={"Player Images"}
-            formik={formik}
-            name={"images"}
-            limitFiles={4}
-          />
-          <FileInput
-            label={"Player Dark Images "}
-            formik={formik}
-            name={"imagesDark"}
-            limitFiles={4}
-          />
-        </FormRow>
-      </FormSection> */}
 
       <FormSection>
         <FormRow>
@@ -303,7 +287,6 @@ function PlayerFrom({
             type={"text"}
             value={formik.values.mainGame}
             label={t("Main Game")}
-            t={t}
             options={mappedArrayToSelectOptions(gamesOptions, "name", "name")}
             onChange={(value) => formik.setFieldValue("mainGame", value)}
             placeholder={t("Enter Main Game")}
@@ -326,7 +309,7 @@ function PlayerFrom({
         <FormRow>
           <InputApp
             name={"numberOfAchievements"}
-            type={"text"}
+            type={"number"}
             value={formik.values.numberOfAchievements}
             label={t("Number Of Achievements")}
             placeholder={t("Enter Number Of Achievements")}
@@ -351,7 +334,7 @@ function PlayerFrom({
           />
           <InputApp
             name={"worldRanking"}
-            type={"text"}
+            type={"number"}
             value={formik.values.worldRanking}
             label={t("World Ranking")}
             placeholder={t("Enter World Ranking")}
@@ -374,7 +357,7 @@ function PlayerFrom({
         <FormRow>
           <InputApp
             name={"marketValue"}
-            type={"text"}
+            type={"number"}
             value={formik.values.marketValue}
             label={t("Market Value")}
             placeholder={t("Enter Market Value")}
@@ -395,7 +378,7 @@ function PlayerFrom({
           />
           <InputApp
             name={"numberOfFollowers"}
-            type={"text"}
+            type={"number"}
             value={formik.values.numberOfFollowers}
             label={t("Number Of Followers")}
             placeholder={t("Enter Number Of Followers")}

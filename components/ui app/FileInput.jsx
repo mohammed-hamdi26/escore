@@ -21,6 +21,7 @@ function FileInput({
   disabled,
   typeFile = "image",
   flexGrow = "flex-1",
+  t,
   ...props
 }) {
   const [file, setFiles] = useState(null);
@@ -91,8 +92,9 @@ function FileInput({
         <InputApp
           value={formik.values?.[name]}
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           // name={"logo"}
-
+          t={t}
           hidden={typeFile !== "image" ? true : false}
           name={name}
           type={"text"}

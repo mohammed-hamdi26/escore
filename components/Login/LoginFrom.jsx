@@ -10,6 +10,7 @@ import InputApp from "../ui app/InputApp";
 import { Button } from "../ui/button";
 import toast from "react-hot-toast";
 function LoginFrom({ formik }) {
+  console.log(formik.isSubmitting || !formik.isValid || formik.errors);
   return (
     <div className="flex flex-[0.5] flex-col ">
       <Image
@@ -34,6 +35,7 @@ function LoginFrom({ formik }) {
           type="text"
           error={formik.touched.username && formik.errors.username}
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           className="max-w-[400px]"
         />
         <InputApp
@@ -42,6 +44,7 @@ function LoginFrom({ formik }) {
           type="password"
           error={formik.touched.password && formik.errors.password}
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           className="max-w-[400px]"
         />
         <Link
@@ -51,7 +54,7 @@ function LoginFrom({ formik }) {
           Forgot Password ?
         </Link>
         <Button
-          disabled={formik.isSubmitting || !formik.isValid || formik.errors}
+          disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
           className="max-w-[400px] font-bold text-lg text-white bg-green-primary cursor-pointer hover:bg-green-primary/80 rounded-[10px] p-6 disabled:bg-gray-600 disabled:cursor-not-allowed"
         >

@@ -62,12 +62,14 @@ function SelectInput({
                   value={option?.value}
                 >
                   <Image src={imagePhoto} width={50} height={50} alt="" />{" "}
-                  {option?.label || option?.name}
+                  {t
+                    ? t(option?.label || option?.name)
+                    : option?.label || option?.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          {error && <p className="text-red-600">{error}</p>}
+          {error && <p className="text-red-600">{t ? t(error) : error}</p>}
         </div>
       </div>
     </div>

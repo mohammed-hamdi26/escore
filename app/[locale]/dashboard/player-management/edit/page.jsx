@@ -1,4 +1,4 @@
-import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
+import { getPlayers, getPlayersCount } from "@/app/[locale]/_Lib/palyerApi";
 import PlayersTable from "@/components/Player Management/PlayersTable";
 import Loading from "@/components/ui app/Loading";
 import Table from "@/components/ui app/Table";
@@ -29,23 +29,22 @@ async function page({ searchParams }) {
 
   const players = await getPlayers({
     "firstName.contains": search || "",
-    "lastName.contains": search || "",
+
     size: size || 20,
     page,
   });
-  // const players = [
-  //   {
-  //     id: 1,
-  //     firstName: "Bilibili",
-  //     lastName: "Bilibili",
-  //     birthDate: "2000-01-01",
-  //     nationality: "Saudi Arabia",
-  //   },
-  // ];
+
+  const numOfPlayers = await getPlayersCount();
+  console.log(numOfPlayers);
 
   return (
     <Suspense fallback={<Loading />}>
-      <PlayersTable search={search} players={players} columns={columns} />
+      <PlayersTable
+        numOfPlayers={numOfPlayers}
+        search={search}
+        players={players}
+        columns={columns}
+      />
     </Suspense>
   );
 }

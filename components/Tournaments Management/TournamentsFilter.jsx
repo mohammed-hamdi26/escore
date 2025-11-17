@@ -4,7 +4,7 @@ import { useState } from "react";
 import InputApp from "../ui app/InputApp";
 import SelectSizeRows from "../ui app/SelectSizeRows";
 
-function TournamentsFilter() {
+function TournamentsFilter({ numOfSize }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,7 +30,7 @@ function TournamentsFilter() {
         flexGrow="flex-0"
       />
 
-      <SelectSizeRows />
+      <SelectSizeRows numOfSize={numOfSize} />
     </div>
   );
 }

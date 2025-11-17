@@ -9,7 +9,7 @@ export async function login(userData) {
     const res = await apiClient.post("/authenticate", userData);
     return res.data;
   } catch (e) {
-    // console.log(e.response);
+    console.log(e.response);
     throw new Error("Error in login");
   }
 }

@@ -17,7 +17,7 @@ import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-export default function LanguageDeleteDialog({ code, onDelete }) {
+export default function LanguageDeleteDialog({ t, code, onDelete }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -29,7 +29,7 @@ export default function LanguageDeleteDialog({ code, onDelete }) {
       if (onDelete) {
         onDelete(code);
       }
-      setOpen(false); 
+      setOpen(false);
     } catch (error) {
       toast.error(error.message || "Failed to delete language");
     } finally {
@@ -45,7 +45,7 @@ export default function LanguageDeleteDialog({ code, onDelete }) {
           className="rounded-full min-w-[100px] cursor-pointer"
           disabled={isLoading}
         >
-          {isLoading ? "Deleting..." : "Delete"}
+          {isLoading ? t("Deleting...") : t("Delete")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -54,25 +54,25 @@ export default function LanguageDeleteDialog({ code, onDelete }) {
             <TriangleAlertIcon className="text-destructive size-6" />
           </div>
           <AlertDialogTitle>
-            Are you absolutely sure you want to delete this language?
+            {t("Are you absolutely sure you want to delete this language?")}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            This action cannot be undone. This will permanently delete the
-            language and remove it from the system.
+            {t(`DialogDescription`)}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>
+            {t("Cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isLoading}
             className="bg-destructive dark:bg-destructive/60 hover:bg-destructive focus-visible:ring-destructive text-white"
           >
-            {isLoading ? "Deleting..." : "Delete"}
+            {isLoading ? t("Deleting...") : t("Delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 }
-
