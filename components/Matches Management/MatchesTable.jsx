@@ -7,12 +7,17 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { deleteMatch } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import { useSearchParams } from "next/navigation";
+import { getNumPages } from "@/app/[locale]/_Lib/helps";
 
-function MatchesTable({ matches, columns }) {
+function MatchesTable({ matches, columns, numOfMatches }) {
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const numPages = getNumPages(numOfMatches, Number(searchParams.get("size")));
+
   return (
     <div className="space-y-8">
-      <FilterMatches />
+      <FilterMatches numOfSize={numOfMatches} />
       <Table
         grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_0.5fr_2fr]"
         columns={[...columns]}
@@ -59,7 +64,7 @@ function MatchesTable({ matches, columns }) {
           </Table.Row>
         ))}
       </Table>
-      <Pagination />
+      <Pagination numPages={numPages} />
     </div>
   );
 }

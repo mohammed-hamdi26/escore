@@ -24,3 +24,13 @@ export async function getTournament(id) {
     throw new Error("Error in Get tournament");
   }
 }
+export async function getNumOfTournaments() {
+  try {
+    const res = await apiClient.get(`/tournaments/count`);
+
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in Get number of tournaments");
+  }
+}

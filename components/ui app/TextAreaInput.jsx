@@ -12,6 +12,7 @@ function TextAreaInput({
   value,
   name,
   disabled,
+  t,
 }) {
   return (
     <div className="flex flex-col flex-1 gap-4">
@@ -32,7 +33,7 @@ function TextAreaInput({
         }
         disabled={disabled}
       />
-      {error && <p className="text-red-600">* {error}</p>}
+      {error && <p className="text-red-600">* {t ? t(error) : error}</p>}
     </div>
   );
 }

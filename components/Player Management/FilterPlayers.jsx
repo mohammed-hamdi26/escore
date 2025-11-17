@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import SelectSizeRows from "../ui app/SelectSizeRows";
 
-function FilterPlayers({ search }) {
+function FilterPlayers({ search, numOfPlayers }) {
   const [searchTerm, setSearchTerm] = useState(search || "");
   const pathname = usePathname();
   const router = useRouter();
@@ -31,7 +31,7 @@ function FilterPlayers({ search }) {
         flexGrow="flex-0"
       />
 
-      <SelectSizeRows />
+      <SelectSizeRows numOfSize={numOfPlayers} />
     </div>
   );
 }
