@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { useState } from "react";
 import LanguageDialog from "./LanguageDialog";
-import LanguageDeleteDialog from './LanguageDeleteDialog';
+import LanguageDeleteDialog from "./LanguageDeleteDialog";
+import { useTranslations } from "next-intl";
 
 const columns = [
   { id: "code", header: "Code" },
@@ -15,10 +16,11 @@ const columns = [
 
 function LanguagesTable({ initialLanguages }) {
   const [languages, setLanguages] = useState(initialLanguages || []);
+  const t = useTranslations("LanguagesTable");
 
-  const handleLanguageDeleted = deletedCode => {
-    setLanguages(prevLanguages =>
-      prevLanguages.filter(lang => lang.code !== deletedCode)
+  const handleLanguageDeleted = (deletedCode) => {
+    setLanguages((prevLanguages) =>
+      prevLanguages.filter((lang) => lang.code !== deletedCode)
     );
   };
 
@@ -41,7 +43,7 @@ function LanguagesTable({ initialLanguages }) {
                 "text-white  text-center min-w-[100px]  px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80 transition-all duration-300"
               }
             >
-              Add new language
+              {t("Add new language")}
             </Button>
           }
           formType="add"
@@ -53,8 +55,12 @@ function LanguagesTable({ initialLanguages }) {
           No languages found
         </div>
       ) : (
-        <Table grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]" columns={columns}>
-          {languages.map(lang => (
+        <Table
+          t={t}
+          grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
+          columns={columns}
+        >
+          {languages.map((lang) => (
             <Table.Row
               key={lang.code}
               grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
@@ -65,14 +71,14 @@ function LanguagesTable({ initialLanguages }) {
               <Table.Cell>
                 <div className="flex justify-end gap-4">
                   <Link href={`/dashboard/settings/language/${lang?.code}`}>
-                    <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
-                      Dictionary
+                    <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer hover:bg-green-primary/70">
+                      {t("Dictionary")}
                     </Button>
                   </Link>
                   <LanguageDialog
                     trigger={
-                      <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
-                        Edit
+                      <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer hover:bg-green-primary/70">
+                        {t("Edit")}
                       </Button>
                     }
                     formType="update"
@@ -80,6 +86,7 @@ function LanguagesTable({ initialLanguages }) {
                     onSuccess={handleLanguageAddedOrUpdated}
                   />
                   <LanguageDeleteDialog
+                    t={t}
                     code={lang.code}
                     onDelete={handleLanguageDeleted}
                   />

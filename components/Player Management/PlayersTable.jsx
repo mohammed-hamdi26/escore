@@ -12,24 +12,31 @@ import toast from "react-hot-toast";
 import { deletePlayer } from "@/app/[locale]/_Lib/actions";
 import DropMenu from "../ui app/DropMenu";
 import { Award, EllipsisVertical, Heart, Link2 } from "lucide-react";
+import { getNumPages } from "@/app/[locale]/_Lib/helps";
+import { useSearchParams } from "next/navigation";
 
-function PlayersTable({ players, columns, search }) {
+function PlayersTable({ players, columns, search, numOfPlayers }) {
   const t = useTranslations("PlayersTable");
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const numPages = getNumPages(numOfPlayers, Number(searchParams.get("size")));
+
   return (
     <div className="space-y-8">
-      <FilterPlayers search={search} />
+      <FilterPlayers numOfPlayers={numOfPlayers} search={search} />
       <Suspense
         name="Players Table"
         fallback={<div>Loading players table...</div>}
       >
         <Table
+          t={t}
           columns={columns}
           grid_cols={"grid-cols-[1fr_0.5fr_0.5fr_0.5fr_2fr]"}
           data={players}
         >
           {players.map((player) => (
             <Table.Row
+              x
               grid_cols={"grid-cols-[1fr_0.5fr_0.5fr_0.5fr_2fr]"}
               key={player.id}
             >
@@ -49,7 +56,7 @@ function PlayersTable({ players, columns, search }) {
                         "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
                       }
                     >
-                      Edit
+                      {t("Edit")}
                     </Button>
                   </Link>
                   <Button
@@ -82,7 +89,7 @@ function PlayersTable({ players, columns, search }) {
                             className="flex items-center gap-2"
                           >
                             <Link2 />
-                            <span>Links</span>
+                            <span>{t("Links")}</span>
                           </Link>
                         ),
                       },
@@ -94,7 +101,7 @@ function PlayersTable({ players, columns, search }) {
                             className="flex  items-center gap-2 flex-1"
                           >
                             <Heart />
-                            <span>Favorites characters</span>
+                            <span>{t("Favorites characters")}</span>
                           </Link>
                         ),
                       },
@@ -106,7 +113,7 @@ function PlayersTable({ players, columns, search }) {
                             className="flex items-center gap-2"
                           >
                             <Award />
-                            <span>Awards</span>
+                            <span>{t("Awards")}</span>
                           </Link>
                         ),
                       },
@@ -119,7 +126,7 @@ function PlayersTable({ players, columns, search }) {
         </Table>
       </Suspense>
 
-      <Pagination />
+      <Pagination numPages={numPages} />
     </div>
   );
 }

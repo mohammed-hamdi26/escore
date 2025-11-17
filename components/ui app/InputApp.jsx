@@ -17,6 +17,7 @@ function InputApp({
   flexGrow = "flex-1",
   hidden = false,
   disabled = false,
+  t,
 }) {
   return (
     <div className={flexGrow}>
@@ -44,7 +45,7 @@ function InputApp({
             disabled={disabled}
             hidden={hidden}
           />
-          {error && <p className="text-red-600">* {error}</p>}
+          {error && <p className="text-red-600">* {t ? t(error) : error}</p>}
         </div>
       </div>
     </div>

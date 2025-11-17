@@ -1,4 +1,4 @@
-import { getMatches } from "@/app/[locale]/_Lib/matchesApi";
+import { getMatches, getMatchesCount } from "@/app/[locale]/_Lib/matchesApi";
 import MatchesTable from "@/components/Matches Management/MatchesTable";
 import Table from "@/components/ui app/Table";
 
@@ -14,8 +14,15 @@ const columns = [
 export default async function page({ searchParams }) {
   const { size, page } = await searchParams;
   const matches = await getMatches({ size, page });
+  const numOfMatches = await getMatchesCount();
 
-  return <MatchesTable matches={matches} columns={columns} />;
+  return (
+    <MatchesTable
+      matches={matches}
+      columns={columns}
+      numOfMatches={numOfMatches}
+    />
+  );
 }
 
 // <Button

@@ -4,3 +4,8 @@ export function mappedArrayToSelectOptions(array, labelKey, valueKey) {
     value: item[valueKey],
   }));
 }
+export function getNumPages(totalItems, pageSize) {
+  return totalItems === pageSize
+    ? 0
+    : Math.floor(totalItems / (pageSize || 20));
+}

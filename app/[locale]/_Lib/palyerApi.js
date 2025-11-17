@@ -22,3 +22,13 @@ export async function getPlayer(id) {
     throw new Error("Failed to get players");
   }
 }
+
+export async function getPlayersCount() {
+  try {
+    const res = await apiClient.get(`/players/count`);
+    return res.data;
+  } catch (e) {
+    // console.log(e.response);
+    throw new Error("Failed to get players count");
+  }
+}
