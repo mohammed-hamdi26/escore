@@ -1,12 +1,11 @@
 "use client";
-import { getLanguages } from "@/app/[locale]/_Lib/languageAPI";
 import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { useState } from "react";
-import LanguageDialog from "./LanguageDialog";
-import LanguageDeleteDialog from "./LanguageDeleteDialog";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import LanguageDeleteDialog from "./LanguageDeleteDialog";
+import LanguageDialog from "./LanguageDialog";
 
 const columns = [
   { id: "code", header: "Code" },
@@ -18,9 +17,9 @@ function LanguagesTable({ initialLanguages }) {
   const [languagesTable, setLanguagesTable] = useState(initialLanguages || []);
   const t = useTranslations("LanguagesTable");
 
-  const handleLanguageDeleted = (deletedCode) => {
-    setLanguagesTable((prevLanguages) =>
-      prevLanguages.filter((lang) => lang.code !== deletedCode)
+  const handleLanguageDeleted = deletedCode => {
+    setLanguagesTable(prevLanguages =>
+      prevLanguages.filter(lang => lang.code !== deletedCode)
     );
   };
 
@@ -51,7 +50,7 @@ function LanguagesTable({ initialLanguages }) {
           grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
           columns={columns}
         >
-          {languagesTable.map((lang) => (
+          {languagesTable.map(lang => (
             <Table.Row
               key={lang.code}
               grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
@@ -73,7 +72,7 @@ function LanguagesTable({ initialLanguages }) {
                       </Button>
                     }
                     formType="update"
-                    languageOptions = {lang}
+                    languageOptions={lang}
                     setLanguagesTable={setLanguagesTable}
                   />
                   <LanguageDeleteDialog

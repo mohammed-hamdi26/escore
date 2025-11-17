@@ -2,9 +2,7 @@
 import { addLanguage, updateLanguage } from "@/app/[locale]/_Lib/languageAPI";
 import InputApp from "@/components/ui app/InputApp";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "@/i18n/navigation";
 import { useFormik } from "formik";
-import { useEffect } from "react";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 
@@ -17,11 +15,11 @@ const validationSchema = yup.object({
 });
 
 export default function LanguageForm({
-  successMessage = "Language saved successfully",
-  formType = "add",
+  successMessage,
+  formType,
   setLanguagesTable,
   setOpen,
-  languageOptions
+  languageOptions,
 }) {
   const formik = useFormik({
     initialValues: {
@@ -58,7 +56,9 @@ export default function LanguageForm({
           await updateLanguage(languageOptions.code, dataValues);
           toast.success(successMessage);
           setLanguagesTable(prev =>
-            prev.map(lang => (lang.code === languageOptions.code ? dataValues : lang))
+            prev.map(lang =>
+              lang.code === languageOptions.code ? dataValues : lang
+            )
           );
           setOpen(false);
         }
