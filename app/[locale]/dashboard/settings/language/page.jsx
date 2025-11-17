@@ -1,9 +1,9 @@
-import { getLanguages } from "@/app/[locale]/_Lib/languageAPI";
-import LanguagesTable from './_components/language/LanguagesTable';
-
-export const dynamic = "force-dynamic";
+import { Suspense } from 'react';
+import LanguageContainer from './_components/language/LanguageContainer';
+import LoadingScreen from '@/components/ui app/loading-screen';
 
 export default async function LanguagePage() {
-  const { data: languages } = await getLanguages();
-  return <LanguagesTable initialLanguages={languages} />;
+  return <Suspense fallback={<LoadingScreen/>}>
+    <LanguageContainer />
+  </Suspense>
 }

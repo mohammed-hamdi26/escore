@@ -15,40 +15,11 @@ import LanguageForm from "./LanguageForm";
 export default function LanguageDialog({
   trigger,
   formType = "add",
-  languageCode = undefined,
-  onSuccess,
+  setLanguagesTable,
+  languageOptions=undefined
 }) {
   const [open, setOpen] = useState(false);
-  const [language, setLanguage] = useState(undefined);
   const [loading, setLoading] = useState(false);
-
-  // Fetch language data when dialog opens for edit mode
-  useEffect(() => {
-    if (open && formType === "update" && languageCode) {
-      setLoading(true);
-      getSpecificLanguage(languageCode)
-        .then(response => {
-          const lang = response?.data || response;
-          setLanguage(lang);
-        })
-        .catch(error => {
-          console.error("Failed to fetch language:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (open && formType === "add") {
-      // Reset language for add mode
-      setLanguage(undefined);
-    }
-  }, [open, formType, languageCode]);
-
-  const handleSuccess = () => {
-    setOpen(false);
-    if (onSuccess) {
-      onSuccess();
-    }
-  };
 
   const dialogTitle = formType === "add" ? "Add New Language" : "Edit Language";
   const dialogDescription =
@@ -71,14 +42,14 @@ export default function LanguageDialog({
         ) : (
           <LanguageForm
             formType={formType}
-            language={language}
-            code={languageCode}
             successMessage={
               formType === "add"
                 ? "Language added successfully"
                 : "Language updated successfully"
             }
-            onSuccess={handleSuccess}
+            setLanguagesTable={setLanguagesTable}
+            setOpen={setOpen}
+            languageOptions={languageOptions}
           />
         )}
       </DialogContent>

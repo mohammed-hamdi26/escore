@@ -11,7 +11,7 @@ import * as yup from "yup";
 const validationSchema = yup.object({
   code: yup.string().required("Code is required"),
   name: yup.string().required("Name is required"),
-  name_local: yup.string().required("Local name is required"),
+  nameLocal: yup.string().required("Local name is required"),
   word: yup.string().required("Word is required"),
   value: yup.string().required("Value is required"),
 });
@@ -19,82 +19,55 @@ const validationSchema = yup.object({
 export default function LanguageForm({
   successMessage = "Language saved successfully",
   formType = "add",
-  language = undefined,
-  code = undefined,
-  onSuccess,
+  setLanguagesTable,
+  setOpen,
+  languageOptions
 }) {
-  const router = useRouter();
   const formik = useFormik({
     initialValues: {
-      code: language?.code || "",
-      name: language?.name || "",
-      name_local: language?.name_local || "",
-      word: language?.dictionary
-        ? Object.keys(language.dictionary)[0] || ""
+      code: languageOptions?.code || "",
+      name: languageOptions?.name || "",
+      nameLocal: languageOptions?.nameLocal || "",
+      word: languageOptions?.dictionary
+        ? Object.keys(languageOptions.dictionary)[0] || ""
         : "",
-      value: language?.dictionary
-        ? Object.values(language.dictionary)[0] || ""
+      value: languageOptions?.dictionary
+        ? Object.values(languageOptions.dictionary)[0] || ""
         : "",
     },
     enableReinitialize: true,
     validationSchema: validationSchema,
     onSubmit: async values => {
-      // Log raw form values
-      console.log("Form Values (Raw):", values);
-
       const dataValues = {
         code: values.code,
         name: values.name,
-        name_local: values.name_local,
+        nameLocal: values.nameLocal,
         dictionary: {
           [values.word]: values.value,
         },
       };
-
-      console.log("Processed Data (for API):", dataValues);
 
       try {
         if (formType === "add") {
           await addLanguage(dataValues);
           formik.resetForm();
           toast.success(successMessage);
-          if (onSuccess) {
-            onSuccess();
-          } else {
-            router.push("/dashboard/settings/language");
-          }
+          setLanguagesTable(prev => [...prev, dataValues]);
+          setOpen(false);
         } else if (formType === "update") {
-          await updateLanguage(code, dataValues);
+          await updateLanguage(languageOptions.code, dataValues);
           toast.success(successMessage);
-          if (onSuccess) {
-            onSuccess();
-          } else {
-            router.push("/dashboard/settings/language");
-          }
+          setLanguagesTable(prev =>
+            prev.map(lang => (lang.code === languageOptions.code ? dataValues : lang))
+          );
+          setOpen(false);
         }
       } catch (error) {
         toast.error(error.message || "An error occurred");
+        setOpen(false);
       }
     },
   });
-
-  // Update form values when language prop changes
-  useEffect(() => {
-    if (language && formType === "update") {
-      formik.setValues({
-        code: language?.code || "",
-        name: language?.name || "",
-        name_local: language?.name_local || "",
-        word: language?.dictionary
-          ? Object.keys(language.dictionary)[0] || ""
-          : "",
-        value: language?.dictionary
-          ? Object.values(language.dictionary)[0] || ""
-          : "",
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language, formType]);
 
   return (
     <form className="space-y-4" onSubmit={formik.handleSubmit}>
@@ -135,19 +108,19 @@ export default function LanguageForm({
       </div>
 
       <InputApp
-        value={formik.values.name_local}
+        value={formik.values.nameLocal}
         onChange={formik.handleChange}
         label="Local Name"
-        name="name_local"
+        name="nameLocal"
         type="text"
         placeholder="Enter local name"
         className="border-0 focus:outline-none"
         backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
         textColor="text-[#677185]"
         error={
-          formik.errors.name_local &&
-          formik.touched.name_local &&
-          formik.errors.name_local
+          formik.errors.nameLocal &&
+          formik.touched.nameLocal &&
+          formik.errors.nameLocal
         }
         onBlur={formik.handleBlur}
         disabled={formik.isSubmitting}
@@ -168,7 +141,7 @@ export default function LanguageForm({
             formik.errors.word && formik.touched.word && formik.errors.word
           }
           onBlur={formik.handleBlur}
-          disabled={formik.isSubmitting}
+          disabled={formik.isSubmitting || formType === "update"}
         />
 
         <InputApp
@@ -185,7 +158,7 @@ export default function LanguageForm({
             formik.errors.value && formik.touched.value && formik.errors.value
           }
           onBlur={formik.handleBlur}
-          disabled={formik.isSubmitting}
+          disabled={formik.isSubmitting || formType === "update"}
         />
       </div>
 
