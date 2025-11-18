@@ -8,24 +8,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import DictionaryForm from "./DictionaryForm";
+import DictionaryForm from "./dictionary-form";
 
 function DictionaryDialog({
   trigger,
-  formType = "add",
-  onSuccess,
+  formType,
   languageCode,
-  word = "",
-  translation = "",
+  word = undefined,
+  translation = undefined,
+  setDictionary
 }) {
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const handleSuccess = () => {
-    setOpen(false);
-    if (onSuccess) {
-      onSuccess();
-    }
-  };
   const dialogTitle = formType === "add" ? "Add New word" : `Edit: ${word}`;
   const dialogDescription =
     formType === "add"
@@ -39,12 +32,7 @@ function DictionaryDialog({
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
-        {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <p className="text-muted-foreground">Loading word data...</p>
-          </div>
-        ) : (
-          <DictionaryForm
+        <DictionaryForm
             formType={formType}
             code={languageCode}
             initialWord={word}
@@ -54,9 +42,9 @@ function DictionaryDialog({
                 ? "Word added successfully"
                 : "Word translation updated successfully"
             }
-            onSuccess={handleSuccess}
+            setOpen={setOpen}
+            setDictionary={setDictionary}
           />
-        )}
       </DialogContent>
     </Dialog>
   );

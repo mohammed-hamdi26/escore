@@ -1,12 +1,11 @@
 "use client";
-import { getLanguages } from "@/app/[locale]/_Lib/languageAPI";
 import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { useState } from "react";
-import LanguageDialog from "./LanguageDialog";
-import LanguageDeleteDialog from "./LanguageDeleteDialog";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import LanguageDeleteDialog from "./language-delete-dialog";
+import LanguageDialog from "./language-dialog";
 
 const columns = [
   { id: "code", header: "Code" },
@@ -15,22 +14,13 @@ const columns = [
 ];
 
 function LanguagesTable({ initialLanguages }) {
-  const [languages, setLanguages] = useState(initialLanguages || []);
+  const [languagesTable, setLanguagesTable] = useState(initialLanguages || []);
   const t = useTranslations("LanguagesTable");
 
-  const handleLanguageDeleted = (deletedCode) => {
-    setLanguages((prevLanguages) =>
-      prevLanguages.filter((lang) => lang.code !== deletedCode)
+  const handleLanguageDeleted = deletedCode => {
+    setLanguagesTable(prevLanguages =>
+      prevLanguages.filter(lang => lang.code !== deletedCode)
     );
-  };
-
-  const handleLanguageAddedOrUpdated = async () => {
-    try {
-      const { data: updatedLanguages } = await getLanguages();
-      setLanguages(updatedLanguages);
-    } catch (error) {
-      console.error("Failed to refresh languages:", error);
-    }
   };
 
   return (
@@ -47,10 +37,10 @@ function LanguagesTable({ initialLanguages }) {
             </Button>
           }
           formType="add"
-          onSuccess={handleLanguageAddedOrUpdated}
+          setLanguagesTable={setLanguagesTable}
         />
       </div>
-      {!languages || languages.length === 0 ? (
+      {!languagesTable || languagesTable.length === 0 ? (
         <div className="text-center py-8 text-lg text-[#677185] dark:text-white">
           No languages found
         </div>
@@ -60,14 +50,14 @@ function LanguagesTable({ initialLanguages }) {
           grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
           columns={columns}
         >
-          {languages.map((lang) => (
+          {languagesTable.map(lang => (
             <Table.Row
               key={lang.code}
               grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
             >
               <Table.Cell>{lang?.code}</Table.Cell>
               <Table.Cell>{lang?.name}</Table.Cell>
-              <Table.Cell>{lang?.name_local}</Table.Cell>
+              <Table.Cell>{lang?.nameLocal}</Table.Cell>
               <Table.Cell>
                 <div className="flex justify-end gap-4">
                   <Link href={`/dashboard/settings/language/${lang?.code}`}>
@@ -82,8 +72,8 @@ function LanguagesTable({ initialLanguages }) {
                       </Button>
                     }
                     formType="update"
-                    languageCode={lang.code}
-                    onSuccess={handleLanguageAddedOrUpdated}
+                    languageOptions={lang}
+                    setLanguagesTable={setLanguagesTable}
                   />
                   <LanguageDeleteDialog
                     t={t}
