@@ -11,7 +11,7 @@ import User from "@/components/icons/User";
 const links = [
   {
     title: "Tournaments Management",
-    href: "/tournaments-management/add",
+    href: "/tournaments-management/edit",
     description:
       "Go to Tournaments Section to Add Tournament: Name, Champion, Start Date, End Date, Teams, Players",
 
@@ -25,51 +25,51 @@ const links = [
   },
   {
     title: "Matches Management",
-    href: "/matches-management/add",
+    href: "/matches-management/edit",
     description:
       "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links",
     icon: <MatchesManagement />,
   },
   {
     title: "Players",
-    href: "/player-management/add",
+    href: "/player-management/edit",
     description:
       "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos",
     icon: <Player />,
   },
   {
     title: "Teams Management",
-    href: "/teams-management/add",
+    href: "/teams-management/edit",
     description: "Add Team: Name, Country, Linked Players, Logo/Images",
     icon: <TeamsManagement />,
   },
 
   {
     title: "Games Management",
-    href: "/games-management/add",
+    href: "/games-management/edit",
     description: "go to Games Sectoin to Add Game: Name + Icon",
     icon: <GamesManagement />,
   },
   {
     title: "News & Updates",
-    href: "/news/add",
+    href: "/news/edit",
     description:
       "Go to news Sectoin to Add News: Title, Description, Image/Video, Author",
     icon: <News />,
   },
-  {
-    title: "Users",
-    href: "/users/",
-    description:
-      "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
-    icon: <User />,
-  },
-  {
-    title: "Support Center",
-    href: "/support-center",
-    description: "Go to Support Center to view user messages and reply to them",
-    icon: <SupportCenter />,
-  },
+  // {
+  //   title: "Users",
+  //   href: "/users/",
+  //   description:
+  //     "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
+  //   icon: <User />,
+  // },
+  // {
+  //   title: "Support Center",
+  //   href: "/support-center",
+  //   description: "Go to Support Center to view user messages and reply to them",
+  //   icon: <SupportCenter />,
+  // },
   {
     title: "Settings",
     href: "/settings",

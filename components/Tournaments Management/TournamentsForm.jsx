@@ -42,12 +42,24 @@ const validateSchema = yup.object({
     .oneOf(["UPCOMING", "ONGOING", "FINISHED"], "Invalid status")
     .required("Status is required"),
 
-  logo: yup.string().url("Invalid logo URL").required("Logo is required"),
+  logo: yup
+    .string()
+    // .url("Invalid logo URL")
+    .required("Logo is required"),
 
   logoDark: yup
     .string()
-    .url("Invalid dark logo URL")
+    // .url("Invalid dark logo URL")
     .required("Dark logo is required"),
+
+  // knockoutImageLight: yup
+  //   .string()
+  //   // .url("Invalid knockout image URL")
+  //   .required("Knockout image is required"),
+  // knockoutImageDark: yup
+  //   .string()
+  //   // .url("Invalid dark knockout image URL")
+  //   .required("Dark knockout image is required"),
 
   winningPoints: yup
     .number()
@@ -88,19 +100,21 @@ export default function TournamentsForm({
       losingPoints: tournament?.losingPoints || 0,
       drawPoints: tournament?.drawPoints || 0,
       description: tournament?.description || "",
+      knockoutImageLight: null,
+      knockoutImageDark: null,
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
       let dataValues = tournament ? { id: tournament.id, ...values } : values;
-      dataValues.country = {
-        id: 1051,
-      };
-
+      dataValues.country = null;
+      console.log(dataValues);
       try {
         await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(
-          formType === "add" ? "The Tournament Added" : "The Tournament Edited"
+          formType === "add"
+            ? t("The Tournament Added")
+            : t("The Tournament Edited")
         );
       } catch (error) {
         console.log(error);
@@ -117,6 +131,7 @@ export default function TournamentsForm({
     { value: "FINISHED", label: t("Finished") },
   ];
 
+  console.log(formik.errors);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
@@ -349,6 +364,35 @@ export default function TournamentsForm({
             }
           />
         </FormRow>
+        <FormRow>
+          <FileInput
+            t={t}
+            formik={formik}
+            label={t("knockout image")}
+            name={"knockoutImageLight"}
+            placeholder={t("Upload Knockout Light Image")}
+            icon={
+              <ImageIcon
+                className={"fill-[#677185]"}
+                color={"text-[#677185]"}
+              />
+            }
+          />
+
+          <FileInput
+            t={t}
+            formik={formik}
+            label={t("knockout image (Dark)")}
+            name={"knockoutImageDark"}
+            placeholder={t("Upload Knockout Dark Image")}
+            icon={
+              <ImageIcon
+                className={"fill-[#677185]"}
+                color={"text-[#677185]"}
+              />
+            }
+          />
+        </FormRow>
       </FormSection>
 
       <div className="flex justify-end">
@@ -359,9 +403,13 @@ export default function TournamentsForm({
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          {formik.isSubmitting &&
-            (formType === "add" ? "Adding..." : "Editing...")}
-          {!formik.isSubmitting && formType === "add" ? t("Add") : t("Edit")}
+          {formik.isSubmitting
+            ? formType === "add"
+              ? "Adding..."
+              : "Editing..."
+            : formType === "add"
+            ? t("Add")
+            : t("Edit")}
         </Button>
       </div>
     </form>
