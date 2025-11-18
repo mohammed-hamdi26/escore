@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteWord } from '@/app/[locale]/_Lib/dictionary';
+import { deleteWord } from "@/app/[locale]/_Lib/dictionary";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,19 +16,17 @@ import { Button } from "@/components/ui/button";
 import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-function DictionaryDeleteDialog({code,word,onDelete}) {
+function DictionaryDeleteDialog({ code, word, onDelete }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  async function handleDelete () {
+  async function handleDelete() {
     try {
       setIsLoading(true);
-      await deleteWord(code,word);
-      toast.success("Successfully deleted ");
-      if (onDelete) {
-        onDelete(word);
-      }
-      setOpen(false); 
+      await deleteWord(code, word);
+      onDelete(word);
+      toast.success("word deleted successfully ");
+      setOpen(false);
     } catch (error) {
       toast.error(error.message || "Failed to delete word");
     } finally {
@@ -39,8 +37,7 @@ function DictionaryDeleteDialog({code,word,onDelete}) {
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button
-          variant="destructive"
-          className="rounded-full min-w-[100px] cursor-pointer"
+          className="rounded-full min-w-[100px] bg-[#3a469d] hover:bg-[#4656bf] text-amber-50 cursor-pointer"
           disabled={isLoading}
         >
           {isLoading ? "Deleting..." : "Delete"}
@@ -55,8 +52,8 @@ function DictionaryDeleteDialog({code,word,onDelete}) {
             Are you absolutely sure you want to delete this word?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            This action cannot be undone. This will permanently delete the
-            word and remove it from the system.
+            This action cannot be undone. This will permanently delete the word
+            and remove it from the system.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -71,7 +68,7 @@ function DictionaryDeleteDialog({code,word,onDelete}) {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }
 
-export default DictionaryDeleteDialog
+export default DictionaryDeleteDialog;
