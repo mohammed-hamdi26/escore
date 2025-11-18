@@ -61,13 +61,23 @@ function SelectInput({
                   key={option?.value}
                   value={option?.value}
                 >
-                  <Image src={imagePhoto} width={50} height={50} alt="" />{" "}
-                  {option?.label || option?.name}
+                  {option?.image && (
+                    <img
+                      src={option?.image}
+                      className="overflow-hidden"
+                      width={25}
+                      height={25}
+                      alt=""
+                    />
+                  )}{" "}
+                  {t
+                    ? t(option?.label || option?.name)
+                    : option?.label || option?.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          {error && <p className="text-red-600">{error}</p>}
+          {error && <p className="text-red-600">{t ? t(error) : error}</p>}
         </div>
       </div>
     </div>

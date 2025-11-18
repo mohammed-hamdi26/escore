@@ -15,6 +15,7 @@ import Date from "../icons/Date";
 import DatePicker from "../ui app/DatePicker";
 import TextAreaInput from "../ui app/TextAreaInput";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 const validateSchema = Yup.object({
   matchDate: Yup.date()
     .typeError("Invalid date format")
@@ -62,7 +63,7 @@ function MatchesFrom({
   match,
   formType = "add",
 }) {
-  console.log(match);
+  const t = useTranslations("MatchForm");
   const formik = useFormik({
     initialValues: {
       matchDate: match?.matchDate || "",
@@ -85,6 +86,7 @@ function MatchesFrom({
         team1: match?.teams[0]?.id || null,
         team2: match?.teams[1]?.id || null,
       },
+      vodUrl: match?.vodUrl || "",
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
@@ -96,6 +98,7 @@ function MatchesFrom({
         games: { id: dataValues.games },
         teams: [{ id: dataValues.teams.team1 }, { id: dataValues.teams.team2 }],
         tournament: { id: dataValues.tournament },
+        vodUrl: "",
         winningTeam: null,
       };
 
@@ -114,23 +117,23 @@ function MatchesFrom({
   });
 
   const matchTypeOptions = [
-    { value: "SOLO", label: "Solo" },
-    { value: "TEAM", label: "Team" },
+    { value: "SOLO", label: t("Solo") },
+    { value: "TEAM", label: t("Team") },
   ];
   const matchStateOptions = [
-    { value: "FINISHED", label: "FINISHED" },
-    { value: "UPCOMING", label: "UPCOMING" },
-    { value: "LIVE", label: "LIVE" },
-    { value: "CANCELLED", label: "CANCELLED" },
+    { value: "UPCOMING", label: t("UPCOMING") },
+    { value: "FINISHED", label: t("FINISHED") },
+    { value: "LIVE", label: t("LIVE") },
+    { value: "CANCELLED", label: t("CANCELLED") },
   ];
   const seriesFormatOptions = [
-    { value: "BO1", label: "BO1" },
-    { value: "BO3", label: "BO3" },
-    { value: "BO5", label: "BO5" },
+    { value: "BO1", label: t("BO1") },
+    { value: "BO3", label: t("BO3") },
+    { value: "BO5", label: t("BO5") },
   ];
   const venueTypeOptions = [
-    { value: "ONLINE", label: "ONLINE" },
-    { value: "OFFLINE", label: "OFFLINE" },
+    { value: "ONLINE", label: t("ONLINE") },
+    { value: "OFFLINE", label: t("OFFLINE") },
   ];
 
   return (
@@ -147,9 +150,9 @@ function MatchesFrom({
               formik.setFieldValue("tournament", Number(value))
             }
             value={formik.values.tournament}
-            label={"Tournaments"}
+            label={t("Tournaments")}
             name={"tournament"}
-            placeholder={"Write Champion Name"}
+            placeholder={t("Write Champion Name")}
             icon={<Champion color={"text-[#677185]"} />}
             error={
               formik?.errors?.tournament && formik?.touched?.tournament
@@ -159,11 +162,11 @@ function MatchesFrom({
           />
           <SelectInput
             options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
-            onChange={value => formik.setFieldValue("games", Number(value))}
+            onChange={(value) => formik.setFieldValue("games", Number(value))}
             value={formik.values.games}
-            label={"Game"}
+            label={t("Game")}
             name={"games"}
-            placeholder={"Write Game Name"}
+            placeholder={t("Write Game Name")}
             icon={
               <Gamepad2 height={35} width={35} className={"text-[#677185]"} />
             }
@@ -176,20 +179,20 @@ function MatchesFrom({
         </FormRow>
         <FormRow>
           <SelectInput
-            label={"Team 1"}
+            label={t("Team 1")}
             name={"team"}
             options={mappedArrayToSelectOptions(
               teamsOptions.filter(
-                team => team.id !== formik.values?.teams?.team2
+                (team) => team.id !== formik.values?.teams?.team2
               ),
               "name",
               "id"
             )}
-            onChange={value =>
+            onChange={(value) =>
               formik.setFieldValue("teams.team1", Number(value))
             }
             value={formik.values.teams.team1}
-            placeholder={"Write Team Name"}
+            placeholder={t("Write Team Name")}
             icon={
               <TeamsManagement
                 height="35"
@@ -207,20 +210,20 @@ function MatchesFrom({
             // onChange={formik.handleChange}
           />
           <SelectInput
-            label={"Team 2"}
+            label={t("Team 2")}
             name={"teams.team2"}
             options={mappedArrayToSelectOptions(
               teamsOptions.filter(
-                team => team.id !== formik.values?.teams?.team1
+                (team) => team.id !== formik.values?.teams?.team1
               ),
               "name",
               "id"
             )}
-            onChange={value =>
+            onChange={(value) =>
               formik.setFieldValue("teams.team2", Number(value))
             }
             value={formik.values?.teams?.team2}
-            placeholder={"Select Team Name"}
+            placeholder={t("Select Team Name")}
             icon={
               <TeamsManagement
                 height="35"
@@ -237,11 +240,11 @@ function MatchesFrom({
             // onBlur={formik.handleBlur}
           />
           <SelectInput
-            label={"Winning Team"}
+            label={t("Winning Team")}
             name={"winningTeam"}
             options={mappedArrayToSelectOptions(
               teamsOptions.filter(
-                team =>
+                (team) =>
                   (team.id === formik.values?.teams?.team1) |
                   (team.id === formik.values?.teams?.team2)
               ),
@@ -249,7 +252,7 @@ function MatchesFrom({
               "id"
             )}
             disabled={!formik.values.teams.team1 || !formik.values.teams.team2}
-            onChange={value =>
+            onChange={(value) =>
               formik.setFieldValue("winningTeam", Number(value))
             }
             value={formik.values.winningTeam}
@@ -260,9 +263,9 @@ function MatchesFrom({
         <FormRow>
           <SelectInput
             options={matchTypeOptions}
-            onChange={value => formik.setFieldValue("matchType", value)}
+            onChange={(value) => formik.setFieldValue("matchType", value)}
             value={formik.values.matchType}
-            label={"Match Type"}
+            label={t("Match Type")}
             name={"matchType"}
             placeholder={"Select Match Type"}
             icon={<Champion color={"text-[#677185]"} />}
@@ -271,14 +274,15 @@ function MatchesFrom({
                 ? formik.errors.matchType
                 : ""
             }
+            disabled={formik.isSubmitting}
             // onBlur={formik.handleBlur}
           />
 
           <SelectInput
             options={matchStateOptions}
-            onChange={value => formik.setFieldValue("status", value)}
+            onChange={(value) => formik.setFieldValue("status", value)}
             value={formik.values.status}
-            label={"Match State"}
+            label={t("Match State")}
             name={"status"}
             placeholder={"Select Match State"}
             icon={<Loader className="text-[#677185]" height={35} width={35} />}
@@ -287,13 +291,14 @@ function MatchesFrom({
                 ? formik.errors.status
                 : ""
             }
+            disabled={formik.isSubmitting}
             // onBlur={formik.handleBlur}
           />
           <SelectInput
             options={seriesFormatOptions}
             onChange={(value) => formik.setFieldValue("seriesFormat", value)}
             value={formik.values.seriesFormat}
-            label={"Series Format"}
+            label={t("Series Format")}
             name={"seriesFormat"}
             placeholder={"Select Series Format"}
             error={
@@ -302,6 +307,7 @@ function MatchesFrom({
                 : ""
             }
             // onBlur={formik.handleBlur}
+            disabled={formik.isSubmitting}
           />
         </FormRow>
       </FormSection>
@@ -309,7 +315,7 @@ function MatchesFrom({
       <FormSection>
         <FormRow>
           <InputApp
-            label={"Player 1 Score"}
+            label={t("Player 1 Score")}
             name={"player1Score"}
             type={"number"}
             placeholder={"Enter Player 1 Score"}
@@ -324,10 +330,11 @@ function MatchesFrom({
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             value={formik.values.player1Score}
+            disabled={formik.isSubmitting}
           />
 
           <InputApp
-            label={"Player 2 Score"}
+            label={t("Player 2 Score")}
             name={"player2Score"}
             type={"number"}
             placeholder={"Enter Player 2 Score"}
@@ -342,10 +349,11 @@ function MatchesFrom({
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             value={formik.values.player2Score}
+            disabled={formik.isSubmitting}
           />
         </FormRow>
         <InputApp
-          label={"Stage"}
+          label={t("Stage")}
           value={formik.values.stage}
           onChange={formik.handleChange}
           name={"stage"}
@@ -360,15 +368,16 @@ function MatchesFrom({
               : ""
           }
           onBlur={formik.handleBlur}
+          disabled={formik.isSubmitting}
         />
       </FormSection>
 
       <FormSection>
         <FormRow>
           <SelectInput
-            label={"Venue Type"}
+            label={t("Venue Type")}
             options={venueTypeOptions}
-            onChange={value => formik.setFieldValue("venueType", value)}
+            onChange={(value) => formik.setFieldValue("venueType", value)}
             value={formik.values.venueType}
             error={
               formik?.errors?.venueType && formik?.touched?.venueType
@@ -377,12 +386,13 @@ function MatchesFrom({
             }
             icon={<MapPin className="text-[#677185]" height={35} width={35} />}
             name={"venueType"}
-            onBlur={open => {
+            onBlur={(open) => {
               if (!open) formik.setFieldTouched("venueType", true);
             }}
+            disabled={formik.isSubmitting}
           />
           <InputApp
-            label={"Venue"}
+            label={t("Venue")}
             name={"venue"}
             type={"text"}
             placeholder={"Enter Venue"}
@@ -398,6 +408,9 @@ function MatchesFrom({
             }
             icon={<MapPin className="text-[#677185]" height={35} width={35} />}
             onBlur={formik.handleBlur}
+            disabled={
+              formik.values.venueType === "ONLINE" || formik.isSubmitting
+            }
           />
         </FormRow>
       </FormSection>
@@ -407,7 +420,7 @@ function MatchesFrom({
           <DatePicker
             placeholder={"Enter Match Date"}
             formik={formik}
-            label={"Match Date"}
+            label={t("Match Date")}
             name={"matchDate"}
             icon={
               <Date
@@ -419,7 +432,7 @@ function MatchesFrom({
             }
           />
           <InputApp
-            label={"time"}
+            label={t("time")}
             name={"matchTime"}
             type={"time"}
             placeholder={"Enter Match Time"}
@@ -448,10 +461,12 @@ function MatchesFrom({
       <FormSection>
         <FormRow>
           <InputApp
-            label={"Stream URL"}
+            t={t}
+            disabled={formik.isSubmitting}
+            label={t("Stream URL")}
             name={"streamUrl"}
             type={"text"}
-            placeholder={"Enter Stream URL"}
+            placeholder={t("Enter Stream URL")}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -483,10 +498,12 @@ function MatchesFrom({
           /> */}
         </FormRow>
         <TextAreaInput
-          label={"Summary"}
+          disabled={formik.isSubmitting}
+          t={t}
+          label={t("Summary")}
           name={"summary"}
           type={"text"}
-          placeholder={"Enter Summary"}
+          placeholder={t("Enter Summary")}
           className=" border-0 focus:outline-none "
           backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
           textColor="text-[#677185]"
@@ -509,11 +526,11 @@ function MatchesFrom({
         >
           {formik.isSubmitting
             ? formType === "add"
-              ? "Adding..."
-              : "Editing..."
+              ? t("Adding")
+              : t("Editing")
             : formType === "add"
-            ? "Add Match"
-            : "Edit Match"}
+            ? t("Add Match")
+            : t("Edit Match")}
         </Button>
       </div>
     </form>

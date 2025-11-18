@@ -1,4 +1,15 @@
 {
+  "Login": {
+    "Sign In to Go to Dashboard": "تسجيل الدخول للذهاب إلى لوحة التحكم",
+    "username": "اسم المستخدم",
+    "Password": "كلمة المرور",
+    "username is required": "اسم المستخدم مطلوب",
+    "password is required": "كلمة المرور مطلوبة",
+    "Login": "تسجيل الدخول",
+    "Forgot Password ?": "هل نسيت كلمة المرور؟",
+    "Login successful": "تم تسجيل الدخول بنجاح",
+    "May be username or password is incorrect": "قد يكون اسم المستخدم أو كلمة المرور غير صحيحة"
+  },
   "Dashboard": {
     "Matches Management": {
       "title": "إدارة المباريات",
@@ -64,7 +75,8 @@
     "news": "الأخبار",
     "tournaments management": "إدارة البطولات",
     "matches management": "إدارة المباريات",
-    "support center": "مركز الدعم"
+    "support center": "مركز الدعم",
+    "settings": "الإعدادات"
   },
   "buttonLinks": {
     "add new": "إضافة جديد",
@@ -105,7 +117,24 @@
     "World Ranking": "التصنيف العالمي",
     "Enter World Ranking": "أدخل التصنيف العالمي",
     "Number Of Achievements": "عدد الإنجازات",
-    "Enter Number Of Achievements": "أدخل عدد الإنجازات"
+    "Enter Number Of Achievements": "أدخل عدد الإنجازات",
+    "Player Photo Dark": "صورة اللاعب الداكنة",
+    "Enter Player Photo Dark": "ادخل صورة اللاعب الداكنة",
+    "Player Photo": "صورة اللاعب",
+    "Enter Player Photo": "ادخل صورة اللاعب",
+    "Yes": "نعم",
+    "No": "لا"
+  },
+  "PlayersTable": {
+    "Edit": "تعديل",
+    "Links": "روابط",
+    "Delete": "حذف",
+    "Favorites characters": "اللاعبين المفضلين",
+    "Awards": "الجوائز",
+    "Player": "لاعب",
+    "Team": "فرق",
+    "Age": "العمر",
+    "Country": "البلد"
   },
   "TeamForm": {
     "Name": "الاسم",
@@ -216,5 +245,164 @@
     "Transfer News": "أخبار الانتقالات",
     "Match Recap": "ملخص المباراة",
     "Trending": "الأكثر تداولاً"
+  },
+  "TournamentForm": {
+    "Tournament name is required": "اسم البطولة مطلوب",
+    "Organizer is required": "اسم المنظم مطلوب",
+    "Invalid start date": "تاريخ البدء غير صالح",
+    "Start date is required": "تاريخ البدء مطلوب",
+    "End date is required": "تاريخ الانتهاء مطلوب",
+    "Venue is required": "مكان إقامة البطولة مطلوب",
+    "Prize pool is required": "قيمة الجائزة مطلوبة",
+    "Prize pool must be positive": "قيمة الجائزة يجب أن تكون موجبة",
+    "Status is required": "الحالة مطلوبة",
+    "Logo is required": "الشعار مطلوب",
+    "Invalid logo URL": "رابط الشعار غير صالح",
+    "Dark logo is required": "شعار الوضع الداكن مطلوب",
+    "Winning points must be 0 or more": "نقاط الفوز يجب أن تكون 0 أو أكثر",
+    "Winning points are required": "نقاط الفوز مطلوبة",
+    "Losing points must be 0 or more": "نقاط الخسارة يجب أن تكون 0 أو أكثر",
+    "Losing points are required": "نقاط الخسارة مطلوبة",
+    "Draw points must be 0 or more": "نقاط التعادل يجب أن تكون 0 أو أكثر",
+    "Draw points are required": "نقاط التعادل مطلوبة",
+    "Description is required": "الوصف مطلوب",
+    "knockout image": "صورة الشكل",
+    "Upload Knockout Light Image": "رفع صورة الشكل الفاتحة",
+    "Upload Knockout Dark Image": "رفع صورة الشكل المظلمة",
+    "knockout image (Dark)": "صورة الشكل (المظلمة)",
+
+    "Edit": "تعديل",
+    "Add": "إضافة",
+    "Upload Tournament Dark Logo": "رفع شعار البطولة (الوضع الداكن)",
+    "Logo (Dark)": "الشعار (الوضع الداكن)",
+    "Upload Tournament Logo": "رفع شعار البطولة",
+    "Logo": "الشعار",
+    "Enter Draw Points": "أدخل نقاط التعادل",
+    "Draw Points": "نقاط التعادل",
+    "Enter Losing Points": "أدخل نقاط الخسارة",
+    "Losing Points": "نقاط الخسارة",
+    "Enter Winning Points": "أدخل نقاط الفوز",
+    "Winning Points": "نقاط الفوز",
+    "Enter Prize Pool": "أدخل قيمة الجائزة",
+    "Prize Pool": "قيمة الجائزة",
+    "End Date": "تاريخ الانتهاء",
+    "Enter End Date": "أدخل تاريخ الانتهاء",
+    "Start Date": "تاريخ البدء",
+    "Enter Start Date": "أدخل تاريخ البدء",
+    "Enter Description": "أدخل الوصف",
+    "Description": "الوصف",
+    "Select Status": "اختر الحالة",
+    "Status": "الحالة",
+    "venue": "المكان",
+    "Enter Name of venue": "أدخل اسم المكان",
+    "Organizer": "المنظم",
+    "Enter Name of Organizer": "أدخل اسم المنظم",
+    "Name": "الاسم",
+    "Enter Name of Tournament": "أدخل اسم البطولة",
+    "Upcoming": "قادمة",
+    "Ongoing": "جارية",
+    "Finished": "منتهية",
+    "The Tournament Edited": "The Tournament Edited",
+    "The Tournament Added": "The Tournament Added",
+    "uploaded Photo": "تم رفع الصورة"
+  },
+  "TournamentsTable": {
+    "name": "الاسم",
+    "Organizer": "المنظم",
+    "Desc": "الوصف",
+    "Start Date": "تاريخ البدء",
+    "End Date": "تاريخ الانتهاء",
+
+    "Status": "الحالة",
+    "Edit": "تعديل",
+    "Delete": "حذف",
+    "Upcoming": "قادمة",
+    "Ongoing": "جارية",
+    "Finished": "منتهية"
+  },
+  "LanguagesTable": {
+    "Local name": "اسم المحلي",
+    "Name": "الاسم",
+    "Code": "الكود",
+    "Add new language": "اضافة لغة جديدة",
+    "Deleting": "جارٍ الحذف...",
+    "Delete": "حذف",
+    "Are you absolutely sure you want to delete this language?": "هل أنت متأكد تمامًا أنك تريد حذف هذه اللغة؟",
+    "DialogDescription": "لا يمكن التراجع عن هذا الإجراء. سيؤدي ذلك إلى حذف اللغة نهائيًا وإزالتها من النظام.",
+    "Edit": "تعديل",
+    "Dictionary": "قاموس",
+    "Cancel": "الغاء"
+  },
+  "MatchForm": {
+    "ONLINE": "أونلاين",
+    "OFFLINE": "أوفلاين",
+    "BO5": "أفضل من 5",
+    "BO3": "أفضل من 3",
+    "BO1": "مباراة واحدة",
+    "CANCELLED": "ملغي",
+    "LIVE": "مباشر",
+    "UPCOMING": "قادم",
+    "FINISHED": "منتهي",
+    "Team": "فريق",
+    "Solo": "فردي",
+    "Tournaments": "البطولات",
+    "Write Champion Name": "اكتب اسم البطولة",
+
+    "Game": "اللعبة",
+    "Write Game Name": "اكتب اسم اللعبة",
+
+    "Team 1": "الفريق 1",
+    "Write Team Name": "اكتب اسم الفريق",
+
+    "Team 2": "الفريق 2",
+    "Select Team Name": "اختر اسم الفريق",
+
+    "Winning Team": "الفريق الفائز",
+    "Select Winning Team": "اختر الفريق الفائز",
+
+    "Match Type": "نوع المباراة",
+    "Select Match Type": "اختر نوع المباراة",
+
+    "Match State": "حالة المباراة",
+    "Select Match State": "اختر حالة المباراة",
+
+    "Series Format": "تنسيق السلسلة",
+    "Select Series Format": "اختر تنسيق السلسلة",
+
+    "Player 1 Score": "نتيجة اللاعب 1",
+    "Enter Player 1 Score": "أدخل نتيجة اللاعب 1",
+
+    "Player 2 Score": "نتيجة اللاعب 2",
+    "Enter Player 2 Score": "أدخل نتيجة اللاعب 2",
+
+    "Stage": "المرحلة",
+    "Enter Stage": "أدخل المرحلة",
+
+    "Venue Type": "نوع المكان",
+
+    "Venue": "المكان",
+    "Enter Venue": "أدخل المكان",
+
+    "Match Date": "تاريخ المباراة",
+    "Enter Match Date": "أدخل تاريخ المباراة",
+
+    "time": "الوقت",
+    "Enter Match Time": "أدخل وقت المباراة",
+    "Stream URL": "رابط البث",
+    "Enter Stream URL": "ادخل رابط البث",
+    "Summary": "ملخص",
+    "Enter Summary": "ادخل ملخص",
+    "Adding": "اضافة...",
+    "Editing": "تعديل...",
+    "Edit Match": "تعديل المباراة",
+    "Add Match": "اضافة مباراة"
+  },
+  "MatchesTable": {
+    "Date": "التاريخ",
+    "Time": "الوقت",
+    "Team 1": "الفريق 1",
+    "Team 2": "الفريق 2",
+    "Edit": "تعديل",
+    "Delete": "حذف"
   }
 }

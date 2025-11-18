@@ -12,6 +12,7 @@ import SelectInput from "../ui app/SelectInput";
 import FileInput from "../ui app/FileInput";
 import ImageIcon from "../icons/ImageIcon";
 import toast from "react-hot-toast";
+import { useTranslations } from "use-intl";
 
 const validateSchema = yup.object({
   name: yup.string().required("Tournament name is required"),
@@ -41,12 +42,24 @@ const validateSchema = yup.object({
     .oneOf(["UPCOMING", "ONGOING", "FINISHED"], "Invalid status")
     .required("Status is required"),
 
-  logo: yup.string().url("Invalid logo URL").required("Logo is required"),
+  logo: yup
+    .string()
+    // .url("Invalid logo URL")
+    .required("Logo is required"),
 
   logoDark: yup
     .string()
-    .url("Invalid dark logo URL")
+    // .url("Invalid dark logo URL")
     .required("Dark logo is required"),
+
+  // knockoutImageLight: yup
+  //   .string()
+  //   // .url("Invalid knockout image URL")
+  //   .required("Knockout image is required"),
+  // knockoutImageDark: yup
+  //   .string()
+  //   // .url("Invalid dark knockout image URL")
+  //   .required("Dark knockout image is required"),
 
   winningPoints: yup
     .number()
@@ -71,6 +84,7 @@ export default function TournamentsForm({
   submit,
   formType = "add",
 }) {
+  const t = useTranslations("TournamentForm");
   const formik = useFormik({
     initialValues: {
       name: tournament?.name || "",
@@ -86,19 +100,21 @@ export default function TournamentsForm({
       losingPoints: tournament?.losingPoints || 0,
       drawPoints: tournament?.drawPoints || 0,
       description: tournament?.description || "",
+      knockoutImageLight: null,
+      knockoutImageDark: null,
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
       let dataValues = tournament ? { id: tournament.id, ...values } : values;
-      dataValues.country = {
-        id: 1051,
-      };
-
+      dataValues.country = null;
+      console.log(dataValues);
       try {
         await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(
-          formType === "add" ? "The Tournament Added" : "The Tournament Edited"
+          formType === "add"
+            ? t("The Tournament Added")
+            : t("The Tournament Edited")
         );
       } catch (error) {
         console.log(error);
@@ -110,20 +126,22 @@ export default function TournamentsForm({
   // console.log(formik.errors);
 
   const statusOptions = [
-    { value: "UPCOMING", label: "Upcoming" },
-    { value: "ONGOING", label: "Ongoing" },
-    { value: "FINISHED", label: "Finished" },
+    { value: "UPCOMING", label: t("Upcoming") },
+    { value: "ONGOING", label: t("Ongoing") },
+    { value: "FINISHED", label: t("Finished") },
   ];
 
+  console.log(formik.errors);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
         <FormRow>
           <InputApp
-            label={"Name"}
+            t={t}
+            label={t("Name")}
             name={"name"}
             type={"text"}
-            placeholder={"Enter Name of Tournament"}
+            placeholder={t("Enter Name of Tournament")}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -137,10 +155,11 @@ export default function TournamentsForm({
             value={formik.values.name}
           />
           <InputApp
-            label={"Organizer"}
+            t={t}
+            label={t("Organizer")}
             name={"organizer"}
             type={"text"}
-            placeholder={"Enter Name of Organizer"}
+            placeholder={t("Enter Name of Organizer")}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -156,10 +175,11 @@ export default function TournamentsForm({
         </FormRow>
         <FormRow>
           <InputApp
-            label={"venue"}
+            t={t}
+            label={t("venue")}
             name={"venue"}
             type={"text"}
-            placeholder={"Enter Name of venue"}
+            placeholder={t("Enter Name of venue")}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -174,11 +194,11 @@ export default function TournamentsForm({
           />
           <SelectInput
             options={statusOptions}
-            onChange={value => formik.setFieldValue("status", value)}
+            onChange={(value) => formik.setFieldValue("status", value)}
             value={formik.values.status}
-            label={"Status"}
+            label={t("Status")}
             name={"status"}
-            placeholder={"Select Status"}
+            placeholder={t("Select Status")}
             error={
               formik?.errors?.status && formik?.touched?.status
                 ? formik?.errors?.status
@@ -192,20 +212,22 @@ export default function TournamentsForm({
           name="description"
           onChange={formik.handleChange}
           value={formik.values.description}
-          label={"Description"}
-          placeholder={"Enter Description"}
+          label={t("Description")}
+          placeholder={t("Enter Description")}
           className="border-0 focus:outline-none"
           error={formik.touched.description && formik.errors.description}
           onBlur={formik.handleBlur}
+          t={t}
         />
       </FormSection>
 
       <FormSection>
         <FormRow>
           <DatePicker
-            placeholder={"Enter Start Date"}
+            t={t}
+            placeholder={t("Enter Start Date")}
             formik={formik}
-            label={"Start Date"}
+            label={t("Start Date")}
             name={"startDate"}
             icon={
               <Date
@@ -217,9 +239,10 @@ export default function TournamentsForm({
             }
           />
           <DatePicker
-            placeholder={"Enter End Date"}
+            t={t}
+            placeholder={t("Enter End Date")}
             formik={formik}
-            label={"End Date"}
+            label={t("End Date")}
             name={"endDate"}
             icon={
               <Date
@@ -236,10 +259,10 @@ export default function TournamentsForm({
       <FormSection>
         <FormRow>
           <InputApp
-            label={"Prize Pool"}
+            label={t("Prize Pool")}
             name={"prizePool"}
             type={"number"}
-            placeholder={"Enter Prize Pool"}
+            placeholder={t("Enter Prize Pool")}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -251,12 +274,13 @@ export default function TournamentsForm({
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             value={formik.values.prizePool}
+            t={t}
           />
           <InputApp
-            label={"Winning Points"}
+            label={t("Winning Points")}
             name={"winningPoints"}
             type={"number"}
-            placeholder={"Enter Winning Points"}
+            placeholder={t("Enter Winning Points")}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -268,14 +292,15 @@ export default function TournamentsForm({
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             value={formik.values.winningPoints}
+            t={t}
           />
         </FormRow>
         <FormRow>
           <InputApp
-            label={"Losing Points"}
+            label={t("Losing Points")}
             name={"losingPoints"}
             type={"number"}
-            placeholder={"Enter Losing Points"}
+            placeholder={t("Enter Losing Points")}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -287,12 +312,13 @@ export default function TournamentsForm({
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             value={formik.values.losingPoints}
+            t={t}
           />
           <InputApp
-            label={"Draw Points"}
+            label={t("Draw Points")}
             name={"drawPoints"}
             type={"number"}
-            placeholder={"Enter Draw Points"}
+            placeholder={t("Enter Draw Points")}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -304,6 +330,7 @@ export default function TournamentsForm({
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             value={formik.values.drawPoints}
+            t={t}
           />
         </FormRow>
       </FormSection>
@@ -311,10 +338,11 @@ export default function TournamentsForm({
       <FormSection>
         <FormRow>
           <FileInput
+            t={t}
             formik={formik}
-            label={"Logo"}
+            label={t("Logo")}
             name={"logo"}
-            placeholder={"Upload Tournament Logo"}
+            placeholder={t("Upload Tournament Logo")}
             icon={
               <ImageIcon
                 className={"fill-[#677185]"}
@@ -323,10 +351,40 @@ export default function TournamentsForm({
             }
           />
           <FileInput
+            t={t}
             formik={formik}
-            label={"Logo (Dark)"}
+            label={t("Logo (Dark)")}
             name={"logoDark"}
-            placeholder={"Upload Tournament Dark Logo"}
+            placeholder={t("Upload Tournament Dark Logo")}
+            icon={
+              <ImageIcon
+                className={"fill-[#677185]"}
+                color={"text-[#677185]"}
+              />
+            }
+          />
+        </FormRow>
+        <FormRow>
+          <FileInput
+            t={t}
+            formik={formik}
+            label={t("knockout image")}
+            name={"knockoutImageLight"}
+            placeholder={t("Upload Knockout Light Image")}
+            icon={
+              <ImageIcon
+                className={"fill-[#677185]"}
+                color={"text-[#677185]"}
+              />
+            }
+          />
+
+          <FileInput
+            t={t}
+            formik={formik}
+            label={t("knockout image (Dark)")}
+            name={"knockoutImageDark"}
+            placeholder={t("Upload Knockout Dark Image")}
             icon={
               <ImageIcon
                 className={"fill-[#677185]"}
@@ -345,9 +403,13 @@ export default function TournamentsForm({
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          {formik.isSubmitting &&
-            (formType === "add" ? "Adding..." : "Editing...")}
-          {!formik.isSubmitting && formType === "add" ? "Add" : "Edit"}
+          {formik.isSubmitting
+            ? formType === "add"
+              ? "Adding..."
+              : "Editing..."
+            : formType === "add"
+            ? t("Add")
+            : t("Edit")}
         </Button>
       </div>
     </form>

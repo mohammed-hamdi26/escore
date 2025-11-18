@@ -21,6 +21,7 @@ function FileInput({
   disabled,
   typeFile = "image",
   flexGrow = "flex-1",
+  t,
   ...props
 }) {
   const [file, setFiles] = useState(null);
@@ -61,12 +62,9 @@ function FileInput({
                     const formData = new FormData();
                     formData.append("file", file);
                     const url = await uploadPhoto(formData);
-                    setUrl(`https://b1fd0acd5715.ngrok-free.app${url}`);
-                    formik.setFieldValue(
-                      name,
-                      `https://b1fd0acd5715.ngrok-free.app${url}`
-                    );
-                    toast.success("uploaded Photo");
+                    setUrl(`${url}`);
+                    formik.setFieldValue(name, `${url}`);
+                    toast.success(t("uploaded Photo"));
                     return url;
                   } catch (e) {
                     // console.log(e);
@@ -81,6 +79,8 @@ function FileInput({
               className={"bg-red-700 hover:bg-red-700/70 "}
               onClick={() => {
                 setFiles(null);
+                setUrl("");
+                formik.setFieldValue(name, "");
               }}
             >
               <X />
@@ -91,8 +91,9 @@ function FileInput({
         <InputApp
           value={formik.values?.[name]}
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           // name={"logo"}
-
+          t={t}
           hidden={typeFile !== "image" ? true : false}
           name={name}
           type={"text"}

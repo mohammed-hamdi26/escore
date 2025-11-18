@@ -8,6 +8,10 @@ import TournamentsFilter from "./TournamentsFilter";
 import { useState } from "react";
 import { deleteTournament } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { getNumPages } from "@/app/[locale]/_Lib/helps";
+import Image from "next/image";
 
 const columns = [
   {
@@ -20,7 +24,7 @@ const columns = [
   },
   {
     id: "description",
-    header: "Description",
+    header: "Desc",
   },
   {
     id: "startDate",
@@ -32,23 +36,42 @@ const columns = [
   },
 ];
 
-function TournamentsTable({ tournaments }) {
+function TournamentsTable({ tournaments, numOfTournaments }) {
   const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations("TournamentsTable");
+  const searchParams = useSearchParams();
+  const numPages = getNumPages(
+    numOfTournaments,
+    Number(searchParams.get("size"))
+  );
+
   return (
     <div className="space-y-8">
-      <TournamentsFilter />
+      <TournamentsFilter numOfSize={numOfTournaments} />
 
       <Table
-        grid_cols="grid-cols-[1fr_0.5fr_0.5fr_0.5fr_0.5fr_2fr]"
+        t={t}
+        grid_cols="grid-cols-[1.4fr_0.5fr_0.5fr_0.5fr_0.5fr_2fr]"
         columns={columns}
         data={tournaments}
       >
         {tournaments.map((tournament) => (
           <Table.Row
             key={tournament.id}
-            grid_cols="grid-cols-[1fr_0.5fr_0.5fr_0.5fr_0.5fr_2fr]"
+            grid_cols="grid-cols-[1.4fr_0.5fr_0.5fr_0.5fr_0.5fr_2fr]"
           >
-            <Table.Cell>{tournament?.name}</Table.Cell>
+            <Table.Cell className="flex gap-2 items-center">
+              {tournament?.logo && (
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_BASE_URL}${tournament?.logo}`}
+                  width={30}
+                  height={30}
+                  alt=""
+                  className="rounded-full"
+                />
+              )}
+              {tournament?.name}
+            </Table.Cell>
             <Table.Cell>{tournament?.organizer}</Table.Cell>
             <Table.Cell>{tournament?.description}</Table.Cell>
             <Table.Cell>
@@ -61,7 +84,7 @@ function TournamentsTable({ tournaments }) {
                 href={`/dashboard/tournaments-management/edit/${tournament.id}`}
               >
                 <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
-                  Edit
+                  {t("Edit")}
                 </Button>
               </Link>
               <Button
@@ -81,13 +104,13 @@ function TournamentsTable({ tournaments }) {
                   }
                 }}
               >
-                Delete
+                {t("Delete")}
               </Button>
             </Table.Cell>
           </Table.Row>
         ))}
       </Table>
-      <Pagination />
+      <Pagination numPages={numPages} numItems={tournaments.length} />
     </div>
   );
 }

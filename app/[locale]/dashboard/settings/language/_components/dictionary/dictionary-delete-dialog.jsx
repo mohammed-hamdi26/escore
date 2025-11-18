@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteLanguage } from "@/app/[locale]/_Lib/languageAPI";
+import { deleteWord } from "@/app/[locale]/_Lib/dictionary";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,33 +16,28 @@ import { Button } from "@/components/ui/button";
 import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-
-export default function LanguageDeleteDialog({ code, onDelete }) {
+function DictionaryDeleteDialog({ code, word, onDelete }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const handleDelete = async () => {
+  async function handleDelete() {
     try {
       setIsLoading(true);
-      await deleteLanguage(code);
-      toast.success("Language deleted successfully");
-      if (onDelete) {
-        onDelete(code);
-      }
-      setOpen(false); 
+      await deleteWord(code, word);
+      onDelete(word);
+      toast.success("word deleted successfully ");
+      setOpen(false);
     } catch (error) {
-      toast.error(error.message || "Failed to delete language");
+      toast.error(error.message || "Failed to delete word");
     } finally {
       setIsLoading(false);
     }
-  };
-
+  }
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button
-          variant="destructive"
-          className="rounded-full min-w-[100px] cursor-pointer"
+          className="rounded-full min-w-[100px] bg-[#3a469d] hover:bg-[#4656bf] text-amber-50 cursor-pointer"
           disabled={isLoading}
         >
           {isLoading ? "Deleting..." : "Delete"}
@@ -54,11 +49,11 @@ export default function LanguageDeleteDialog({ code, onDelete }) {
             <TriangleAlertIcon className="text-destructive size-6" />
           </div>
           <AlertDialogTitle>
-            Are you absolutely sure you want to delete this language?
+            Are you absolutely sure you want to delete this word?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            This action cannot be undone. This will permanently delete the
-            language and remove it from the system.
+            This action cannot be undone. This will permanently delete the word
+            and remove it from the system.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -76,3 +71,4 @@ export default function LanguageDeleteDialog({ code, onDelete }) {
   );
 }
 
+export default DictionaryDeleteDialog;

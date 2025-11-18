@@ -1,6 +1,5 @@
 "use client";
-
-import { deleteWord } from '@/app/[locale]/_Lib/dictionary';
+import { deleteTheme } from '@/app/[locale]/_Lib/themesApi';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,19 +15,17 @@ import { Button } from "@/components/ui/button";
 import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-function DictionaryDeleteDialog({code,word,onDelete}) {
+function ThemeDeleteDialog({theme_id,onDelete}) {
+  console.log(theme_id)
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
-
-  async function handleDelete () {
+  async function handleDelete() {
     try {
       setIsLoading(true);
-      await deleteWord(code,word);
-      toast.success("Successfully deleted ");
-      if (onDelete) {
-        onDelete(word);
-      }
-      setOpen(false); 
+      await deleteTheme(theme_id);
+      onDelete(theme_id);
+      toast.success("theme deleted successfully ");
+      setOpen(false);
     } catch (error) {
       toast.error(error.message || "Failed to delete word");
     } finally {
@@ -39,8 +36,7 @@ function DictionaryDeleteDialog({code,word,onDelete}) {
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button
-          variant="destructive"
-          className="rounded-full min-w-[100px] cursor-pointer"
+          className="rounded-full min-w-[100px] bg-[#3a469d] hover:bg-[#4656bf] text-amber-50 cursor-pointer"
           disabled={isLoading}
         >
           {isLoading ? "Deleting..." : "Delete"}
@@ -52,11 +48,11 @@ function DictionaryDeleteDialog({code,word,onDelete}) {
             <TriangleAlertIcon className="text-destructive size-6" />
           </div>
           <AlertDialogTitle>
-            Are you absolutely sure you want to delete this word?
+            Are you absolutely sure you want to delete this theme?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            This action cannot be undone. This will permanently delete the
-            word and remove it from the system.
+            This action cannot be undone. This will permanently delete the theme
+            and remove it from the system.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -71,7 +67,7 @@ function DictionaryDeleteDialog({code,word,onDelete}) {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }
 
-export default DictionaryDeleteDialog
+export default ThemeDeleteDialog

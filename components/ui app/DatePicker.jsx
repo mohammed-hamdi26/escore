@@ -6,7 +6,15 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { format } from "date-fns";
 
-function DatePicker({ label, name, formik, placeholder, icon }) {
+function DatePicker({
+  t,
+  label,
+  name,
+  formik,
+  placeholder,
+  icon,
+  disabled = { before: new Date() },
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,9 +44,7 @@ function DatePicker({ label, name, formik, placeholder, icon }) {
             </PopoverTrigger>
             <PopoverContent>
               <Calendar
-                disabled={{
-                  before: new Date(),
-                }}
+                disabled={disabled}
                 selected={formik.values[name]}
                 onSelect={(date) => {
                   formik.setFieldValue(name, date);
@@ -52,7 +58,9 @@ function DatePicker({ label, name, formik, placeholder, icon }) {
             </PopoverContent>
           </Popover>
           {formik?.errors?.[name] && formik?.touched?.[name] && (
-            <p className="text-red-600">{formik?.errors?.[name]}</p>
+            <p className="text-red-600">
+              {t ? t(formik?.errors?.[name]) : formik?.errors?.[name]}
+            </p>
           )}
         </div>
       </div>

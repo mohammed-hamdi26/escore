@@ -26,3 +26,12 @@ export async function getMatch(id) {
     throw new Error("Failed to get Match");
   }
 }
+export async function getMatchesCount() {
+  try {
+    const res = await apiClient.get(`/matches/count`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Failed to get Matches Count");
+  }
+}

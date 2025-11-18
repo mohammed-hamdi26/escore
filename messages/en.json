@@ -1,4 +1,15 @@
 {
+  "Login": {
+    "Sign In to Go to Dashboard": "Sign In to Go to Dashboard",
+    "username": "username",
+    "Password": "password",
+    "username is required": "username is required",
+    "password is required": "password is required",
+    "Login": "Login",
+    "Forgot Password ?": "forgot password?",
+    "Login successful": "Login successful",
+    "May be username or password is incorrect": "May be username or password is incorrect"
+  },
   "Dashboard": {
     "Matches Management": {
       "title": "Matches Management",
@@ -67,7 +78,8 @@
     "news": "News",
     "tournaments management": "Tournaments Management",
     "matches management": "Matches Management",
-    "support center": "Support Center"
+    "support center": "Support Center",
+    "settings": "Settings"
   },
   "buttonLinks": {
     "add new": "Add New",
@@ -108,7 +120,24 @@
     "World Ranking": "World Ranking",
     "Enter World Ranking": "Enter World Ranking",
     "Number Of Achievements": "Number Of Achievements",
-    "Enter Number Of Achievements": "Enter Number Of Achievements"
+    "Enter Number Of Achievements": "Enter Number Of Achievements",
+    "Player Photo Dark": "Player Photo Dark",
+    "Enter Player Photo Dark": "Enter Player Photo Dark",
+    "Player Photo": "Player Photo",
+    "Enter Player Photo": "Enter Player Photo",
+    "Yes": "Yes",
+    "No": "No"
+  },
+  "PlayersTable": {
+    "Edit": "Edit",
+    "Links": "Links",
+    "Delete": "Delete",
+    "Favorites characters": "Favorites characters",
+    "Awards": "Awards",
+    "Player": "Player",
+    "Team": "Team",
+    "Age": "Age",
+    "Country": "Country"
   },
   "TeamForm": {
     "Name": "Name",
@@ -218,5 +247,167 @@
     "Transfer News": "Transfer News",
     "Match Recap": "Match Recap",
     "Trending": "Trending"
+  },
+  "TournamentForm": {
+    "Tournament name is required": "Tournament name is required",
+    "Organizer is required": "Organizer is required",
+    "Invalid start date": "Invalid start date",
+    "Start date is required": "Start date is required",
+    "End date is required": "End date is required",
+    "Venue is required": "Venue is required",
+    "Prize pool is required": "Prize pool is required",
+    "Prize pool must be positive": "Prize pool must be positive",
+    "Status is required": "Status is required",
+    "Logo is required": "Logo is required",
+    "Invalid logo URL": "Invalid logo URL",
+    "Dark logo is required": "Dark logo is required",
+    "Winning points must be 0 or more": "Winning points must be 0 or more",
+    "Winning points are required": "Winning points are required",
+    "Losing points must be 0 or more": "Losing points must be 0 or more",
+    "Losing points are required": "Losing points are required",
+    "Draw points must be 0 or more": "Draw points must be 0 or more",
+    "Draw points are required": "Draw points are required",
+    "Description is required": "Description is required",
+    "Edit": "Edit",
+    "Add": "Add",
+    "Upload Tournament Dark Logo": "Upload Tournament Dark Logo",
+    "Logo (Dark)": "Logo (Dark)",
+    "Upload Tournament Logo": "Upload Tournament Logo",
+    "Logo": "Logo",
+    "Enter Draw Points": "Enter Draw Points",
+    "Draw Points": "Draw Points",
+    "Enter Losing Points": "Enter Losing Points",
+    "Losing Points": "Losing Points",
+    "Enter Winning Points": "Enter Winning Points",
+    "Winning Points": "Winning Points",
+    "Enter Prize Pool": "Enter Prize Pool",
+    "Prize Pool": "Prize Pool",
+    "End Date": "End Date",
+    "Enter End Date": "Enter End Date",
+    "Start Date": "Start Date",
+    "Enter Start Date": "Enter Start Date",
+    "Enter Description": "Enter Description",
+    "Description": "Description",
+    "Select Status": "Select Status",
+    "Status": "Status",
+    "venue": "Venue",
+    "Enter Name of venue": "Enter Name of venue",
+    "Organizer": "Organizer",
+    "Enter Name of Organizer": "Enter Name of Organizer",
+    "Name": "Name",
+    "Enter Name of Tournament": "Enter Name of Tournament",
+    "Upcoming": "Upcoming",
+    "Ongoing": "Ongoing",
+    "Finished": "Finished",
+    "Invalid knockout image URL": "Invalid knockout image URL",
+    "Knockout image is required": "Knockout image is required",
+    "Invalid dark knockout image URL": "Invalid dark knockout image URL",
+    "Dark knockout image is required": "Dark knockout image is required",
+    "knockout image": "knockout image",
+    "Upload Knockout Light Image": "Upload Knockout Light Image",
+    "Upload Knockout Dark Image": "Upload Knockout Dark Image",
+    "knockout image (Dark)": "knockout image (Dark)",
+    "The Tournament Added": "The Tournament Added",
+    "The Tournament Edited": "The Tournament Edited",
+    "uploaded Photo": "uploaded Photo"
+  },
+  "TournamentsTable": {
+    "name": "Name",
+    "Organizer": "Organizer",
+    "Desc": "Description",
+    "Start Date": "Start Date",
+    "End Date": "End Date",
+    "Status": "Status",
+    "Edit": "Edit",
+    "Delete": "Delete",
+    "Upcoming": "Upcoming",
+    "Ongoing": "Ongoing",
+    "Finished": "Finished"
+  },
+  "LanguagesTable": {
+    "Local name": "Local name",
+    "Name": "Name",
+    "Code": "Code",
+    "Add new language": "Add new language",
+    "Deleting": "Deleting...",
+    "Delete": "Delete",
+    "Are you absolutely sure you want to delete this language?": "Are you absolutely sure you want to delete this language?",
+    "DialogDescription": "This action cannot be undone. This will permanently delete the language and remove it from the system.",
+    "Edit": "Edit",
+    "Dictionary": "Dictionary",
+    "Cancel": "Cancel"
+  },
+  "MatchForm": {
+    "ONLINE": "ONLINE",
+    "OFFLINE": "OFFLINE",
+    "BO5": "BO5",
+    "BO3": "BO3",
+    "BO1": "BO1",
+    "CANCELLED": "CANCELLED",
+    "LIVE": "LIVE",
+    "UPCOMING": "UPCOMING",
+    "FINISHED": "FINISHED",
+    "Team": "Team",
+    "Solo": "Solo",
+
+    "Tournaments": "Tournaments",
+    "Write Champion Name": "Write Champion Name",
+
+    "Game": "Game",
+    "Write Game Name": "Write Game Name",
+
+    "Team 1": "Team 1",
+    "Write Team Name": "Write Team Name",
+
+    "Team 2": "Team 2",
+    "Select Team Name": "Select Team Name",
+
+    "Winning Team": "Winning Team",
+    "Select Winning Team": "Select Winning Team",
+
+    "Match Type": "Match Type",
+    "Select Match Type": "Select Match Type",
+
+    "Match State": "Match State",
+    "Select Match State": "Select Match State",
+
+    "Series Format": "Series Format",
+    "Select Series Format": "Select Series Format",
+
+    "Player 1 Score": "Player 1 Score",
+    "Enter Player 1 Score": "Enter Player 1 Score",
+
+    "Player 2 Score": "Player 2 Score",
+    "Enter Player 2 Score": "Enter Player 2 Score",
+
+    "Stage": "Stage",
+    "Enter Stage": "Enter Stage",
+
+    "Venue Type": "Venue Type",
+
+    "Venue": "Venue",
+    "Enter Venue": "Enter Venue",
+
+    "Match Date": "Match Date",
+    "Enter Match Date": "Enter Match Date",
+
+    "time": "Time",
+    "Enter Match Time": "Enter Match Time",
+    "Stream URL": "Stream URL",
+    "Enter Stream URL": "Enter Stream URL",
+    "Summary": "Summary",
+    "Enter Summary": "Enter Summary",
+    "Adding": "Adding...",
+    "Editing": "Editing...",
+    "Edit Match": "Edit Match",
+    "Add Match": "Add Match"
+  },
+  "MatchesTable": {
+    "Date": "Date",
+    "Time": "Stage",
+    "Team 1": "Team 1",
+    "Team 2": "Team 2",
+    "Edit": "Edit",
+    "Delete": "Delete"
   }
 }

@@ -7,7 +7,6 @@ export default function DashboardLayout({ children }) {
       <TopNav />
 
       <div className="flex gap-5 h-full">
-        <SideNavBar />
         <div className="flex-1">{children}</div>
       </div>
     </div>

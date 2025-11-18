@@ -7,13 +7,21 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { deleteMatch } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import { useSearchParams } from "next/navigation";
+import { getNumPages } from "@/app/[locale]/_Lib/helps";
+import { useTranslations } from "next-intl";
 
-function MatchesTable({ matches, columns }) {
+function MatchesTable({ matches, columns, numOfMatches }) {
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const numPages = getNumPages(numOfMatches, Number(searchParams.get("size")));
+  const t = useTranslations("MatchesTable");
+
   return (
     <div className="space-y-8">
-      <FilterMatches />
+      <FilterMatches numOfSize={numOfMatches} />
       <Table
+        t={t}
         grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_0.5fr_2fr]"
         columns={[...columns]}
       >
@@ -24,7 +32,7 @@ function MatchesTable({ matches, columns }) {
           >
             <Table.Cell>{match?.teams[0]?.name}</Table.Cell>
             <Table.Cell>{match?.teams[1]?.name}</Table.Cell>
-            <Table.Cell>{match.matchTime}</Table.Cell>
+            <Table.Cell>{match.stage}</Table.Cell>
             <Table.Cell>{match.matchDate}</Table.Cell>
             <Table.Cell className="flex gap-4 justify-end">
               <Link href={`/dashboard/matches-management/edit/${match.id}`}>
@@ -33,7 +41,7 @@ function MatchesTable({ matches, columns }) {
                     "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
                   }
                 >
-                  Edit
+                  {t("Edit")}{" "}
                 </Button>
               </Link>
               <Button
@@ -53,13 +61,13 @@ function MatchesTable({ matches, columns }) {
                   }
                 }}
               >
-                {"Delete"}
+                {t("Delete")}
               </Button>
             </Table.Cell>
           </Table.Row>
         ))}
       </Table>
-      <Pagination />
+      <Pagination numPages={numPages} />
     </div>
   );
 }

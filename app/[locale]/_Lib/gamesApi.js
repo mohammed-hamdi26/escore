@@ -23,3 +23,13 @@ export async function getGame(id) {
     throw new Error("Failed to get game");
   }
 }
+
+export async function getGamesCount() {
+  try {
+    const res = await apiClient.get(`/games/count`);
+    return res.data;
+  } catch (e) {
+    // console.log(e.response);
+    throw new Error("Failed to get games count");
+  }
+}

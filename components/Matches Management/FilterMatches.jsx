@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import SelectInput from "../ui app/SelectInput";
 import SelectSizeRows from "../ui app/SelectSizeRows";
 
-function FilterMatches() {
+function FilterMatches({ numOfSize }) {
   const searchParams = new useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -28,7 +28,7 @@ function FilterMatches() {
         }}
       /> */}
 
-      <SelectSizeRows />
+      <SelectSizeRows numOfSize={numOfSize} />
     </div>
   );
 }
