@@ -86,6 +86,7 @@ function MatchesFrom({
         team1: match?.teams[0]?.id || null,
         team2: match?.teams[1]?.id || null,
       },
+      vodUrl: match?.vodUrl || "",
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
@@ -97,6 +98,7 @@ function MatchesFrom({
         games: { id: dataValues.games },
         teams: [{ id: dataValues.teams.team1 }, { id: dataValues.teams.team2 }],
         tournament: { id: dataValues.tournament },
+        vodUrl: "",
         winningTeam: null,
       };
 
@@ -459,10 +461,12 @@ function MatchesFrom({
       <FormSection>
         <FormRow>
           <InputApp
+            t={t}
+            disabled={formik.isSubmitting}
             label={t("Stream URL")}
             name={"streamUrl"}
             type={"text"}
-            placeholder={"Enter Stream URL"}
+            placeholder={t("Enter Stream URL")}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -494,10 +498,12 @@ function MatchesFrom({
           /> */}
         </FormRow>
         <TextAreaInput
+          disabled={formik.isSubmitting}
+          t={t}
           label={t("Summary")}
           name={"summary"}
           type={"text"}
-          placeholder={"Enter Summary"}
+          placeholder={t("Enter Summary")}
           className=" border-0 focus:outline-none "
           backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
           textColor="text-[#677185]"
@@ -520,11 +526,11 @@ function MatchesFrom({
         >
           {formik.isSubmitting
             ? formType === "add"
-              ? "Adding..."
-              : "Editing..."
+              ? t("Adding")
+              : t("Editing")
             : formType === "add"
-            ? "Add Match"
-            : "Edit Match"}
+            ? t("Add Match")
+            : t("Edit Match")}
         </Button>
       </div>
     </form>

@@ -43,8 +43,14 @@ function GamesForm({
       tournaments: data?.tournaments || [],
     },
     validationSchema: validationSchema,
-    onSubmit: async values => {
-      let dataValues = data ? { id: data.id, ...values } : values;
+    onSubmit: async (values) => {
+      let dataValues = data
+        ? {
+            id: data.id,
+            ...values,
+          }
+        : values;
+
       // dataValues = {
       //   ...dataValues,
       //   players: dataValues.players.map((player) => {
@@ -60,9 +66,10 @@ function GamesForm({
       //     return { id: JSON.parse(tournament).value };
       //   }),
       // };
-
+      console.log(dataValues);
       try {
         const res = await submitFunction(dataValues);
+        console.log(res);
         typeForm === "add" && formik.resetForm();
         toast.success(
           typeForm === "add" ? "The Game is Added" : "The Game Is Edited"
@@ -72,7 +79,7 @@ function GamesForm({
       }
     },
   });
-  // console.log(formik.errors, formik.isValid);
+
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>

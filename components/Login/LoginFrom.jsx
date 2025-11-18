@@ -1,16 +1,11 @@
 "use client";
 
-import { login } from "@/app/[locale]/_Lib/actions";
-import { useFormik } from "formik";
 import Image from "next/image";
 import Link from "next/link";
-import * as Yup from "yup";
 import logoImage from "../../public/images/logo.png";
 import InputApp from "../ui app/InputApp";
 import { Button } from "../ui/button";
-import toast from "react-hot-toast";
-function LoginFrom({ formik }) {
-  console.log(formik.isSubmitting || !formik.isValid || formik.errors);
+function LoginFrom({ formik, t }) {
   return (
     <div className="flex flex-[0.5] flex-col ">
       <Image
@@ -30,7 +25,8 @@ function LoginFrom({ formik }) {
           className="max-w-[400px]"
         /> */}
         <InputApp
-          placeholder={"username"}
+          t={t}
+          placeholder={t("username")}
           name="username"
           type="text"
           error={formik.touched.username && formik.errors.username}
@@ -39,7 +35,8 @@ function LoginFrom({ formik }) {
           className="max-w-[400px]"
         />
         <InputApp
-          placeholder={"Password"}
+          t={t}
+          placeholder={t("Password")}
           name="password"
           type="password"
           error={formik.touched.password && formik.errors.password}
@@ -51,14 +48,14 @@ function LoginFrom({ formik }) {
           className="text-[#C7C7C7] hover:text-[#C7C7C7]/90 text-end max-w-[400px]"
           href="/forgot-password"
         >
-          Forgot Password ?
+          {t("Forgot Password ?")}
         </Link>
         <Button
           disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
           className="max-w-[400px] font-bold text-lg text-white bg-green-primary cursor-pointer hover:bg-green-primary/80 rounded-[10px] p-6 disabled:bg-gray-600 disabled:cursor-not-allowed"
         >
-          Sign In
+          {t("Login")}
         </Button>
       </form>
     </div>

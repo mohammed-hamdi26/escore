@@ -18,6 +18,8 @@ import InputApp from "../ui app/InputApp";
 import SelectInput from "../ui app/SelectInput";
 import TextAreaInput from "../ui app/TextAreaInput";
 import { Button } from "../ui/button";
+import { tr } from "date-fns/locale";
+import { format } from "date-fns";
 
 const validationSchema = yup.object({
   title: yup.string().required("Required"),
@@ -26,7 +28,7 @@ const validationSchema = yup.object({
   image: yup.string(),
   imageDark: yup.string(),
   videoUrl: yup.string(),
-  publishDate: yup.string().required("Required"),
+  // publishDate: yup.string().required("Required"),
   authorName: yup.string().required("Required"),
   authorPicture: yup.string(),
   authorProfile: yup.string(),
@@ -37,35 +39,33 @@ const validationSchema = yup.object({
   // transfers: yup.string(),
 });
 
-const initialValues = {
-  title: "",
-  content: "",
-  summary: "",
-  image: "",
-  imageDark: "",
-  videoUrl: "",
-  publishDate: "",
-  authorName: "",
-  authorPicture: "",
-  authorProfile: "",
-  externalUrl: "",
-  status: "",
-  newsType: "",
-  players: [],
-  transfers: [],
-  notify: true,
-};
-
 function NewsForm({ formType = "add", submit, newData }) {
   const t = useTranslations("NewsForm");
 
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      title: newData?.title || "",
+      content: newData?.content || "",
+      summary: newData?.summary || "",
+      image: newData?.image || "",
+      imageDark: newData?.imageDark || "",
+      videoUrl: newData?.videoUrl || "",
+      publishDate: newData?.publishDate,
+      authorName: newData?.authorName || "",
+      authorPicture: newData?.authorPicture || "",
+      authorProfile: newData?.authorProfile || "",
+      externalUrl: newData?.externalUrl || "",
+      status: newData?.status || "",
+      newsType: newData?.newsType || "",
+      players: newData?.players || [],
+      transfers: newData?.transfers || [],
+      notify: true,
+    },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      const dataValues = newData ? { id: newData.id, ...values } : values;
-
       try {
+        let dataValues = newData ? { id: newData?.id, ...values } : values;
+
         await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(
@@ -79,7 +79,7 @@ function NewsForm({ formType = "add", submit, newData }) {
     },
   });
   const statusOptions = [
-    { value: "DRAFT", label: "Draft" },
+    // { value: "DRAFT", label: "Draft" },
     { value: "PUBLISHED", label: "Published" },
     { value: "SCHEDULED", label: "Scheduled" },
   ];
@@ -90,6 +90,7 @@ function NewsForm({ formType = "add", submit, newData }) {
     { value: "MATCH_RECAP", label: "Match Recap" },
     { value: "TRENDING", label: "Trending" },
   ];
+  console.log(formik.errors);
   // console.log(formik.values);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
@@ -179,21 +180,6 @@ function NewsForm({ formType = "add", submit, newData }) {
             icon={<Play height={31} width={31} className={"text-[#677185]"} />}
             error={formik.touched.videoUrl && formik.errors.videoUrl}
             onBlur={formik.handleBlur}
-          />
-        </FormRow>
-      </FormSection>
-
-      {/* Publishing */}
-      <FormSection>
-        <FormRow>
-          <DatePicker
-            formik={formik}
-            name={"publishDate"}
-            label={t("Publish Date")}
-            placeholder={t("Select Publish Date")}
-            icon={
-              <Date className={"fill-[#677185]"} color={"text-[#677185]"} />
-            }
           />
         </FormRow>
       </FormSection>
@@ -298,10 +284,25 @@ function NewsForm({ formType = "add", submit, newData }) {
           />
         </FormRow>
       </FormSection>
+      {formik.values.status === "SCHEDULED" && (
+        <FormSection>
+          <FormRow>
+            <DatePicker
+              formik={formik}
+              name={"publishDate"}
+              label={t("Publish Date")}
+              placeholder={t("Select Publish Date")}
+              icon={
+                <Date className={"fill-[#677185]"} color={"text-[#677185]"} />
+              }
+            />
+          </FormRow>
+        </FormSection>
+      )}
 
       <div className="flex justify-end">
         <Button
-          disabled={formik.isSubmitting}
+          disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
           className={
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
