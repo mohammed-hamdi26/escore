@@ -1,4 +1,15 @@
 {
+  "Login": {
+    "Sign In to Go to Dashboard": "تسجيل الدخول للذهاب إلى لوحة التحكم",
+    "username": "اسم المستخدم",
+    "Password": "كلمة المرور",
+    "username is required": "اسم المستخدم مطلوب",
+    "password is required": "كلمة المرور مطلوبة",
+    "Login": "تسجيل الدخول",
+    "Forgot Password ?": "هل نسيت كلمة المرور؟",
+    "Login successful": "تم تسجيل الدخول بنجاح",
+    "May be username or password is incorrect": "قد يكون اسم المستخدم أو كلمة المرور غير صحيحة"
+  },
   "Dashboard": {
     "Matches Management": {
       "title": "إدارة المباريات",
@@ -255,6 +266,10 @@
     "Draw points must be 0 or more": "نقاط التعادل يجب أن تكون 0 أو أكثر",
     "Draw points are required": "نقاط التعادل مطلوبة",
     "Description is required": "الوصف مطلوب",
+    "knockout image": "صورة الشكل",
+    "Upload Knockout Light Image": "رفع صورة الشكل الفاتحة",
+    "Upload Knockout Dark Image": "رفع صورة الشكل المظلمة",
+    "knockout image (Dark)": "صورة الشكل (المظلمة)",
 
     "Edit": "تعديل",
     "Add": "إضافة",
@@ -286,7 +301,10 @@
     "Enter Name of Tournament": "أدخل اسم البطولة",
     "Upcoming": "قادمة",
     "Ongoing": "جارية",
-    "Finished": "منتهية"
+    "Finished": "منتهية",
+    "The Tournament Edited": "The Tournament Edited",
+    "The Tournament Added": "The Tournament Added",
+    "uploaded Photo": "تم رفع الصورة"
   },
   "TournamentsTable": {
     "name": "الاسم",
@@ -369,6 +387,22 @@
     "Enter Match Date": "أدخل تاريخ المباراة",
 
     "time": "الوقت",
-    "Enter Match Time": "أدخل وقت المباراة"
+    "Enter Match Time": "أدخل وقت المباراة",
+    "Stream URL": "رابط البث",
+    "Enter Stream URL": "ادخل رابط البث",
+    "Summary": "ملخص",
+    "Enter Summary": "ادخل ملخص",
+    "Adding": "اضافة...",
+    "Editing": "تعديل...",
+    "Edit Match": "تعديل المباراة",
+    "Add Match": "اضافة مباراة"
+  },
+  "MatchesTable": {
+    "Date": "التاريخ",
+    "Time": "الوقت",
+    "Team 1": "الفريق 1",
+    "Team 2": "الفريق 2",
+    "Edit": "تعديل",
+    "Delete": "حذف"
   }
 }

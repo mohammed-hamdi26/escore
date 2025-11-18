@@ -24,10 +24,40 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "d421d3a6bcd2.ngrok-free.app",
+        hostname: "supersafely-integumentary-danilo.ngrok-free.dev",
         // port: "8000",
         // pathname: "/**",
       },
+      // {
+      //   protocol: "https",
+      //   hostname: "digitalhub.fifa.com",
+      //   // port: "8000",
+      //   // pathname: "/**",
+      // },
+      // {
+      //   protocol: "https",
+      //   hostname: "b1fd0acd5715.ngrok-free.app",
+      //   // port: "8000",
+      //   // pathname: "/**",
+      // },
+      // {
+      //   protocol: "https",
+      //   hostname: "th.bing.com",
+      //   // port: "8000",
+      //   // pathname: "/**",
+      // },
+      // {
+      //   protocol: "https",
+      //   hostname: "example.com",
+      //   // port: "8000",
+      //   // pathname: "/**",
+      // },
+      // {
+      //   protocol: "https",
+      //   hostname: "example.com",
+      //   // port: "8000",
+      //   // pathname: "/**",
+      // },
     ],
   },
 };

@@ -61,7 +61,15 @@ function SelectInput({
                   key={option?.value}
                   value={option?.value}
                 >
-                  <Image src={imagePhoto} width={50} height={50} alt="" />{" "}
+                  {option?.image && (
+                    <img
+                      src={option?.image}
+                      className="overflow-hidden"
+                      width={25}
+                      height={25}
+                      alt=""
+                    />
+                  )}{" "}
                   {t
                     ? t(option?.label || option?.name)
                     : option?.label || option?.name}

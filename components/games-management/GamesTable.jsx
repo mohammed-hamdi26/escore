@@ -11,14 +11,19 @@ import toast from "react-hot-toast";
 import GamesFilter from "./GamesFilter";
 import Pagination from "../ui app/Pagination";
 import imageLogo from "@/public/images/a-flat-vector-lettermark-logo-design-sho_M1U1HI8tTvOIgjZLmcU6eg_gSbp1v7WSyql-yuko9RTsQ-removebg-preview.png";
+import { useSearchParams } from "next/navigation";
+import { getFirst10Words, getNumPages } from "@/app/[locale]/_Lib/helps";
 
-function GamesTable({ games, columns }) {
+function GamesTable({ games, columns, numOfGames }) {
   const t = useTranslations("GamesTable");
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  console.log(numOfGames);
+  const numPages = getNumPages(numOfGames, Number(searchParams.get("size")));
 
   return (
     <div className="space-y-8">
-      <GamesFilter />
+      <GamesFilter numOfSize={numOfGames} />
       <Table
         t={t}
         grid_cols="grid-cols-[1fr_0.5fr_2fr]"
@@ -28,10 +33,17 @@ function GamesTable({ games, columns }) {
         {games.map((game) => (
           <Table.Row key={game.id} grid_cols="grid-cols-[1fr_0.5fr_2fr]">
             <Table.Cell className="flex items-center gap-2">
-              <Image src={imageLogo} width={40} height={40} alt="" />
+              {game?.icon && (
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${game?.icon}`}
+                  width={40}
+                  height={40}
+                  alt=""
+                />
+              )}
               {game.name}
             </Table.Cell>
-            <Table.Cell> {game.description}</Table.Cell>
+            <Table.Cell> {getFirst10Words(game.description)}</Table.Cell>
             <Table.Cell>
               <div className="flex justify-end gap-4">
                 <Link href={`/dashboard/games-management/edit/${game.id}`}>
@@ -68,7 +80,7 @@ function GamesTable({ games, columns }) {
           </Table.Row>
         ))}
       </Table>
-      <Pagination />
+      <Pagination numPages={numPages} />
     </div>
   );
 }

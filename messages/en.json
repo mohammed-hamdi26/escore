@@ -1,4 +1,15 @@
 {
+  "Login": {
+    "Sign In to Go to Dashboard": "Sign In to Go to Dashboard",
+    "username": "username",
+    "Password": "password",
+    "username is required": "username is required",
+    "password is required": "password is required",
+    "Login": "Login",
+    "Forgot Password ?": "forgot password?",
+    "Login successful": "Login successful",
+    "May be username or password is incorrect": "May be username or password is incorrect"
+  },
   "Dashboard": {
     "Matches Management": {
       "title": "Matches Management",
@@ -287,7 +298,18 @@
     "Enter Name of Tournament": "Enter Name of Tournament",
     "Upcoming": "Upcoming",
     "Ongoing": "Ongoing",
-    "Finished": "Finished"
+    "Finished": "Finished",
+    "Invalid knockout image URL": "Invalid knockout image URL",
+    "Knockout image is required": "Knockout image is required",
+    "Invalid dark knockout image URL": "Invalid dark knockout image URL",
+    "Dark knockout image is required": "Dark knockout image is required",
+    "knockout image": "knockout image",
+    "Upload Knockout Light Image": "Upload Knockout Light Image",
+    "Upload Knockout Dark Image": "Upload Knockout Dark Image",
+    "knockout image (Dark)": "knockout image (Dark)",
+    "The Tournament Added": "The Tournament Added",
+    "The Tournament Edited": "The Tournament Edited",
+    "uploaded Photo": "uploaded Photo"
   },
   "TournamentsTable": {
     "name": "Name",
@@ -370,6 +392,22 @@
     "Enter Match Date": "Enter Match Date",
 
     "time": "Time",
-    "Enter Match Time": "Enter Match Time"
+    "Enter Match Time": "Enter Match Time",
+    "Stream URL": "Stream URL",
+    "Enter Stream URL": "Enter Stream URL",
+    "Summary": "Summary",
+    "Enter Summary": "Enter Summary",
+    "Adding": "Adding...",
+    "Editing": "Editing...",
+    "Edit Match": "Edit Match",
+    "Add Match": "Add Match"
+  },
+  "MatchesTable": {
+    "Date": "Date",
+    "Time": "Stage",
+    "Team 1": "Team 1",
+    "Team 2": "Team 2",
+    "Edit": "Edit",
+    "Delete": "Delete"
   }
 }
