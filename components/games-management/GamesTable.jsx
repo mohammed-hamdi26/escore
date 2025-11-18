@@ -35,7 +35,7 @@ function GamesTable({ games, columns, numOfGames }) {
             <Table.Cell className="flex items-center gap-2">
               {game?.icon && (
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${game?.icon}`}
+                  src={`${process.env.NEXT_PUBLIC_BASE_URL}${game?.icon}`}
                   width={40}
                   height={40}
                   alt=""

@@ -63,7 +63,7 @@ function TournamentsTable({ tournaments, numOfTournaments }) {
             <Table.Cell className="flex gap-2 items-center">
               {tournament?.logo && (
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${tournament?.logo}`}
+                  src={`${process.env.NEXT_PUBLIC_BASE_URL}${tournament?.logo}`}
                   width={30}
                   height={30}
                   alt=""
