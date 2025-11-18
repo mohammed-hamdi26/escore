@@ -12,16 +12,11 @@ import ThemeForm from './theme-form';
 function ThemeDialog({
   trigger,
   formType = "add",
-  onSucess
+  setThemes,
+  currentTheme
 }) {
   const [open,setOpen] = useState(false);
-  const [loading,setLoading] = useState(false)
-  const handleSuccess = () => {
-    setOpen(false);
-    if(onSucess) {
-      onSucess()
-    }
-  }
+
   const dialogTitle = formType === "add" ? "Add New theme" : "Edit theme";
   const dialogDescription =
     formType === "add"
@@ -35,7 +30,7 @@ function ThemeDialog({
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
-        <ThemeForm sucessMessage={formType === "add" ? "Theme added successfully" : "Theme updated successfully" } formType={formType} onSucess={handleSuccess} />
+        <ThemeForm sucessMessage={formType === "add" ? "Theme added successfully" : "Theme updated successfully" } formType={formType} setThemes={setThemes} setOpen={setOpen} currentTheme={currentTheme}/>
       </DialogContent>
     </Dialog>
   )

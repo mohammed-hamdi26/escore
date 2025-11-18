@@ -8,7 +8,6 @@ import DictionaryDialog from "./dictionary-dialog";
 const columns = [
   { id: "word", header: "Word" },
   { id: "translation", header: "Translation" },
-  { id: "actions", header: "Actions" },
 ];
 function DictionaryTable({ code, initialDictionary }) {
   const [dictionary, setDictionary] = useState(initialDictionary || {});

@@ -1,10 +1,11 @@
-import { getAllThemes } from "@/app/[locale]/_Lib/themesApi";
-import ThemesTable from "./_components/themes-table";
+import { Suspense } from 'react';
+import ThemesContainer from './_components/themes-container';
+import LoadingScreen from '@/components/ui app/loading-screen';
 
 async function ApperancePage() {
-  const { data: themes } = await getAllThemes();
-  console.log(themes);
-  return <ThemesTable initialThemes={themes} />;
+  return <Suspense fallback={<LoadingScreen/>}>
+    <ThemesContainer/>
+  </Suspense>
 }
 
 export default ApperancePage;

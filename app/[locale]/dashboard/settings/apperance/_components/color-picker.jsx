@@ -1,4 +1,4 @@
-'use client';;
+'use client';
 import Color from 'color';
 import { PipetteIcon } from 'lucide-react';
 import { Slider } from 'radix-ui';
@@ -332,7 +332,6 @@ export const ColorPickerFormat = ({
           readOnly
           type="text"
           value={hex} />
-        <PercentageInput value={alpha} />
       </div>
     );
   }
@@ -359,7 +358,6 @@ export const ColorPickerFormat = ({
             type="text"
             value={value} />
         ))}
-        <PercentageInput value={alpha} />
       </div>
     );
   }
@@ -404,7 +402,6 @@ export const ColorPickerFormat = ({
             type="text"
             value={value} />
         ))}
-        <PercentageInput value={alpha} />
       </div>
     );
   }
