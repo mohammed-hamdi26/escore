@@ -100,7 +100,7 @@ function DictionaryForm({
         <Button
           disabled={formik.isSubmitting}
           type="submit"
-          className="text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
+          className="text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-[#2ca54d]"
         >
           {formik.isSubmitting
             ? "Submitting..."

@@ -30,7 +30,7 @@ function LanguagesTable({ initialLanguages }) {
           trigger={
             <Button
               className={
-                "text-white  text-center min-w-[100px]  px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80 transition-all duration-300"
+                "text-white  text-center min-w-[100px]  px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-[#2ca54d] transition-all duration-300"
               }
             >
               {t("Add new language")}
@@ -61,13 +61,13 @@ function LanguagesTable({ initialLanguages }) {
               <Table.Cell>
                 <div className="flex justify-end gap-4">
                   <Link href={`/dashboard/settings/language/${lang?.code}`}>
-                    <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer hover:bg-green-primary/70">
+                    <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer hover:bg-[#2ca54d]">
                       {t("Dictionary")}
                     </Button>
                   </Link>
                   <LanguageDialog
                     trigger={
-                      <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer hover:bg-green-primary/70">
+                      <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer hover:bg-[#2ca54d]">
                         {t("Edit")}
                       </Button>
                     }
