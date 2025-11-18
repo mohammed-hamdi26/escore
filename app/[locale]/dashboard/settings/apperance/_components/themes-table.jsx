@@ -1,74 +1,73 @@
 "use client";
+
 import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import DictionaryDeleteDialog from "./dictionary-delete-dialog";
-import DictionaryDialog from "./dictionary-dialog";
+import ThemeDialog from "./theme-dialog";
+import ThemeDeleteDialog from './theme-delete-dialog';
 
 const columns = [
-  { id: "word", header: "Word" },
-  { id: "translation", header: "Translation" },
+  { id: "color-code", header: "Color Code" },
+  { id: "theme-type", header: "Theme Type" },
+  { id: "color", header: "Color" },
 ];
-function DictionaryTable({ code, initialDictionary }) {
-  const [dictionary, setDictionary] = useState(initialDictionary || {});
-
-  function handleDeleteWord(word) {
-    setDictionary(prev => {
-      const {[word] : _ , ...rest} = prev ;
-      return rest
-    })
-  }
+function ThemesTable({ initialThemes }) {
+  const [themes, setThemes] = useState(initialThemes || []);
+  const handleDeleteTheme = theme_id => {
+    setThemes(prevThemes =>
+      prevThemes.filter(theme => theme.id !== theme_id)
+    );
+  };
 
   return (
     <>
       <div className="mb-5">
-        <DictionaryDialog
+        <ThemeDialog
           trigger={
             <Button className="text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-[#2ca54d] transition-all duration-300">
-              Add new Word
+              Add new theme
             </Button>
           }
           formType="add"
-          languageCode={code}
-          setDictionary={setDictionary}
+          setThemes={setThemes}
         />
       </div>
       <div>
-        {Object.keys(dictionary).length === 0 ? (
+        {!themes || themes.length === 0 ? (
           <div className="text-center py-8 text-lg text-[#677185] dark:text-white">
-            No words found
+            No themes found
           </div>
         ) : (
           <Table
             grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
             columns={columns}
           >
-            {Object.entries(dictionary).map(([word, value]) => (
+            {themes.map(theme => (
               <Table.Row
-                key={word}
+                key={theme.color}
                 grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
               >
-                <Table.Cell>{word}</Table.Cell>
-                <Table.Cell>{value}</Table.Cell>
+                <Table.Cell>{theme?.color}</Table.Cell>
+                <Table.Cell>{theme?.typeTheme}</Table.Cell>
+                <Table.Cell>
+                  <div
+                    className="w-5 h-5 rounded-full"
+                    style={{ backgroundColor: theme.color }}
+                  />
+                </Table.Cell>
                 <Table.Cell>
                   <div className="flex justify-end gap-4">
-                    <DictionaryDialog
+                    <ThemeDialog
                       trigger={
                         <Button className="text-white bg-green-primary hover:bg-[#2ca54d] rounded-full min-w-[100px] cursor-pointer">
                           Edit
                         </Button>
                       }
                       formType="edit"
-                      languageCode={code}
-                      word={word}
-                      translation={value}
-                      setDictionary={setDictionary}
+                      setThemes={setThemes}
+                      currentTheme={theme}
                     />
-                    <DictionaryDeleteDialog
-                      code={code}
-                      word={word}
-                      onDelete={handleDeleteWord}
-                    />
+                    <ThemeDeleteDialog onDelete={handleDeleteTheme} theme_id={theme.id} />
                   </div>
                 </Table.Cell>
               </Table.Row>
@@ -80,4 +79,4 @@ function DictionaryTable({ code, initialDictionary }) {
   );
 }
 
-export default DictionaryTable;
+export default ThemesTable;
