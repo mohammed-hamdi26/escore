@@ -2,6 +2,7 @@
 import { addLanguage, updateLanguage } from "@/app/[locale]/_Lib/languageAPI";
 import InputApp from "@/components/ui app/InputApp";
 import { Button } from "@/components/ui/button";
+import { cn } from '@/lib/utils';
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
 import * as yup from "yup";
@@ -50,7 +51,7 @@ export default function LanguageForm({
           await addLanguage(dataValues);
           formik.resetForm();
           toast.success(successMessage);
-          setLanguagesTable(prev => [...prev, dataValues]);
+          setLanguagesTable(prev => [dataValues,...prev]);
           setOpen(false);
         } else if (formType === "update") {
           await updateLanguage(languageOptions.code, dataValues);
@@ -71,23 +72,25 @@ export default function LanguageForm({
 
   return (
     <form className="space-y-4" onSubmit={formik.handleSubmit}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <InputApp
-          value={formik.values.code}
-          onChange={formik.handleChange}
-          label="Code"
-          name="code"
-          type="text"
-          placeholder="Enter language code"
-          className="border-0 focus:outline-none"
-          backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-          textColor="text-[#677185]"
-          error={
-            formik.errors.code && formik.touched.code && formik.errors.code
-          }
-          onBlur={formik.handleBlur}
-          disabled={formik.isSubmitting}
-        />
+      <div className={cn("grid grid-cols-1 gap-4",{"md:grid-cols-2" : formType === "add"})}>
+        {formType === "add" && (
+          <InputApp
+            value={formik.values.code}
+            onChange={formik.handleChange}
+            label="Code"
+            name="code"
+            type="text"
+            placeholder="Enter language code"
+            className="border-0 focus:outline-none"
+            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
+            textColor="text-[#677185]"
+            error={
+              formik.errors.code && formik.touched.code && formik.errors.code
+            }
+            onBlur={formik.handleBlur}
+            disabled={formik.isSubmitting}
+          />
+        )}
 
         <InputApp
           value={formik.values.name}
@@ -125,42 +128,43 @@ export default function LanguageForm({
         onBlur={formik.handleBlur}
         disabled={formik.isSubmitting}
       />
+      {formType === "add" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InputApp
+            value={formik.values.word}
+            onChange={formik.handleChange}
+            label="Word"
+            name="word"
+            type="text"
+            placeholder="Enter word"
+            className="border-0 focus:outline-none"
+            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
+            textColor="text-[#677185]"
+            error={
+              formik.errors.word && formik.touched.word && formik.errors.word
+            }
+            onBlur={formik.handleBlur}
+            disabled={formik.isSubmitting || formType === "update"}
+          />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <InputApp
-          value={formik.values.word}
-          onChange={formik.handleChange}
-          label="Word"
-          name="word"
-          type="text"
-          placeholder="Enter word"
-          className="border-0 focus:outline-none"
-          backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-          textColor="text-[#677185]"
-          error={
-            formik.errors.word && formik.touched.word && formik.errors.word
-          }
-          onBlur={formik.handleBlur}
-          disabled={formik.isSubmitting || formType === "update"}
-        />
-
-        <InputApp
-          value={formik.values.value}
-          onChange={formik.handleChange}
-          label="Value"
-          name="value"
-          type="text"
-          placeholder="Enter value"
-          className="border-0 focus:outline-none"
-          backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-          textColor="text-[#677185]"
-          error={
-            formik.errors.value && formik.touched.value && formik.errors.value
-          }
-          onBlur={formik.handleBlur}
-          disabled={formik.isSubmitting || formType === "update"}
-        />
-      </div>
+          <InputApp
+            value={formik.values.value}
+            onChange={formik.handleChange}
+            label="Value"
+            name="value"
+            type="text"
+            placeholder="Enter value"
+            className="border-0 focus:outline-none"
+            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
+            textColor="text-[#677185]"
+            error={
+              formik.errors.value && formik.touched.value && formik.errors.value
+            }
+            onBlur={formik.handleBlur}
+            disabled={formik.isSubmitting || formType === "update"}
+          />
+        </div>
+      )}
 
       <div className="flex justify-end pt-4">
         <Button

@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteWord } from '@/app/[locale]/_Lib/dictionary';
+import { deleteLanguage } from "@/app/[locale]/_Lib/languageAPI";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,34 +16,35 @@ import { Button } from "@/components/ui/button";
 import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-function DictionaryDeleteDialog({code,word,onDelete}) {
+
+export default function LanguageDeleteDialog({ t, code, onDelete }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  async function handleDelete () {
+  const handleDelete = async () => {
     try {
       setIsLoading(true);
-      await deleteWord(code,word);
-      toast.success("Successfully deleted ");
+      await deleteLanguage(code);
+      toast.success("Language deleted successfully");
       if (onDelete) {
-        onDelete(word);
+        onDelete(code);
       }
-      setOpen(false); 
+      setOpen(false);
     } catch (error) {
-      toast.error(error.message || "Failed to delete word");
+      toast.error(error.message || "Failed to delete language");
     } finally {
       setIsLoading(false);
     }
-  }
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button
-          variant="destructive"
-          className="rounded-full min-w-[100px] cursor-pointer"
+          className="rounded-full min-w-[100px] cursor-pointer bg-[#3a469d] hover:bg-[#4656bf] text-amber-50"
           disabled={isLoading}
         >
-          {isLoading ? "Deleting..." : "Delete"}
+          {isLoading ? t("Deleting") : t("Delete")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -52,26 +53,25 @@ function DictionaryDeleteDialog({code,word,onDelete}) {
             <TriangleAlertIcon className="text-destructive size-6" />
           </div>
           <AlertDialogTitle>
-            Are you absolutely sure you want to delete this word?
+            {t("Are you absolutely sure you want to delete this language?")}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            This action cannot be undone. This will permanently delete the
-            word and remove it from the system.
+            {t(`DialogDescription`)}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>
+            {t("Cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isLoading}
             className="bg-destructive dark:bg-destructive/60 hover:bg-destructive focus-visible:ring-destructive text-white"
           >
-            {isLoading ? "Deleting..." : "Delete"}
+            {isLoading ? t("Deleting") : t("Delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }
-
-export default DictionaryDeleteDialog

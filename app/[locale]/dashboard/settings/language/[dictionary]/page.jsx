@@ -1,15 +1,13 @@
-import { getDictionaryWords } from "@/app/[locale]/_Lib/dictionary";
-import Table from "@/components/ui app/Table";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import DictionaryTable from '../_components/dictionary/DictionaryTable';
+import LoadingScreen from "@/components/ui app/loading-screen";
+import { Suspense } from "react";
+import DictionaryContainer from "../_components/dictionary/dictionary-container";
 
-
-async function DictionaryPage({params}) {
-  const {dictionary:code } =  await params
-  const { data: dictionary } = await getDictionaryWords(code);
+async function DictionaryPage({ params }) {
+  const { dictionary: code } = await params;
   return (
-    <DictionaryTable code={code} initialDictionary={dictionary} />
+    <Suspense fallback={<LoadingScreen />}>
+      <DictionaryContainer code={code} />
+    </Suspense>
   );
 }
 

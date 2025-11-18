@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import LanguageForm from "./LanguageForm";
+import LanguageForm from "./language-form";
 
 export default function LanguageDialog({
   trigger,

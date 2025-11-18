@@ -1,6 +1,6 @@
 import LoadingScreen from "@/components/ui app/loading-screen";
 import { Suspense } from "react";
-import LanguageContainer from "./_components/language/LanguageContainer";
+import LanguageContainer from "./_components/language/languages-container";
 
 export default async function LanguagePage() {
   return (

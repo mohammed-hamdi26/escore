@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import LanguageDeleteDialog from "./LanguageDeleteDialog";
-import LanguageDialog from "./LanguageDialog";
+import LanguageDeleteDialog from "./language-delete-dialog";
+import LanguageDialog from "./language-dialog";
 
 const columns = [
   { id: "code", header: "Code" },
