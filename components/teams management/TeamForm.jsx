@@ -18,6 +18,7 @@ import ListInput from "../ui app/ListInput";
 import SelectInput from "../ui app/SelectInput";
 import TextAreaInput from "../ui app/TextAreaInput";
 import { Button } from "../ui/button";
+import ComboboxInput from "../ui app/ComboBoxInput";
 
 const validationSchema = yup.object({
   name: yup.string().required("Required"),
@@ -70,37 +71,8 @@ function TeamForm({
       news: team?.news || [],
     },
     validationSchema: validationSchema,
-    onSubmit: async values => {
+    onSubmit: async (values) => {
       let dataValues = team ? { id: team.id, ...values } : values;
-
-      dataValues = {
-        ...dataValues,
-        games: dataValues.games.map((game) => {
-          console.log(game);
-          return {
-            id:
-              typeof game === "string"
-                ? +JSON.parse(game).value
-                : game.value || game.id,
-          };
-        }),
-        news: dataValues.news.map((news) => {
-          return {
-            id:
-              typeof news === "string"
-                ? +JSON.parse(news).value
-                : news.value || news.id,
-          };
-        }),
-        players: dataValues.players.map((player) => {
-          return {
-            id:
-              typeof player === "string"
-                ? +JSON.parse(player).value
-                : player.value || player.id,
-          };
-        }),
-      };
 
       // console.log("data", dataValues);
       try {
@@ -109,13 +81,17 @@ function TeamForm({
         formType === "add" && formik.resetForm();
         toast.success(successMessage);
       } catch (error) {
-        // console.log(error);
-        toast.error(error.message);
+        if (!error.toString().includes("Error: NEXT_REDIRECT")) {
+          toast.error(error.message);
+        } else {
+          toast.success(successMessage);
+        }
+        // toast.error(error.message);
       }
     },
   });
-  // console.log("formik ", formik.values);
-  // console.log("formik errors", formik.errors);
+  console.log("formik ", formik.values);
+  console.log("formik errors", formik.errors);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>
@@ -250,11 +226,11 @@ function TeamForm({
               : ""
           }
           // onBlur={formik.handleBlur}
-          onBlur={e => {
+          onBlur={(e) => {
             formik.handleBlur(e);
             formik.setFieldValue("description", e.target.value.trim());
           }}
-          onChange={e => {
+          onChange={(e) => {
             formik.setFieldValue("description", e.target.value);
           }}
         />
@@ -355,9 +331,9 @@ function TeamForm({
       </FormSection>
       <FormSection>
         <FormRow>
-          <SelectInput
+          {/* <SelectInput
             value={formik.values.subscribe}
-            onChange={value => {
+            onChange={(value) => {
               formik.setFieldValue("subscribe", value);
             }}
             // onChange={formik.handleChange}
@@ -369,19 +345,19 @@ function TeamForm({
               { value: "true", label: t("Subscribed") },
               { value: "false", label: t("Not Subscribed") },
             ]}
-          />
+          /> */}
           <SelectInput
-            // value={formik?.values?.captain}
-            onChange={value => {
-              formik.setFieldValue("captain", value);
+            value={formik?.values?.captain?.id}
+            onChange={(value) => {
+              formik.setFieldValue("captain", { id: Number(value) });
             }}
             label={t("Captain")}
             name={"captain"}
-            options={[
-              { value: "Captain A", label: "Captain A" },
-              { value: "Captain B", label: "Captain B" },
-              { value: "Captain C", label: "Captain C" },
-            ]}
+            options={mappedArrayToSelectOptions(
+              playersOptions || [],
+              "firstName",
+              "id"
+            )}
             placeholder={t("Enter Captain Name")}
             icon={
               <ImageIcon
@@ -396,15 +372,9 @@ function TeamForm({
 
       <FormSection>
         <FormRow>
-          <ListInput
-            typeForm={formType}
+          <ComboboxInput
             name={"players"}
             formik={formik}
-            error={
-              formik?.errors?.players && formik?.touched?.players
-                ? formik.errors.players
-                : ""
-            }
             placeholder={t("Select Players for Team")}
             options={mappedArrayToSelectOptions(
               playersOptions || [],
@@ -418,15 +388,9 @@ function TeamForm({
             )}
             label={t("Players")}
           />
-          <ListInput
-            typeForm={formType}
+          <ComboboxInput
             name={"games"}
             formik={formik}
-            error={
-              formik?.errors?.games && formik?.touched?.games
-                ? formik.errors.games
-                : ""
-            }
             placeholder={t("Enter Games")}
             options={mappedArrayToSelectOptions(
               gamesOptions || [],
@@ -442,7 +406,7 @@ function TeamForm({
           />
         </FormRow>
         <FormRow>
-          <ListInput
+          <ComboboxInput
             typeForm={formType}
             name={"news"}
             formik={formik}

@@ -64,12 +64,12 @@ const links = [
   //     "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
   //   icon: <User />,
   // },
-  // {
-  //   title: "Support Center",
-  //   href: "/support-center",
-  //   description: "Go to Support Center to view user messages and reply to them",
-  //   icon: <SupportCenter />,
-  // },
+  {
+    title: "Support Center",
+    href: "/support-center",
+    description: "Go to Support Center to view user messages and reply to them",
+    icon: <SupportCenter />,
+  },
   {
     title: "Settings",
     href: "/settings",

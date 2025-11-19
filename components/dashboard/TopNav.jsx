@@ -1,8 +1,12 @@
+"use client";
+import { logout } from "@/app/[locale]/_Lib/actions";
 import { Link } from "@/i18n/navigation";
+import { LogOut } from "lucide-react";
 import BackPage from "../ui app/BackPage";
-import ToggleThemeMode from "../ui app/ToggleThemeMode";
-import EscoreLogo from "./EscoreLogo";
 import LocaleChange from "../ui app/LocaleChange";
+import ToggleThemeMode from "../ui app/ToggleThemeMode";
+import { Button } from "../ui/button";
+import EscoreLogo from "./EscoreLogo";
 
 function TopNav() {
   return (
@@ -15,6 +19,15 @@ function TopNav() {
         <div className={`flex in-ltr:ml-auto rtl:mr-auto items-center gap-6`}>
           <ToggleThemeMode />
           <LocaleChange />
+          <Button
+            onClick={() => logout()}
+            className={
+              "bg-destructive hover:bg-destructive/90 cursor-pointer text-white "
+            }
+          >
+            {" "}
+            <LogOut className="rtl:rotate-180" />
+          </Button>
         </div>
       </div>
     </div>

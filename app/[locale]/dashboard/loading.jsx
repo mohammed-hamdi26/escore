@@ -1,7 +1,9 @@
+import LoadingScreen from "@/components/ui app/loading-screen";
+
 function loading() {
   return (
     <div>
-      <h1>Loading...</h1>
+      <LoadingScreen />
     </div>
   );
 }

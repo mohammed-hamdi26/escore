@@ -28,6 +28,12 @@ const nextConfig = {
         // port: "8000",
         // pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "supersafely-integumentary-danilo.ngrok-free.devhttps",
+        // port: "8000",
+        // pathname: "/**",
+      },
       // {
       //   protocol: "https",
       //   hostname: "digitalhub.fifa.com",

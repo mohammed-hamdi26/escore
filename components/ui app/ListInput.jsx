@@ -19,21 +19,25 @@ function ListInput({
 }) {
   const [selectedData, setSelectedData] = useState(initialData);
 
+  const filteredOptions = options
+    .filter(
+      (item) =>
+        !selectedData.includes(JSON.stringify(item)) ||
+        !selectedData.find((selectedItem) => selectedItem.value === item.value)
+    )
+    .map((item) => {
+      return {
+        value: JSON.stringify(item),
+        label: item.name,
+        icon: item.image ? item.image : item.logo ? item.logo : "",
+      };
+    });
+
   return (
     <div className="flex-1">
       <SelectInput
         placeholder={placeholder}
-        options={options
-          .filter((item) =>
-            typeForm === "add"
-              ? !selectedData.includes(JSON.stringify(item))
-              : !selectedData.find(
-                  (selectedItem) => selectedItem.value === item.value
-                )
-          )
-          .map((item) => {
-            return { value: JSON.stringify(item), label: item.name };
-          })}
+        options={filteredOptions}
         label={label}
         icon={icon}
         error={error}

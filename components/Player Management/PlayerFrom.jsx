@@ -18,6 +18,7 @@ import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import ListInput from "../ui app/ListInput";
 import FileInput from "../ui app/FileInput";
+import ComboboxInput from "../ui app/ComboBoxInput";
 
 const validateSchema = Yup.object({
   firstName: Yup.string().required("Required"),
@@ -96,51 +97,25 @@ function PlayerFrom({
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
-      let dataValues = player ? { id: player.id, ...values } : values;
-
-      dataValues = {
-        ...dataValues,
-
-        games:
-          (dataValues?.games &&
-            dataValues?.games?.map((game) => {
-              return { id: +JSON.parse(game).value };
-            })) ??
-          [],
-        news:
-          (dataValues?.news &&
-            dataValues?.news?.map((news) => {
-              return { id: +JSON.parse(news).value };
-            })) ??
-          [],
-
-        teams:
-          (dataValues?.teams &&
-            dataValues?.teams?.map((team) => {
-              return { id: +JSON.parse(team).value };
-            })) ??
-          [],
-
-        tournaments:
-          (dataValues?.tournaments &&
-            dataValues?.tournaments?.map((tournament) => {
-              return { id: +JSON.parse(tournament).value };
-            })) ??
-          [],
-      };
-      // console.log(dataValues);
       try {
+        let dataValues = player ? { id: player.id, ...values } : values;
+
+        console.log(dataValues);
         await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(successMessage);
       } catch (error) {
         // console.log(error);
-        toast.error(error.message);
+        if (!error.toString().includes("Error: NEXT_REDIRECT")) {
+          toast.error(error.message);
+        } else {
+          toast.success(successMessage);
+        }
       }
     },
   });
 
-  console.log(formik.errors, formik.dirty, formik.isValid);
+  console.log(formik.values);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
@@ -403,7 +378,39 @@ function PlayerFrom({
 
       <FormSection>
         <FormRow>
-          <ListInput
+          <ComboboxInput
+            name={"teams"}
+            formik={formik}
+            placeholder={t("Enter Teams")}
+            options={mappedArrayToSelectOptions(
+              teamsOptions || [],
+              "name",
+              "id"
+            )}
+            initialData={mappedArrayToSelectOptions(
+              formik?.values?.teams,
+              "name",
+              "id"
+            )}
+            label={t("Teams")}
+          />
+          <ComboboxInput
+            name={"games"}
+            formik={formik}
+            placeholder={t("Enter Games")}
+            options={mappedArrayToSelectOptions(
+              gamesOptions || [],
+              "name",
+              "id"
+            )}
+            initialData={mappedArrayToSelectOptions(
+              formik?.values?.games,
+              "name",
+              "id"
+            )}
+            label={t("Games")}
+          />
+          {/* <ListInput
             name={"teams"}
             formik={formik}
             error={
@@ -444,10 +451,10 @@ function PlayerFrom({
               "id"
             )}
             label={t("Games")}
-          />
+          /> */}
         </FormRow>
         <FormRow>
-          <ListInput
+          {/* <ListInput
             name={"tournaments"}
             formik={formik}
             error={
@@ -484,9 +491,33 @@ function PlayerFrom({
               "id"
             )}
             label={t("News")}
+          /> */}
+          <ComboboxInput
+            name={"tournaments"}
+            formik={formik}
+            placeholder={t("Enter Tournaments")}
+            options={mappedArrayToSelectOptions(
+              tournamentsOptions || [],
+              "name",
+              "id"
+            )}
+            initialData={formik?.values?.tournaments}
+            label={t("Tournaments")}
+          />
+          <ComboboxInput
+            formik={formik}
+            placeholder={t("Enter News")}
+            label={t("News")}
+            name={"news"}
+            options={mappedArrayToSelectOptions(newsOptions, "title", "id")}
+            initialData={mappedArrayToSelectOptions(
+              formik?.values?.news,
+              "title",
+              "id"
+            )}
           />
         </FormRow>
-        <SelectInput
+        {/* <SelectInput
           name={"selected"}
           value={formik.values.selected}
           type={"text"}
@@ -504,12 +535,12 @@ function PlayerFrom({
               ? formik.errors.selected
               : ""
           }
-        />
+        /> */}
       </FormSection>
 
       <div className="flex justify-end">
         <Button
-          disabled={formik.isSubmitting}
+          disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
           className={
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"

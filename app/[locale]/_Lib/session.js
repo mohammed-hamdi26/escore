@@ -35,3 +35,8 @@ export async function saveSession(token) {
     path: "/",
   });
 }
+
+export async function deleteSession() {
+  const cookieStore = await cookies();
+  cookieStore.delete("session");
+}
