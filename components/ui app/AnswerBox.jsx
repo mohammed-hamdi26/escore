@@ -3,7 +3,7 @@ import imagePerson from "../../public/images/dashboard/avatar.jpg";
 import { Input } from "../ui/input";
 import { Link, Send, X } from "lucide-react";
 import { Button } from "../ui/button";
-function AnswerBox({ chat, onClose }) {
+function AnswerBox({ chat = [], onClose }) {
   return (
     <div className="bg-dashboard-box dark:bg-[#10131D]  mx-auto  sm:w-[702px] h-[500px] rounded-3xl flex flex-col overflow-hidden ">
       <div className="flex items-center justify-end p-4">
@@ -16,13 +16,13 @@ function AnswerBox({ chat, onClose }) {
         />
       </div>
       <div className="px-4 md:px-11 pt-0 overflow-y-auto space-y-8 flex-1">
-        {Array.from({ length: 2 }, (_, index) => (
+        {chat.map((message, index) => (
           <PersonMessage
             info={{
               imagePerson,
-              name: "ahmed",
+              name: message?.user?.name,
               date: "2023-06-01",
-              message: " Hello, how can I help you?",
+              message: message?.description,
             }}
             key={index}
           />
@@ -35,7 +35,7 @@ function AnswerBox({ chat, onClose }) {
 
 function PersonMessage({ info }) {
   return (
-    <div className="flex gap-4  ">
+    <div className="flex items-center gap-4  ">
       <Image
         className="rounded-lg"
         src={info.imagePerson}
@@ -46,6 +46,7 @@ function PersonMessage({ info }) {
       <div>
         <h3 className="font-semibold">{info.name}</h3>
         <p>{info.message}</p>
+        <span className="text-[#667085]">{info.date}</span>
       </div>
     </div>
   );
