@@ -1,11 +1,11 @@
-import MarkdownEditor from '../_components/markdown-editor'
+import MarkdownEditor from "../privacy-policy/_components/privacy-editor";
 
 function AboutPage() {
   return (
     <div>
-      <MarkdownEditor/>
+      <MarkdownEditor />
     </div>
-  )
+  );
 }
 
-export default AboutPage
+export default AboutPage;
