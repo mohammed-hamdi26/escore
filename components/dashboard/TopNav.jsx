@@ -22,11 +22,11 @@ function TopNav() {
           <Button
             onClick={() => logout()}
             className={
-              "bg-destructive hover:bg-destructive/90 cursor-pointer text-white"
+              "bg-destructive hover:bg-destructive/90 cursor-pointer text-white "
             }
           >
             {" "}
-            <LogOut />
+            <LogOut className="rtl:rotate-180" />
           </Button>
         </div>
       </div>

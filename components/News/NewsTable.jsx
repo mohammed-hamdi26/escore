@@ -11,14 +11,20 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import NewFilter from "./NewFilter";
 import Pagination from "../ui app/Pagination";
-function NewsTable({ news, columns }) {
-  const t = useTranslations();
+import { useSearchParams } from "next/navigation";
+import { getNumPages } from "@/app/[locale]/_Lib/helps";
+function NewsTable({ news, columns, numOfNews }) {
+  const t = useTranslations("NewsTable");
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const numPages = getNumPages(numOfNews, Number(searchParams.get("size")));
+
   return (
     <div className="space-y-8">
-      <NewFilter />
+      <NewFilter numOfSize={numOfNews} />
       <Table
         // showHeader={false}
+        t={t}
         data={news}
         grid_cols={"grid-cols-[0.5fr_0.5fr_0.5fr_0.5fr_2fr]"}
         columns={columns}
@@ -68,7 +74,7 @@ function NewsTable({ news, columns }) {
           </Table.Row>
         ))}
       </Table>
-      <Pagination />
+      <Pagination numPages={numPages} />
     </div>
   );
 }

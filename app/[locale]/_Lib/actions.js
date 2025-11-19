@@ -158,12 +158,13 @@ export async function addNews(newsData) {
 }
 
 export async function editNews(newsData) {
+  const locale = await getLocale();
   try {
     const res = await apiClient.put(`/news/${newsData.id}`, newsData);
     revalidatePath(`/${locale}/dashboard/news/edit/${newsData.id}`);
     return res.data;
   } catch (e) {
-    // console.log(e.response);
+    console.log(e.response);
     throw new Error("Error in updating news");
   }
 }
