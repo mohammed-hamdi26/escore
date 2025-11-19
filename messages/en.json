@@ -177,7 +177,7 @@
     "Select Players for Team": "Select Players for Team"
   },
   "TeamsTable": {
-    "Game Name": "Name",
+    "Name": "Name",
     "Country": "Country",
     "Founded": "Founded",
     "Description": "Description",
@@ -407,6 +407,13 @@
     "Time": "Stage",
     "Team 1": "Team 1",
     "Team 2": "Team 2",
+    "Edit": "Edit",
+    "Delete": "Delete"
+  },
+  "NewsTable": {
+    "title": "Title",
+    "Author": "Author",
+    "Date": "Date",
     "Edit": "Edit",
     "Delete": "Delete"
   }

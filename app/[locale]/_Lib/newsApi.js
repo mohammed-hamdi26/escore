@@ -23,3 +23,13 @@ export async function getNew(id) {
     throw new Error("Failed to get News");
   }
 }
+
+export async function getNewsCount() {
+  try {
+    const res = await apiClient.get(`/news/count`);
+    return res.data;
+  } catch (e) {
+    // console.log(e.response);
+    throw new Error("Failed to get news count");
+  }
+}

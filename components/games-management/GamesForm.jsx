@@ -54,19 +54,39 @@ function GamesForm({
       // dataValues = {
       //   ...dataValues,
       //   players: dataValues.players.map((player) => {
-      //     return { id: JSON.parse(player).value };
+      //     return {
+      //       id:
+      //         typeof player === "string"
+      //           ? +JSON.parse(player).value
+      //           : player.value || player.id,
+      //     };
       //   }),
       //   news: dataValues.news.map((news) => {
-      //     return { id: JSON.parse(news).value };
+      //     return {
+      //       id:
+      //         typeof news === "string"
+      //           ? +JSON.parse(news).value
+      //           : news.value || news.id,
+      //     };
       //   }),
       //   teams: dataValues.teams.map((team) => {
-      //     return { id: JSON.parse(team).value };
+      //     return {
+      //       id:
+      //         typeof team === "string"
+      //           ? +JSON.parse(team).value
+      //           : team.value || team.id,
+      //     };
       //   }),
       //   tournaments: dataValues.tournaments.map((tournament) => {
-      //     return { id: JSON.parse(tournament).value };
+      //     return {
+      //       id:
+      //         typeof tournament === "string"
+      //           ? +JSON.parse(tournament).value
+      //           : tournament.value || tournament.id,
+      //     };
       //   }),
       // };
-      console.log(dataValues);
+
       try {
         const res = await submitFunction(dataValues);
         console.log(res);
@@ -75,7 +95,11 @@ function GamesForm({
           typeForm === "add" ? "The Game is Added" : "The Game Is Edited"
         );
       } catch (error) {
-        toast.error(error.message);
+        if (!error.toString().includes("Error: NEXT_REDIRECT")) {
+          toast.error(error.message);
+        } else {
+          toast.success("The Game is Added");
+        }
       }
     },
   });

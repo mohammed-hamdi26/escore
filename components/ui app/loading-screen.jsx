@@ -1,11 +1,11 @@
-import { Spinner } from '../ui/spinner'
+import { Spinner } from "../ui/spinner";
 
 function LoadingScreen() {
   return (
-    <div className='h-30 flex justify-center items-center '>
-      <Spinner className="w-10 h-10" /> 
+    <div className="h-dvh flex justify-center items-center ">
+      <Spinner className="w-10 h-10" />
     </div>
-  )
+  );
 }
 
-export default LoadingScreen
+export default LoadingScreen;

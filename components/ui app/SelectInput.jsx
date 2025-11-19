@@ -26,6 +26,9 @@ function SelectInput({
   //   label: option?.name ? option?.name : option?.label,
   //   value: option?.value,
   // }));
+  if (name === "teams") {
+    console.log(options);
+  }
   return (
     <div className={`${flexGrow}`}>
       {label && (

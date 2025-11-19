@@ -22,16 +22,26 @@ function MatchesTable({ matches, columns, numOfMatches }) {
       <FilterMatches numOfSize={numOfMatches} />
       <Table
         t={t}
-        grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_0.5fr_2fr]"
+        grid_cols="grid-cols-[1fr_1fr_0.5fr_0.5fr_2fr]"
         columns={[...columns]}
       >
         {matches?.map((match) => (
           <Table.Row
-            grid_cols={"grid-cols-[0.5fr_0.5fr_0.5fr_0.5fr_2fr]"}
+            grid_cols={"grid-cols-[1fr_1fr_0.5fr_0.5fr_2fr]"}
             key={match.id}
           >
-            <Table.Cell>{match?.teams[0]?.name}</Table.Cell>
-            <Table.Cell>{match?.teams[1]?.name}</Table.Cell>
+            <Table.Cell className="flex gap-2 items-center">
+              {match?.teams[0]?.logo && (
+                <img width={30} src={match?.teams[0]?.logo} alt="" />
+              )}{" "}
+              {match?.teams[0]?.name}
+            </Table.Cell>
+            <Table.Cell className="flex gap-2 items-center">
+              {match?.teams[1]?.logo && (
+                <img width={30} src={match?.teams[1]?.logo} alt="" />
+              )}{" "}
+              {match?.teams[1]?.name}
+            </Table.Cell>
             <Table.Cell>{match.stage}</Table.Cell>
             <Table.Cell>{match.matchDate}</Table.Cell>
             <Table.Cell className="flex gap-4 justify-end">
