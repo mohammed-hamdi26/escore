@@ -32,6 +32,7 @@ function AboutEditor({ languageCode }) {
       if (!languageCode) return;
       if (contentCache.has(languageCode)) {
         setContent(contentCache.get(languageCode));
+        setHasAbout(true)
         return;
       }
       setIsLoading(true);
@@ -66,9 +67,11 @@ function AboutEditor({ languageCode }) {
       if (!hasAbout) {
         await addAboutContent(languageCode, content);
         toast.success("About content has created sucessfully");
+        contentCache.set(languageCode, content);
       } else if (hasAbout) {
         await updateAboutContent(languageCode, content);
         toast.success("About content has updated sucessfully");
+        contentCache.set(languageCode, content);
       }
     } catch (error) {
       toast.error(error.message);
@@ -239,7 +242,7 @@ function AboutEditor({ languageCode }) {
       {isLoading ? (
         <LoadingScreen />
       ) : (
-        <div className="w-full min-h-[65vh] flex flex-col bg-gray-50 text-stone-900">
+        <div dir={languageCode === "ar" ? "rtl" : "ltr"} className="w-full min-h-[65vh] flex flex-col bg-gray-50 text-stone-900">
           <div className="bg-white border-b border-gray-300 p-2 flex items-center gap-1 flex-wrap">
             {toolbarButtons.map((btn, idx) => (
               <button
@@ -255,7 +258,7 @@ function AboutEditor({ languageCode }) {
             <div className="h-6 w-px bg-gray-300 mx-2" />
             <Button
               onClick={handleSubmit}
-              disabled={isLoading}
+              disabled={isLoading || !languageCode}
               className="rounded-full min-w-[50px] bg-blue-600 hover:bg-blue-500 text-amber-50 cursor-pointer transition-all duration-300 font-medium text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {hasAbout?"Update" : "Submit"}
@@ -280,7 +283,7 @@ function AboutEditor({ languageCode }) {
                 value={content}
                 onChange={e => setContent(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Start typing in markdown..."
+                placeholder="Select language first then start typing..."
                 disabled={isLoading}
                 className="flex-1 p-4 font-mono text-sm resize-none focus:outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
               />

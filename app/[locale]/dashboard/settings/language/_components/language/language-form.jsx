@@ -11,8 +11,6 @@ const validationSchema = yup.object({
   code: yup.string().required("Code is required"),
   name: yup.string().required("Name is required"),
   nameLocal: yup.string().required("Local name is required"),
-  word: yup.string().required("Word is required"),
-  value: yup.string().required("Value is required"),
 });
 
 export default function LanguageForm({
@@ -27,12 +25,6 @@ export default function LanguageForm({
       code: languageOptions?.code || "",
       name: languageOptions?.name || "",
       nameLocal: languageOptions?.nameLocal || "",
-      word: languageOptions?.dictionary
-        ? Object.keys(languageOptions.dictionary)[0] || ""
-        : "",
-      value: languageOptions?.dictionary
-        ? Object.values(languageOptions.dictionary)[0] || ""
-        : "",
     },
     enableReinitialize: true,
     validationSchema: validationSchema,
@@ -41,9 +33,6 @@ export default function LanguageForm({
         code: values.code,
         name: values.name,
         nameLocal: values.nameLocal,
-        dictionary: {
-          [values.word]: values.value,
-        },
       };
 
       try {
@@ -128,44 +117,6 @@ export default function LanguageForm({
         onBlur={formik.handleBlur}
         disabled={formik.isSubmitting}
       />
-      {formType === "add" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InputApp
-            value={formik.values.word}
-            onChange={formik.handleChange}
-            label="Word"
-            name="word"
-            type="text"
-            placeholder="Enter word"
-            className="border-0 focus:outline-none"
-            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-            textColor="text-[#677185]"
-            error={
-              formik.errors.word && formik.touched.word && formik.errors.word
-            }
-            onBlur={formik.handleBlur}
-            disabled={formik.isSubmitting || formType === "update"}
-          />
-
-          <InputApp
-            value={formik.values.value}
-            onChange={formik.handleChange}
-            label="Value"
-            name="value"
-            type="text"
-            placeholder="Enter value"
-            className="border-0 focus:outline-none"
-            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-            textColor="text-[#677185]"
-            error={
-              formik.errors.value && formik.touched.value && formik.errors.value
-            }
-            onBlur={formik.handleBlur}
-            disabled={formik.isSubmitting || formType === "update"}
-          />
-        </div>
-      )}
-
       <div className="flex justify-end pt-4">
         <Button
           disabled={formik.isSubmitting}
