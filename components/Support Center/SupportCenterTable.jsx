@@ -26,7 +26,7 @@ function SupportCenterTable({ tickets }) {
                 alt=""
                 className="rounded-full"
               />{" "}
-              {ticket.user.name}
+              {ticket?.user?.name}
             </Table.Cell>
             <Table.Cell>{ticket.description}</Table.Cell>
             <Table.Cell className="flex gap-4 justify-end">
@@ -41,7 +41,7 @@ function SupportCenterTable({ tickets }) {
                   </Button>
                 </Model.Open>
                 <Model.Window openName={"answer"}>
-                  <AnswerBox />
+                  <AnswerBox chat={tickets} />
                 </Model.Window>
               </Model>
             </Table.Cell>
