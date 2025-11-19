@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export async function getPrivacyContent(language_code) {
+export async function getAboutContent(language_code) {
   try {
     const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/privacy/${language_code}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/about-app/${language_code}`,
       {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
@@ -13,14 +13,13 @@ export async function getPrivacyContent(language_code) {
     );
     return res.data;
   } catch (error) {
-    console.log("Failed to get language privacy and policy", error);
     throw error;
   }
 }
-export async function addPrivacyContent(language_code, content) {
+export async function addAboutContent(language_code, content) {
   try {
     const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/privacy`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/about-app`,
       { languageCode: language_code, content: content },
       {
         headers: {
@@ -32,15 +31,14 @@ export async function addPrivacyContent(language_code, content) {
     console.log(res.data);
     return res.data;
   } catch (error) {
-    console.log("Failed to add language privacy and policy", error);
     throw error;
   }
 }
 
-export async function deletePrivacyContent(language_code) {
+export async function deleteAboutContent(language_code) {
   try {
     const res = await axios.delete(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/privacy/${language_code}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/about-app/${language_code}`,
       {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
@@ -51,15 +49,14 @@ export async function deletePrivacyContent(language_code) {
     console.log(res.data);
     return res.data;
   } catch (error) {
-    console.log("Failed to get language privacy and policy", error);
     throw error;
   }
 }
 
-export async function updatePrivacyContent(language_code, content) {
+export async function updateAboutContent(language_code, content) {
   try {
     const res = await axios.patch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/privacy/${language_code}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/about-app/${language_code}`,
       { languageCode: language_code, content: content },
       {
         headers: {
@@ -71,7 +68,6 @@ export async function updatePrivacyContent(language_code, content) {
     console.log(res.data);
     return res.data;
   } catch (error) {
-    console.log("Failed to get language privacy and policy", error);
     throw error;
   }
 }

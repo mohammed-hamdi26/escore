@@ -1,5 +1,5 @@
 "use client";
-import { deletePrivacyContent } from "@/app/[locale]/_Lib/PrivacyApi";
+import { deleteAboutContent } from '@/app/[locale]/_Lib/aboutAPI';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,16 +14,16 @@ import {
 import { Trash, TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-function PrivacyDeleteDialog({ languageCode,contentCache, setHasPrivacy,setContent }) {
+function AboutDeleteDialog({ languageCode,contentCache, setHasAbout,setContent }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   async function handleDelete() {
     setIsLoading(true);
     try {
-      await deletePrivacyContent(languageCode);
+      await deleteAboutContent(languageCode);
       setContent("");
       contentCache.delete(languageCode);
-      setHasPrivacy(false);
+      setHasAbout(false);
       toast.success("Privacy content deleted successfully");
     } catch (error) {
       toast.error(error.message || "Failed to delete content");
@@ -32,7 +32,7 @@ function PrivacyDeleteDialog({ languageCode,contentCache, setHasPrivacy,setConte
     }
   }
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+<AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <button
           disabled={isLoading}
@@ -48,11 +48,11 @@ function PrivacyDeleteDialog({ languageCode,contentCache, setHasPrivacy,setConte
             <TriangleAlertIcon className="text-destructive size-6" />
           </div>
           <AlertDialogTitle>
-            Are you absolutely sure you want to delete this privacy terms?
+            Are you absolutely sure you want to delete this About page content?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
             This action cannot be undone. This will permanently delete the
-            privact content and remove it from the system.
+            about page content and remove it from the system.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -67,7 +67,7 @@ function PrivacyDeleteDialog({ languageCode,contentCache, setHasPrivacy,setConte
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
+  )
 }
 
-export default PrivacyDeleteDialog;
+export default AboutDeleteDialog

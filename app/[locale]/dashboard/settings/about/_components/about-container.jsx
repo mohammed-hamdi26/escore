@@ -7,8 +7,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import PrivacyEditor from "./privacy-editor";
-function PrivacyContainer({ languages }) {
+import AboutEditor from './about-editor';
+function AboutContainer({ languages }) {
   const [languageCode, setLanguageCode] = useState("");
   return (
     <div>
@@ -26,11 +26,9 @@ function PrivacyContainer({ languages }) {
           </SelectContent>
         </Select>
       </div>
-      <PrivacyEditor
-        languageCode={languageCode}
-      />
+      <AboutEditor languageCode={languageCode} />
     </div>
   );
 }
 
-export default PrivacyContainer;
+export default AboutContainer;

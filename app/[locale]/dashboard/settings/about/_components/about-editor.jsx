@@ -1,9 +1,9 @@
 "use client";
 import {
-  addPrivacyContent,
-  getPrivacyContent,
-  updatePrivacyContent,
-} from "@/app/[locale]/_Lib/PrivacyApi";
+  addAboutContent,
+  getAboutContent,
+  updateAboutContent,
+} from "@/app/[locale]/_Lib/aboutAPI";
 import LoadingScreen from "@/components/ui app/loading-screen";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,15 +18,15 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import PrivacyDeleteDialog from "./privacy-delete-dialog";
+import AboutDeleteDialog from "./about-delete-dialog";
 
 const contentCache = new Map();
-
-export default function PrivacyEditor({ languageCode }) {
+function AboutEditor({ languageCode }) {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [hasPrivacy, setHasPrivacy] = useState(false);
+  const [hasAbout, setHasAbout] = useState(false);
   const textareaRef = useRef(null);
+
   useEffect(() => {
     const fetchContent = async () => {
       if (!languageCode) return;
@@ -36,21 +36,21 @@ export default function PrivacyEditor({ languageCode }) {
       }
       setIsLoading(true);
       try {
-        const { data } = await getPrivacyContent(languageCode);
+        const { data } = await getAboutContent(languageCode);
         if (data && data.content) {
           const cleanedData = data.content
             .replace(/\\n/g, "\n")
             .replace(/^"|"$/g, "");
           setContent(cleanedData);
           contentCache.set(languageCode, cleanedData);
-          setHasPrivacy(true);
+          setHasAbout(true);
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {
           setContent("");
-          setHasPrivacy(false);
+          setHasAbout(false);
         } else {
-          console.error("Failed to fetch privacy content:", error);
+          console.error("Failed to fetch about content:", error);
         }
       } finally {
         setIsLoading(false);
@@ -63,12 +63,12 @@ export default function PrivacyEditor({ languageCode }) {
   const submitContent = async languageCode => {
     setIsLoading(true);
     try {
-      if (!hasPrivacy) {
-        await addPrivacyContent(languageCode, content);
-        toast.success("Privacy content has created sucessfully");
-      } else if (hasPrivacy) {
-        await updatePrivacyContent(languageCode, content);
-        toast.success("Privacy content has updated sucessfully");
+      if (!hasAbout) {
+        await addAboutContent(languageCode, content);
+        toast.success("About content has created sucessfully");
+      } else if (hasAbout) {
+        await updateAboutContent(languageCode, content);
+        toast.success("About content has updated sucessfully");
       }
     } catch (error) {
       toast.error(error.message);
@@ -102,7 +102,6 @@ export default function PrivacyEditor({ languageCode }) {
       textarea.setSelectionRange(start + before.length, end + before.length);
     }, 0);
   };
-
   const handleKeyDown = e => {
     if (e.key === "Enter") {
       const textarea = textareaRef.current;
@@ -184,7 +183,6 @@ export default function PrivacyEditor({ languageCode }) {
       }
     }
   };
-
   const toolbarButtons = [
     { icon: Bold, action: () => insertMarkdown("**", "**"), title: "Bold" },
     { icon: Italic, action: () => insertMarkdown("*", "*"), title: "Italic" },
@@ -203,7 +201,6 @@ export default function PrivacyEditor({ languageCode }) {
       title: "Inline Code",
     },
   ];
-
   const renderMarkdown = text => {
     let html = text;
 
@@ -237,7 +234,6 @@ export default function PrivacyEditor({ languageCode }) {
 
     return html;
   };
-
   return (
     <>
       {isLoading ? (
@@ -262,13 +258,13 @@ export default function PrivacyEditor({ languageCode }) {
               disabled={isLoading}
               className="rounded-full min-w-[50px] bg-blue-600 hover:bg-blue-500 text-amber-50 cursor-pointer transition-all duration-300 font-medium text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {hasPrivacy ? "Update" : "Submit"}
+              {hasAbout?"Update" : "Submit"}
             </Button>
-            {hasPrivacy && (
-              <PrivacyDeleteDialog
+            {hasAbout && (
+              <AboutDeleteDialog
                 contentCache={contentCache}
                 languageCode={languageCode}
-                setHasPrivacy={setHasPrivacy}
+                setHasAbout={setHasAbout}
                 setContent={setContent}
               />
             )}
@@ -311,3 +307,5 @@ export default function PrivacyEditor({ languageCode }) {
     </>
   );
 }
+
+export default AboutEditor;

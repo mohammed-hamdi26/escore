@@ -1,9 +1,11 @@
-import MarkdownEditor from "../privacy-policy/_components/privacy-editor";
+import { getLanguages } from "@/app/[locale]/_Lib/languageAPI";
+import AboutContainer from './_components/about-container';
 
-function AboutPage() {
+async function AboutPage() {
+  const { data: languages } = await getLanguages();
   return (
     <div>
-      <MarkdownEditor />
+      <AboutContainer languages={languages} />
     </div>
   );
 }
