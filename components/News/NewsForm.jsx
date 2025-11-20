@@ -102,7 +102,7 @@ function NewsForm({
     { value: "TRENDING", label: "Trending" },
   ];
   console.log(formik.errors);
-  // console.log(formik.values);
+  console.log(formik.values);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>
@@ -322,7 +322,11 @@ function NewsForm({
               "id"
             )}
             placeholder={t("Select Players")}
-            initialData={formik.values.players}
+            initialData={mappedArrayToSelectOptions(
+              formik.values.players,
+              "firstName",
+              "id"
+            )}
           />
           <ComboboxInput
             name={"teams"}
@@ -330,7 +334,11 @@ function NewsForm({
             label={t("Teams")}
             options={mappedArrayToSelectOptions(teamsOptions, "name", "id")}
             placeholder={t("Select Teams")}
-            initialData={formik.values.teams}
+            initialData={mappedArrayToSelectOptions(
+              formik.values.teams,
+              "name",
+              "id"
+            )}
           />
         </FormRow>
         <FormRow>
@@ -340,7 +348,11 @@ function NewsForm({
             label={t("Games")}
             options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
             placeholder={t("Select Games")}
-            initialData={formik.values.games}
+            initialData={mappedArrayToSelectOptions(
+              formik.values.games,
+              "name",
+              "id"
+            )}
           />
           <ComboboxInput
             name={"tournaments"}
@@ -352,7 +364,11 @@ function NewsForm({
               "id"
             )}
             placeholder={t("Select Tournaments")}
-            initialData={formik.values.tournaments}
+            initialData={mappedArrayToSelectOptions(
+              formik.values.tournaments,
+              "name",
+              "id"
+            )}
           />
         </FormRow>
       </FormSection>
