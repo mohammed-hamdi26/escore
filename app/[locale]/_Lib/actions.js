@@ -142,17 +142,18 @@ export async function deleteTeam(id) {
 // News Actions
 export async function addNews(newsData) {
   try {
-    const res = await apiClient.post("/news", {
+    const newsDataWithDate = {
       ...newsData,
       publishDate:
         newsData.status === "PUBLISHED"
           ? new Date().toISOString()
           : newsData.publishDate,
-    });
+    };
+    const res = await apiClient.post("/news", newsDataWithDate);
     // console.log(res.data);
     return res.data;
   } catch (e) {
-    // console.log(e.response);
+    console.log(e.response);
     throw new Error("Error in adding news");
   }
 }
@@ -207,7 +208,7 @@ export async function addTournament(tournamentData) {
     console.log(e.response);
     throw new Error("Error in adding tournament");
   }
-  redirect("/dashboard/tournaments/edit");
+  redirect("/dashboard/tournaments-management/edit");
 }
 
 export async function editTournament(tournamentData) {
@@ -305,5 +306,234 @@ export async function addAward(awardData) {
   } catch (e) {
     console.log(e.response);
     throw new Error("Error in adding favorite game");
+  }
+}
+
+// langues
+
+export async function addLanguage(language_data) {
+  try {
+    const response = await apiClient.post(
+      `/v1/languages`,
+      language_data
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
+      //   },
+      // }
+    );
+    console.log("Language added:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to add language:", error);
+    throw error;
+  }
+}
+
+export async function updateLanguage(code, language_data) {
+  try {
+    const response = await apiClient.patch(
+      `/v1/languages/${code}`,
+      language_data
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
+      //   },
+      // }
+    );
+    console.log("Language updated:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update language:", error);
+    throw error;
+  }
+}
+export async function deleteLanguage(code) {
+  try {
+    const response = await apiClient.delete(
+      `/v1/languages/${code}`
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
+      //   },
+      // }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete language:", error);
+    throw error;
+  }
+}
+
+// dictionary
+export async function addToDictionary(code, { word, translation }) {
+  try {
+    const response = await axios.post(`/v1/languages/${code}/dictionary`, {
+      word,
+      translation,
+    });
+    console.log("Word added:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to add word:", error);
+    throw error;
+  }
+}
+
+export async function updateWord(code, word, translation) {
+  try {
+    const response = await axios.put(
+      `/v1/languages/${code}/dictionary/${word}`,
+      { translation }
+    );
+    console.log("Word translation updated:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update word translation", error);
+    throw error;
+  }
+}
+export async function deleteWord(code, word) {
+  try {
+    const response = await apiClient.delete(
+      `/v1/languages/${code}/dictionary/${word}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete word:", error);
+    throw error;
+  }
+}
+
+// about
+
+export async function addAboutContent(language_code, content) {
+  try {
+    const res = await apiClient.post(
+      `/v1/about-app`,
+      { languageCode: language_code, content: content },
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      }
+    );
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function deleteAboutContent(language_code) {
+  try {
+    const res = await apiClient.delete(`/v1/about-app/${language_code}`, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function updateAboutContent(language_code, content) {
+  try {
+    const res = await apiClient.patch(
+      `/v1/about-app/${language_code}`,
+      { languageCode: language_code, content: content },
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      }
+    );
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getAboutContent(language_code) {
+  try {
+    const res = await apiClient.get(`/v1/about-app/${language_code}`, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// privacy content
+export async function getPrivacyContent(language_code) {
+  try {
+    const res = await apiClient.get(`/v1/privacy/${language_code}`, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.log("Failed to get language privacy and policy", error);
+    throw error;
+  }
+}
+export async function addPrivacyContent(language_code, content) {
+  try {
+    const res = await apiClient.post(
+      `/v1/privacy`,
+      { languageCode: language_code, content: content },
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      }
+    );
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Failed to add language privacy and policy", error);
+    throw error;
+  }
+}
+
+export async function deletePrivacyContent(language_code) {
+  try {
+    const res = await apiClient.delete(`/v1/privacy/${language_code}`, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Failed to get language privacy and policy", error);
+    throw error;
+  }
+}
+
+export async function updatePrivacyContent(language_code, content) {
+  try {
+    const res = await apiClient.patch(
+      `/v1/privacy/${language_code}`,
+      { languageCode: language_code, content: content },
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      }
+    );
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Failed to get language privacy and policy", error);
+    throw error;
   }
 }

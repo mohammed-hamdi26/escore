@@ -1,6 +1,6 @@
 "use client";
 
-import { addToDictionary, updateWord } from "@/app/[locale]/_Lib/dictionary";
+import { addToDictionary, updateWord } from "@/app/[locale]/_Lib/actions";
 import InputApp from "@/components/ui app/InputApp";
 import { Button } from "@/components/ui/button";
 import { useFormik } from "formik";
@@ -26,7 +26,7 @@ function DictionaryForm({
     },
     enableReinitialize: true,
     validationSchema: validationSchema,
-    onSubmit: async values => {
+    onSubmit: async (values) => {
       const dataValues = {
         word: values.word,
         translation: values.translation,
@@ -34,7 +34,7 @@ function DictionaryForm({
       try {
         if (formType === "add") {
           await addToDictionary(code, dataValues);
-          setDictionary(prev => ({
+          setDictionary((prev) => ({
             [values.word]: values.translation,
             ...prev,
           }));
@@ -44,7 +44,7 @@ function DictionaryForm({
         } else {
           await updateWord(code, values.word, values.translation);
           toast.success(successMessage);
-          setDictionary(prev => ({
+          setDictionary((prev) => ({
             ...prev,
             [values.word]: values.translation,
           }));

@@ -32,7 +32,10 @@ function SelectInput({
   return (
     <div className={`${flexGrow}`}>
       {label && (
-        <Label className={" text-[#677185] dark:text-white mb-4"}>
+        <Label
+          htmlFor={name}
+          className={" text-[#677185] dark:text-white mb-4"}
+        >
           {label}
         </Label>
       )}
@@ -48,6 +51,7 @@ function SelectInput({
             disabled={disabled}
           >
             <SelectTrigger
+              id={name}
               className={
                 " bg-dashboard-box w-full text-black dark:text-[#677185]  dark:bg-[#0F1017] border-0 p-6 "
               }

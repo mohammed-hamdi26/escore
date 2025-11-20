@@ -244,7 +244,18 @@
     "Scheduled": "مجدول",
     "Transfer News": "أخبار الانتقالات",
     "Match Recap": "ملخص المباراة",
-    "Trending": "الأكثر تداولاً"
+    "Trending": "الأكثر تداولاً",
+    "Players": "اللاعبون",
+    "Select Players": "اختر اللاعبين",
+
+    "Teams": "الفرق",
+    "Select Teams": "اختر الفرق",
+
+    "Games": "الألعاب",
+    "Select Games": "اختر الألعاب",
+
+    "Tournaments": "البطولات",
+    "Select Tournaments": "اختر البطولات"
   },
   "TournamentForm": {
     "Tournament name is required": "اسم البطولة مطلوب",

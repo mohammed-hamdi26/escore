@@ -246,7 +246,19 @@
     "Scheduled": "Scheduled",
     "Transfer News": "Transfer News",
     "Match Recap": "Match Recap",
-    "Trending": "Trending"
+    "Trending": "Trending",
+
+    "Players": "Players",
+    "Select Players": "Select Players",
+
+    "Teams": "Teams",
+    "Select Teams": "Select Teams",
+
+    "Games": "Games",
+    "Select Games": "Select Games",
+
+    "Tournaments": "Tournaments",
+    "Select Tournaments": "Select Tournaments"
   },
   "TournamentForm": {
     "Tournament name is required": "Tournament name is required",

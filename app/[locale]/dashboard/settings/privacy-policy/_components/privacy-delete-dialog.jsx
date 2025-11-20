@@ -1,5 +1,5 @@
 "use client";
-import { deletePrivacyContent } from "@/app/[locale]/_Lib/PrivacyApi";
+import { deletePrivacyContent } from "@/app/[locale]/_Lib/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +14,12 @@ import {
 import { Trash, TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-function PrivacyDeleteDialog({ languageCode,contentCache, setHasPrivacy,setContent }) {
+function PrivacyDeleteDialog({
+  languageCode,
+  contentCache,
+  setHasPrivacy,
+  setContent,
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   async function handleDelete() {

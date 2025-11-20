@@ -1,9 +1,10 @@
 "use client";
+// import { getAboutContent } from "@/app/[locale]/_Lib/aboutAPI";
 import {
   addAboutContent,
   getAboutContent,
   updateAboutContent,
-} from "@/app/[locale]/_Lib/aboutAPI";
+} from "@/app/[locale]/_Lib/actions";
 import LoadingScreen from "@/components/ui app/loading-screen";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +33,7 @@ function AboutEditor({ languageCode }) {
       if (!languageCode) return;
       if (contentCache.has(languageCode)) {
         setContent(contentCache.get(languageCode));
-        setHasAbout(true)
+        setHasAbout(true);
         return;
       }
       setIsLoading(true);
@@ -61,7 +62,7 @@ function AboutEditor({ languageCode }) {
     fetchContent();
   }, [languageCode]);
 
-  const submitContent = async languageCode => {
+  const submitContent = async (languageCode) => {
     setIsLoading(true);
     try {
       if (!hasAbout) {
@@ -105,7 +106,7 @@ function AboutEditor({ languageCode }) {
       textarea.setSelectionRange(start + before.length, end + before.length);
     }, 0);
   };
-  const handleKeyDown = e => {
+  const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       const textarea = textareaRef.current;
       const cursorPos = textarea.selectionStart;
@@ -204,7 +205,7 @@ function AboutEditor({ languageCode }) {
       title: "Inline Code",
     },
   ];
-  const renderMarkdown = text => {
+  const renderMarkdown = (text) => {
     let html = text;
 
     html = html.replace(
@@ -242,7 +243,10 @@ function AboutEditor({ languageCode }) {
       {isLoading ? (
         <LoadingScreen />
       ) : (
-        <div dir={languageCode === "ar" ? "rtl" : "ltr"} className="w-full min-h-[65vh] flex flex-col bg-gray-50 text-stone-900">
+        <div
+          dir={languageCode === "ar" ? "rtl" : "ltr"}
+          className="w-full min-h-[65vh] flex flex-col bg-gray-50 text-stone-900"
+        >
           <div className="bg-white border-b border-gray-300 p-2 flex items-center gap-1 flex-wrap">
             {toolbarButtons.map((btn, idx) => (
               <button
@@ -261,7 +265,7 @@ function AboutEditor({ languageCode }) {
               disabled={isLoading || !languageCode}
               className="rounded-full min-w-[50px] bg-blue-600 hover:bg-blue-500 text-amber-50 cursor-pointer transition-all duration-300 font-medium text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {hasAbout?"Update" : "Submit"}
+              {hasAbout ? "Update" : "Submit"}
             </Button>
             {hasAbout && (
               <AboutDeleteDialog
@@ -281,7 +285,7 @@ function AboutEditor({ languageCode }) {
               <textarea
                 ref={textareaRef}
                 value={content}
-                onChange={e => setContent(e.target.value)}
+                onChange={(e) => setContent(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Select language first then start typing..."
                 disabled={isLoading}
@@ -302,7 +306,7 @@ function AboutEditor({ languageCode }) {
           <div className="bg-gray-200 px-4 py-2 text-xs text-gray-600 flex justify-between">
             <span>{content.length} characters</span>
             <span>
-              {content.split(/\s+/).filter(w => w.length > 0).length} words
+              {content.split(/\s+/).filter((w) => w.length > 0).length} words
             </span>
           </div>
         </div>
