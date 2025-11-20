@@ -20,6 +20,8 @@ import TextAreaInput from "../ui app/TextAreaInput";
 import { Button } from "../ui/button";
 import { tr } from "date-fns/locale";
 import { format } from "date-fns";
+import ComboboxInput from "../ui app/ComboBoxInput";
+import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 
 const validationSchema = yup.object({
   title: yup.string().required("Required"),
@@ -39,7 +41,12 @@ const validationSchema = yup.object({
   // transfers: yup.string(),
 });
 
-function NewsForm({ formType = "add", submit, newData }) {
+function NewsForm({
+  formType = "add",
+  submit,
+  newData,
+  options: { playersOptions, teamsOptions, tournamentsOptions, gamesOptions },
+}) {
   const t = useTranslations("NewsForm");
 
   const formik = useFormik({
@@ -59,6 +66,10 @@ function NewsForm({ formType = "add", submit, newData }) {
       newsType: newData?.newsType || "",
       players: newData?.players || [],
       transfers: newData?.transfers || [],
+      matches: newData?.matches || [],
+      tournaments: newData?.tournaments || [],
+      teams: newData?.teams || [],
+      games: newData?.games || [],
       notify: true,
     },
     validationSchema: validationSchema,
@@ -299,6 +310,52 @@ function NewsForm({ formType = "add", submit, newData }) {
           </FormRow>
         </FormSection>
       )}
+      <FormSection>
+        <FormRow>
+          <ComboboxInput
+            name={"players"}
+            formik={formik}
+            label={t("Players")}
+            options={mappedArrayToSelectOptions(
+              playersOptions,
+              "firstName",
+              "id"
+            )}
+            placeholder={t("Select Players")}
+            initialData={formik.values.players}
+          />
+          <ComboboxInput
+            name={"teams"}
+            formik={formik}
+            label={t("Teams")}
+            options={mappedArrayToSelectOptions(teamsOptions, "name", "id")}
+            placeholder={t("Select Teams")}
+            initialData={formik.values.teams}
+          />
+        </FormRow>
+        <FormRow>
+          <ComboboxInput
+            name={"games"}
+            formik={formik}
+            label={t("Games")}
+            options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
+            placeholder={t("Select Games")}
+            initialData={formik.values.games}
+          />
+          <ComboboxInput
+            name={"tournaments"}
+            formik={formik}
+            label={t("Tournaments")}
+            options={mappedArrayToSelectOptions(
+              tournamentsOptions,
+              "name",
+              "id"
+            )}
+            placeholder={t("Select Tournaments")}
+            initialData={formik.values.tournaments}
+          />
+        </FormRow>
+      </FormSection>
 
       <div className="flex justify-end">
         <Button

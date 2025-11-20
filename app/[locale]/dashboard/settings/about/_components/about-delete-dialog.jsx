@@ -1,5 +1,5 @@
 "use client";
-import { deleteAboutContent } from '@/app/[locale]/_Lib/aboutAPI';
+import { deleteAboutContent } from "@/app/[locale]/_Lib/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +14,12 @@ import {
 import { Trash, TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-function AboutDeleteDialog({ languageCode,contentCache, setHasAbout,setContent }) {
+function AboutDeleteDialog({
+  languageCode,
+  contentCache,
+  setHasAbout,
+  setContent,
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   async function handleDelete() {
@@ -32,7 +37,7 @@ function AboutDeleteDialog({ languageCode,contentCache, setHasAbout,setContent }
     }
   }
   return (
-<AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <button
           disabled={isLoading}
@@ -51,8 +56,8 @@ function AboutDeleteDialog({ languageCode,contentCache, setHasAbout,setContent }
             Are you absolutely sure you want to delete this About page content?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            This action cannot be undone. This will permanently delete the
-            about page content and remove it from the system.
+            This action cannot be undone. This will permanently delete the about
+            page content and remove it from the system.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -67,7 +72,7 @@ function AboutDeleteDialog({ languageCode,contentCache, setHasAbout,setContent }
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }
 
-export default AboutDeleteDialog
+export default AboutDeleteDialog;

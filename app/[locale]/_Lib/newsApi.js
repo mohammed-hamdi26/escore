@@ -1,3 +1,4 @@
+"use server";
 import apiClient from "./apiCLient";
 
 export async function getNews(searchParams = {}) {

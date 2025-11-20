@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteWord } from "@/app/[locale]/_Lib/dictionary";
+import { deleteWord } from "@/app/[locale]/_Lib/actions";
 import {
   AlertDialog,
   AlertDialogAction,

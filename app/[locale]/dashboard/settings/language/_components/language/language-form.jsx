@@ -1,8 +1,8 @@
 "use client";
-import { addLanguage, updateLanguage } from "@/app/[locale]/_Lib/languageAPI";
+import { addLanguage, updateLanguage } from "@/app/[locale]/_Lib/actions";
 import InputApp from "@/components/ui app/InputApp";
 import { Button } from "@/components/ui/button";
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
 import * as yup from "yup";
@@ -28,7 +28,7 @@ export default function LanguageForm({
     },
     enableReinitialize: true,
     validationSchema: validationSchema,
-    onSubmit: async values => {
+    onSubmit: async (values) => {
       const dataValues = {
         code: values.code,
         name: values.name,
@@ -40,13 +40,13 @@ export default function LanguageForm({
           await addLanguage(dataValues);
           formik.resetForm();
           toast.success(successMessage);
-          setLanguagesTable(prev => [dataValues,...prev]);
+          setLanguagesTable((prev) => [dataValues, ...prev]);
           setOpen(false);
         } else if (formType === "update") {
           await updateLanguage(languageOptions.code, dataValues);
           toast.success(successMessage);
-          setLanguagesTable(prev =>
-            prev.map(lang =>
+          setLanguagesTable((prev) =>
+            prev.map((lang) =>
               lang.code === languageOptions.code ? dataValues : lang
             )
           );
@@ -61,7 +61,11 @@ export default function LanguageForm({
 
   return (
     <form className="space-y-4" onSubmit={formik.handleSubmit}>
-      <div className={cn("grid grid-cols-1 gap-4",{"md:grid-cols-2" : formType === "add"})}>
+      <div
+        className={cn("grid grid-cols-1 gap-4", {
+          "md:grid-cols-2": formType === "add",
+        })}
+      >
         {formType === "add" && (
           <InputApp
             value={formik.values.code}

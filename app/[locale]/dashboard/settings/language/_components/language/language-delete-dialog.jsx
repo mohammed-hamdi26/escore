@@ -1,6 +1,7 @@
 "use client";
 
-import { deleteLanguage } from "@/app/[locale]/_Lib/languageAPI";
+// import { deleteLanguage } from "@/app/[locale]/_Lib/languageAPI";
+import { deleteLanguage } from "@/app/[locale]/_Lib/actions";
 import {
   AlertDialog,
   AlertDialogAction,

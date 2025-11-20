@@ -3,7 +3,7 @@ import {
   addPrivacyContent,
   getPrivacyContent,
   updatePrivacyContent,
-} from "@/app/[locale]/_Lib/PrivacyApi";
+} from "@/app/[locale]/_Lib/actions";
 import LoadingScreen from "@/components/ui app/loading-screen";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +31,7 @@ export default function PrivacyEditor({ languageCode }) {
       if (!languageCode) return;
       if (contentCache.has(languageCode)) {
         setContent(contentCache.get(languageCode));
-        setHasPrivacy(true)
+        setHasPrivacy(true);
         return;
       }
       setIsLoading(true);
@@ -60,7 +60,7 @@ export default function PrivacyEditor({ languageCode }) {
     fetchContent();
   }, [languageCode]);
 
-  const submitContent = async languageCode => {
+  const submitContent = async (languageCode) => {
     setIsLoading(true);
     try {
       if (!hasPrivacy) {
@@ -105,7 +105,7 @@ export default function PrivacyEditor({ languageCode }) {
     }, 0);
   };
 
-  const handleKeyDown = e => {
+  const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       const textarea = textareaRef.current;
       const cursorPos = textarea.selectionStart;
@@ -206,7 +206,7 @@ export default function PrivacyEditor({ languageCode }) {
     },
   ];
 
-  const renderMarkdown = text => {
+  const renderMarkdown = (text) => {
     let html = text;
 
     html = html.replace(
@@ -245,7 +245,10 @@ export default function PrivacyEditor({ languageCode }) {
       {isLoading ? (
         <LoadingScreen />
       ) : (
-        <div dir={languageCode === "ar" ? "rtl" : "ltr"} className="w-full min-h-[65vh] flex flex-col bg-gray-50 text-stone-900">
+        <div
+          dir={languageCode === "ar" ? "rtl" : "ltr"}
+          className="w-full min-h-[65vh] flex flex-col bg-gray-50 text-stone-900"
+        >
           <div className="bg-white border-b border-gray-300 p-2 flex items-center gap-1 flex-wrap">
             {toolbarButtons.map((btn, idx) => (
               <button
@@ -284,7 +287,7 @@ export default function PrivacyEditor({ languageCode }) {
               <textarea
                 ref={textareaRef}
                 value={content}
-                onChange={e => setContent(e.target.value)}
+                onChange={(e) => setContent(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Select language first then start typing..."
                 disabled={isLoading}
@@ -305,7 +308,7 @@ export default function PrivacyEditor({ languageCode }) {
           <div className="bg-gray-200 px-4 py-2 text-xs text-gray-600 flex justify-between">
             <span>{content.length} characters</span>
             <span>
-              {content.split(/\s+/).filter(w => w.length > 0).length} words
+              {content.split(/\s+/).filter((w) => w.length > 0).length} words
             </span>
           </div>
         </div>

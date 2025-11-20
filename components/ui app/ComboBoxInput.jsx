@@ -127,13 +127,15 @@ const ComboboxInput = ({
                       ]);
                     }}
                   >
-                    <img
-                      width={20}
-                      //   height={16}
-                      src={option.image}
-                      alt={""}
-                      className="mr-2"
-                    />{" "}
+                    {(option.image || option.logo) && (
+                      <img
+                        width={20}
+                        //   height={16}
+                        src={option.image || option.logo}
+                        alt={""}
+                        className="mr-2"
+                      />
+                    )}{" "}
                     <span className="truncate">{option.name}</span>
                     {selectedValues.find((value) => {
                       return value.value === option.value;

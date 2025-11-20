@@ -1,5 +1,5 @@
 "use client";
-import { deleteTheme } from '@/app/[locale]/_Lib/themesApi';
+import { deleteTheme } from "@/app/[locale]/_Lib/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,8 +15,8 @@ import { Button } from "@/components/ui/button";
 import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-function ThemeDeleteDialog({theme_id,onDelete}) {
-  console.log(theme_id)
+function ThemeDeleteDialog({ theme_id, onDelete }) {
+  console.log(theme_id);
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   async function handleDelete() {
@@ -70,4 +70,4 @@ function ThemeDeleteDialog({theme_id,onDelete}) {
   );
 }
 
-export default ThemeDeleteDialog
+export default ThemeDeleteDialog;
