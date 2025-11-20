@@ -1,5 +1,5 @@
 "use client";
-import { addTheme, updateTheme } from "@/app/[locale]/_Lib/themesApi";
+import { addTheme, updateTheme } from "@/app/[locale]/_Lib/actions";
 import { useFormik } from "formik";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -27,7 +27,7 @@ function ThemeForm({
       color: selectedColor,
     },
     enableReinitialize: true,
-    onSubmit: async values => {
+    onSubmit: async (values) => {
       const dataValues = {
         typeTheme: values.typeTheme,
         color: selectedColor,
@@ -36,14 +36,14 @@ function ThemeForm({
         if (formType === "add") {
           await addTheme(dataValues);
           formik.resetForm();
-          setThemes(prev => [dataValues, ...prev]);
+          setThemes((prev) => [dataValues, ...prev]);
           toast.success(sucessMessage);
           setOpen(false);
         } else if (formType === "edit") {
           await updateTheme(dataValues, currentTheme.id);
           toast.success(sucessMessage);
-          setThemes(prev =>
-            prev.map(theme =>
+          setThemes((prev) =>
+            prev.map((theme) =>
               theme.id === currentTheme.id ? dataValues : theme
             )
           );
@@ -80,7 +80,7 @@ function ThemeForm({
           ]}
           label="Theme type"
           value={formik.values.typeTheme}
-          onChange={value => formik.setFieldValue("typeTheme", value)}
+          onChange={(value) => formik.setFieldValue("typeTheme", value)}
           onBlur={() => formik.setFieldTouched("typeTheme", true)}
           name="typeTheme"
           error={formik.touched.typeTheme && formik.errors.typeTheme}

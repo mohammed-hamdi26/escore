@@ -369,7 +369,7 @@ export async function deleteLanguage(code) {
 // dictionary
 export async function addToDictionary(code, { word, translation }) {
   try {
-    const response = await axios.post(`/v1/languages/${code}/dictionary`, {
+    const response = await apiClient.post(`/v1/languages/${code}/dictionary`, {
       word,
       translation,
     });
@@ -383,7 +383,7 @@ export async function addToDictionary(code, { word, translation }) {
 
 export async function updateWord(code, word, translation) {
   try {
-    const response = await axios.put(
+    const response = await apiClient.put(
       `/v1/languages/${code}/dictionary/${word}`,
       { translation }
     );
@@ -534,6 +534,37 @@ export async function updatePrivacyContent(language_code, content) {
     return res.data;
   } catch (error) {
     console.log("Failed to get language privacy and policy", error);
+    throw error;
+  }
+}
+
+export async function addTheme(theme) {
+  try {
+    const res = await apiClient.post(`/v1/themes`, theme);
+    console.log("theme added", res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Failed to add theme", error);
+    throw error;
+  }
+}
+export async function updateTheme(theme, theme_id) {
+  try {
+    const res = await apiClient.put(`/v1/themes/${theme_id}`, theme);
+    console.log("theme updated", res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Failed to add theme", error);
+    throw error;
+  }
+}
+export async function deleteTheme(theme_id) {
+  try {
+    const res = await apiClient.delete(`/v1/themes/${theme_id}`);
+    console.log("theme deleted", res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Failed to add theme", error);
     throw error;
   }
 }
