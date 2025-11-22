@@ -9,11 +9,15 @@ import { redirect } from "next/navigation";
 // login
 export async function login(userData) {
   try {
-    const res = await apiClient.post("/authenticate", userData);
+    const res = await apiClient.post("/authenticate", userData, {
+      headers: {
+        "apple-id": "",
+      },
+    });
 
     await saveSession(res?.data?.id_token);
   } catch (e) {
-    console.log(e);
+    console.log(e.response);
     // if (JSON.stringify(e).contains("NEXT_REDIRECT")) {
     //   redirect("/dashboard");
     //   return;
