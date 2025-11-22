@@ -13,7 +13,8 @@ export default function Pagination({ numPages }) {
 
   const [page, setPage] = useState(Number(searchParams.get("page")) || 0);
 
-  console.log("page", page, "numPages", numPages);
+  if (numPages === 0) return null;
+
   return (
     <div className="flex justify-between items-center">
       <Button

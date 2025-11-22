@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import FileInput from "../ui app/FileInput";
+import MarkDown from "../ui app/MarkDown";
 const validationSchema = yup.object({
   name: yup.string().required("Name is required"),
   icon: yup.string().required("Icon is required"),
@@ -103,6 +104,7 @@ function GamesForm({
       }
     },
   });
+  console.log(formik.errors);
 
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
@@ -129,28 +131,23 @@ function GamesForm({
             error={formik.touched.name && formik.errors.name}
             onBlur={formik.handleBlur}
           />
-          <InputApp
-            value={formik.values.description}
-            onChange={formik.handleChange}
-            label={t("Description")}
-            name={"description"}
-            type={"text"}
-            placeholder={t("Enter Description")}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            icon={
-              <Description
-                width="40"
-                height="40"
-                className={"fill-[#677185]"}
-                color={"text-[#677185]"}
-              />
-            }
-            error={formik.touched.description && formik.errors.description}
-            onBlur={formik.handleBlur}
-          />
         </FormRow>
+        <MarkDown
+          formik={formik}
+          label={t("Description")}
+          name={"description"}
+          placeholder={t("Enter Description")}
+          icon={
+            <Description
+              width="40"
+              height="40"
+              className={"fill-[#677185]"}
+              color={"text-[#677185]"}
+            />
+          }
+          error={formik.touched.description && formik.errors.description}
+          onBlur={formik.handleBlur}
+        />
       </FormSection>
       <FormSection>
         <FormRow>
@@ -228,11 +225,11 @@ function GamesForm({
         >
           {formik.isSubmitting
             ? typeForm === "add"
-              ? "Adding..."
-              : "Editing..."
+              ? t("Adding")
+              : t("Editing")
             : typeForm === "add"
-            ? "Add Game"
-            : "Edit Game"}
+            ? t("Add")
+            : t("EditG")}
         </Button>
       </div>
     </form>

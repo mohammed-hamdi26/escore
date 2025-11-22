@@ -19,6 +19,7 @@ import SelectInput from "../ui app/SelectInput";
 import TextAreaInput from "../ui app/TextAreaInput";
 import { Button } from "../ui/button";
 import ComboboxInput from "../ui app/ComboBoxInput";
+import MarkDown from "../ui app/MarkDown";
 
 const validationSchema = yup.object({
   name: yup.string().required("Required"),
@@ -59,9 +60,9 @@ function TeamForm({
       logoDark: team?.logoDark || "",
       description: team?.description || "",
       foundedDate: team?.foundedDate || "",
-      numberOfFollowers: team?.numberOfFollowers || 0,
-      worldRanking: team?.worldRanking || 0,
-      numberOfAchievements: team?.numberOfAchievements || 0,
+      numberOfFollowers: team?.numberOfFollowers || "",
+      worldRanking: team?.worldRanking || "",
+      numberOfAchievements: team?.numberOfAchievements || "",
       captain: team?.captain || null,
       subscribe: team?.subscribe || "false",
       tournaments: team?.tournaments || [],
@@ -92,6 +93,7 @@ function TeamForm({
   });
   console.log("formik ", formik.values);
   console.log("formik errors", formik.errors);
+  console.log(playersOptions);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>
@@ -110,6 +112,8 @@ function TeamForm({
             error={
               formik.errors.name && formik.touched.name && formik.errors.name
             }
+            disabled={formik.isSubmitting}
+            onBlur={formik.handleBlur}
             // onBlur={(e) => {
             //   formik.handleBlur(e);
             //   formik.setFieldValue("name", e.target.value.trim());
@@ -207,32 +211,14 @@ function TeamForm({
               className="text-[#677185] fill-[#677185]"
             />
           }
+          disabled={formik.isSubmitting}
+          disabledDate={{}}
         />
-        <TextAreaInput
-          value={formik?.values?.description}
+        <MarkDown
           name={"description"}
           label={t("Description")}
           placeholder={t("Enter Team Description")}
-          className="border-0 focus:outline-none "
-          icon={
-            <Description
-              className={"fill-[#677185]"}
-              color={"text-[#677185]"}
-            />
-          }
-          error={
-            formik.touched.description && formik.errors.description
-              ? formik.errors.description
-              : ""
-          }
-          // onBlur={formik.handleBlur}
-          onBlur={(e) => {
-            formik.handleBlur(e);
-            formik.setFieldValue("description", e.target.value.trim());
-          }}
-          onChange={(e) => {
-            formik.setFieldValue("description", e.target.value);
-          }}
+          formik={formik}
         />
       </FormSection>
       <FormSection>

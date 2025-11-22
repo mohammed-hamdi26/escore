@@ -22,6 +22,7 @@ import { tr } from "date-fns/locale";
 import { format } from "date-fns";
 import ComboboxInput from "../ui app/ComboBoxInput";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
+import MarkDown from "../ui app/MarkDown";
 
 const validationSchema = yup.object({
   title: yup.string().required("Required"),
@@ -124,10 +125,9 @@ function NewsForm({
         </FormRow>
 
         <FormRow>
-          <TextAreaInput
+          <MarkDown
             name="content"
-            onChange={formik.handleChange}
-            value={formik.values.content}
+            formik={formik}
             label={t("Content")}
             placeholder={t("Enter Content")}
             className="border-0 focus:outline-none"
@@ -137,16 +137,12 @@ function NewsForm({
                 color={"text-[#677185]"}
               />
             }
-            error={formik.touched.content && formik.errors.content}
-            onBlur={formik.handleBlur}
           />
-          <TextAreaInput
+          <MarkDown
             name="summary"
-            onChange={formik.handleChange}
-            value={formik.values.summary}
+            formik={formik}
             label={t("Summary")}
             placeholder={t("Enter Summary")}
-            className="border-0 focus:outline-none"
             icon={
               <Description
                 className={"fill-[#677185]"}

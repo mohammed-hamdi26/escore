@@ -24,3 +24,12 @@ export async function getTeam(id) {
     throw new Error("Failed to get team");
   }
 }
+export async function getTeamsCount() {
+  try {
+    const res = await apiClient.get(`/teams/count`);
+    return res.data;
+  } catch (e) {
+    // console.log(e.response);
+    throw new Error("Failed to get teams count");
+  }
+}

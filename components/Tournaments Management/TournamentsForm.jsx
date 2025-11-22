@@ -13,6 +13,8 @@ import FileInput from "../ui app/FileInput";
 import ImageIcon from "../icons/ImageIcon";
 import toast from "react-hot-toast";
 import { useTranslations } from "use-intl";
+import MarkDown from "../ui app/MarkDown";
+import { min } from "date-fns";
 
 const validateSchema = yup.object({
   name: yup.string().required("Tournament name is required"),
@@ -26,8 +28,8 @@ const validateSchema = yup.object({
 
   endDate: yup
     .date()
-    // .typeError("Invalid end date")
-    // .(yup.ref("startDate"), "End date cannot be before start date")
+    .typeError("Invalid end date")
+    // .min(yup.ref("startDate"), "End date cannot be before start date")
     .required("End date is required"),
 
   venue: yup.string().required("Venue is required"),
@@ -92,16 +94,16 @@ export default function TournamentsForm({
       startDate: tournament?.startDate || "",
       endDate: tournament?.endDate || "",
       venue: tournament?.venue || "",
-      prizePool: tournament?.prizePool || 0,
+      prizePool: tournament?.prizePool || "",
       status: tournament?.status || "UPCOMING",
       logo: tournament?.logo || "",
       logoDark: tournament?.logoDark || "",
-      winningPoints: tournament?.winningPoints || 0,
-      losingPoints: tournament?.losingPoints || 0,
-      drawPoints: tournament?.drawPoints || 0,
+      winningPoints: tournament?.winningPoints || "",
+      losingPoints: tournament?.losingPoints || "",
+      drawPoints: tournament?.drawPoints || "",
       description: tournament?.description || "",
-      knockoutImageLight: null,
-      knockoutImageDark: null,
+      knockoutImageLight: tournament?.knockoutImageLight || "",
+      knockoutImageDark: tournament?.knockoutImageDark || "",
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
@@ -131,7 +133,7 @@ export default function TournamentsForm({
     { value: "FINISHED", label: t("Finished") },
   ];
 
-  console.log(formik.errors);
+  console.log(formik.values);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
@@ -208,7 +210,13 @@ export default function TournamentsForm({
           />
         </FormRow>
 
-        <TextAreaInput
+        <MarkDown
+          label={t("Description")}
+          formik={formik}
+          name={"description"}
+          placeholder={t("Enter Description")}
+        />
+        {/* <TextAreaInput
           name="description"
           onChange={formik.handleChange}
           value={formik.values.description}
@@ -218,12 +226,14 @@ export default function TournamentsForm({
           error={formik.touched.description && formik.errors.description}
           onBlur={formik.handleBlur}
           t={t}
-        />
+        /> */}
       </FormSection>
 
       <FormSection>
         <FormRow>
           <DatePicker
+            disabled={formik.isSubmitting}
+            disabledDate={{}}
             t={t}
             placeholder={t("Enter Start Date")}
             formik={formik}
@@ -239,6 +249,10 @@ export default function TournamentsForm({
             }
           />
           <DatePicker
+            disabled={
+              (formik.values.startDate ? false : true) || formik.isSubmitting
+            }
+            disabledDate={{ before: formik?.values?.startDate }}
             t={t}
             placeholder={t("Enter End Date")}
             formik={formik}

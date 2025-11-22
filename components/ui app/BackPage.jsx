@@ -27,7 +27,7 @@ function BackPage() {
       </Link>
       {/* </Link> */}
 
-      <p className="capitalize text-lg font-normal text-green-primary dark:text-white">
+      <p className="capitalize text-lg font-normal hidden md:block text-green-primary dark:text-white">
         {t(GetTitlePage(pathname))}
       </p>
     </div>

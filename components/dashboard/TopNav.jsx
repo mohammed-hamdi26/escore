@@ -10,8 +10,8 @@ import EscoreLogo from "./EscoreLogo";
 
 function TopNav() {
   return (
-    <div className="flex items-center justify-between gap-[190px] mb-8">
-      <Link href="/dashboard">
+    <div className="flex items-center justify-between md:gap-[190px] mb-8">
+      <Link className="hidden md:block" href="/dashboard">
         <EscoreLogo width={100} height={50} />
       </Link>
       <div className="flex items-center  justify-between flex-1 ">
