@@ -13,7 +13,8 @@ function DatePicker({
   formik,
   placeholder,
   icon,
-  disabled = { before: new Date() },
+  disabled,
+  disabledDate = { before: new Date() },
 }) {
   const [open, setOpen] = useState(false);
 
@@ -29,11 +30,13 @@ function DatePicker({
             open={open}
             onOpenChange={(open) => {
               setOpen(open);
+              // formik.setFieldTouched(name, true);
               // if(open)
             }}
           >
             <PopoverTrigger className="w-full" asChild>
               <Button
+                disabled={disabled}
                 variant="outline"
                 className="min-w-48 justify-between font-normal border-0 bg-dashboard-box hover:bg-dashboard-box  text-[#677185] dark:bg-[#0F1017] p-6 cursor-pointer "
               >
@@ -44,13 +47,14 @@ function DatePicker({
             </PopoverTrigger>
             <PopoverContent>
               <Calendar
-                disabled={disabled}
+                onBlur={() => formik.setFieldTouched(name, true)}
+                disabled={disabledDate}
                 selected={formik.values[name]}
                 onSelect={(date) => {
                   formik.setFieldValue(name, date);
-                  // formik.setFieldValue(name, date);
+
                   setOpen(false);
-                  formik.setFieldTouched(name, true);
+                  // formik.setFieldTouched(name, true);
                 }}
                 mode="single"
                 captionLayout="dropdown"

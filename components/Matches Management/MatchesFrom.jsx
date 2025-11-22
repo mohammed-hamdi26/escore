@@ -16,6 +16,7 @@ import DatePicker from "../ui app/DatePicker";
 import TextAreaInput from "../ui app/TextAreaInput";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import MarkDown from "../ui app/MarkDown";
 const validateSchema = Yup.object({
   matchDate: Yup.date()
     .typeError("Invalid date format")
@@ -497,24 +498,11 @@ function MatchesFrom({
             value={formik.values.vodUrl}
           /> */}
         </FormRow>
-        <TextAreaInput
+        <MarkDown
           disabled={formik.isSubmitting}
-          t={t}
           label={t("Summary")}
           name={"summary"}
-          type={"text"}
           placeholder={t("Enter Summary")}
-          className=" border-0 focus:outline-none "
-          backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-          textColor="text-[#677185]"
-          error={
-            formik?.errors?.summary && formik?.touched?.summary
-              ? formik?.errors?.summary
-              : ""
-          }
-          onBlur={formik.handleBlur}
-          onChange={formik.handleChange}
-          value={formik.values.summary}
         />
       </FormSection>
       <div className="flex justify-end">

@@ -1,4 +1,4 @@
-import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
+import { getTeams, getTeamsCount } from "@/app/[locale]/_Lib/teamsApi";
 import TeamsTable from "@/components/teams management/TeamsTable";
 
 const columns = [
@@ -8,10 +8,13 @@ const columns = [
 ];
 
 async function page({ searchParams }) {
-  const { size, page } = await searchParams;
-  const teams = await getTeams({ size, page });
+  const { size, page, search } = await searchParams;
+  const [teams, numOfTeams] = await Promise.all([
+    getTeams({ size, page, "name.contains": search || "" }),
+    getTeamsCount(),
+  ]);
 
-  return <TeamsTable columns={columns} teams={teams} />;
+  return <TeamsTable columns={columns} numOfTeams={numOfTeams} teams={teams} />;
 }
 
 export default page;

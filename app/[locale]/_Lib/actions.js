@@ -151,11 +151,12 @@ export async function addNews(newsData) {
     };
     const res = await apiClient.post("/news", newsDataWithDate);
     // console.log(res.data);
-    return res.data;
+    // return res.data;
   } catch (e) {
     console.log(e.response);
     throw new Error("Error in adding news");
   }
+  redirect("/dashboard/news/edit");
 }
 
 export async function editNews(newsData) {

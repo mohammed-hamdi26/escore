@@ -194,7 +194,11 @@
     "Edit": "تعديل",
     "Players": "اللاعبون",
     "Teams": "الفرق",
-    "Tournaments": "البطولات"
+    "Tournaments": "البطولات",
+    "Adding": "جاري الاضافة...",
+    "Editing": "جاري التعديل...",
+    "Add": "اضافة لعبة",
+    "EditG": "تعديل لعبة"
   },
   "GamesTable": {
     "Game": "اللعبة",
@@ -422,5 +426,16 @@
     "Date": "التاريخ",
     "Edit": "تعديل",
     "Delete": "حذف"
+  },
+  "MarkDown": {
+    "Markdown": "التنسيق",
+    "Preview": "معاينة",
+    "words": "كلمات",
+    "characters": "حروف"
+  },
+  "Error": {
+    "Something went wrong!": "حدث خطأ",
+    "Try again": "حاول مرة اخرى",
+    "Home": "الصفحة الرئيسية"
   }
 }

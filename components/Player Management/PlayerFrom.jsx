@@ -136,6 +136,7 @@ function PlayerFrom({
                 ? formik.errors.firstName
                 : ""
             }
+            onBlur={formik.handleBlur}
             // onBlur={(e) => {
             //   formik.handleBlur(e);
             //   formik.setFieldValue("firstName", e.target.value.trim());

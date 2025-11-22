@@ -197,7 +197,11 @@
     "Edit": "Edit",
     "Players": "Players",
     "Teams": "Teams",
-    "Tournaments": "Tournaments"
+    "Tournaments": "Tournaments",
+    "Adding": "Adding...",
+    "Editing": "Editing...",
+    "Add": "Add Game",
+    "EditG": "Edit Game"
   },
   "GamesTable": {
     "Game": "Game",
@@ -428,5 +432,16 @@
     "Date": "Date",
     "Edit": "Edit",
     "Delete": "Delete"
+  },
+  "MarkDown": {
+    "Markdown": "Markdown",
+    "Preview": "Preview",
+    "words": "words",
+    "characters": "characters"
+  },
+  "Error": {
+    "Something went wrong!": "Something went wrong!",
+    "Try again": "Try again",
+    "Home": "Home"
   }
 }

@@ -4,7 +4,7 @@ import SelectSizeRows from "../ui app/SelectSizeRows";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 
-export default function TeamsFilter() {
+export default function TeamsFilter(numOfSize) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,7 +30,7 @@ export default function TeamsFilter() {
         flexGrow="flex-0"
       />
 
-      <SelectSizeRows />
+      <SelectSizeRows numOfSize={numOfSize} />
     </div>
   );
 }
