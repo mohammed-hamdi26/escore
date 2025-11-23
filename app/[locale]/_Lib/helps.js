@@ -16,3 +16,23 @@ export function getFirst10Words(str) {
   if (str.length <= 10) return str;
   return str.trim().split(/\s+/).slice(0, 10).join(" ") + " ...";
 }
+export function combineDateAndTime(date, time) {
+  if (!date || !time) return null;
+
+  // Example time input: "02:30 PM"
+  const [timePart, modifier] = time.split(" "); // ["02:30", "PM"]
+  let [hours, minutes, seconds] = timePart.split(":").map(Number);
+
+  // Convert to 24-hour format
+  if (modifier === "PM" && hours !== 12) {
+    hours += 12;
+  }
+  if (modifier === "AM" && hours === 12) {
+    hours = 0;
+  }
+
+  const result = new Date(date);
+  result.setHours(hours, minutes, seconds || 0, 0);
+
+  return result;
+}
