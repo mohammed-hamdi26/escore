@@ -3,7 +3,10 @@ import Champion from "@/components/icons/Champion";
 import TeamsManagement from "@/components/icons/TeamsManagement";
 import { Gamepad2, Loader, MapPin, Trophy } from "lucide-react";
 
-import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
+import {
+  combineDateAndTime,
+  mappedArrayToSelectOptions,
+} from "@/app/[locale]/_Lib/helps";
 import FormRow from "@/components/ui app/FormRow";
 import FormSection from "@/components/ui app/FormSection";
 import InputApp from "@/components/ui app/InputApp";
@@ -17,45 +20,50 @@ import TextAreaInput from "../ui app/TextAreaInput";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import MarkDown from "../ui app/MarkDown";
-const validateSchema = Yup.object({
-  matchDate: Yup.date()
-    .typeError("Invalid date format")
-    .required("Match date is required"),
+import SelectDateTimeInput from "../ui app/SelectDateAndTimeInput";
+import { format } from "date-fns";
+const validateSchema = Yup
+  .object
+  //   {
+  //   // matchDate: Yup.date()
+  //   //   .typeError("Invalid date format")
+  //   //   .required("Match date is required"),
 
-  matchTime: Yup.string().required("Match time is required"),
+  //   matchTime: Yup.string().required("Match time is required"),
 
-  matchType: Yup.string()
-    .oneOf(["SOLO", "TEAM"], "Invalid match type")
-    .required("Match type is required"),
+  //   matchType: Yup.string()
+  //     .oneOf(["SOLO", "TEAM"], "Invalid match type")
+  //     .required("Match type is required"),
 
-  status: Yup.string()
-    .oneOf(["UPCOMING", "LIVE", "FINISHED", "CANCELLED"], "Invalid status")
-    .required("Status is required"),
+  //   status: Yup.string()
+  //     .oneOf(["UPCOMING", "LIVE", "FINISHED", "CANCELLED"], "Invalid status")
+  //     .required("Status is required"),
 
-  seriesFormat: Yup.string().nullable(),
+  //   seriesFormat: Yup.string().nullable(),
 
-  venueType: Yup.string()
-    .oneOf(["ONLINE", "OFFLINE"], "Invalid venue type")
-    .required("Venue type is required"),
+  //   venueType: Yup.string()
+  //     .oneOf(["ONLINE", "OFFLINE"], "Invalid venue type")
+  //     .required("Venue type is required"),
 
-  player1Score: Yup.number()
-    .min(0, "Score cannot be negative")
-    .required("Player 1 score is required"),
+  //   player1Score: Yup.number()
+  //     .min(0, "Score cannot be negative")
+  //     .required("Player 1 score is required"),
 
-  player2Score: Yup.number()
-    .min(0, "Score cannot be negative")
-    .required("Player 2 score is required"),
+  //   player2Score: Yup.number()
+  //     .min(0, "Score cannot be negative")
+  //     .required("Player 2 score is required"),
 
-  summary: Yup.string().nullable(),
+  //   summary: Yup.string().nullable(),
 
-  venue: Yup.string().nullable(),
+  //   venue: Yup.string().nullable(),
 
-  streamUrl: Yup.string().url("Invalid URL").nullable(),
+  //   streamUrl: Yup.string().url("Invalid URL").nullable(),
 
-  vodUrl: Yup.string().url("Invalid URL").nullable(),
+  //   vodUrl: Yup.string().url("Invalid URL").nullable(),
 
-  stage: Yup.string().nullable(),
-});
+  //   stage: Yup.string().nullable(),
+  // }
+  ();
 function MatchesFrom({
   teamsOptions,
   gamesOptions,
@@ -68,6 +76,8 @@ function MatchesFrom({
   const formik = useFormik({
     initialValues: {
       matchDate: match?.matchDate || "",
+      date: "",
+      time: "",
       matchTime: match?.matchTime || "",
       matchType: match?.matchType || "SOLO",
       status: match?.status || "UPCOMING",
@@ -100,10 +110,18 @@ function MatchesFrom({
         teams: [{ id: dataValues.teams.team1 }, { id: dataValues.teams.team2 }],
         tournament: { id: dataValues.tournament },
         vodUrl: "",
-        winningTeam: null,
+
+        matchDate: format(
+          combineDateAndTime(dataValues.date, dataValues.time),
+          "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        ),
       };
 
+      delete dataValues.date;
+      delete dataValues.time;
+
       console.log(dataValues);
+
       try {
         await submit(dataValues);
         formType === "add" && formik.resetForm();
@@ -137,6 +155,7 @@ function MatchesFrom({
     { value: "OFFLINE", label: t("OFFLINE") },
   ];
 
+  console.log(formik.errors);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
@@ -418,7 +437,12 @@ function MatchesFrom({
 
       <FormSection>
         <FormRow>
-          <DatePicker
+          <SelectDateTimeInput
+            label={{ date: "Date", time: "Match Time " }}
+            names={{ date: "date", time: "time" }}
+            formik={formik}
+          />
+          {/* <DatePicker
             placeholder={"Enter Match Date"}
             formik={formik}
             label={t("Match Date")}
@@ -431,23 +455,24 @@ function MatchesFrom({
                 color={"text-[#677185]"}
               />
             }
-          />
+          /> */}
           <InputApp
-            label={t("time")}
+            // label={t("time") }
+            label={"Duration"}
             name={"matchTime"}
             type={"time"}
-            placeholder={"Enter Match Time"}
+            placeholder={"Enter Match Duration"}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
-            icon={
-              <TeamsManagement
-                height="35"
-                width="35"
-                className={"fill-[#677185] "}
-                color={"text-[#677185]"}
-              />
-            }
+            // icon={
+            //   <TeamsManagement
+            //     height="35"
+            //     width="35"
+            //     className={"fill-[#677185] "}
+            //     color={"text-[#677185]"}
+            //   />
+            // }
             error={
               formik?.errors?.time && formik?.touched?.time
                 ? formik?.errors?.time

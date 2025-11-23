@@ -573,3 +573,15 @@ export async function deleteTheme(theme_id) {
     throw error;
   }
 }
+
+export async function replayTicket(id, data) {
+  console.log(data);
+  try {
+    const res = apiClient.patch(`/support-tickets/${id}`, data);
+    // return res.data;
+  } catch (error) {
+    console.log("Failed to get replay ticket", error);
+    throw error;
+  }
+  revalidatePath("/dashboard/support-center");
+}

@@ -8,6 +8,7 @@ import imagePerson from "../../public/images/dashboard/avatar.jpg";
 import Image from "next/image";
 
 function SupportCenterTable({ tickets }) {
+  console.log(tickets);
   return (
     <div>
       <Table showHeader={false} grid_cols="grid-cols-[0.5fr_0.5fr_0.7fr_2fr]">
@@ -19,14 +20,14 @@ function SupportCenterTable({ tickets }) {
             <Table.Cell>{format(ticket.createdAt, "yyyy-MM-dd")}</Table.Cell>
 
             <Table.Cell className="flex gap-2 items-center">
-              <Image
+              {/* <Image
                 src={imagePerson}
                 width={30}
                 height={30}
                 alt=""
                 className="rounded-full"
-              />{" "}
-              {ticket?.user?.name}
+              />{" "} */}
+              {ticket?.email}
             </Table.Cell>
             <Table.Cell>{ticket.description}</Table.Cell>
             <Table.Cell className="flex gap-4 justify-end">
@@ -41,7 +42,7 @@ function SupportCenterTable({ tickets }) {
                   </Button>
                 </Model.Open>
                 <Model.Window openName={"answer"}>
-                  <AnswerBox chat={tickets} />
+                  <AnswerBox ticket={ticket} />
                 </Model.Window>
               </Model>
             </Table.Cell>
