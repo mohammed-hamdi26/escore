@@ -126,7 +126,20 @@
     "Player Photo": "Player Photo",
     "Enter Player Photo": "Enter Player Photo",
     "Yes": "Yes",
-    "No": "No"
+    "No": "No",
+
+    "firstNameRequired": "First Name is Required",
+    "lastNameRequired": "Last Name is Required",
+
+    "birthDateRequired": "Birth Date is Required",
+    "nationalityRequired": "Nationality is Required",
+    "photoRequired": "Photo Player is Required",
+    "photoDarkRequired": "Photo Player (Dark) is Required",
+
+    "earningsNegative": "Earnings cannot be negative",
+    "achievementsNegative": "Achievements cannot be negative",
+    "rankingNegative": "Ranking cannot be negative",
+    "marketValueNegative": "Market Value cannot be negative"
   },
   "PlayersTable": {
     "Edit": "Edit",
@@ -262,7 +275,14 @@
     "Select Games": "Select Games",
 
     "Tournaments": "Tournaments",
-    "Select Tournaments": "Select Tournaments"
+    "Select Tournaments": "Select Tournaments",
+
+    "newsTypeInvalid": "news type must be general or match recap or trending",
+    "statusInvalid": "Status must be Published or Scheduled",
+    "authorNameRequired": "author name is required",
+    "contentRequired": "content is required",
+    "imageRequired": "image is required",
+    "titleRequired": "title is required"
   },
   "TournamentForm": {
     "Tournament name is required": "Tournament name is required",
@@ -416,7 +436,18 @@
     "Adding": "Adding...",
     "Editing": "Editing...",
     "Edit Match": "Edit Match",
-    "Add Match": "Add Match"
+    "Add Match": "Add Match",
+    "Select Game": "Select Game",
+    "Select Tournament": "Select Tournament",
+    "Team 1 Score": "Team 1 Score",
+    "Team 2 Score": "Team 2 Score",
+    "Score cannot be negative": "Score cannot be negative",
+    "Date": "Date",
+    "Match Time": "Match Time",
+    "Duration": "Duration",
+    "VOD URL": "VOD URL",
+    "Enter VOD URL": "Enter VOD URL",
+    "Pick a date": "Pick a date"
   },
   "MatchesTable": {
     "Date": "Date",
@@ -443,5 +474,9 @@
     "Something went wrong!": "Something went wrong!",
     "Try again": "Try again",
     "Home": "Home"
+  },
+  "toast": {
+    "uploaded Photo": "uploaded Photo",
+    "error uploading photo": "error uploading photo"
   }
 }

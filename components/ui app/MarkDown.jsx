@@ -14,8 +14,8 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { Label } from "../ui/label";
-function MarkDown({ formik, name, label, placeholder }) {
-  const [content, setContent] = useState("");
+function MarkDown({ formik, name, label, placeholder, error }) {
+  const [content, setContent] = useState(formik?.values[name]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasAbout, setHasAbout] = useState(false);
   const textareaRef = useRef(null);
@@ -180,7 +180,6 @@ function MarkDown({ formik, name, label, placeholder }) {
     return html;
   };
 
-  function handleSubmit() {}
   return (
     <>
       {isLoading ? (
@@ -230,7 +229,10 @@ function MarkDown({ formik, name, label, placeholder }) {
                   value={content}
                   onChange={(e) => {
                     setContent(e.target.value);
-                    formik.setFieldValue(name, "hallo");
+                    formik.setFieldValue(name, e.target.value);
+                  }}
+                  onBlur={() => {
+                    formik.setFieldTouched(name, true);
                   }}
                   onKeyDown={handleKeyDown}
                   placeholder={placeholder}
@@ -259,6 +261,7 @@ function MarkDown({ formik, name, label, placeholder }) {
               </span>
             </div>
           </div>
+          {error && <p className="text-red-500 mt-2">{error} </p>}
         </div>
       )}
     </>

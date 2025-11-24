@@ -34,7 +34,7 @@ export default async function page({ searchParams }) {
 // </Button>
 // <Button
 //   className={
-//     "text-white bg-red-800 rounded-full min-w-[100px] cursor-pointer"
+//     "text-white bg-[#3A469D] rounded-full min-w-[100px] cursor-pointer"
 //   }
 // >
 //   Delete

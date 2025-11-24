@@ -13,21 +13,26 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useLocale } from "next-intl";
 
 const SelectDateTimeInput = ({
   t,
   label = { date: "Date", time: "Time" },
   names,
   formik,
-  placeholder,
+  placeholder = "Pick a date",
 }) => {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(undefined);
+  const locale = useLocale();
 
   return (
     <div className="flex flex-1 gap-4">
       <div className="flex flex-1 flex-col gap-3">
-        <Label htmlFor="date-picker" className="px-1 text-[#677185]">
+        <Label
+          htmlFor="date-picker"
+          className="px-1 text-[#677185] dark:text-white"
+        >
           {label.date}
         </Label>
         <Popover open={open} onOpenChange={setOpen}>
@@ -37,7 +42,7 @@ const SelectDateTimeInput = ({
               id="date-picker"
               className="justify-between text-black dark:text-white dark:bg-[#10131D] p-6 font-normal"
             >
-              {date ? date.toLocaleDateString() : "Pick a date"}
+              {date ? date.toLocaleDateString() : placeholder}
               <ChevronDownIcon />
             </Button>
           </PopoverTrigger>
@@ -55,10 +60,14 @@ const SelectDateTimeInput = ({
         </Popover>
       </div>
       <div className="flex flex-1 flex-col gap-3">
-        <Label htmlFor="time-picker" className="px-1 text-[#677185]">
+        <Label
+          htmlFor="time-picker"
+          className="px-1 text-[#677185] dark:text-white"
+        >
           {label.time}
         </Label>
         <Input
+          dir={locale}
           value={formik.values[names?.time]}
           name={names?.time}
           onChange={formik.handleChange}

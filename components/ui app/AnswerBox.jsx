@@ -103,7 +103,7 @@ function SendMessageInput({ id }) {
       <div className="flex items-center justify-between bg-dashboard-box  dark:bg-[#10131D] py-4 px-2.5 gap-4 rounded-xl">
         <Input
           name="replyMessage"
-          value={formik.values.message}
+          value={formik.values.replyMessage}
           onChange={formik.handleChange}
           className={
             " text-[#10131D] dark:text-white  dark:bg-[#10131D]  shadow-none border-none focus:outline-none "

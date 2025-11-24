@@ -24,7 +24,7 @@ function FormContainer() {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      // console.log(values);
+      console.log(values);
       try {
         await login(values);
         toast.success(t("Login successful"));

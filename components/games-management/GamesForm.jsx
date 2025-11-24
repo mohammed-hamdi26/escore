@@ -132,7 +132,7 @@ function GamesForm({
             onBlur={formik.handleBlur}
           />
         </FormRow>
-        <MarkDown
+        {/* <MarkDown
           formik={formik}
           label={t("Description")}
           name={"description"}
@@ -147,7 +147,7 @@ function GamesForm({
           }
           error={formik.touched.description && formik.errors.description}
           onBlur={formik.handleBlur}
-        />
+        /> */}
       </FormSection>
       <FormSection>
         <FormRow>
@@ -181,40 +181,7 @@ function GamesForm({
           />
         </FormRow>
       </FormSection>
-      {/* <FormSection>
-        <FormRow>
-          <ListInput
-            label={t("Players")}
-            name={"players"}
-            options={[
-              { value: 1, name: "Player 1" },
-              { value: 2, name: "Player 2" },
-            ]}
-            formik={formik}
-            placeholder={t("Players")}
-          />
-          <ListInput
-            label={t("Teams")}
-            name={"teams"}
-            options={[
-              { value: 1, name: "Team 1" },
-              { value: 2, name: "Team 2" },
-            ]}
-            formik={formik}
-            placeholder={t("Teams")}
-          />
-          <ListInput
-            label={t("Tournaments")}
-            name={"tournaments"}
-            options={[
-              { value: 1, name: "Tournament 1" },
-              { value: 2, name: "Tournament 2" },
-            ]}
-            formik={formik}
-            placeholder={t("Tournaments")}
-          />
-        </FormRow>
-      </FormSection> */}
+
       <div className="flex justify-end">
         <Button
           disabled={!formik.isValid || formik.isSubmitting}

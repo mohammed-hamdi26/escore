@@ -10,7 +10,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import DropMenu from "../ui app/DropMenu";
 import { Award, EllipsisVertical, Link2 } from "lucide-react";
-import { getNumPages } from "@/app/[locale]/_Lib/helps";
+import { getFirst10Words, getNumPages } from "@/app/[locale]/_Lib/helps";
 import { useSearchParams } from "next/navigation";
 export default function TeamsTable({ teams, columns, numOfTeams }) {
   const t = useTranslations("TeamsTable");
@@ -35,7 +35,7 @@ export default function TeamsTable({ teams, columns, numOfTeams }) {
               {team?.name}
             </Table.Cell>
             <Table.Cell>{team?.region}</Table.Cell>
-            <Table.Cell>{team?.description}</Table.Cell>
+            <Table.Cell>{getFirst10Words(team?.description)}</Table.Cell>
             <Table.Cell className="flex justify-end gap-4">
               <Link
                 disabled={isLoading}
@@ -52,7 +52,7 @@ export default function TeamsTable({ teams, columns, numOfTeams }) {
               <Button
                 disabled={isLoading}
                 className={
-                  "text-white bg-red-800 rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
+                  "text-white bg-[#3A469D] rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
                 }
                 onClick={async () => {
                   try {

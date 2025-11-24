@@ -42,7 +42,7 @@ export default function LanguageDeleteDialog({ t, code, onDelete }) {
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button
-          className="rounded-full min-w-[100px] cursor-pointer bg-[#3a469d] hover:bg-[#4656bf] text-amber-50"
+          className="rounded-full min-w-[100px] cursor-pointer bg-destructive hover:bg-destructive/80 text-amber-50"
           disabled={isLoading}
         >
           {isLoading ? t("Deleting") : t("Delete")}

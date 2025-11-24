@@ -39,7 +39,7 @@ export async function addPlayer(playerData) {
     const res = await apiClient.post("/players", playerData);
     // return res.data;
   } catch (e) {
-    // console.log(e.response);
+    console.log(e.response);
     throw new Error("Error in adding player");
   }
   redirect("/dashboard/player-management/edit");
@@ -575,13 +575,13 @@ export async function deleteTheme(theme_id) {
 }
 
 export async function replayTicket(id, data) {
-  console.log(data);
+  const locale = await getLocale();
   try {
     const res = apiClient.patch(`/support-tickets/${id}`, data);
+    revalidatePath(`/${locale}/dashboard/support-center`);
     // return res.data;
   } catch (error) {
     console.log("Failed to get replay ticket", error);
     throw error;
   }
-  revalidatePath("/dashboard/support-center");
 }

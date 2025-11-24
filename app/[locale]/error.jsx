@@ -16,7 +16,6 @@ export default function Error({ error, reset }) {
       <h1 className="text-3xl font-semibold flex gap-2 items-center">
         <CircleX /> {t("Something went wrong!")}
       </h1>
-      <p className="text-lg">{error.message}</p>
       <BoxPoints
         position={" bottom-4 left-4 "}
         className={"fill-green-primary"}
@@ -25,6 +24,7 @@ export default function Error({ error, reset }) {
         position={" right-10 bottom-[200px] "}
         className={"fill-green-primary"}
       />
+      <p className="text-lg text-black">{error.message}</p>
       <div className="flex items-center gap-4">
         <Link href="/" className="cursor-pointer">
           <Button className="bg-green-primary text-white  font-bold px-6 py-6 text-lg">

@@ -44,12 +44,12 @@ function LoginFrom({ formik, t }) {
           onBlur={formik.handleBlur}
           className="max-w-[400px]"
         />
-        <Link
+        {/* <Link
           className="text-[#C7C7C7] hover:text-[#C7C7C7]/90 text-end max-w-[400px]"
           href="/forgot-password"
         >
           {t("Forgot Password ?")}
-        </Link>
+        </Link> */}
         <Button
           disabled={formik.isSubmitting || !formik.isValid}
           type="submit"

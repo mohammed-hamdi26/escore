@@ -27,7 +27,7 @@ function LinksButtons() {
           className={` text-white text-center min-w-[100px] px-5 py-2 rounded-lg ${
             pathname.includes("edit")
               ? "bg-green-primary  hover:bg-green-primary "
-              : "bg-[#F5F6F8] dark:bg-[#10131D] text-black dark:text-white  hover:bg-green-primary/50 hover:text-white"
+              : "bg-[#F5F6F8] dark:bg-[#10131D] text-black dark:text-white  hover:bg-green-primary hover:text-white"
           }  cursor-pointer  disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {t("edit")}
@@ -43,7 +43,7 @@ function LinksButtons() {
           className={`text-white  text-center min-w-[100px]  px-5 py-2 rounded-lg ${
             pathname.includes("add")
               ? "bg-green-primary cursor-not-allowed hover:bg-green-primary "
-              : "bg-[#F5F6F8]  dark:bg-[#10131D] text-black dark:text-white cursor-pointer hover:bg-green-primary/50 hover:text-white"
+              : "bg-[#F5F6F8]  dark:bg-[#10131D] text-black dark:text-white cursor-pointer hover:bg-green-primary hover:text-white"
           }  disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {t("add new")}
