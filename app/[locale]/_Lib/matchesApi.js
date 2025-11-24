@@ -6,13 +6,11 @@ export async function getMatches(searchParams = {}) {
     .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
     .join("&");
 
-  console.log("searchParamsString in getPlayers", searchParamsString);
   try {
     const res = await apiClient.get(`/matches?${searchParamsString}`);
 
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in get Matches");
   }
 }
@@ -22,7 +20,6 @@ export async function getMatch(id) {
     const res = await apiClient.get(`/matches/${id}`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Failed to get Match");
   }
 }
@@ -31,7 +28,6 @@ export async function getMatchesCount() {
     const res = await apiClient.get(`/matches/count`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Failed to get Matches Count");
   }
 }

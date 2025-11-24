@@ -5,7 +5,6 @@ export async function getTickets() {
     const res = await apiClient.get("/support-tickets");
     return res.data;
   } catch (e) {
-    console.log(e);
     throw new Error("Failed to get tickets");
   }
 }

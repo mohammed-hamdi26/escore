@@ -474,5 +474,75 @@
   "toast": {
     "uploaded Photo": "تم تحميل الصورة",
     "error uploading photo": "حدث خطأ في تحميل الصورة"
+  },
+  "themes": {
+    "Color Code": "رمز اللون",
+    "Theme Type": "نوع النمط",
+    "Color": "اللون",
+    "Add new theme": "اضافة نمط جديد",
+    "Edit": "تعديل",
+    "Delete": "حذف",
+    "DialogEditTitle": "تعديل الثيم",
+    "DialogEditDescription": "قم بتحديث لون الثيم. عدّل الحقول حسب الحاجة.",
+    "DialogDeleteTitle": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف الثيم نهائيًا وإزالته من النظام.",
+    "DialogDeleteDescription": "هل أنت متأكد تمامًا أنك تريد حذف هذا الثيم؟",
+    "Cancel": "الغاء",
+    "AddTheme": "اضافة ثيم",
+    "DialogAddDescription": "اضافة نمط جديد للنظام. قم بملء جميع الحقول المطلوبة.",
+    "Add New theme": "اضافة نمط جديد",
+    "Theme added successfully": "تمت اضافة الثيم بنجاح",
+    "Theme updated successfully": "تم تحديث الثيم بنجاح",
+    "Update": "تحديث",
+    "Submit": "ارسال",
+    "ThemeType": "نوع الثيم"
+  },
+  "Links": {
+    "Icon": "الأيقونة",
+    "Link added successfully": "تمت اضافة الرابط بنجاح",
+    "URL": "الرابط",
+    "URL is required": "الرابط مطلوب",
+    "Name is required": "الاسم مطلوب",
+    "Icon is required": "الايقونة مطلوبة",
+    "Add new link": "اضافة رابط جديد",
+    "Add Link": "اضافة رابط",
+    "URL Icon": "رابط الايقونة",
+    "URL Link": "رابط الرابط",
+    "Name": "الاسم"
+  },
+  "FavoriteCharacter": {
+    "Game Name": "اسم اللعبة",
+    "Name": "الاسم",
+    "Name is required": "الاسم مطلوب",
+    "Icon": "رابط الايقونة",
+    "Add new Favorite Character": "اضافة شخصية مفضلة جديد",
+    "Add Favorite Character": "اضافة الشخصية المفضلة",
+    "Game Name is required": "اسم اللعبة مطلوب",
+    "Icon is required": "الايقونة مطلوبة"
+  },
+  "Awards": {
+    "title": "العنوان",
+    "titlePlaceholder": "أدخل العنوان",
+
+    "image": "الصورة",
+    "imagePlaceholder": "رابط الصورة",
+
+    "game": "اللعبة",
+    "gamePlaceholder": "الألعاب",
+
+    "tournament": "البطولة",
+    "tournamentPlaceholder": "البطولة",
+
+    "achievedDate": "تاريخ الإنجاز",
+    "datePlaceholder": "التاريخ",
+
+    "description": "الوصف",
+    "descriptionPlaceholder": "أدخل الوصف",
+    "Add new Award": "اضافة جائزة جديدة",
+    "Add Award": "اضافة جائزة ",
+    "Awards added successfully": "تمت اضافة الجائزة بنجاح",
+    "title is required": "العنوان مطلوب",
+    "image is required": "الصورة مطلوبة",
+    "description is required": "الوصف مطلوب",
+    "achievedDate is required": "تاريخ الإنجاز مطلوب"
   }
 }

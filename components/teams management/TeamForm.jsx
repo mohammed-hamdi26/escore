@@ -78,7 +78,6 @@ function TeamForm({
     onSubmit: async (values) => {
       let dataValues = team ? { id: team.id, ...values } : values;
 
-      console.log("data", dataValues);
       try {
         const res = await submit(dataValues);
 
@@ -95,7 +94,6 @@ function TeamForm({
     },
   });
 
-  console.log(formik.errors);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>

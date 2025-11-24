@@ -32,7 +32,6 @@ const ComboboxInput = ({
   const id = useId();
   const [open, setOpen] = useState(false);
   const [selectedValues, setSelectedValues] = useState(initialData);
-  console.log(selectedValues);
 
   const toggleSelection = (value) => {
     setSelectedValues((prev) =>

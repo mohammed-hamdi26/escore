@@ -1,6 +1,6 @@
 import { Label } from "@radix-ui/react-label";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Calendar } from "../ui/calendar";
+import { Calendar } from "@/components/ui/calendar";
 
 import { Button } from "../ui/button";
 import { useState } from "react";
@@ -57,7 +57,7 @@ function DatePicker({
                   // formik.setFieldTouched(name, true);
                 }}
                 mode="single"
-                captionLayout="dropdown"
+                // captionLayout="dropdown"
               />
             </PopoverContent>
           </Popover>

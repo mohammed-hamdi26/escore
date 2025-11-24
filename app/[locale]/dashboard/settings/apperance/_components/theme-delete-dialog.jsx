@@ -12,11 +12,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-function ThemeDeleteDialog({ theme_id, onDelete }) {
-  console.log(theme_id);
+function ThemeDeleteDialog({ theme_id, onDelete, t }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   async function handleDelete() {
@@ -39,7 +39,7 @@ function ThemeDeleteDialog({ theme_id, onDelete }) {
           className="rounded-full min-w-[100px] bg-[#3a469d] hover:bg-[#4656bf] text-amber-50 cursor-pointer"
           disabled={isLoading}
         >
-          {isLoading ? "Deleting..." : "Delete"}
+          {isLoading ? <Spinner /> : t("Delete")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -47,22 +47,21 @@ function ThemeDeleteDialog({ theme_id, onDelete }) {
           <div className="bg-destructive/10 mx-auto mb-2 flex size-12 items-center justify-center rounded-full">
             <TriangleAlertIcon className="text-destructive size-6" />
           </div>
-          <AlertDialogTitle>
-            Are you absolutely sure you want to delete this theme?
-          </AlertDialogTitle>
+          <AlertDialogTitle>{t("DialogDeleteTitle")}</AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            This action cannot be undone. This will permanently delete the theme
-            and remove it from the system.
+            {t("DialogDeleteDescription")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>
+            {t("Cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isLoading}
             className="bg-destructive dark:bg-destructive/60 hover:bg-destructive focus-visible:ring-destructive text-white"
           >
-            {isLoading ? "Deleting..." : "Delete"}
+            {isLoading ? <Spinner /> : t("Delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

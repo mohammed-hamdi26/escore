@@ -8,7 +8,7 @@ const columns = [
 
 async function page({ searchParams }) {
   const { size, page, search } = await searchParams;
-  console.log(size);
+
   const games = await getGames({ size, page, "name.contains": search || "" });
   const numOfGames = await getGamesCount();
 

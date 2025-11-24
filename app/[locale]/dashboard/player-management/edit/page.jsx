@@ -35,7 +35,6 @@ async function page({ searchParams }) {
   });
 
   const numOfPlayers = await getPlayersCount();
-  console.log(numOfPlayers);
 
   return (
     <Suspense fallback={<Loading />}>

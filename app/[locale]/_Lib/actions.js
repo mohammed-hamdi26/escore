@@ -17,7 +17,6 @@ export async function login(userData) {
 
     await saveSession(res?.data?.id_token);
   } catch (e) {
-    console.log(e.response);
     // if (JSON.stringify(e).contains("NEXT_REDIRECT")) {
     //   redirect("/dashboard");
     //   return;
@@ -34,12 +33,10 @@ export async function logout() {
 
 // player actions
 export async function addPlayer(playerData) {
-  // console.log(playerData);
   try {
     const res = await apiClient.post("/players", playerData);
     // return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in adding player");
   }
   redirect("/dashboard/player-management/edit");
@@ -53,19 +50,17 @@ export async function editPlayer(playerData) {
     );
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in updating player");
   }
 }
 export async function deletePlayer(id) {
   const locale = await getLocale();
-  console.log(id);
+
   try {
     const res = await apiClient.delete(`/players/${id}`);
     revalidatePath(`${locale}/dashboard/player-management/edit`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("error in Delete");
   }
 }
@@ -75,7 +70,6 @@ export async function addGame(gameData) {
     const res = await apiClient.post("/games", gameData);
     // return res.data;
   } catch (e) {
-    // console.log(e.response);
     throw new Error("Error in adding game");
   }
   redirect("/dashboard/games-management/edit");
@@ -88,19 +82,17 @@ export async function updateGame(gameData) {
     revalidatePath(`/${locale}/dashboard/games-management/edit/${gameData.id}`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in updating game");
   }
 }
 export async function deleteGame(id) {
   const locale = await getLocale();
-  // console.log(id);
+
   try {
     const res = await apiClient.delete(`/games/${id}`);
     revalidatePath(`/${locale}/dashboard/games-management/edit`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("error in Delete");
   }
 }
@@ -111,7 +103,6 @@ export async function addTeam(teamData) {
     const res = await apiClient.post("/teams", teamData);
     // return res.data;
   } catch (e) {
-    // console.log(e.response);
     throw new Error("Error in adding team");
   }
   redirect("/dashboard/teams-management/edit");
@@ -119,14 +110,13 @@ export async function addTeam(teamData) {
 
 export async function updateTeam(teamData) {
   const locale = await getLocale();
-  console.log(teamData);
+
   try {
     const res = await apiClient.put(`/teams/${teamData.id}`, teamData);
     revalidatePath(`/${locale}/dashboard/teams-management/edit/${teamData.id}`);
-    console.log(res.data);
+
     return res.data;
   } catch (e) {
-    // console.log(e.response);
     throw new Error("Error in updating team");
   }
 }
@@ -138,7 +128,6 @@ export async function deleteTeam(id) {
     revalidatePath(`/${locale}/dashboard/teams-management/edit`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("error in Delete");
   }
 }
@@ -154,10 +143,9 @@ export async function addNews(newsData) {
           : newsData.publishDate,
     };
     const res = await apiClient.post("/news", newsDataWithDate);
-    // console.log(res.data);
+
     // return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in adding news");
   }
   redirect("/dashboard/news/edit");
@@ -170,19 +158,17 @@ export async function editNews(newsData) {
     revalidatePath(`/${locale}/dashboard/news/edit/${newsData.id}`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in updating news");
   }
 }
 export async function deleteNew(id) {
   const locale = await getLocale();
-  // console.log(id);
+
   try {
     const res = await apiClient.delete(`/news/${id}`);
     revalidatePath(`/${locale}/dashboard/news/edit`);
     return res.data;
   } catch (e) {
-    // console.log(e.response);
     throw new Error("error in Delete");
   }
 }
@@ -197,7 +183,6 @@ export async function uploadPhoto(formData) {
 
     return url.data;
   } catch (e) {
-    // console.log(e.response);
     throw new Error("error in upload");
   }
 }
@@ -207,10 +192,9 @@ export async function uploadPhoto(formData) {
 export async function addTournament(tournamentData) {
   try {
     const res = await apiClient.post("/tournaments", tournamentData);
-    console.log(res.data);
+
     // return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in adding tournament");
   }
   redirect("/dashboard/tournaments-management/edit");
@@ -228,7 +212,6 @@ export async function editTournament(tournamentData) {
     );
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in updating tournaments");
   }
 }
@@ -240,7 +223,6 @@ export async function deleteTournament(id) {
     revalidatePath(`/${locale}/dashboard/tournaments/edit`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("error in Delete tournament");
   }
 }
@@ -252,7 +234,6 @@ export async function addMatch(matchData) {
     const res = await apiClient.post("/matches", matchData);
     // return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in adding game");
   }
   redirect("/dashboard/matches-management/edit");
@@ -267,19 +248,17 @@ export async function updateMatch(matchData) {
     );
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in updating game");
   }
 }
 export async function deleteMatch(id) {
   const locale = await getLocale();
-  console.log(id);
+
   try {
     const res = await apiClient.delete(`/matches/${id}`);
     revalidatePath(`/${locale}/dashboard/matches-management/edit`);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("error in Delete");
   }
 }
@@ -289,7 +268,6 @@ export async function addLink(linkData) {
     const res = await apiClient.post("/social-links", linkData);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in adding link");
   }
 }
@@ -299,7 +277,6 @@ export async function addFavoriteCharacter(characterData) {
     const res = await apiClient.post("/favorite-characters", characterData);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in adding favorite character");
   }
 }
@@ -309,7 +286,6 @@ export async function addAward(awardData) {
     const res = await apiClient.post("/achievements", awardData);
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in adding favorite game");
   }
 }

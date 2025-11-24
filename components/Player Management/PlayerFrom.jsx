@@ -101,12 +101,11 @@ function PlayerFrom({
 
         delete dataValues.country;
         delete dataValues.teams;
-        console.log(dataValues);
+
         await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(successMessage);
       } catch (error) {
-        // console.log(error);
         if (!error.toString().includes("Error: NEXT_REDIRECT")) {
           toast.error(error.message);
         } else {
@@ -116,7 +115,6 @@ function PlayerFrom({
     },
   });
 
-  console.log(formik.errors);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>

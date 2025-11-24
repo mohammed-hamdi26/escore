@@ -23,9 +23,12 @@ import MarkDown from "../ui app/MarkDown";
 import SelectDateTimeInput from "../ui app/SelectDateAndTimeInput";
 import { format } from "date-fns";
 const validateSchema = Yup.object({
-  matchDate: Yup.date()
-    .typeError("Invalid date format")
-    .required("Match date is required"),
+  // matchDate: Yup.date()
+  //   .typeError("Invalid date format")
+  //   .required("Match date is required"),
+  date: Yup.date().required("Match date is required"),
+
+  time: Yup.string().required("Match time is required"),
 
   matchTime: Yup.string().required("Match time is required"),
 
@@ -117,8 +120,6 @@ function MatchesFrom({
       delete dataValues.date;
       delete dataValues.time;
 
-      console.log(dataValues);
-
       try {
         await submit(dataValues);
         formType === "add" && formik.resetForm();
@@ -126,7 +127,6 @@ function MatchesFrom({
           formType === "add" ? "The match Added" : "The Match Edited"
         );
       } catch (error) {
-        console.log(error);
         toast.error(error.message);
       }
     },
@@ -152,7 +152,6 @@ function MatchesFrom({
     { value: "OFFLINE", label: t("OFFLINE") },
   ];
 
-  console.log(formik.errors);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
@@ -457,6 +456,16 @@ function MatchesFrom({
           <SelectDateTimeInput
             label={{ date: t("Date"), time: t("Match Time") }}
             names={{ date: "date", time: "time" }}
+            errors={{
+              date:
+                formik?.errors?.matchDate &&
+                formik?.touched?.matchDate &&
+                t(formik?.errors?.matchDate),
+              time:
+                formik?.errors?.matchTime &&
+                formik?.touched?.matchTime &&
+                t(formik?.errors?.matchTime),
+            }}
             formik={formik}
             placeholder={t("Pick a date")}
           />

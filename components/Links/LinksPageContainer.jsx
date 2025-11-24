@@ -1,6 +1,9 @@
+"use client";
+import { useTranslations } from "next-intl";
 import { Button } from "../ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogTitle,
   DialogTrigger,
@@ -15,6 +18,7 @@ function LinksPageContainer({
   links,
   linkType = "player",
 }) {
+  const t = useTranslations("Links");
   return (
     <div className="space-y-8">
       <Dialog>
@@ -24,12 +28,13 @@ function LinksPageContainer({
               "bg-green-primary text-white cursor-pointer hover:bg-green-primary/70"
             }
           >
-            Add new link
+            {t("Add new link")}
           </Button>
         </DialogTrigger>
-        <DialogContent>
-          <DialogTitle>Add new link</DialogTitle>
+        <DialogContent dir="rtl">
+          <DialogTitle>{t("Add new link")}</DialogTitle>
           <LinksForm
+            t={t}
             id={id}
             teams={teams}
             players={players}

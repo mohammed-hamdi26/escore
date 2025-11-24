@@ -36,7 +36,6 @@ function FileInput({
       setFiles(e.target.files[0]);
     }
   }
-  console.log(isLoading);
 
   return (
     <div className={flexGrow + " "}>
@@ -74,7 +73,6 @@ function FileInput({
                     toast.success(t("uploaded Photo"));
                     return url;
                   } catch (e) {
-                    console.log(e);
                     toast.error(t("error uploading photo"));
                   } finally {
                     setIsLoading(false);

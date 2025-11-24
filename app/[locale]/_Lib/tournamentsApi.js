@@ -10,7 +10,6 @@ export async function getTournaments(searchParams = {}) {
 
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in Get tournaments");
   }
 }
@@ -20,7 +19,6 @@ export async function getTournament(id) {
 
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in Get tournament");
   }
 }
@@ -30,7 +28,6 @@ export async function getNumOfTournaments() {
 
     return res.data;
   } catch (e) {
-    console.log(e.response);
     throw new Error("Error in Get number of tournaments");
   }
 }

@@ -20,7 +20,7 @@ import { cookies } from "next/headers";
 //     });
 //     return payload;
 //   } catch (error) {
-//     console.log("Failed to verify session");
+//
 //   }
 // }
 

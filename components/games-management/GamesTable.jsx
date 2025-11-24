@@ -18,7 +18,7 @@ function GamesTable({ games, columns, numOfGames }) {
   const t = useTranslations("GamesTable");
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
-  console.log(numOfGames);
+
   const numPages = getNumPages(numOfGames, Number(searchParams.get("size")));
 
   return (

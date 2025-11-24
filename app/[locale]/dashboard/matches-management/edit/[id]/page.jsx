@@ -10,7 +10,6 @@ async function page({ params }) {
   const [match, teamsOptions, gamesOptions, tournamentsOptions] =
     await Promise.all([getMatch(id), getTeams(), getGames(), getTournaments()]);
 
-  console.log(match);
   return (
     <MatchesFrom
       gamesOptions={gamesOptions}

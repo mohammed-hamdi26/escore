@@ -12,7 +12,6 @@ import toast from "react-hot-toast";
 import LoadingScreen from "./loading-screen";
 import { Spinner } from "../ui/spinner";
 function AnswerBox({ ticket = {}, onClose }) {
-  console.log(ticket);
   return (
     <div className="bg-dashboard-box dark:bg-[#10131D]  mx-auto  sm:w-[702px] h-[500px] rounded-3xl flex flex-col overflow-hidden ">
       <div className="flex items-center justify-end p-4">
@@ -80,13 +79,12 @@ function SendMessageInput({ id }) {
       replyMessage: "",
     },
     onSubmit: async (values) => {
-      // console.log(values);
+      //
       try {
         await replayTicket(id, { ...values, id: id });
         formik.resetForm();
         toast.success("Message sent successfully");
       } catch (error) {
-        console.log(error);
         toast.error(error.message);
       }
     },

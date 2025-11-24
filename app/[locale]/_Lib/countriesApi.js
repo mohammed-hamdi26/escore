@@ -8,7 +8,6 @@ export async function getCountries() {
 
     return res.data;
   } catch (e) {
-    // console.log(e.response);
     throw new Error("Failed to get countries");
   }
 }

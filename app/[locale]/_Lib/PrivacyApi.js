@@ -9,7 +9,7 @@ import apiClient from "./apiCLient";
 //     });
 //     return res.data;
 //   } catch (error) {
-//     console.log("Failed to get language privacy and policy", error);
+//
 //     throw error;
 //   }
 // }
@@ -24,10 +24,10 @@ import apiClient from "./apiCLient";
 //         },
 //       }
 //     );
-//     console.log(res.data);
+//
 //     return res.data;
 //   } catch (error) {
-//     console.log("Failed to add language privacy and policy", error);
+//
 //     throw error;
 //   }
 // }
@@ -39,10 +39,10 @@ import apiClient from "./apiCLient";
 //         "ngrok-skip-browser-warning": "true",
 //       },
 //     });
-//     console.log(res.data);
+//
 //     return res.data;
 //   } catch (error) {
-//     console.log("Failed to get language privacy and policy", error);
+//
 //     throw error;
 //   }
 // }
@@ -58,10 +58,10 @@ import apiClient from "./apiCLient";
 //         },
 //       }
 //     );
-//     console.log(res.data);
+//
 //     return res.data;
 //   } catch (error) {
-//     console.log("Failed to get language privacy and policy", error);
+//
 //     throw error;
 //   }
 // }
