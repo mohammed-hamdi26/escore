@@ -20,6 +20,7 @@ const SelectDateTimeInput = ({
   label = { date: "Date", time: "Time" },
   names,
   formik,
+  errors,
   placeholder = "Pick a date",
 }) => {
   const [open, setOpen] = useState(false);
@@ -58,6 +59,7 @@ const SelectDateTimeInput = ({
             />
           </PopoverContent>
         </Popover>
+        {errors.date && <div className="text-red-500">{errors.date}</div>}
       </div>
       <div className="flex flex-1 flex-col gap-3">
         <Label
@@ -77,6 +79,7 @@ const SelectDateTimeInput = ({
           defaultValue="06:30:00"
           className=" text-black dark:text-white dark:bg-[#10131D] h-13  appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
         />
+        {errors.time && <div className="text-red-500">{errors.time}</div>}
       </div>
     </div>
   );

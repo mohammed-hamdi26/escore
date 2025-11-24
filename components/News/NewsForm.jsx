@@ -106,7 +106,7 @@ function NewsForm({
     { value: "MATCH_RECAP", label: "Match Recap" },
     { value: "TRENDING", label: "Trending" },
   ];
-  console.log(formik.errors);
+
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>

@@ -78,7 +78,7 @@ const validateSchema = yup.object({
     .min(0, "Draw points must be 0 or more")
     .required("Draw points are required"),
 
-  description: yup.string().required("Description is required"),
+  // description: yup.string().required("Description is required"),
 });
 
 export default function TournamentsForm({
@@ -101,7 +101,7 @@ export default function TournamentsForm({
       winningPoints: tournament?.winningPoints || "",
       losingPoints: tournament?.losingPoints || "",
       drawPoints: tournament?.drawPoints || "",
-      description: tournament?.description || "",
+      // description: tournament?.description || "",
       knockoutImageLight: tournament?.knockoutImageLight || "",
       knockoutImageDark: tournament?.knockoutImageDark || "",
     },
@@ -109,7 +109,7 @@ export default function TournamentsForm({
     onSubmit: async (values) => {
       let dataValues = tournament ? { id: tournament.id, ...values } : values;
       dataValues.country = null;
-      console.log(dataValues);
+
       try {
         await submit(dataValues);
         formType === "add" && formik.resetForm();
@@ -119,13 +119,12 @@ export default function TournamentsForm({
             : t("The Tournament Edited")
         );
       } catch (error) {
-        console.log(error);
         toast.error(error.message);
       }
     },
   });
 
-  // console.log(formik.errors);
+  //
 
   const statusOptions = [
     { value: "UPCOMING", label: t("Upcoming") },
@@ -133,7 +132,6 @@ export default function TournamentsForm({
     { value: "FINISHED", label: t("Finished") },
   ];
 
-  console.log(formik.values);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
@@ -210,12 +208,12 @@ export default function TournamentsForm({
           />
         </FormRow>
 
-        <MarkDown
+        {/* <MarkDown
           label={t("Description")}
           formik={formik}
           name={"description"}
           placeholder={t("Enter Description")}
-        />
+        /> */}
         {/* <TextAreaInput
           name="description"
           onChange={formik.handleChange}

@@ -5,7 +5,7 @@ const withNextIntl = createNextIntlPlugin();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects(parm) {
-    // console.log(parm);
+    //
     return [
       {
         source:

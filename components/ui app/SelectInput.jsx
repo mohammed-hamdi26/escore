@@ -89,7 +89,6 @@ function SelectInput({
               <div>
                 <X
                   onClick={() => {
-                    console.log("name", name);
                     formik.setFieldValue(name, "");
                   }}
                 />

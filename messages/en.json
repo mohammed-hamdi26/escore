@@ -478,5 +478,78 @@
   "toast": {
     "uploaded Photo": "uploaded Photo",
     "error uploading photo": "error uploading photo"
+  },
+  "themes": {
+    "Color Code": "Color Code",
+    "Theme Type": "Theme Type",
+    "Color": "Color",
+    "Add new theme": "Add new theme",
+    "Edit": "Edit",
+    "Delete": "Delete",
+    "DialogEditTitle": "Edit theme",
+    "DialogEditDescription": "Update the theme color. Modify the fields as needed.",
+    "DialogDeleteTitle": "Are you absolutely sure you want to delete this theme?",
+    "DialogDeleteDescription": "This action cannot be undone. This will permanently delete the theme and remove it from the system.",
+    "ThemeType": "Theme Type",
+
+    "Cancel": "Cancel",
+    "EditTheme": "Edit Theme",
+    "AddTheme": "Add Theme",
+    "DialogAddDescription": "Add a new theme to the system. Fill in all the required fields.",
+
+    "Add New theme": "Add New theme",
+    "Theme added successfully": "Theme added successfully",
+    "Theme updated successfully": "Theme updated successfully",
+    "Update": "Update"
+  },
+  "Links": {
+    "Icon": "Icon",
+    "Link added successfully": "Link added successfully",
+    "URL": "URL",
+    "URL Icon": "URL Icon",
+    "URL Link": "URL Link",
+    "URL is required": "URL is required",
+    "Name": "Name",
+    "Name is required": "Name is required",
+    "Icon is required": "Icon is required",
+    "Add new link": "Add new link",
+    "Add Link": "Add Link"
+  },
+  "FavoriteCharacter": {
+    "Game Name": "Game Name",
+    "Name": "Name",
+    "Name is required": "Name is required",
+    "Icon": "Icon",
+    "Add new Favorite Character": "Add new Favorite Character",
+    "Add Favorite Character": "Add Favorite Character",
+    "Game Name is required": "Game Name is required",
+    "Icon is required": "Icon is required"
+  },
+  "Awards": {
+    "title": "Title",
+    "titlePlaceholder": "Title",
+
+    "image": "Image",
+    "imagePlaceholder": "Image Link",
+
+    "game": "Game",
+    "gamePlaceholder": "Games",
+
+    "tournament": "Tournament",
+    "tournamentPlaceholder": "Tournament",
+
+    "achievedDate": "Achieved Date",
+    "datePlaceholder": "Date",
+
+    "description": "Description",
+    "descriptionPlaceholder": "Description",
+    "Add new Award": "اضافة جائزة جديدة",
+
+    "Add Award": "Add new Award",
+    "Awards added successfully": "Awards added successfully",
+    "title is required": "title is required",
+    "image is required": "image is required",
+    "description is required": "description is required",
+    "achievedDate is required": "achievedDate is required"
   }
 }

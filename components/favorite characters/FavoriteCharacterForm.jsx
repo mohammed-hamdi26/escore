@@ -9,10 +9,11 @@ import { Button } from "../ui/button";
 import FileInput from "../ui app/FileInput";
 import { addFavoriteCharacter } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import { Spinner } from "../ui/spinner";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
-  icon: Yup.string().url().required("Icon is required"),
+  icon: Yup.string().required("Icon is required"),
   gameName: Yup.string().required("Game Name is required"),
 });
 const initialValues = {
@@ -28,6 +29,7 @@ function FavoriteCharacterForm({
   teams,
   games,
   favoriteCharacterFor = "player",
+  t,
 }) {
   const formik = useFormik({
     initialValues,
@@ -41,48 +43,53 @@ function FavoriteCharacterForm({
         formik.resetForm();
         toast.success("Favorite character added successfully");
       } catch (error) {
-        console.log(error);
         toast.error(error.message);
       }
     },
     validationSchema,
   });
-  console.log(formik.errors);
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <InputApp
         value={formik.values.name}
         onBlur={formik.handleBlur}
-        label="Name"
+        label={t("Name")}
         name="name"
         onChange={formik.handleChange}
-        placeholder={"Name"}
-        error={formik.touched.name && formik.errors.name}
+        placeholder={t("Name")}
+        error={
+          formik.touched.name && formik.errors.name && t(formik.errors.name)
+        }
         disabled={formik.isSubmitting}
       />
 
       <FileInput
         value={formik.values.icon}
-        label="Icon"
+        label={t("Icon")}
         typeFile="image"
-        placeholder={"Icon"}
+        placeholder={t("Icon")}
         formik={formik}
         name="icon"
         disabled={formik.isSubmitting}
         flexGrow="flex-1"
+        error={
+          formik.touched.icon && formik.errors.icon && t(formik.errors.icon)
+        }
       />
 
       <SelectInput
-        label="Game Name"
+        label={t("Game Name")}
         name={"gameName"}
+        formik={formik}
         onChange={(value) => formik.setFieldValue("gameName", value)}
-        placeholder={"Game Name"}
+        placeholder={t("Game Name")}
         value={formik.values.gameName}
         error={formik.touched.player && formik.errors.player}
         options={mappedArrayToSelectOptions(games, "name", "name")}
         disabled={formik.isSubmitting}
       />
-      <SelectInput
+      {/* <SelectInput
         label="Player"
         name={favoriteCharacterFor === "player" ? "player" : "team"}
         onChange={(value) =>
@@ -97,7 +104,7 @@ function FavoriteCharacterForm({
           "id"
         )}
         disabled={formik.isSubmitting}
-      />
+      /> */}
 
       <div className="flex justify-end">
         <Button
@@ -107,7 +114,7 @@ function FavoriteCharacterForm({
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          Add Link
+          {formik.isSubmitting ? <Spinner /> : t("Add Favorite Character")}
         </Button>
       </div>
     </form>

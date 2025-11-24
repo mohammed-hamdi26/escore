@@ -1,7 +1,9 @@
+"use client";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import { DialogContent, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import AwardsForm from "./AwardsForm";
+import { useTranslations } from "next-intl";
 
 function AwardsPageContainer({
   awardsType = "player",
@@ -11,6 +13,7 @@ function AwardsPageContainer({
   games,
   id,
 }) {
+  const t = useTranslations("Awards");
   return (
     <div className="space-y-8   ">
       <Dialog>
@@ -20,11 +23,11 @@ function AwardsPageContainer({
               "bg-green-primary text-white cursor-pointer hover:bg-green-primary/70"
             }
           >
-            Add new Award
+            {t("Add new Award")}
           </Button>
         </DialogTrigger>
         <DialogContent className={" max-h-[80vh] overflow-y-auto"}>
-          <DialogTitle>Add new Award</DialogTitle>
+          <DialogTitle>{t("Add new Award")}</DialogTitle>
           <AwardsForm
             id={id}
             tournaments={tournaments}
@@ -32,6 +35,7 @@ function AwardsPageContainer({
             games={games}
             players={players}
             awardsType={awardsType}
+            t={t}
           />
         </DialogContent>
       </Dialog>

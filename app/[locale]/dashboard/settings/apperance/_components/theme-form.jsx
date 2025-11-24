@@ -12,6 +12,7 @@ import {
   ColorPickerHue,
   ColorPickerSelection,
 } from "./color-picker";
+import { Spinner } from "@/components/ui/spinner";
 
 function ThemeForm({
   sucessMessage,
@@ -19,6 +20,7 @@ function ThemeForm({
   setThemes,
   setOpen,
   currentTheme,
+  t,
 }) {
   const [selectedColor, setSelectedColor] = useState(currentTheme?.color || "");
   const formik = useFormik({
@@ -78,7 +80,7 @@ function ThemeForm({
             { value: "dark", label: "Dark" },
             { value: "light", label: "Light" },
           ]}
-          label="Theme type"
+          label={t("ThemeType")}
           value={formik.values.typeTheme}
           onChange={(value) => formik.setFieldValue("typeTheme", value)}
           onBlur={() => formik.setFieldTouched("typeTheme", true)}
@@ -94,11 +96,13 @@ function ThemeForm({
           type="submit"
           className="text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-[#2ca54d]"
         >
-          {formik.isSubmitting
-            ? "Submitting..."
-            : formType === "add"
-            ? "Submit"
-            : "Update"}
+          {formik.isSubmitting ? (
+            <Spinner />
+          ) : formType === "add" ? (
+            t("Submit")
+          ) : (
+            t("Update")
+          )}
         </Button>
       </div>
     </form>

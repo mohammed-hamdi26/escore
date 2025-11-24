@@ -9,9 +9,11 @@ import FileInput from "../ui app/FileInput";
 import InputApp from "../ui app/InputApp";
 import SelectInput from "../ui app/SelectInput";
 import { Button } from "../ui/button";
+import { useTranslations } from "next-intl";
+import { Spinner } from "../ui/spinner";
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
-  icon: Yup.string().url().required("Icon is required"),
+  icon: Yup.string().required("Icon is required"),
   url: Yup.string().url().required("URL is required"),
 });
 const initialValues = {
@@ -23,6 +25,8 @@ const initialValues = {
 };
 
 function LinksForm({ players, teams, id, linksType = "player" }) {
+  const t = useTranslations("Links");
+
   const formik = useFormik({
     initialValues,
     onSubmit: async (values) => {
@@ -33,45 +37,54 @@ function LinksForm({ players, teams, id, linksType = "player" }) {
       try {
         await addLink(linkData);
         formik.resetForm();
-        toast.success("Link added successfully");
+        toast.success(t("Link added successfully"));
       } catch (error) {
-        console.log(error);
-        toast.error(error.message);
+        t.error(error.message);
       }
     },
     validationSchema,
   });
-  console.log(formik.errors);
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <InputApp
-        label="Name"
+        label={t("Name")}
         name="name"
         onChange={formik.handleChange}
-        placeholder={"Name"}
+        placeholder={t("Name")}
         error={formik.touched.name && formik.errors.name}
         disabled={formik.isSubmitting}
+        className={`p-0 border-0 focus:outline-none `}
+        backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+        textColor="text-[#677185]"
+        value={formik.values.name}
       />
 
       <FileInput
         formik={formik}
         name="icon"
-        typeFile="icon"
+        // typeFile="icon"
         disabled={formik.isSubmitting}
-        flexGrow="flex-0"
+        flexGrow="flex-1"
+        placeholder={t("URL Icon")}
+        label={t("Icon")}
       />
       <InputApp
-        label="URL"
+        label={t("URL")}
         name="url"
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        placeholder={"URL"}
+        placeholder={t("URL Link")}
         error={
-          formik?.errors?.url && formik?.touched?.url && formik?.errors?.url
+          formik?.errors?.url && formik?.touched?.url && t(formik?.errors?.url)
         }
         disabled={formik.isSubmitting}
+        className={`p-0 border-0 focus:outline-none `}
+        backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+        textColor="text-[#677185]"
+        value={formik.values.url}
       />
-      <SelectInput
+      {/* <SelectInput
         label="Player"
         name={linksType === "player" ? "player" : "team"}
         onChange={formik.handleChange}
@@ -84,7 +97,7 @@ function LinksForm({ players, teams, id, linksType = "player" }) {
           "id"
         )}
         disabled={true}
-      />
+      /> */}
 
       <div className="flex justify-end">
         <Button
@@ -94,7 +107,7 @@ function LinksForm({ players, teams, id, linksType = "player" }) {
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          Add Link
+          {formik.isSubmitting ? <Spinner /> : t("Add Link")}
         </Button>
       </div>
     </form>

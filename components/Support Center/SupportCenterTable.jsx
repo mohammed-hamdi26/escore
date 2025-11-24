@@ -8,7 +8,6 @@ import imagePerson from "../../public/images/dashboard/avatar.jpg";
 import Image from "next/image";
 
 function SupportCenterTable({ tickets }) {
-  console.log(tickets);
   return (
     <div>
       <Table showHeader={false} grid_cols="grid-cols-[0.5fr_0.5fr_0.7fr_2fr]">

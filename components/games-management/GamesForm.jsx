@@ -90,7 +90,7 @@ function GamesForm({
 
       try {
         const res = await submitFunction(dataValues);
-        console.log(res);
+
         typeForm === "add" && formik.resetForm();
         toast.success(
           typeForm === "add" ? "The Game is Added" : "The Game Is Edited"
@@ -104,7 +104,6 @@ function GamesForm({
       }
     },
   });
-  console.log(formik.errors);
 
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>

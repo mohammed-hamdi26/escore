@@ -10,7 +10,7 @@ function ToggleThemeMode() {
 
   useLayoutEffect(() => {
     if (typeof window !== "undefined") {
-      // console.log(localStorage.getItem("theme"));
+      // );
     }
   }, []);
 
