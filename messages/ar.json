@@ -123,7 +123,20 @@
     "Player Photo": "صورة اللاعب",
     "Enter Player Photo": "ادخل صورة اللاعب",
     "Yes": "نعم",
-    "No": "لا"
+    "No": "لا",
+
+    "firstNameRequired": "الاسم الأول مطلوب",
+    "lastNameRequired": "اسم العائلة مطلوب",
+
+    "birthDateRequired": "تاريخ الميلاد مطلوب",
+    "nationalityRequired": "الجنسية مطلوبة",
+    "photoRequired": "صورة اللاعب مطلوبة",
+    "photoDarkRequired": "صورة اللاعب (الوضع الداكن) مطلوبة",
+
+    "earningsNegative": "لا يمكن أن تكون الأرباح رقمًا سالبًا",
+    "achievementsNegative": "لا يمكن أن تكون الإنجازات رقمًا سالبًا",
+    "rankingNegative": "لا يمكن أن يكون التصنيف رقمًا سالبًا",
+    "marketValueNegative": "لا يمكن أن تكون القيمة السوقية رقمًا سالبًا"
   },
   "PlayersTable": {
     "Edit": "تعديل",
@@ -259,7 +272,15 @@
     "Select Games": "اختر الألعاب",
 
     "Tournaments": "البطولات",
-    "Select Tournaments": "اختر البطولات"
+    "Select Tournaments": "اختر البطولات",
+
+    "newsTypeInvalid": "يجب أن يكون نوع الخبر عامًا أو ملخص مباراة أو شائعًا",
+    "statusInvalid": "يجب أن تكون الحالة منشورة أو مجدولة",
+    "authorNameRequired": "اسم المؤلف مطلوب",
+    "contentRequired": "المحتوى مطلوب",
+    "imageRequired": "الصورة مطلوبة",
+
+    "titleRequired": "العنوان مطلوب"
   },
   "TournamentForm": {
     "Tournament name is required": "اسم البطولة مطلوب",
@@ -392,6 +413,7 @@
 
     "Stage": "المرحلة",
     "Enter Stage": "أدخل المرحلة",
+    "Stage is required": "المرحلة مطلوبة",
 
     "Venue Type": "نوع المكان",
 
@@ -410,7 +432,18 @@
     "Adding": "اضافة...",
     "Editing": "تعديل...",
     "Edit Match": "تعديل المباراة",
-    "Add Match": "اضافة مباراة"
+    "Add Match": "اضافة مباراة",
+    "Select Game": "اختر اللعبة",
+    "Select Tournament": "اختر البطولة",
+    "Team 1 Score": "نتيجة الفريق 1",
+    "Team 2 Score": "نتيجة الفريق 2",
+    "Score cannot be negative": "لا يمكن ان يكون النتيجة سالبة",
+    "Date": "التاريخ",
+    "Match Time": "وقت المباراة",
+    "Duration": "المدة",
+    "VOD URL": "رابط VOD",
+    "Enter VOD URL": "ادخل رابط VOD",
+    "Pick a date": "اختر تاريخ"
   },
   "MatchesTable": {
     "Date": "التاريخ",
@@ -437,5 +470,9 @@
     "Something went wrong!": "حدث خطأ",
     "Try again": "حاول مرة اخرى",
     "Home": "الصفحة الرئيسية"
+  },
+  "toast": {
+    "uploaded Photo": "تم تحميل الصورة",
+    "error uploading photo": "حدث خطأ في تحميل الصورة"
   }
 }

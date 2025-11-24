@@ -7,6 +7,8 @@ import InputApp from "./InputApp";
 
 import { ChevronUp, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
+import { Spinner } from "../ui/spinner";
 
 const { Input } = require("../ui/input");
 const { Label } = require("../ui/label");
@@ -21,18 +23,20 @@ function FileInput({
   disabled,
   typeFile = "image",
   flexGrow = "flex-1",
-  t,
+  error,
   ...props
 }) {
   const [file, setFiles] = useState(null);
   const [url, setUrl] = useState(formik?.values?.[name]);
+  const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations("toast");
 
   async function handleAddFile(e) {
     if (e.target.files && e.target.files.length > 0) {
       setFiles(e.target.files[0]);
     }
   }
-  // console.log(name);
+  console.log(isLoading);
 
   return (
     <div className={flexGrow + " "}>
@@ -55,9 +59,12 @@ function FileInput({
             <PreviewImage file={file} />
             {
               <Button
-                disabled={disabled}
-                className={"bg-green-primary hover:bg-green-primary/70 "}
+                disabled={disabled || isLoading}
+                className={
+                  "bg-green-primary hover:bg-green-primary/70 disabled:bg-green-primary/20 disabled:cursor-not-allowed "
+                }
                 onClick={async () => {
+                  setIsLoading(true);
                   try {
                     const formData = new FormData();
                     formData.append("file", file);
@@ -67,16 +74,21 @@ function FileInput({
                     toast.success(t("uploaded Photo"));
                     return url;
                   } catch (e) {
-                    // console.log(e);
-                    toast.error("error");
+                    console.log(e);
+                    toast.error(t("error uploading photo"));
+                  } finally {
+                    setIsLoading(false);
                   }
                 }}
               >
-                <ChevronUp />
+                {isLoading ? <Spinner /> : <ChevronUp />}
               </Button>
             }
             <Button
-              className={"bg-red-700 hover:bg-red-700/70 "}
+              disabled={disabled || isLoading}
+              className={
+                "bg-red-700 hover:bg-red-700/70  disabled:bg-red-700/20 disabled:cursor-not-allowed "
+              }
               onClick={() => {
                 setFiles(null);
                 setUrl("");
@@ -92,8 +104,7 @@ function FileInput({
           value={formik.values?.[name]}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          // name={"logo"}
-          t={t}
+          error={error}
           hidden={typeFile !== "image" ? true : false}
           name={name}
           type={"text"}
@@ -140,12 +151,13 @@ function PreviewImage({ file }) {
   );
 }
 
-function Button({ children, className, onClick }) {
+function Button({ children, className, onClick, disabled }) {
   return (
     <button
       className={` text-white rounded-full size-8 flex justify-center items-center transition duration-300 cursor-pointer ${className} `}
       type="button"
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>

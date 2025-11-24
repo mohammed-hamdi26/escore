@@ -8,6 +8,8 @@ import {
 import { Label } from "../ui/label";
 import Image from "next/image";
 import imagePhoto from "@/public/images/a-flat-vector-lettermark-logo-design-sho_M1U1HI8tTvOIgjZLmcU6eg_gSbp1v7WSyql-yuko9RTsQ-removebg-preview.png";
+import { X } from "lucide-react";
+import { useLocale } from "next-intl";
 function SelectInput({
   t,
   placeholder,
@@ -20,15 +22,10 @@ function SelectInput({
   onChange,
   value,
   disabled,
+  formik,
   flexGrow = "flex-1",
 }) {
-  // const mappedOptions = options.map((option) => ({
-  //   label: option?.name ? option?.name : option?.label,
-  //   value: option?.value,
-  // }));
-  if (name === "teams") {
-    console.log(options);
-  }
+  const locale = useLocale();
   return (
     <div className={`${flexGrow}`}>
       {label && (
@@ -42,48 +39,63 @@ function SelectInput({
       <div className="flex items-center gap-4  ">
         {icon && icon}
         <div className="flex-1 space-y-2">
-          <Select
-            className="text-black  dark:text-[#677185] p-6 "
-            onValueChange={onChange}
-            onOpenChange={onBlur}
-            name={name}
-            value={value}
-            disabled={disabled}
-          >
-            <SelectTrigger
-              id={name}
-              className={
-                " bg-dashboard-box w-full text-black dark:text-[#677185]  dark:bg-[#0F1017] border-0 p-6 "
-              }
+          <div className="flex items-center gap-2">
+            <Select
+              className="text-black  dark:text-[#677185] p-6 "
+              onValueChange={onChange}
+              // onOpenChange={onBlur}
+
+              name={name}
+              value={value}
+              disabled={disabled}
             >
-              <SelectValue
-                placeholder={placeholder}
-                className="text-[#677185]"
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {options.map((option) => (
-                <SelectItem
-                  className={"flex gap-4"}
-                  key={option?.value}
-                  value={option?.value}
-                >
-                  {option?.image && (
-                    <img
-                      src={option?.image}
-                      className="overflow-hidden"
-                      width={25}
-                      height={25}
-                      alt=""
-                    />
-                  )}{" "}
-                  {t
-                    ? t(option?.label || option?.name)
-                    : option?.label || option?.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <SelectTrigger
+                onBlur={onBlur}
+                dir={locale}
+                id={name}
+                className={
+                  " bg-dashboard-box w-full text-black dark:text-[#677185]   dark:bg-[#0F1017] border-0 p-6 "
+                }
+              >
+                <SelectValue
+                  placeholder={placeholder}
+                  className="text-[#677185]"
+                />
+              </SelectTrigger>
+              <SelectContent dir={locale}>
+                {options.map((option) => (
+                  <SelectItem
+                    className={"flex gap-4 "}
+                    key={option?.value}
+                    value={option?.value}
+                  >
+                    {option?.image && (
+                      <img
+                        src={option?.image}
+                        className="overflow-hidden"
+                        width={25}
+                        height={25}
+                        alt=""
+                      />
+                    )}{" "}
+                    {t
+                      ? t(option?.label || option?.name)
+                      : option?.label || option?.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {value && name && (
+              <div>
+                <X
+                  onClick={() => {
+                    console.log("name", name);
+                    formik.setFieldValue(name, "");
+                  }}
+                />
+              </div>
+            )}
+          </div>
           {error && <p className="text-red-600">{t ? t(error) : error}</p>}
         </div>
       </div>

@@ -41,7 +41,11 @@ function PlayersTable({ players, columns, search, numOfPlayers }) {
               {player.firstName} {player.lastName}
             </Table.Cell>
             <Table.Cell>
-              <Image src={imageIcon} width={40} height={40} />
+              <img
+                className="rounded-full overflow-hidden size-12"
+                src={`${process.env.NEXT_PUBLIC_BASE_URL}${player?.photo}`}
+                alt=""
+              />
             </Table.Cell>
             <Table.Cell>{player.birthDate}</Table.Cell>
             <Table.Cell>{player.nationality}</Table.Cell>
@@ -59,7 +63,7 @@ function PlayersTable({ players, columns, search, numOfPlayers }) {
                 <Button
                   disabled={isLoading}
                   className={
-                    "text-white bg-red-800 rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
+                    "text-white bg-[#3A469D] rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
                   }
                   onClick={async () => {
                     try {

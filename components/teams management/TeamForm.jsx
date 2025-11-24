@@ -20,6 +20,9 @@ import TextAreaInput from "../ui app/TextAreaInput";
 import { Button } from "../ui/button";
 import ComboboxInput from "../ui app/ComboBoxInput";
 import MarkDown from "../ui app/MarkDown";
+import Loading from "../ui app/Loading";
+import LoadingScreen from "../ui app/loading-screen";
+import { Spinner } from "../ui/spinner";
 
 const validationSchema = yup.object({
   name: yup.string().required("Required"),
@@ -29,11 +32,10 @@ const validationSchema = yup.object({
   logoDark: yup.string().required("Required"),
   description: yup.string().required("Required"),
   foundedDate: yup.string().required("Required"),
-  numberOfFollowers: yup.number().required("Required"),
+  // numberOfFollowers: yup.number().required("Required"),
   worldRanking: yup.number().required("Required"),
   numberOfAchievements: yup.number().required("Required"),
   // captain: yup.object().required("Required"),
-  subscribe: yup.boolean(),
 });
 
 function TeamForm({
@@ -60,11 +62,12 @@ function TeamForm({
       logoDark: team?.logoDark || "",
       description: team?.description || "",
       foundedDate: team?.foundedDate || "",
-      numberOfFollowers: team?.numberOfFollowers || "",
+      // numberOfFollowers: team?.numberOfFollowers || "",
+
       worldRanking: team?.worldRanking || "",
       numberOfAchievements: team?.numberOfAchievements || "",
       captain: team?.captain || null,
-      subscribe: team?.subscribe || "false",
+
       tournaments: team?.tournaments || [],
       games: team?.games || [],
       matches: team?.matches || [],
@@ -75,7 +78,7 @@ function TeamForm({
     onSubmit: async (values) => {
       let dataValues = team ? { id: team.id, ...values } : values;
 
-      // console.log("data", dataValues);
+      console.log("data", dataValues);
       try {
         const res = await submit(dataValues);
 
@@ -91,9 +94,8 @@ function TeamForm({
       }
     },
   });
-  console.log("formik ", formik.values);
-  console.log("formik errors", formik.errors);
-  console.log(playersOptions);
+
+  console.log(formik.errors);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>
@@ -124,20 +126,20 @@ function TeamForm({
             value={formik?.values?.country}
             icon={
               <CountryIcon
-                className="fill-[#677185]"
-                color={"text-[#677185]"}
-                height="44"
-                width="44"
+              className="fill-[#677185]"
+              color={"text-[#677185]"}
+              height="44"
+              width="44"
               />
-            }
-            options={countries?.countries || []}
-            name={"country"}
-            label={t("Country")}
-            placeholder={t("Select Country")}
-            error={formik.touched.country && formik.errors.country}
-            // onBlur={formik.handleBlur}
-            onChange={(value) => formik.setFieldValue("country", value)}
-          /> */}
+              }
+              options={countries?.countries || []}
+              name={"country"}
+              label={t("Country")}
+              placeholder={t("Select Country")}
+              error={formik.touched.country && formik.errors.country}
+              // onBlur={formik.handleBlur}
+              onChange={(value) => formik.setFieldValue("country", value)}
+              /> */}
           <InputApp
             value={formik?.values?.region}
             onChange={formik.handleChange}
@@ -164,6 +166,12 @@ function TeamForm({
             // }}
           />
         </FormRow>
+        <MarkDown
+          name={"description"}
+          label={t("Description")}
+          placeholder={t("Enter Team Description")}
+          formik={formik}
+        />
       </FormSection>
       <FormSection>
         <FormRow>
@@ -214,16 +222,10 @@ function TeamForm({
           disabled={formik.isSubmitting}
           disabledDate={{}}
         />
-        <MarkDown
-          name={"description"}
-          label={t("Description")}
-          placeholder={t("Enter Team Description")}
-          formik={formik}
-        />
       </FormSection>
       <FormSection>
-        <FormRow>
-          <InputApp
+        {/* <FormRow> */}
+        {/* <InputApp
             value={formik?.values?.numberOfFollowers}
             onChange={formik.handleChange}
             label={t("Number of Followers")}
@@ -252,8 +254,8 @@ function TeamForm({
             //   );
             //   formik.setFieldTouched("numberOfFollowers", true);
             // }}
-          />
-        </FormRow>
+          /> */}
+        {/* </FormRow> */}
         <FormRow>
           <InputApp
             value={formik?.values?.worldRanking}
@@ -317,21 +319,6 @@ function TeamForm({
       </FormSection>
       <FormSection>
         <FormRow>
-          {/* <SelectInput
-            value={formik.values.subscribe}
-            onChange={(value) => {
-              formik.setFieldValue("subscribe", value);
-            }}
-            // onChange={formik.handleChange}
-            label={t("Subscribe")}
-            name={"subscribe"}
-            error={formik.touched.subscribe && formik.errors.subscribe}
-            placeholder={t("Select Subscription Status")}
-            options={[
-              { value: "true", label: t("Subscribed") },
-              { value: "false", label: t("Not Subscribed") },
-            ]}
-          /> */}
           <SelectInput
             value={formik?.values?.captain?.id}
             onChange={(value) => {
@@ -429,11 +416,13 @@ function TeamForm({
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          {formik.isSubmitting
-            ? "Submitting..."
-            : formType === "add"
-            ? t("Submit")
-            : t("Edit")}
+          {formik.isSubmitting ? (
+            <Spinner className="w-10 h-10 text-white" />
+          ) : formType === "add" ? (
+            t("Submit")
+          ) : (
+            t("Edit")
+          )}
         </Button>
       </div>
     </form>

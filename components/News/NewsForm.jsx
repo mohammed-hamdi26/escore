@@ -25,19 +25,24 @@ import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import MarkDown from "../ui app/MarkDown";
 
 const validationSchema = yup.object({
-  title: yup.string().required("Required"),
-  content: yup.string().required("Required"),
+  title: yup.string().required("titleRequired"),
+  content: yup.string().required("contentRequired"),
   summary: yup.string(),
-  image: yup.string(),
+  image: yup.string().required("imageRequired"),
   imageDark: yup.string(),
-  videoUrl: yup.string(),
-  // publishDate: yup.string().required("Required"),
-  authorName: yup.string().required("Required"),
+  // videoUrl: yup.string(),
+  publishDate: yup.string().when("status", {
+    is: "SCHEDULED",
+    then: yup.string().required("publishDateRequired"),
+  }),
+  authorName: yup.string().required("authorNameRequired"),
   authorPicture: yup.string(),
   authorProfile: yup.string(),
   externalUrl: yup.string(),
-  status: yup.string(),
-  newsType: yup.string(),
+  status: yup.string().oneOf(["SCHEDULED", "PUBLISHED"], "statusInvalid"),
+  newsType: yup
+    .string()
+    .oneOf(["GENERAL", "MATCH_RECAP", "TRENDING"], "newsTypeInvalid"),
   // players: yup.string(),
   // transfers: yup.string(),
 });
@@ -63,7 +68,7 @@ function NewsForm({
       authorPicture: newData?.authorPicture || "",
       authorProfile: newData?.authorProfile || "",
       externalUrl: newData?.externalUrl || "",
-      status: newData?.status || "",
+      status: newData?.status || "PUBLISHED",
       newsType: newData?.newsType || "",
       players: newData?.players || [],
       transfers: newData?.transfers || [],
@@ -71,9 +76,8 @@ function NewsForm({
       tournaments: newData?.tournaments || [],
       teams: newData?.teams || [],
       games: newData?.games || [],
-      notify: true,
     },
-    validationSchema: validationSchema,
+    validationSchema,
     onSubmit: async (values) => {
       try {
         let dataValues = newData ? { id: newData?.id, ...values } : values;
@@ -98,12 +102,11 @@ function NewsForm({
 
   const newsTypeOptions = [
     { value: "GENERAL", label: "General News" },
-    { value: "TRANSFER", label: "Transfer News" },
+    // { value: "TRANSFER", label: "Transfer News" },
     { value: "MATCH_RECAP", label: "Match Recap" },
     { value: "TRENDING", label: "Trending" },
   ];
   console.log(formik.errors);
-  console.log(formik.values);
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
       <FormSection>
@@ -119,13 +122,23 @@ function NewsForm({
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<Title height="31" width="31" color={"text-[#677185]"} />}
-            error={formik.touched.title && formik.errors.title}
+            error={
+              (formik.touched.title &&
+                formik.errors.title &&
+                t(formik.errors.title)) ||
+              ""
+            }
             onBlur={formik.handleBlur}
           />
         </FormRow>
 
         <FormRow>
           <MarkDown
+            error={
+              formik?.touched?.content &&
+              formik?.errors?.content &&
+              t(formik?.errors?.content)
+            }
             name="content"
             formik={formik}
             label={t("Content")}
@@ -138,7 +151,7 @@ function NewsForm({
               />
             }
           />
-          <MarkDown
+          {/* <MarkDown
             name="summary"
             formik={formik}
             label={t("Summary")}
@@ -151,7 +164,7 @@ function NewsForm({
             }
             error={formik.touched.summary && formik.errors.summary}
             onBlur={formik.handleBlur}
-          />
+          /> */}
         </FormRow>
       </FormSection>
 
@@ -164,6 +177,11 @@ function NewsForm({
             label={t("Image")}
             placeholder={t("Enter Image URL")}
             icon={<ImageIcon />}
+            error={
+              formik.touched.image &&
+              formik.errors.image &&
+              t(formik.errors.image)
+            }
           />
           <FileInput
             formik={formik}
@@ -171,9 +189,10 @@ function NewsForm({
             label={t("Image Dark")}
             placeholder={t("Enter Dark Mode Image URL")}
             icon={<ImageIcon />}
+            error={formik.touched.imageDark && formik.errors.imageDark}
           />
         </FormRow>
-        <FormRow>
+        {/* <FormRow>
           <InputApp
             name={"videoUrl"}
             onChange={formik.handleChange}
@@ -188,7 +207,7 @@ function NewsForm({
             error={formik.touched.videoUrl && formik.errors.videoUrl}
             onBlur={formik.handleBlur}
           />
-        </FormRow>
+        </FormRow> */}
       </FormSection>
 
       {/* Author Information */}
@@ -212,7 +231,11 @@ function NewsForm({
                 color={"text-[#677185]"}
               />
             }
-            error={formik.touched.authorName && formik.errors.authorName}
+            error={
+              formik.touched.authorName &&
+              formik.errors.authorName &&
+              t(formik.errors.authorName)
+            }
             onBlur={formik.handleBlur}
           />
           <FileInput
@@ -235,7 +258,11 @@ function NewsForm({
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<Writer color={"text-[#677185]"} />}
-            error={formik.touched.authorProfile && formik.errors.authorProfile}
+            error={
+              formik.touched.authorProfile &&
+              formik.errors.authorProfile &&
+              t(formik.errors.authorProfile)
+            }
             onBlur={formik.handleBlur}
           />
         </FormRow>
@@ -255,7 +282,11 @@ function NewsForm({
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<Link width={31} height={31} className={"text-[#677185]"} />}
-            error={formik.touched.externalUrl && formik.errors.externalUrl}
+            error={
+              formik.touched.externalUrl &&
+              formik.errors.externalUrl &&
+              t(formik.errors.externalUrl)
+            }
             onBlur={formik.handleBlur}
           />
         </FormRow>
@@ -265,6 +296,7 @@ function NewsForm({
       <FormSection>
         <FormRow>
           <SelectInput
+            formik={formik}
             t={t}
             name={"status"}
             onChange={(value) => formik.setFieldValue("status", value)}
@@ -276,6 +308,7 @@ function NewsForm({
             onBlur={() => formik.setFieldTouched("status", true)}
           />
           <SelectInput
+            formik={formik}
             t={t}
             name={"newsType"}
             onChange={(value) => formik.setFieldValue("newsType", value)}
@@ -295,6 +328,8 @@ function NewsForm({
         <FormSection>
           <FormRow>
             <DatePicker
+              disabled={formik.isSubmitting}
+              disabledDate={{}}
               formik={formik}
               name={"publishDate"}
               label={t("Publish Date")}
