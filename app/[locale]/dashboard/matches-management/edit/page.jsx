@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 const columns = [
   { id: "team1", header: "Team 1" },
   { id: "team2", header: "Team 2" },
-  { id: "time", header: "Time" },
+  { id: "stage", header: "Stage" },
   { id: "date", header: "Date" },
 ];
 
