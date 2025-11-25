@@ -478,6 +478,7 @@
     "Team 1": "Team 1",
     "Team 2": "Team 2",
     "Edit": "Edit",
+    "Stage": "Stage",
     "Delete": "Delete"
   },
   "NewsTable": {
@@ -627,5 +628,15 @@
     "Registration failed": "Registration failed",
     "Login": "Login",
     "Already have an account?": "Already have an account?"
+  },
+
+  "SupportCenter": {
+    "Answer": "Answer",
+    "Type your message": "Type your message...",
+    "Message sent successfully": "Message sent successfully",
+    "Date": "Date",
+    "Email": "Email",
+    "Status": "Status",
+    "Description": "Description"
   }
 }

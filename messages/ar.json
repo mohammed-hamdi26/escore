@@ -475,6 +475,7 @@
     "Team 1": "الفريق 1",
     "Team 2": "الفريق 2",
     "Edit": "تعديل",
+    "Stage": "المرحلة",
     "Delete": "حذف"
   },
   "NewsTable": {
@@ -627,5 +628,15 @@
     "Login": "تسجيل الدخول",
 
     "Already have an account?": "هل لديك حساب بالفعل؟"
+  },
+
+  "SupportCenter": {
+    "Answer": "الرد",
+    "Type your message": "اكتب ردك هنا...",
+    "Message sent successfully": "تم ارسال الرسالة بنجاح",
+    "Date": "التاريخ",
+    "Email": "البريد الإلكتروني",
+    "Status": "الحالة",
+    "Description": "الوصف"
   }
 }

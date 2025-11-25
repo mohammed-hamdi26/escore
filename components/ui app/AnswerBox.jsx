@@ -11,7 +11,7 @@ import { replayTicket } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import LoadingScreen from "./loading-screen";
 import { Spinner } from "../ui/spinner";
-function AnswerBox({ ticket = {}, onClose }) {
+function AnswerBox({ ticket = {}, onClose, t }) {
   return (
     <div className="bg-dashboard-box dark:bg-[#10131D]  mx-auto  sm:w-[702px] h-[500px] rounded-3xl flex flex-col overflow-hidden ">
       <div className="flex items-center justify-end p-4">
@@ -44,7 +44,7 @@ function AnswerBox({ ticket = {}, onClose }) {
           />
         )}
       </div>
-      <SendMessageInput id={ticket.id} />
+      <SendMessageInput t={t} id={ticket.id} />
     </div>
   );
 }
@@ -73,7 +73,7 @@ function PersonMessage({ info, typePerson = "question" }) {
     </div>
   );
 }
-function SendMessageInput({ id }) {
+function SendMessageInput({ id, t }) {
   const formik = useFormik({
     initialValues: {
       replyMessage: "",
@@ -83,7 +83,7 @@ function SendMessageInput({ id }) {
       try {
         await replayTicket(id, { ...values, id: id });
         formik.resetForm();
-        toast.success("Message sent successfully");
+        toast.success(t("Message sent successfully"));
       } catch (error) {
         toast.error(error.message);
       }
@@ -107,7 +107,7 @@ function SendMessageInput({ id }) {
             " text-[#10131D] dark:text-white  dark:bg-[#10131D]  shadow-none border-none focus:outline-none "
           }
           type="text"
-          placeholder="Type your message..."
+          placeholder={t("Type your message")}
         />
         <div className="flex items-center gap-3">
           {/* <Link className="cursor-pointer h-4 w-4" />
@@ -118,9 +118,9 @@ function SendMessageInput({ id }) {
             className="bg-green-primary cursor-pointer size-9 rounded-full flex justify-center items-center hover:bg-green-primary/70 "
           >
             {formik.isSubmitting ? (
-              <Spinner className="w-10 h-10" />
+              <Spinner color="white" />
             ) : (
-              <Send className="text-white" />
+              <Send className="text-white rtl:-rotate-90" />
             )}
           </Button>
         </div>
