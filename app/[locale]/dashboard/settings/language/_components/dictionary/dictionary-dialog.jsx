@@ -16,14 +16,14 @@ function DictionaryDialog({
   languageCode,
   word = undefined,
   translation = undefined,
-  setDictionary
+  setDictionary,
+  t,
 }) {
   const [open, setOpen] = useState(false);
-  const dialogTitle = formType === "add" ? "Add New word" : `Edit: ${word}`;
+  const dialogTitle =
+    formType === "add" ? t("DialogAddTitle") : `${t("Edit")} : ${word}`;
   const dialogDescription =
-    formType === "add"
-      ? "Add a new word to the system. Fill in all the required fields."
-      : "Update the word translation. Modify the fields as needed.";
+    formType === "add" ? t("DialogAddDescription") : t("DialogEditDescription");
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -33,18 +33,19 @@ function DictionaryDialog({
           <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
         <DictionaryForm
-            formType={formType}
-            code={languageCode}
-            initialWord={word}
-            initialTranslation={translation}
-            successMessage={
-              formType === "add"
-                ? "Word added successfully"
-                : "Word translation updated successfully"
-            }
-            setOpen={setOpen}
-            setDictionary={setDictionary}
-          />
+          t={t}
+          formType={formType}
+          code={languageCode}
+          initialWord={word}
+          initialTranslation={translation}
+          successMessage={
+            formType === "add"
+              ? t("Word added successfully")
+              : t("Word translation updated successfully")
+          }
+          setOpen={setOpen}
+          setDictionary={setDictionary}
+        />
       </DialogContent>
     </Dialog>
   );

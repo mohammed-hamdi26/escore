@@ -8,7 +8,8 @@
     "Login": "Login",
     "Forgot Password ?": "forgot password?",
     "Login successful": "Login successful",
-    "May be username or password is incorrect": "May be username or password is incorrect"
+    "May be username or password is incorrect": "May be username or password is incorrect",
+    "Don't have an account?": "Don't have an account?"
   },
   "Dashboard": {
     "Matches Management": {
@@ -365,13 +366,35 @@
     "Name": "Name",
     "Code": "Code",
     "Add new language": "Add new language",
+    "Submit": "Submit",
+    "Update": "Update",
     "Deleting": "Deleting...",
     "Delete": "Delete",
     "Are you absolutely sure you want to delete this language?": "Are you absolutely sure you want to delete this language?",
     "DialogDescription": "This action cannot be undone. This will permanently delete the language and remove it from the system.",
     "Edit": "Edit",
     "Dictionary": "Dictionary",
-    "Cancel": "Cancel"
+    "Cancel": "Cancel",
+    "No languages found": "No languages found",
+
+    "Edit Language": "Edit Language",
+
+    "DialogAddDescription": "Add a new language to the system. Fill in all the required fields.",
+    "DialogEditDescription": "Update the language information. Modify the fields as needed.",
+    "DialogEditTitle": "Edit Language",
+
+    "Language added successfully": "Language added successfully",
+    "Language updated successfully": "Language updated successfully",
+    "Language deleted successfully": "Language deleted successfully",
+
+    "Enter local name": "Enter local name",
+    "Enter language name": "Enter language name",
+    "Enter language code": "Enter language code",
+    "Local Name": "Local Name",
+
+    "Local name is required": "Local name is required",
+    "Name is required": "Name is required",
+    "Code is required": "Code is required"
   },
   "MatchForm": {
     "ONLINE": "ONLINE",
@@ -502,6 +525,30 @@
     "Theme updated successfully": "Theme updated successfully",
     "Update": "Update"
   },
+  "languages": {
+    "Word": "Word",
+    "Translation": "Translation",
+    "Add new Word": "Add New word",
+    "Word is required": "Word is required",
+    "DialogAddTitle": "Add New word",
+    "DialogAddDescription": "Add a new word to the system. Fill in all the required fields.",
+    "Enter the word": "Enter the word",
+    "Enter the translation": "Enter the translation",
+    "Submit": "Submit",
+    "Delete": "Delete",
+    "Edit": "Edit",
+    "Update": "Update",
+    "Cancel": "Cancel",
+
+    "No words found": "No words found",
+
+    "word deleted successfully": "word deleted successfully",
+    "Word translation updated successfully": "Word translation updated successfully",
+    "Word added successfully": "Word added successfully",
+
+    "translation is required": "translation is required"
+  },
+
   "Links": {
     "Icon": "Icon",
     "Link added successfully": "Link added successfully",
@@ -551,5 +598,34 @@
     "image is required": "image is required",
     "description is required": "description is required",
     "achievedDate is required": "achievedDate is required"
+  },
+  "Register": {
+    "Register to Go to Dashboard": "Register to Go to Dashboard",
+    "First name": "First Name",
+    "Last name": "Last Name",
+    "Your Email": "Your Email",
+    "Image": "Image",
+    "Support": "Support",
+    "Admin": "Admin",
+    "Creator": "Creator",
+    "Password": "Password",
+    "Username": "Username",
+    "Register": "Register",
+    "Already have an account": "Already have an account",
+    "password is required": "password is required",
+    "Email is required": "Email is required",
+    "Invalid email address": "Invalid email address",
+    "Last name is required": "Last name is required",
+    "First name is required": "First name is required",
+    "The Code is Send To Your Email": "The Code is Send To Your Email",
+    "Registration successful": "Registration successful",
+
+    "Code must contain only numbers": "Code must contain only numbers",
+    "Code must be 6 numbers": "Code must be 6 numbers",
+    "Code is required": "Code is required",
+
+    "Registration failed": "Registration failed",
+    "Login": "Login",
+    "Already have an account?": "Already have an account?"
   }
 }

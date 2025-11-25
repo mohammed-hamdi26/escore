@@ -16,14 +16,14 @@ export default function LanguageDialog({
   formType,
   setLanguagesTable,
   languageOptions = undefined,
+  t,
 }) {
   const [open, setOpen] = useState(false);
 
-  const dialogTitle = formType === "add" ? "Add New Language" : "Edit Language";
+  const dialogTitle =
+    formType === "add" ? t("Add new language") : t("Edit Language");
   const dialogDescription =
-    formType === "add"
-      ? "Add a new language to the system. Fill in all the required fields."
-      : "Update the language information. Modify the fields as needed.";
+    formType === "add" ? t("DialogAddDescription") : t("DialogEditDescription");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -34,11 +34,12 @@ export default function LanguageDialog({
           <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
         <LanguageForm
+          t={t}
           formType={formType}
           successMessage={
             formType === "add"
-              ? "Language added successfully"
-              : "Language updated successfully"
+              ? t("Language added successfully")
+              : t("Language updated successfully")
           }
           setLanguagesTable={setLanguagesTable}
           setOpen={setOpen}

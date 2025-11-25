@@ -14,6 +14,7 @@ const { Input } = require("../ui/input");
 const { Label } = require("../ui/label");
 
 function FileInput({
+  showIcon = true,
   label,
   icon,
   limitFiles = 8,
@@ -24,6 +25,7 @@ function FileInput({
   typeFile = "image",
   flexGrow = "flex-1",
   error,
+  inputAuth = false,
   ...props
 }) {
   const [file, setFiles] = useState(null);
@@ -67,12 +69,14 @@ function FileInput({
                   try {
                     const formData = new FormData();
                     formData.append("file", file);
+                    console.log("Uploading file:", file);
                     const url = await uploadPhoto(formData);
                     setUrl(`${url}`);
                     formik.setFieldValue(name, `${url}`);
                     toast.success(t("uploaded Photo"));
                     return url;
                   } catch (e) {
+                    console.log(e);
                     toast.error(t("error uploading photo"));
                   } finally {
                     setIsLoading(false);
@@ -107,9 +111,9 @@ function FileInput({
           name={name}
           type={"text"}
           placeholder={placeholder}
-          className={`p-0 border-0 focus:outline-none `}
-          backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-          textColor="text-[#677185]"
+          className={!inputAuth && `p-0 border-0 focus:outline-none `}
+          backGroundColor={!inputAuth && "bg-dashboard-box  dark:bg-[#0F1017]"}
+          textColor={!inputAuth && "text-[#677185]"}
           flexGrow={flexGrow}
         />
       </div>

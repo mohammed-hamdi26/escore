@@ -6,11 +6,14 @@ import { NextResponse } from "next/server";
 const intlMiddleware = createMiddleware(routing);
 
 const protectedRoutePath = "dashboard";
-const publicRoutesPath = "/login";
+const publicRoutesPath = ["/login", "/register"];
 export default async function middleware(req) {
   const pathname = req.nextUrl.pathname;
   const isProtectedRoute = pathname.includes(protectedRoutePath);
-  const isPublicRoute = pathname.includes(publicRoutesPath);
+  const isPublicRoute = publicRoutesPath.forEach((route) => {
+    console.log(pathname.includes(route));
+    pathname.includes(route) ? true : false;
+  });
 
   const session = (await cookies()).get("session")?.value;
 

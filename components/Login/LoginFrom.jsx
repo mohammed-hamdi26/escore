@@ -7,14 +7,16 @@ import InputApp from "../ui app/InputApp";
 import { Button } from "../ui/button";
 function LoginFrom({ formik, t }) {
   return (
-    <div className="flex flex-[0.5] flex-col ">
-      <Image
-        src={logoImage}
-        alt="logo"
-        width={250}
-        height={40}
-        className="mb-12"
-      />
+    <div className="flex flex-[0.5] flex-col space-y-8 ">
+      <div className="space-y-8 flex flex-col items-center justify-center ">
+        <Image src={logoImage} alt="logo" width={250} height={40} />
+        <Link
+          href="/register/form"
+          className="text-gray-400 hover:text-gray-400/90 hover:underline transition-all duration-300"
+        >
+          {t("Don't have an account?")}
+        </Link>
+      </div>
       <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
         {/* <InputApp
           placeholder={"Your Email"}

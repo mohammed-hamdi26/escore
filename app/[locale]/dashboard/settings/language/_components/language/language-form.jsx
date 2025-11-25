@@ -2,6 +2,7 @@
 import { addLanguage, updateLanguage } from "@/app/[locale]/_Lib/actions";
 import InputApp from "@/components/ui app/InputApp";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
@@ -19,6 +20,7 @@ export default function LanguageForm({
   setLanguagesTable,
   setOpen,
   languageOptions,
+  t,
 }) {
   const formik = useFormik({
     initialValues: {
@@ -70,15 +72,15 @@ export default function LanguageForm({
           <InputApp
             value={formik.values.code}
             onChange={formik.handleChange}
-            label="Code"
+            label={t("Code")}
             name="code"
             type="text"
-            placeholder="Enter language code"
+            placeholder={t("Enter language code")}
             className="border-0 focus:outline-none"
             backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
             textColor="text-[#677185]"
             error={
-              formik.errors.code && formik.touched.code && formik.errors.code
+              formik.errors.code && formik.touched.code && t(formik.errors.code)
             }
             onBlur={formik.handleBlur}
             disabled={formik.isSubmitting}
@@ -88,15 +90,15 @@ export default function LanguageForm({
         <InputApp
           value={formik.values.name}
           onChange={formik.handleChange}
-          label="Name"
+          label={t("Name")}
           name="name"
           type="text"
-          placeholder="Enter language name"
+          placeholder={t("Enter language name")}
           className="border-0 focus:outline-none"
           backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
           textColor="text-[#677185]"
           error={
-            formik.errors.name && formik.touched.name && formik.errors.name
+            formik.errors.name && formik.touched.name && t(formik.errors.name)
           }
           onBlur={formik.handleBlur}
           disabled={formik.isSubmitting}
@@ -106,17 +108,17 @@ export default function LanguageForm({
       <InputApp
         value={formik.values.nameLocal}
         onChange={formik.handleChange}
-        label="Local Name"
+        label={t("Local Name")}
         name="nameLocal"
         type="text"
-        placeholder="Enter local name"
+        placeholder={t("Enter local name")}
         className="border-0 focus:outline-none"
         backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
         textColor="text-[#677185]"
         error={
           formik.errors.nameLocal &&
           formik.touched.nameLocal &&
-          formik.errors.nameLocal
+          t(formik.errors.nameLocal)
         }
         onBlur={formik.handleBlur}
         disabled={formik.isSubmitting}
@@ -127,11 +129,13 @@ export default function LanguageForm({
           type="submit"
           className="text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-[#2ca54d]"
         >
-          {formik.isSubmitting
-            ? "Submitting..."
-            : formType === "add"
-            ? "Submit"
-            : "Update"}
+          {formik.isSubmitting ? (
+            <Spinner />
+          ) : formType === "add" ? (
+            t("Submit")
+          ) : (
+            t("Update")
+          )}
         </Button>
       </div>
     </form>

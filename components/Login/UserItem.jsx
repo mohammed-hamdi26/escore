@@ -1,4 +1,4 @@
-function UserItem({ icon, label, selectedUser, onClick }) {
+function UserItem({ icon, label, selectedUser, onClick, t }) {
   return (
     <li
       onClick={onClick}
@@ -8,7 +8,7 @@ function UserItem({ icon, label, selectedUser, onClick }) {
         {icon}
       </div>
       {selectedUser === label.toLowerCase() && (
-        <p className=" text-lg font-semibold ">{label}</p>
+        <p className=" text-lg font-semibold ">{t(label)}</p>
       )}
     </li>
   );

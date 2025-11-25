@@ -3,6 +3,7 @@
 import { addToDictionary, updateWord } from "@/app/[locale]/_Lib/actions";
 import InputApp from "@/components/ui app/InputApp";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
 import * as yup from "yup";
@@ -18,6 +19,7 @@ function DictionaryForm({
   initialTranslation,
   setOpen,
   setDictionary,
+  t,
 }) {
   const formik = useFormik({
     initialValues: {
@@ -63,15 +65,15 @@ function DictionaryForm({
         <InputApp
           value={formik.values.word}
           onChange={formik.handleChange}
-          label="Word"
+          label={t("Word")}
           name="word"
           type="text"
-          placeholder="Enter the word"
+          placeholder={t("Enter the word")}
           className="border-0 focus:outline-none"
           backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
           textColor="text-[#677185]"
           error={
-            formik.errors.word && formik.touched.word && formik.errors.word
+            formik.errors.word && formik.touched.word && t(formik.errors.word)
           }
           onBlur={formik.handleBlur}
           disabled={formik.isSubmitting || formType === "edit"}
@@ -81,17 +83,17 @@ function DictionaryForm({
       <InputApp
         value={formik.values.translation}
         onChange={formik.handleChange}
-        label="Translation"
+        label={t("Translation")}
         name="translation"
         type="text"
-        placeholder="Enter the translation"
+        placeholder={t("Enter the translation")}
         className="border-0 focus:outline-none"
         backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
         textColor="text-[#677185]"
         error={
           formik.errors.translation &&
           formik.touched.translation &&
-          formik.errors.translation
+          t(formik.errors.translation)
         }
         onBlur={formik.handleBlur}
         disabled={formik.isSubmitting}
@@ -102,11 +104,13 @@ function DictionaryForm({
           type="submit"
           className="text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-[#2ca54d]"
         >
-          {formik.isSubmitting
-            ? "Submitting..."
-            : formType === "add"
-            ? "Submit"
-            : "Update"}
+          {formik.isSubmitting ? (
+            <Spinner />
+          ) : formType === "add" ? (
+            t("Submit")
+          ) : (
+            t("Update")
+          )}
         </Button>
       </div>
     </form>

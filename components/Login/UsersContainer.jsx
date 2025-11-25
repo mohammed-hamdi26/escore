@@ -9,23 +9,26 @@ const users = [
   {
     icon: <Admin />,
     label: "Admin",
+    value: "ROLE_ADMIN",
   },
   {
     icon: <SupportUserIcon />,
     label: "Support",
+    value: "ROLE_USER",
   },
   { label: "Creator", icon: <CreatorUserIcon /> },
 ];
-function UsersContainer({ formik }) {
+function UsersContainer({ t, formik }) {
   const [selectedUser, setSelectedUser] = useState("admin");
   return (
-    <ul className="flex flex-col gap-4 min-w-[200px]">
+    <ul className="flex flex-row md:flex-col gap-4 md:min-w-[200px]">
       {users.map((user) => (
         <UserItem
+          t={t}
           selectedUser={selectedUser}
           onClick={() => {
             setSelectedUser(user.label.toLowerCase());
-            formik.setFieldValue("role", user.label.toLowerCase());
+            formik.setFieldValue("authorities", [user.value]);
           }}
           key={user.label}
           icon={user.icon}

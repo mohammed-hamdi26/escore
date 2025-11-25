@@ -17,9 +17,9 @@ function LanguagesTable({ initialLanguages }) {
   const [languagesTable, setLanguagesTable] = useState(initialLanguages || []);
   const t = useTranslations("LanguagesTable");
 
-  const handleLanguageDeleted = deletedCode => {
-    setLanguagesTable(prevLanguages =>
-      prevLanguages.filter(lang => lang.code !== deletedCode)
+  const handleLanguageDeleted = (deletedCode) => {
+    setLanguagesTable((prevLanguages) =>
+      prevLanguages.filter((lang) => lang.code !== deletedCode)
     );
   };
 
@@ -27,6 +27,7 @@ function LanguagesTable({ initialLanguages }) {
     <>
       <div className="mb-5">
         <LanguageDialog
+          t={t}
           trigger={
             <Button
               className={
@@ -42,7 +43,7 @@ function LanguagesTable({ initialLanguages }) {
       </div>
       {!languagesTable || languagesTable.length === 0 ? (
         <div className="text-center py-8 text-lg text-[#677185] dark:text-white">
-          No languages found
+          {t("No languages found")}
         </div>
       ) : (
         <Table
@@ -50,7 +51,7 @@ function LanguagesTable({ initialLanguages }) {
           grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
           columns={columns}
         >
-          {languagesTable.map(lang => (
+          {languagesTable.map((lang) => (
             <Table.Row
               key={lang.code}
               grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
@@ -66,6 +67,7 @@ function LanguagesTable({ initialLanguages }) {
                     </Button>
                   </Link>
                   <LanguageDialog
+                    t={t}
                     trigger={
                       <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer hover:bg-[#2ca54d]">
                         {t("Edit")}

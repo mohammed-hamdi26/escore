@@ -26,6 +26,26 @@ export async function login(userData) {
   }
   redirect("/dashboard");
 }
+export async function register(userData) {
+  try {
+    await apiClient.post("/register", userData);
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Maybe Email already exists");
+  }
+
+  redirect("/register/code-verification");
+}
+export async function verifyAccount(code) {
+  console.log("code", code);
+  try {
+    await apiClient.get(`/activate?key=${code}`);
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in verify account");
+  }
+  redirect("/login");
+}
 export async function logout() {
   await deleteSession();
   redirect("/login");
@@ -183,6 +203,7 @@ export async function uploadPhoto(formData) {
 
     return url.data;
   } catch (e) {
+    console.log(e.response);
     throw new Error("error in upload");
   }
 }
