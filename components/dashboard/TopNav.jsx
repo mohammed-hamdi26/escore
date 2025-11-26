@@ -19,15 +19,6 @@ function TopNav() {
         <div className={`flex in-ltr:ml-auto rtl:mr-auto items-center gap-6`}>
           <ToggleThemeMode />
           <LocaleChange />
-          <Button
-            onClick={() => logout()}
-            className={
-              "bg-destructive hover:bg-destructive/90 cursor-pointer text-white "
-            }
-          >
-            {" "}
-            <LogOut className="rtl:rotate-180" />
-          </Button>
         </div>
       </div>
     </div>

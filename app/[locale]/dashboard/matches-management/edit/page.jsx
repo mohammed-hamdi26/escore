@@ -1,4 +1,5 @@
 import { getMatches, getMatchesCount } from "@/app/[locale]/_Lib/matchesApi";
+import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import MatchesTable from "@/components/Matches Management/MatchesTable";
 import Table from "@/components/ui app/Table";
 
@@ -13,11 +14,15 @@ const columns = [
 
 export default async function page({ searchParams }) {
   const { size, page } = await searchParams;
-  const matches = await getMatches({ size, page });
+  const [matches, players] = await Promise.all([
+    getMatches({ size, page }),
+    getPlayers(),
+  ]);
   const numOfMatches = await getMatchesCount();
 
   return (
     <MatchesTable
+      players={players}
       matches={matches}
       columns={columns}
       numOfMatches={numOfMatches}

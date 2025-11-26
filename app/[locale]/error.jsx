@@ -24,7 +24,7 @@ export default function Error({ error, reset }) {
         position={" right-10 bottom-[200px] "}
         className={"fill-green-primary"}
       />
-      <p className="text-lg text-black">{error.message}</p>
+      <p className="text-lg text-black dark:text-white">{error.message}</p>
       <div className="flex items-center gap-4">
         <Link href="/" className="cursor-pointer">
           <Button className="bg-green-primary text-white  font-bold px-6 py-6 text-lg">

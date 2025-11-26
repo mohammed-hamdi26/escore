@@ -7,15 +7,15 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { getMessages } from "next-intl/server";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
 
 export const metadata = {
   title: "Create Next App",
@@ -29,10 +29,11 @@ export default async function RootLayout({ children, params }) {
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+  // ${geistSans.variable} ${geistMono.variable}
   return (
     <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased  dark:bg-background transition-colors duration-300 text-white`}
+        className={` antialiased  dark:bg-background transition-colors duration-300 text-white`}
       >
         <ThemeProvider
           attribute="class"

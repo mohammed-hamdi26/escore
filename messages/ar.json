@@ -63,11 +63,17 @@
     "Privacy and Policy": {
       "title": "السياسات والخصوصية",
       "description": "تعديل السياسات والخصوصية"
+    },
+    "Links": {
+      "title": "الروابط",
+      "description": "اذهب إلى الروابط لعرض رسائل المستخدمين والرد عليها"
     }
   },
   "nav": {
     "Settings": "الإعدادات",
-    "admin": "المشرف"
+    "admin": "المشرف",
+    "Logout": "تسجيل الخروج",
+    "Change Password": "تغيير كلمة المرور"
   },
   "topNav": {
     "player management": "إدارة اللاعبين",
@@ -476,7 +482,15 @@
     "Team 2": "الفريق 2",
     "Edit": "تعديل",
     "Stage": "المرحلة",
-    "Delete": "حذف"
+    "Delete": "حذف",
+    "error in Delete": "خطأ في الحذف",
+    "Add Lineup For": "إضافة تشكيلة لـ",
+    "The Match is Deleted": "تم حذف المباراة",
+    "Lineup added successfully": "تمت إضافة التشكيلة بنجاح",
+    "Error adding lineup": "خطأ في إضافة التشكيلة",
+    "Player": "لاعب",
+    "Select a player": "اختر لاعبًا",
+    "Add Lineup": "إضافة تشكيلة"
   },
   "NewsTable": {
     "title": "العنوان",
@@ -638,5 +652,20 @@
     "Email": "البريد الإلكتروني",
     "Status": "الحالة",
     "Description": "الوصف"
+  },
+  "LinksApp": {
+    "Link": "الرابط",
+    "Add New Link": "اضافة رابط جديد",
+    "Add Link": "إضافة رابط",
+    "Dark Image URL": "رابط صورة الوضع الداكن",
+    "Light Image URL": "رابط صورة الوضع الفاتح",
+    "URL": "الرابط",
+    "Light image URL is required": "رابط صورة الوضع الفاتح مطلوب",
+    "URL is required": "الرابط مطلوب",
+    "Invalid URL": "الرابط غير صالح",
+    "Name is required": "الاسم مطلوب",
+    "Name": "الاسم",
+    "Description": "الوصف",
+    "Link Name": "اسم الرابط"
   }
 }
