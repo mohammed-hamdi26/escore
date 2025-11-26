@@ -130,6 +130,10 @@
   @apply text-[#289546] transition-colors duration-300 group-hover:text-white;
 }
 
+button[data-slot="dialog-close"] {
+  @apply absolute top-4 right-4 rtl:left-4 rtl:right-auto;
+}
+
 /* thead {
   background-color: transparent !important;
   border-radius: 1000px !important;

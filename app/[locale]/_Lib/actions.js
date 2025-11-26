@@ -582,3 +582,14 @@ export async function replayTicket(id, data) {
     throw error;
   }
 }
+
+export async function addLineUp(data) {
+  try {
+    const res = await apiClient.post(`/lineups`, data);
+
+    return res.data;
+  } catch (error) {
+    console.log("Failed to add lineup", error);
+    throw error;
+  }
+}

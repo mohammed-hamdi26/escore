@@ -3,6 +3,7 @@ import SettingsIcon from "@/components/dashboard/SettingsIcon";
 import News from "@/components/icons/News";
 import SupportCenter from "@/components/icons/SuppotCenter";
 import User from "@/components/icons/User";
+import { Link2 } from "lucide-react";
 const links = [
   {
     title: "Languages",
@@ -15,6 +16,12 @@ const links = [
     href: "/settings/apperance",
     description: "update and modify global appearance",
     icon: <User />,
+  },
+  {
+    title: "Links",
+    href: "/settings/links",
+    description: "Go to Links to view user messages and reply to them",
+    icon: <Link2 className="icon-transition " width={"41"} height={"49"} />,
   },
   {
     title: "About",

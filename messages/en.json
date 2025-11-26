@@ -66,11 +66,17 @@
     "Privacy and Policy": {
       "title": "Privacy and Policy",
       "description": "Manage your privacy and Policy configuration settings."
+    },
+    "Links": {
+      "title": "Links",
+      "description": "Go to Links to view user messages and reply to them"
     }
   },
   "nav": {
     "Settings": "Settings",
-    "admin": "Admin"
+    "admin": "Admin",
+    "Logout": "Logout",
+    "Change Password": "Change Password"
   },
   "topNav": {
     "player management": "Player Management",
@@ -479,7 +485,15 @@
     "Team 2": "Team 2",
     "Edit": "Edit",
     "Stage": "Stage",
-    "Delete": "Delete"
+    "Delete": "Delete",
+    "error in Delete": "error in Delete",
+    "Add Lineup For": "Add Lineup For",
+    "The Match is Deleted": "The Match is Deleted",
+    "Lineup added successfully": "Lineup added successfully",
+    "Error adding lineup": "Error adding lineup",
+    "Player": "Player",
+    "Select a player": "Select a player",
+    "Add Lineup": "Add Lineup"
   },
   "NewsTable": {
     "title": "Title",
@@ -638,5 +652,20 @@
     "Email": "Email",
     "Status": "Status",
     "Description": "Description"
+  },
+  "LinksApp": {
+    "Description": "Description",
+    "Link": "Link",
+    "Add New Link": "Add New Link",
+    "Add Link": "Add Link",
+    "Dark Image URL": "Dark Image URL",
+    "Light Image URL": "Light image URL",
+    "URL": "URL",
+    "Light image URL is required": "Light image URL is required",
+    "URL is required": "URL is required",
+    "Invalid URL": "Invalid URL",
+    "Name is required": "Name is required",
+    "Name": "Name",
+    "Link Name": "Link Name"
   }
 }

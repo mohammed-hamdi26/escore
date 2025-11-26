@@ -32,7 +32,7 @@ import NavItems from "./NavItems";
 function SideNavBar() {
   const t = useTranslations("nav");
   return (
-    <div className="hidden lg:block  w-[270px] ">
+    <div className="hidden lg:block  w-[290px] ">
       <nav
         className={
           "  bg-dashboard-box  dark:bg-linear-to-b dark:from-[#00000005] dark:to-[#24397b14] flex flex-col justify-center   py-16 w-[270px]  rounded-2xl min-h-[calc(100vh-155px)]  "

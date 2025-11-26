@@ -88,6 +88,10 @@ const ComboboxInput = ({
                         onClick={(e) => {
                           e.stopPropagation();
                           removeSelection(val);
+                          formik.setFieldValue(
+                            name,
+                            selectedValues.filter((v) => v.value !== val.value)
+                          );
                         }}
                         asChild
                       >
