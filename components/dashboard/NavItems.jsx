@@ -1,5 +1,5 @@
 "use client";
-import { usePathname } from "next/navigation";
+
 import NavItem from "./NavItem";
 import SettingsIcon from "./SettingsIcon";
 import { Button } from "../ui/button";
@@ -7,6 +7,7 @@ import { logout } from "@/app/[locale]/_Lib/actions";
 import { LogOut } from "lucide-react";
 import { cloneElement } from "react";
 import PasswordIcon from "../icons/PasswordIcon";
+import { usePathname } from "@/i18n/navigation";
 
 const pages = [
   {

@@ -10,6 +10,7 @@ import Image from "next/image";
 import imagePhoto from "@/public/images/a-flat-vector-lettermark-logo-design-sho_M1U1HI8tTvOIgjZLmcU6eg_gSbp1v7WSyql-yuko9RTsQ-removebg-preview.png";
 import { X } from "lucide-react";
 import { useLocale } from "next-intl";
+import SelectInputCombox from "./SelectInputCombox";
 function SelectInput({
   t,
   placeholder,
@@ -40,7 +41,32 @@ function SelectInput({
         {icon && icon}
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2">
-            <Select
+            <SelectInputCombox
+              options={options}
+              formik={formik}
+              name={name}
+              placeholder={placeholder}
+              onChange={onChange}
+            />
+            {/* {value && name && (
+              <div>
+                <X
+                  onClick={() => {
+                    formik.setFieldValue(name, "");
+                  }}
+                />
+              </div>
+            )} */}
+          </div>
+          {error && <p className="text-red-600">{t ? t(error) : error}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+{
+  /* <Select
               className="text-black  dark:text-[#677185] p-6 "
               onValueChange={onChange}
               // onOpenChange={onBlur}
@@ -84,22 +110,6 @@ function SelectInput({
                   </SelectItem>
                 ))}
               </SelectContent>
-            </Select>
-            {value && name && (
-              <div>
-                <X
-                  onClick={() => {
-                    formik.setFieldValue(name, "");
-                  }}
-                />
-              </div>
-            )}
-          </div>
-          {error && <p className="text-red-600">{t ? t(error) : error}</p>}
-        </div>
-      </div>
-    </div>
-  );
+            </Select> */
 }
-
 export default SelectInput;

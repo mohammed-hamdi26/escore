@@ -285,14 +285,46 @@ export async function deleteMatch(id) {
 }
 
 export async function addLink(linkData) {
+  const locale = await getLocale();
   try {
     const res = await apiClient.post("/social-links", linkData);
-    return res.data;
   } catch (e) {
     throw new Error("Error in adding link");
   }
+  revalidatePath(
+    `/${locale}/dashboard/links/edit/${linkData.player.id || linkData.team.id}`
+  );
 }
 
+export async function updateLink(linkData) {
+  console.log(linkData);
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(`/social-links/${linkData.id}`, linkData);
+    revalidatePath(
+      `/${locale}/dashboard/links/edit/${
+        linkData.player.id || linkData.team.id
+      }`
+    );
+    return res.data;
+  } catch (e) {
+    console.log(e.response);
+    throw new Error("Error in updating link");
+  }
+}
+
+export async function deleteLink(id, idUser) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.delete(`/social-links/${id}`);
+    // return res.data;
+  } catch (error) {
+    console.log("Failed to delete link", error);
+    throw error;
+  } finally {
+  }
+  revalidatePath(`/${locale}/dashboard/links/edit/${idUser}`);
+}
 export async function addFavoriteCharacter(characterData) {
   try {
     const res = await apiClient.post("/favorite-characters", characterData);
@@ -590,6 +622,55 @@ export async function addLineUp(data) {
     return res.data;
   } catch (error) {
     console.log("Failed to add lineup", error);
+    throw error;
+  }
+}
+
+// password change
+
+export async function changePassword(data) {
+  console.log(data);
+  try {
+    const res = await apiClient.post(`/account/change-password`, data);
+    return res.data;
+  } catch (error) {
+    // console.log("Failed to change password", error.response);
+    throw error;
+  }
+}
+
+export async function addAppSocialLink(data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(`/v1/escore-social-links`, data);
+    revalidatePath(`/${locale}/dashboard/settings/links`);
+    return res.data;
+  } catch (error) {
+    // console.log("Failed to add social link", error.response);
+    throw error;
+  }
+}
+
+export async function updateAppSocialLink(data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(`/v1/escore-social-links/${data.id}`, data);
+    revalidatePath(`/${locale}/dashboard/settings/links`);
+    return res.data;
+  } catch (error) {
+    // console.log("Failed to add social link", error.response);
+    throw error;
+  }
+}
+
+export async function deleteAppSocialLink(id) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.delete(`/v1/escore-social-links/${id}`);
+    revalidatePath(`/${locale}/dashboard/settings/links`);
+    return res.data;
+  } catch (error) {
+    // console.log("Failed to add social link", error.response);
     throw error;
   }
 }

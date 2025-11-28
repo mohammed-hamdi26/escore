@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import { useTranslations } from "use-intl";
 import MarkDown from "../ui app/MarkDown";
 import { min } from "date-fns";
+import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 
 const validateSchema = yup.object({
   name: yup.string().required("Tournament name is required"),
@@ -54,10 +55,10 @@ const validateSchema = yup.object({
     // .url("Invalid dark logo URL")
     .required("Dark logo is required"),
 
-  // knockoutImageLight: yup
-  //   .string()
-  //   // .url("Invalid knockout image URL")
-  //   .required("Knockout image is required"),
+  knockoutImageLight: yup
+    .string()
+    // .url("Invalid knockout image URL")
+    .required("Knockout image is required"),
   // knockoutImageDark: yup
   //   .string()
   //   // .url("Invalid dark knockout image URL")
@@ -131,7 +132,7 @@ export default function TournamentsForm({
     { value: "ONGOING", label: t("Ongoing") },
     { value: "FINISHED", label: t("Finished") },
   ];
-
+  console.log("formik errors", formik.values);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
@@ -193,7 +194,12 @@ export default function TournamentsForm({
             value={formik.values.venue}
           />
           <SelectInput
-            options={statusOptions}
+            formik={formik}
+            options={mappedArrayToSelectOptions(
+              statusOptions,
+              "label",
+              "value"
+            )}
             onChange={(value) => formik.setFieldValue("status", value)}
             value={formik.values.status}
             label={t("Status")}
@@ -361,6 +367,9 @@ export default function TournamentsForm({
                 color={"text-[#677185]"}
               />
             }
+            error={
+              formik.touched.logo && formik.errors.logo && t(formik.errors.logo)
+            }
           />
           <FileInput
             t={t}
@@ -388,6 +397,11 @@ export default function TournamentsForm({
                 className={"fill-[#677185]"}
                 color={"text-[#677185]"}
               />
+            }
+            error={
+              formik.touched.knockoutImageLight &&
+              formik.errors.knockoutImageLight &&
+              t(formik.errors.knockoutImageLight)
             }
           />
 
