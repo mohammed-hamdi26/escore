@@ -8,6 +8,7 @@ import Player from "@/components/icons/Player";
 import SupportCenter from "@/components/icons/SuppotCenter";
 import TeamsManagement from "@/components/icons/TeamsManagement";
 import User from "@/components/icons/User";
+import { ArrowRightLeft, icons } from "lucide-react";
 const links = [
   {
     title: "Tournaments Management",
@@ -28,34 +29,41 @@ const links = [
     href: "/matches-management/edit",
     description:
       "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links",
-    icon: <MatchesManagement />,
+    icon: <MatchesManagement width="57" height="56" />,
   },
   {
     title: "Players",
     href: "/player-management/edit",
     description:
       "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos",
-    icon: <Player />,
+    icon: <Player width="57" height="56" />,
   },
+
   {
     title: "Teams Management",
     href: "/teams-management/edit",
     description: "Add Team: Name, Country, Linked Players, Logo/Images",
-    icon: <TeamsManagement />,
+    icon: <TeamsManagement width="57" height="56" />,
   },
-
+  {
+    title: "transfers Management",
+    href: "/transfers-management/edit",
+    description:
+      "Go to Transfers Section to Add Transfer: Player, From Team, To Team, Transfer Date, Transfer Fee",
+    icon: <ArrowRightLeft className="icon-transition" width="57" height="56" />,
+  },
   {
     title: "Games Management",
     href: "/games-management/edit",
-    description: "go to Games Sectoin to Add Game: Name + Icon",
-    icon: <GamesManagement />,
+    description: "go to Games Section to Add Game: Name + Icon",
+    icon: <GamesManagement width="57" height="56" />,
   },
   {
     title: "News & Updates",
     href: "/news/edit",
     description:
       "Go to news Sectoin to Add News: Title, Description, Image/Video, Author",
-    icon: <News />,
+    icon: <News width="57" height="56" />,
   },
   // {
   //   title: "Users",
@@ -68,14 +76,14 @@ const links = [
     title: "Support Center",
     href: "/support-center",
     description: "Go to Support Center to view user messages and reply to them",
-    icon: <SupportCenter />,
+    icon: <SupportCenter width="57" height="56" />,
   },
-  {
-    title: "Settings",
-    href: "/settings",
-    description: "Manage your preferences and account configuration settings.",
-    icon: <SettingsIcon width="41" height="49" className="icon-transition" />,
-  },
+  // {
+  //   title: "Settings",
+  //   href: "/settings",
+  //   description: "Manage your preferences and account configuration settings.",
+  //   icon: <SettingsIcon width="41" height="49" className="icon-transition" />,
+  // },
 ];
 export default function page() {
   return <ServicesContainer links={links} />;

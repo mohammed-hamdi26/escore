@@ -10,6 +10,8 @@ import {
 } from "../ui/dialog";
 import LinksContainer from "./LinksContainer";
 import LinksForm from "./LinksForm";
+import LinksTable from "./LinksTable";
+import { useState } from "react";
 
 function LinksPageContainer({
   players,
@@ -19,9 +21,10 @@ function LinksPageContainer({
   linkType = "player",
 }) {
   const t = useTranslations("Links");
+  const [open, setOpen] = useState(false);
   return (
     <div className="space-y-8">
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
             className={
@@ -34,6 +37,7 @@ function LinksPageContainer({
         <DialogContent dir="rtl">
           <DialogTitle>{t("Add new link")}</DialogTitle>
           <LinksForm
+            setOpen={setOpen}
             t={t}
             id={id}
             teams={teams}
@@ -42,6 +46,7 @@ function LinksPageContainer({
           />
         </DialogContent>
       </Dialog>
+      <LinksTable links={links} numOfLinks={links.length} idUser={id} />
     </div>
   );
 }

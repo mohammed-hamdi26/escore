@@ -17,7 +17,7 @@
       "description": "اذهب إلى قسم المباريات لإضافة مباراة: التاريخ، الوقت، الفرق، اللعبة، البطولة، روابط البث"
     },
     "Tournaments Management": {
-      "title": "إدارة البطولات",
+      "title": "البطولات",
       "description": "اذهب إلى قسم البطولات لإضافة بطولة: الاسم، البطل، تاريخ البدء، تاريخ النهاية، الفرق، اللاعبين"
     },
     "Players": {
@@ -83,7 +83,9 @@
     "tournaments management": "إدارة البطولات",
     "matches management": "إدارة المباريات",
     "support center": "مركز الدعم",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "change password": "تغيير كلمة المرور",
+    "transfers management": "إدارة الانتقالات"
   },
   "buttonLinks": {
     "add new": "إضافة جديد",
@@ -345,9 +347,10 @@
     "Upcoming": "قادمة",
     "Ongoing": "جارية",
     "Finished": "منتهية",
-    "The Tournament Edited": "The Tournament Edited",
-    "The Tournament Added": "The Tournament Added",
-    "uploaded Photo": "تم رفع الصورة"
+    "The Tournament Edited": "تم تعديل البطولة",
+    "The Tournament Added": "تمت إضافة البطولة",
+    "uploaded Photo": "تم رفع الصورة",
+    "Knockout image is required": "صورة الشكل مطلوبة"
   },
   "TournamentsTable": {
     "name": "الاسم",
@@ -564,6 +567,14 @@
 
     "translation is required": "الترجمة مطلوبة"
   },
+  "LinksTable": {
+    "URL": "الرابط",
+    "name": "الاسم",
+    "The Link is Deleted": "تم حذف الرابط",
+    "error in Delete": "حدث خطأ أثناء الحذف",
+    "Delete": "حذف",
+    "Edit": "تعديل"
+  },
   "Links": {
     "Icon": "الأيقونة",
     "Link added successfully": "تمت اضافة الرابط بنجاح",
@@ -575,7 +586,9 @@
     "Add Link": "اضافة رابط",
     "URL Icon": "رابط الايقونة",
     "URL Link": "رابط الرابط",
-    "Name": "الاسم"
+    "Name": "الاسم",
+    "Link updated successfully": "تم تحديث الرابط بنجاح",
+    "Update Link": "تحديث الرابط"
   },
   "FavoriteCharacter": {
     "Game Name": "اسم اللعبة",
@@ -666,6 +679,54 @@
     "Name is required": "الاسم مطلوب",
     "Name": "الاسم",
     "Description": "الوصف",
-    "Link Name": "اسم الرابط"
+    "Link Name": "اسم الرابط",
+    "Delete": "حذف",
+    "Edit": "تعديل",
+    "Update Link": "تحديث الرابط",
+    "name": "الاسم",
+    "error in Delete": "خطأ في حذف الرابط",
+    "The Link is Deleted": "تم حذف الرابط بنجاح"
+  },
+  "ChangePassword": {
+    "Current Password": "كلمة المرور الحالية",
+    "Enter Current Password": "أدخل كلمة المرور الحالية",
+    "New Password": "كلمة المرور الجديدة",
+    "Enter New Password": "أدخل كلمة المرور الجديدة",
+    "Confirm Password": "تأكيد كلمة المرور الجديدة",
+    "Enter Confirm New Password": "أدخل تأكيد كلمة المرور الجديدة",
+    "Submit": "إرسال",
+    "Current password is required": "كلمة المرور الحالية مطلوبة",
+    "New password is required": "كلمة المرور الجديدة مطلوبة",
+    "Confirm password is required": "تأكيد كلمة المرور مطلوب",
+    "Confirm new password is required": "تأكيد كلمة المرور الجديدة مطلوب",
+    "New password and confirm password do not match": "كلمة المرور الجديدة وتأكيدها غير متطابقين",
+    "Password changed successfully": "تم تغيير كلمة المرور بنجاح",
+    "Error changing password": "حدث خطأ أثناء تغيير كلمة المرور",
+    "Change Password": "تغيير كلمة المرور",
+    "Passwords must match": "يجب أن تتطابق كلمات المرور"
+  },
+  "TransfersForm": {
+    "player": "اللاعب",
+    "selectPlayerPlaceholder": "اختر اللاعب",
+
+    "transfer Date": "تاريخ الانتقال",
+    "selectDatePlaceholder": "اختر تاريخ الانتقال",
+
+    "description": "الوصف",
+    "descriptionPlaceholder": "أدخل الوصف",
+
+    "from Team": "من الفريق",
+    "selectFromTeamPlaceholder": "اختر الفريق المرسل",
+
+    "to Team": "إلى الفريق",
+    "selectToTeamPlaceholder": "اختر الفريق المستلم",
+
+    "Transfer date is required": "تاريخ الانتقال مطلوب",
+    "Transfer fee is required": "رسوم الانتقال مطلوبة",
+    "Player is required": "اللاعب مطلوب",
+    "From team is required": "الفريق المرسل مطلوب",
+    "To team is required": "الفريق المستلم مطلوب",
+    "Add Transfer": "إضافة انتقال",
+    "Edit Transfer": "تعديل الانتقال"
   }
 }

@@ -4,8 +4,12 @@ import LinksPageContainer from "@/components/Links/LinksPageContainer";
 
 async function page({ params }) {
   const { id } = await params;
-  const [players] = await Promise.all([getPlayers()]);
-  return <LinksPageContainer players={players} id={id} />;
+  const [players, links] = await Promise.all([
+    getPlayers(),
+    getLinks({ "playerId.equals": id }),
+  ]);
+
+  return <LinksPageContainer players={players} links={links} id={id} />;
 }
 
 export default page;

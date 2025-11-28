@@ -17,7 +17,7 @@
       "description": "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links"
     },
     "Tournaments Management": {
-      "title": "Tournaments Management",
+      "title": "Tournaments",
       "description": "Go to Tournaments Section to Add Tournament: Name, Champion, Start Date, End Date, Teams, Players"
     },
     "Players": {
@@ -70,6 +70,10 @@
     "Links": {
       "title": "Links",
       "description": "Go to Links to view user messages and reply to them"
+    },
+    "transfers Management": {
+      "title": "Transfers Management",
+      "description": "Go to Transfers Section to Add Transfer: Player, From Team, To Team, Transfer Date, Transfer Fee"
     }
   },
   "nav": {
@@ -86,7 +90,9 @@
     "tournaments management": "Tournaments Management",
     "matches management": "Matches Management",
     "support center": "Support Center",
-    "settings": "Settings"
+    "settings": "Settings",
+    "change password": "Change Password",
+    "transfers management": "Transfers Management"
   },
   "buttonLinks": {
     "add new": "Add New",
@@ -563,10 +569,18 @@
 
     "translation is required": "translation is required"
   },
-
+  "LinksTable": {
+    "URL": "URL",
+    "name": "Name",
+    "The Link is Deleted": "The Link is Deleted",
+    "error in Delete": "Error in Delete",
+    "Delete": "Delete",
+    "Edit": "Edit"
+  },
   "Links": {
     "Icon": "Icon",
     "Link added successfully": "Link added successfully",
+    "Link updated successfully": "Link updated successfully",
     "URL": "URL",
     "URL Icon": "URL Icon",
     "URL Link": "URL Link",
@@ -575,7 +589,8 @@
     "Name is required": "Name is required",
     "Icon is required": "Icon is required",
     "Add new link": "Add new link",
-    "Add Link": "Add Link"
+    "Add Link": "Add Link",
+    "Update Link": "Update Link"
   },
   "FavoriteCharacter": {
     "Game Name": "Game Name",
@@ -666,6 +681,55 @@
     "Invalid URL": "Invalid URL",
     "Name is required": "Name is required",
     "Name": "Name",
-    "Link Name": "Link Name"
+    "Link Name": "Link Name",
+    "Delete": "Delete",
+    "Edit": "Edit",
+    "Update Link": "Update Link",
+    "name": "Name",
+    "error in Delete": "error in Delete",
+    "The Link is Deleted": "The Link is Deleted"
+  },
+  "ChangePassword": {
+    "Current Password": "Current Password",
+    "Enter Current Password": "Enter Current Password",
+    "New Password": "New Password",
+    "Enter New Password": "Enter New Password",
+    "Confirm Password": "Confirm New Password",
+    "Enter Confirm New Password": "Enter Confirm New Password",
+    "Submit": "Submit",
+    "Current password is required": "Current password is required",
+    "New password is required": "New password is required",
+    "Confirm password is required": "Confirm password is required",
+    "Confirm new password is required": "Confirm new password is required",
+    "New password and confirm password do not match": "New password and confirm password do not match",
+    "Password changed successfully": "Password changed successfully",
+    "Error changing password": "Error changing password",
+    "Change Password": "Change Password",
+    "Passwords must match": "Passwords must match"
+  },
+
+  "TransfersForm": {
+    "player": "Player",
+    "selectPlayerPlaceholder": "Select Player",
+
+    "transfer Date": "Transfer Date",
+    "selectDatePlaceholder": "Select Transfer Date",
+
+    "description": "Description",
+    "descriptionPlaceholder": "Enter Description",
+
+    "from Team": "From Team",
+    "selectFromTeamPlaceholder": "Select From Team",
+
+    "to Team": "To Team",
+    "selectToTeamPlaceholder": "Select To Team",
+
+    "Transfer date is required": "Transfer date is required",
+    "Transfer fee is required": "Transfer fee is required",
+    "Player is required": "Player is required",
+    "From team is required": "From team is required",
+    "To team is required": "To team is required",
+    "Add Transfer": "Add Transfer",
+    "Edit Transfer": "Edit Transfer"
   }
 }

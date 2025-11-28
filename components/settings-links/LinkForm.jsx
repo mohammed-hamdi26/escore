@@ -5,6 +5,12 @@ import InputApp from "../ui app/InputApp";
 import FileInput from "../ui app/FileInput";
 import FormRow from "../ui app/FormRow";
 import { Button } from "../ui/button";
+import { Spinner } from "../ui/spinner";
+import {
+  addAppSocialLink,
+  updateAppSocialLink,
+} from "@/app/[locale]/_Lib/actions";
+import toast from "react-hot-toast";
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
   url: Yup.string().url("Invalid URL").required("URL is required"),
@@ -12,20 +18,31 @@ const validationSchema = Yup.object({
   lightImage: Yup.string().required("Light image URL is required"),
 });
 
-function LinkForm({ t }) {
+function LinkForm({ t, setOpen, link }) {
   const formik = useFormik({
     initialValues: {
-      name: "",
-      url: "",
-      darkImage: "",
-      lightImage: "",
+      name: link?.name || "",
+      url: link?.url || "",
+      darkImage: link?.darkImage || "",
+      lightImage: link?.lightImage || "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      const linkData = link ? { id: link.id, ...values } : values;
+      try {
+        (await link)
+          ? updateAppSocialLink(linkData)
+          : addAppSocialLink(linkData);
+        toast.success(
+          link ? t("Link updated successfully") : t("Link added successfully")
+        );
+        setOpen(false);
+      } catch (error) {
+        toast.error(error.message);
+      }
     },
   });
-  console.log(formik.errors);
+
   return (
     <form className="space-y-6" onSubmit={formik.handleSubmit}>
       <InputApp
@@ -82,7 +99,13 @@ function LinkForm({ t }) {
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          {formik.isSubmitting ? <Spinner /> : t("Add Link")}
+          {formik.isSubmitting ? (
+            <Spinner />
+          ) : link ? (
+            t("Update Link")
+          ) : (
+            t("Add Link")
+          )}
         </Button>
       </div>
     </form>

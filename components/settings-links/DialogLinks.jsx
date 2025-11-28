@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -9,21 +10,16 @@ import {
 } from "../ui/dialog";
 import LinkForm from "./LinkForm";
 
-function DialogLinks({ t }) {
+function DialogLinks({ t, trigger, dialogTitle, link }) {
+  const [open, setOpen] = useState(false);
   return (
-    <Dialog>
-      <DialogTrigger
-        className={
-          "text-white text-center w-fit min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80 transition-colors duration-300"
-        }
-      >
-        {t("Add New Link")}
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
-        <DialogTitle>{t("Add New Link")}</DialogTitle>
+        <DialogTitle>{dialogTitle}</DialogTitle>
         {/* <DialogDescription></DialogDescription> */}
 
-        <LinkForm t={t} />
+        <LinkForm setOpen={setOpen} t={t} link={link} />
       </DialogContent>
     </Dialog>
   );

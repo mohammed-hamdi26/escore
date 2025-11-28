@@ -30,7 +30,7 @@ function TeamLineup({ t, title, players, match, setOpen }) {
       }
     },
   });
-  console.log(formik.values);
+  // console.log(formik.values);
   return (
     <>
       <DialogTitle>{title}</DialogTitle>

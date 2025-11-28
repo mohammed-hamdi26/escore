@@ -1,6 +1,6 @@
 "use client";
 
-import { addLink } from "@/app/[locale]/_Lib/actions";
+import { addLink, updateLink } from "@/app/[locale]/_Lib/actions";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
@@ -16,30 +16,40 @@ const validationSchema = Yup.object({
   icon: Yup.string().required("Icon is required"),
   url: Yup.string().url().required("URL is required"),
 });
-const initialValues = {
-  name: "",
-  icon: "",
-  url: "",
-  player: null,
-  team: null,
-};
 
-function LinksForm({ players, teams, id, linksType = "player" }) {
+function LinksForm({
+  players,
+  teams,
+  id,
+  linksType = "player",
+  link,
+  setOpen,
+}) {
+  console.log(setOpen);
   const t = useTranslations("Links");
 
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      name: link?.name || "",
+      icon: link?.icon || "",
+      url: link?.url || "",
+      player: null,
+      team: null,
+    },
     onSubmit: async (values) => {
-      const linkData = values;
+      const linkData = link ? { id: link.id, ...values } : values;
       linksType === "player"
         ? (linkData.player = { id: Number(id) })
         : (linkData.team = { id: Number(id) });
       try {
-        await addLink(linkData);
-        formik.resetForm();
-        toast.success(t("Link added successfully"));
+        link ? await updateLink(linkData) : await addLink(linkData);
+        !link && formik.resetForm();
+        toast.success(
+          link ? t("Link updated successfully") : t("Link added successfully")
+        );
+        setOpen(false);
       } catch (error) {
-        t.error(error.message);
+        toast.error(error.message);
       }
     },
     validationSchema,
@@ -84,20 +94,6 @@ function LinksForm({ players, teams, id, linksType = "player" }) {
         textColor="text-[#677185]"
         value={formik.values.url}
       />
-      {/* <SelectInput
-        label="Player"
-        name={linksType === "player" ? "player" : "team"}
-        onChange={formik.handleChange}
-        placeholder={"Player"}
-        value={Number(id)}
-        error={formik.touched.player && formik.errors.player}
-        options={mappedArrayToSelectOptions(
-          linksType === "player" ? players : teams,
-          linksType === "player" ? "firstName" : "name",
-          "id"
-        )}
-        disabled={true}
-      /> */}
 
       <div className="flex justify-end">
         <Button
@@ -107,7 +103,13 @@ function LinksForm({ players, teams, id, linksType = "player" }) {
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          {formik.isSubmitting ? <Spinner /> : t("Add Link")}
+          {formik.isSubmitting ? (
+            <Spinner />
+          ) : link ? (
+            t("Update Link")
+          ) : (
+            t("Add Link")
+          )}
         </Button>
       </div>
     </form>

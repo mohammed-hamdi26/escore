@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import ComboboxInput from "../ui app/ComboBoxInput";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import MarkDown from "../ui app/MarkDown";
+import { Spinner } from "../ui/spinner";
 
 const validationSchema = yup.object({
   title: yup.string().required("titleRequired"),
@@ -412,11 +413,13 @@ function NewsForm({
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          {formik.isSubmitting
-            ? t("Submitting__")
-            : formType === "add"
-            ? t("Submit")
-            : t("Edit")}
+          {formik.isSubmitting ? (
+            <Spinner />
+          ) : formType === "add" ? (
+            t("Submit")
+          ) : (
+            t("Edit")
+          )}
         </Button>
       </div>
     </form>
