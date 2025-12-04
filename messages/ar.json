@@ -366,7 +366,10 @@
     "Knockout image is required": "صورة الشكل مطلوبة",
     "Cancelled": "ملغية",
     "Completed": "منتهية",
-    "Country": "البلد"
+    "Country": "البلد",
+
+    "Games": "الألعاب",
+    "Select Game": "اختر اللعبة"
   },
   "TournamentsTable": {
     "name": "الاسم",
@@ -492,7 +495,26 @@
     "Duration": "المدة",
     "VOD URL": "رابط VOD",
     "Enter VOD URL": "ادخل رابط VOD",
-    "Pick a date": "اختر تاريخ"
+    "Pick a date": "اختر تاريخ",
+
+    "Enter Highlight URL": "ادخل رابط الحلقة",
+    "Highlight URL": "رابط الحلقة",
+    "Enter End Time": "ادخل وقت النهاية",
+    "End Time": "وقت النهاية",
+    "Enter Start Time": "ادخل وقت البدء",
+    "Start Time": "وقت البدء",
+    "Enter Venue": "ادخل المكان",
+    "Venue": "المكان",
+    "Venue Type": "نوع المكان",
+
+    "Venue is required": "المكان مطلوب",
+    "Start Time is required": "وقت البدء مطلوب",
+    "End Time is required": "وقت النهاية مطلوب",
+    "Tournament is required": "البطولة مطلوبة",
+    "Game is required": "اللعبة مطلوبة",
+    "Team 1 is required": "الفريق 1 مطلوب",
+    "Team 2 is required": "الفريق 2 مطلوب",
+    "Series Format is required": "تنسيق السلسلة مطلوب"
   },
   "MatchesTable": {
     "Date": "التاريخ",

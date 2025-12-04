@@ -18,7 +18,7 @@ function LinksPageContainer({
   teams,
   id,
   links,
-  linkType = "player",
+  linkType = "players",
 }) {
   const t = useTranslations("Links");
   const [open, setOpen] = useState(false);
@@ -46,7 +46,12 @@ function LinksPageContainer({
           />
         </DialogContent>
       </Dialog>
-      <LinksTable links={links} numOfLinks={links.length} idUser={id} />
+      <LinksTable
+        linksType={linkType}
+        links={links}
+        numOfLinks={links.length}
+        idUser={id}
+      />
     </div>
   );
 }

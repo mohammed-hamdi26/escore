@@ -1,7 +1,7 @@
-import UserForm from "@/components/user-management/UserForm";
+import UserContainer from "@/components/user-management/UserContainer";
 
 function page() {
-  return <UserForm typeForm={"add"} />;
+  return <UserContainer />;
 }
 
 export default page;

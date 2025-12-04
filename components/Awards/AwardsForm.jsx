@@ -11,61 +11,68 @@ import FileInput from "../ui app/FileInput";
 import FormRow from "../ui app/FormRow";
 import DatePicker from "../ui app/DatePicker";
 import TextAreaInput from "../ui app/TextAreaInput";
-import { addAward } from "@/app/[locale]/_Lib/actions";
+import { addAward, editAward } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { Spinner } from "../ui/spinner";
 
 const validationSchema = Yup.object({
-  title: Yup.string().required("title is required"),
-  image: Yup.string().required("image is required"),
-  description: Yup.string().required("description is required"),
-  achievedDate: Yup.date().required("achievedDate is required"),
+  name: Yup.string().required("name is required"),
+  imageLight: Yup.string().required("image is required"),
+  // description: Yup.string().required("description is required"),
+  // achievedDate: Yup.date().required("achievedDate is required"),
 });
 const initialValues = {
-  title: "",
-  image: "",
-  description: "",
-  achievedDate: new Date(),
-  player: null,
-  team: null,
+  name: "",
+  imageLight: "",
+  imageDark: "",
+  // description: "",
+  // achievedDate: new Date(),
+
   game: null,
-  tournament: null,
 };
-function AwardsForm({ awardsType, players, teams, games, tournaments, id, t }) {
+function AwardsForm({ awardsType, award, games, tournaments, id, t }) {
   const formik = useFormik({
     initialValues,
     onSubmit: async (values) => {
       const awardsValues = {
         ...values,
-        player: values.player ? { id: Number(values.player) } : null,
-        team: values.team ? { id: Number(values.team) } : null,
-        game: values.game ? { id: Number(values.game) } : null,
-        tournament: values.tournament
-          ? { id: Number(values.tournament) }
-          : null,
+        image: {
+          light: values.imageLight,
+          iconDark: values.imageDark,
+        },
       };
-
+      console.log(awardsValues);
       try {
-        await addAward(awardsValues);
+        awardsType === "players"
+          ? await editAward("players", id, awardsValues)
+          : await editAward("teams", id, awardsValues);
         formik.resetForm();
-        toast.success(t("Awards added successfully"));
+        toast.success(
+          award
+            ? t("Awards updated successfully")
+            : t("Awards added successfully")
+        );
       } catch (error) {
-        toast.error(error.message);
+        toast.error(
+          award ? t("Error in Awards updated") : t("Error in Awards added")
+        );
       }
     },
     validationSchema,
   });
 
+  console.log(games);
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <FormRow gap="gap-4">
         <InputApp
-          value={formik.values.title}
+          value={formik.values.name}
           formik={formik}
-          label={t("title")}
-          name="title"
+          label={t("name")}
+          name="name"
           onChange={formik.handleChange}
-          placeholder={t("titlePlaceholder")}
+          placeholder={t("namePlaceholder")}
           error={
             formik.touched.name && formik.errors.name && t(formik.errors.name)
           }
@@ -77,7 +84,7 @@ function AwardsForm({ awardsType, players, teams, games, tournaments, id, t }) {
       <FileInput
         label={t("image")}
         formik={formik}
-        name="image"
+        name="imageLight"
         typeFile="image"
         disabled={formik.isSubmitting}
         placeholder={t("imagePlaceholder")}
@@ -88,13 +95,17 @@ function AwardsForm({ awardsType, players, teams, games, tournaments, id, t }) {
           formik={formik}
           label={t("game")}
           name={"game"}
-          onChange={(value) => formik.setFieldValue("game", Number(value))}
+          onChange={(value) => {
+            console.log(value);
+            formik.setFieldValue("game", value);
+          }}
           placeholder={"gamePlaceholder"}
           value={formik?.values?.game || null}
           error={formik.errors.game}
           options={mappedArrayToSelectOptions(games, "name", "id")}
         />
-        <SelectInput
+      </FormRow>
+      {/* <SelectInput
           formik={formik}
           label={t("tournament")}
           name={"tournament"}
@@ -106,9 +117,9 @@ function AwardsForm({ awardsType, players, teams, games, tournaments, id, t }) {
           error={formik.errors.tournament}
           options={mappedArrayToSelectOptions(tournaments, "name", "id")}
         />
-      </FormRow>
+      </FormRow> */}
 
-      <DatePicker
+      {/* <DatePicker
         disabled={formik.isSubmitting}
         disabledDate={{}}
         formik={formik}
@@ -133,7 +144,7 @@ function AwardsForm({ awardsType, players, teams, games, tournaments, id, t }) {
         placeholder={t("descriptionPlaceholder")}
         value={formik.values.description}
         disabled={formik.isSubmitting}
-      />
+      /> */}
 
       <div className="flex justify-end">
         <Button

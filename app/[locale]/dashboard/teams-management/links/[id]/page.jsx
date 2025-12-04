@@ -1,11 +1,13 @@
-import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
+import { getTeams, getTeamsLinks } from "@/app/[locale]/_Lib/teamsApi";
 import LinksPageContainer from "@/components/Links/LinksPageContainer";
 
 async function page({ params }) {
   const { id } = await params;
-  const [teams] = await Promise.all([getTeams()]);
+  const [teams, links] = await Promise.all([getTeams(), getTeamsLinks(id)]);
 
-  return <LinksPageContainer linkType="team" teams={teams} id={id} />;
+  return (
+    <LinksPageContainer links={links} linkType="teams" teams={teams} id={id} />
+  );
 }
 
 export default page;

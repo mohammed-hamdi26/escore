@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
-async function page() {
-  const users = await getUsers();
+async function page({ searchParams }) {
+  const page = searchParams.page || 1;
+  const { data: users, meta } = await getUsers({ page });
   const t = await getTranslations("buttonLinks");
   return (
     <div>
@@ -19,7 +20,7 @@ async function page() {
           </Button>
         </Link>
       </div>
-      <UsersTable users={users} />
+      <UsersTable users={users} meta={meta} />
     </div>
   );
 }

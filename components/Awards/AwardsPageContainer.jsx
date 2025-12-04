@@ -4,6 +4,7 @@ import { DialogContent, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import AwardsForm from "./AwardsForm";
 import { useTranslations } from "next-intl";
+import AwardsTable from "./AwardsTable";
 
 function AwardsPageContainer({
   awardsType = "player",
@@ -12,6 +13,7 @@ function AwardsPageContainer({
   tournaments,
   games,
   id,
+  awards,
 }) {
   const t = useTranslations("Awards");
   return (
@@ -39,6 +41,13 @@ function AwardsPageContainer({
           />
         </DialogContent>
       </Dialog>
+      <AwardsTable
+        awards={awards}
+        awardsType={awardsType}
+        games={games}
+        idUser={id}
+        t={t}
+      />
     </div>
   );
 }

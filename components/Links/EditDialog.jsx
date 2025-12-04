@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 
-function EditDialog({ link, idUser, t, trigger, contentDialog, title }) {
+function EditDialog({ idUser, t, trigger, contentDialog, title }) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>

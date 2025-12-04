@@ -26,7 +26,7 @@ const columns = [
   },
 ];
 
-function LinksTable({ links, numOfLinks, idUser }) {
+function LinksTable({ links, numOfLinks, idUser, linksType = "players" }) {
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("LinksTable");
   const searchParams = useSearchParams();
@@ -71,7 +71,13 @@ function LinksTable({ links, numOfLinks, idUser }) {
                   </Button>
                 }
                 contentDialog={
-                  <LinksForm id={idUser} link={link} idUser={idUser} t={t} />
+                  <LinksForm
+                    linksType={linksType}
+                    id={idUser}
+                    link={link}
+                    idUser={idUser}
+                    t={t}
+                  />
                 }
               />
               <Button
@@ -82,7 +88,7 @@ function LinksTable({ links, numOfLinks, idUser }) {
                 onClick={async () => {
                   try {
                     setIsLoading(true);
-                    await deleteLink(link.id, idUser);
+                    await deleteLink(linksType, idUser, link.id);
                     toast.success(t("The Link is Deleted"));
                   } catch (e) {
                     toast.error(t("error in Delete"));

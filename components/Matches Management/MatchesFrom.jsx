@@ -56,7 +56,11 @@ const validateSchema = Yup.object({
 
   summary: Yup.string().nullable(),
 
-  venue: Yup.string().nullable(),
+  venue: Yup.string().when("isOnline", {
+    is: "OFFLINE",
+    then: (schema) => schema.required("Venue is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 
   streamUrl: Yup.string().url("Invalid URL").nullable(),
 
@@ -66,6 +70,12 @@ const validateSchema = Yup.object({
 
   startedAt: Yup.string().required("Start Time is required"),
   endedAt: Yup.string().required("End Time is required"),
+
+  tournament: Yup.string().required("Tournament is required"),
+  game: Yup.string().required("Game is required"),
+  team1: Yup.string().required("Team 1 is required"),
+  team2: Yup.string().required("Team 2 is required"),
+  // seriesFormat: Yup.string().required("Series Format is required"),
 });
 function MatchesFrom({
   teamsOptions,
@@ -90,6 +100,7 @@ function MatchesFrom({
       player2Score: match?.player2Score || 0,
       summary: match?.summary || "",
       venue: match?.venue || "",
+
       streamUrl: match?.streamUrl || "",
 
       round: match?.round || "",
@@ -126,10 +137,20 @@ function MatchesFrom({
             combineDateAndTime(dataValues.date, dataValues.time),
             "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
           ),
+          startedAt: format(
+            combineDateAndTime(dataValues.date, dataValues.startedAt),
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+          ),
+          endedAt: format(
+            combineDateAndTime(dataValues.date, dataValues.endedAt),
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+          ),
         };
 
         delete dataValues.date;
         delete dataValues.time;
+
+        console.log(dataValues);
         await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(
@@ -163,23 +184,17 @@ function MatchesFrom({
   ];
 
   console.log("find", tournamentsOptions[0]?.games);
-  console.log(
-    gamesOptions.filter((game) =>
-      tournamentsOptions.some((tournament) =>
-        tournament.games.find((g) => g.id === game.id)
-      )
-    )
-  );
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
         <FormRow>
           <SelectInput
-            options={[
-              // { label: t("Select Tournament") },
-              ...mappedArrayToSelectOptions(tournamentsOptions, "name", "id"),
-            ]}
+            options={mappedArrayToSelectOptions(
+              tournamentsOptions,
+              "name",
+              "id"
+            )}
             onChange={(value) => formik.setFieldValue("tournament", value)}
             value={formik.values.tournament}
             label={t("Tournaments")}
@@ -188,7 +203,7 @@ function MatchesFrom({
             icon={<Champion color={"text-[#677185]"} />}
             error={
               formik?.errors?.tournament && formik?.touched?.tournament
-                ? formik.errors.tournament
+                ? t(formik.errors.tournament)
                 : ""
             }
             formik={formik}
@@ -197,7 +212,7 @@ function MatchesFrom({
             formik={formik}
             options={mappedArrayToSelectOptions(
               tournamentsOptions.find((t) => t.id === formik.values?.tournament)
-                ?.games,
+                ?.games || [],
 
               "name",
               "id"
@@ -216,7 +231,7 @@ function MatchesFrom({
             }
             error={
               formik?.errors?.game && formik?.touched?.game
-                ? formik.errors.game
+                ? t(formik.errors.game)
                 : ""
             }
           />
@@ -227,7 +242,11 @@ function MatchesFrom({
             label={t("Team 1")}
             name={"team1"}
             options={mappedArrayToSelectOptions(
-              teamsOptions.filter((team) => team.id !== formik.values?.team2),
+              teamsOptions
+                .filter((team) =>
+                  team.games.find((g) => g.id === formik.values?.game)
+                )
+                .filter((team) => team.id !== formik.values?.team2),
               "name",
               "id"
             )}
@@ -244,7 +263,7 @@ function MatchesFrom({
             }
             error={
               formik?.errors?.team1 && formik?.touched?.team1
-                ? formik?.errors?.team1
+                ? t(formik?.errors?.team1)
                 : ""
             }
             disabled={formik.values?.game === ""}
@@ -256,7 +275,11 @@ function MatchesFrom({
             label={t("Team 2")}
             name={"team2"}
             options={mappedArrayToSelectOptions(
-              teamsOptions.filter((team) => team.id !== formik.values?.team1),
+              teamsOptions
+                .filter((team) =>
+                  team.games.find((g) => g.id === formik.values?.game)
+                )
+                .filter((team) => team.id !== formik.values?.team1),
               "name",
               "id"
             )}
@@ -273,7 +296,7 @@ function MatchesFrom({
             }
             error={
               formik?.errors?.team2 && formik?.touched?.team2
-                ? formik?.errors?.team2
+                ? t(formik?.errors?.team2)
                 : ""
             }
             disabled={formik.values?.game === ""}
@@ -341,7 +364,7 @@ function MatchesFrom({
             icon={<Loader className="text-[#677185]" height={35} width={35} />}
             error={
               formik?.errors?.status && formik?.touched?.status
-                ? formik.errors.status
+                ? t(formik.errors.status)
                 : ""
             }
             disabled={formik.isSubmitting}
@@ -359,8 +382,8 @@ function MatchesFrom({
             name={"bestOf"}
             placeholder={t("Select Series Format")}
             error={
-              formik?.errors?.status && formik?.touched?.status
-                ? formik.errors.status
+              formik?.errors?.seriesFormat && formik?.touched?.seriesFormat
+                ? t(formik.errors.seriesFormat)
                 : ""
             }
             // onBlur={formik.handleBlur}
@@ -472,12 +495,14 @@ function MatchesFrom({
             value={formik.values.venue}
             error={
               formik?.errors?.venue && formik?.touched?.venue
-                ? formik?.errors?.venue
+                ? t(formik?.errors?.venue)
                 : ""
             }
             icon={<MapPin className="text-[#677185]" height={35} width={35} />}
             onBlur={formik.handleBlur}
-            disabled={formik.values.isOnline || formik.isSubmitting}
+            disabled={
+              formik.values.isOnline === "ONLINE" || formik.isSubmitting
+            }
           />
         </FormRow>
       </FormSection>
@@ -524,7 +549,7 @@ function MatchesFrom({
             textColor="text-[#677185]"
             error={
               formik?.errors?.startedAt && formik?.touched?.startedAt
-                ? formik?.errors?.startedAt
+                ? t(formik?.errors?.startedAt)
                 : ""
             }
             onBlur={formik.handleBlur}
@@ -540,7 +565,7 @@ function MatchesFrom({
             textColor="text-[#677185]"
             error={
               formik?.errors?.endedAt && formik?.touched?.endedAt
-                ? formik?.errors?.endedAt
+                ? t(formik?.errors?.endedAt)
                 : ""
             }
             onBlur={formik.handleBlur}
