@@ -36,7 +36,7 @@ const columns = [
   },
 ];
 
-function TournamentsTable({ tournaments, numOfTournaments }) {
+function TournamentsTable({ tournaments, numOfTournaments, countries }) {
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("TournamentsTable");
   const searchParams = useSearchParams();
@@ -51,19 +51,19 @@ function TournamentsTable({ tournaments, numOfTournaments }) {
 
       <Table
         t={t}
-        grid_cols="grid-cols-[1.4fr_0.5fr_0.5fr_0.5fr_0.5fr_2fr]"
+        grid_cols="grid-cols-[1fr_0.5fr_1fr_0.5fr_0.5fr_1.5fr]"
         columns={columns}
         data={tournaments}
       >
         {tournaments.map((tournament) => (
           <Table.Row
             key={tournament.id}
-            grid_cols="grid-cols-[1.4fr_0.5fr_0.5fr_0.5fr_0.5fr_2fr]"
+            grid_cols="grid-cols-[1fr_0.5fr_1fr_0.5fr_0.5fr_1.5fr]"
           >
             <Table.Cell className="flex gap-2 items-center">
               {tournament?.logo && (
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_BASE_URL}${tournament?.logo}`}
+                <img
+                  src={tournament?.logo.light}
                   width={30}
                   height={30}
                   alt=""

@@ -27,18 +27,18 @@ const SelectInputCombox = ({
   name,
   placeholder,
   onChange,
+  disabled,
 }) => {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(formik?.values[name]?.id || "");
+  const [value, setValue] = useState(formik?.values[name] || "");
 
   //   console.log("SelectInputCombox value", options);
-  //   console.log(value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          disabled={formik?.isSubmitting}
+          disabled={formik?.isSubmitting || disabled}
           variant="outline"
           role="combobox"
           aria-expanded={open}
@@ -56,7 +56,7 @@ const SelectInputCombox = ({
       <PopoverContent className="p-0 w-full min-w-[400px]  ">
         <Command>
           <CommandInput placeholder={placeholder} className="h-9" />
-          <CommandList>
+          <CommandList value={formik?.values[name]}>
             <CommandEmpty>No Data.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (

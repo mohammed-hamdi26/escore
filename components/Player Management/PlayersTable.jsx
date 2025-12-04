@@ -37,9 +37,7 @@ function PlayersTable({ players, columns, search, numOfPlayers }) {
             grid_cols={"grid-cols-[1fr_0.5fr_0.5fr_0.5fr_2fr]"}
             key={player.id}
           >
-            <Table.Cell>
-              {player.firstName} {player.lastName}
-            </Table.Cell>
+            <Table.Cell>{player.nickname}</Table.Cell>
             <Table.Cell>
               <img
                 className="rounded-full overflow-hidden size-12"
@@ -47,8 +45,8 @@ function PlayersTable({ players, columns, search, numOfPlayers }) {
                 alt=""
               />
             </Table.Cell>
-            <Table.Cell>{player.birthDate}</Table.Cell>
-            <Table.Cell>{player.nationality}</Table.Cell>
+            <Table.Cell>{player.dateOfBirth}</Table.Cell>
+            <Table.Cell>{player.country.name}</Table.Cell>
             <Table.Cell>
               <div className="flex justify-end gap-4">
                 <Link href={`/dashboard/player-management/edit/${player.id}`}>

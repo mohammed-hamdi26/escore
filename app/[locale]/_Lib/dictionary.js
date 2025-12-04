@@ -3,9 +3,10 @@ import apiClient from "./apiCLient";
 
 export async function getDictionaryWords(code) {
   try {
-    const res = await apiClient.get(`/v1/languages/${code}/dictionary`);
-    return res.data;
+    const res = await apiClient.get(`/settings/languages/${code}`);
+    return res.data.data;
   } catch (error) {
+    console.log(error.response.data.errors || error.response.data || error);
     console.error("Failed to fetch dictionary:", error);
     throw error;
   }
@@ -14,7 +15,7 @@ export async function getDictionaryWords(code) {
 export async function getSpecificWordTranslation(code, word) {
   try {
     const response = await apiClient.get(
-      `/v1/languages/${code}/dictionary/${word}`
+      `/settings/languages/${code}/dictionary/${word}`
     );
     return response.data;
   } catch (error) {

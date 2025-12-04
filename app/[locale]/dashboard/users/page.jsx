@@ -1,31 +1,25 @@
-import Table from "@/components/ui app/Table";
+import UsersTable from "@/components/Users/UsersTable";
+import { getUsers } from "../../_Lib/usersApi";
 import { Button } from "@/components/ui/button";
-
-async function getData() {
-  // Fetch data from your API here.
-  return [
-    {
-      // id: "728ed52f",
-      team1: "Team 1",
-    },
-
-    // ...
-  ];
-}
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 
 async function page() {
-  const data = await getData();
+  const users = await getUsers();
+  const t = await getTranslations("buttonLinks");
   return (
     <div>
-      <Table showHeader={false} grid_cols="grid-cols-[0.5fr_2fr]" data={data}>
-        <Button
-          className={
-            "text-white   bg-[#3A469D] rounded-full min-w-[100px] cursor-pointer"
-          }
-        >
-          Delete
-        </Button>
-      </Table>
+      <div className="flex items-center  gap-4 mb-8">
+        <Link href="/dashboard/users/add">
+          <Button
+            className={` text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary  hover:bg-green-primary/80
+            cursor-pointer  disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            {t("add new")}
+          </Button>
+        </Link>
+      </div>
+      <UsersTable users={users} />
     </div>
   );
 }

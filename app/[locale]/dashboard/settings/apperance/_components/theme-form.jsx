@@ -13,6 +13,7 @@ import {
   ColorPickerSelection,
 } from "./color-picker";
 import { Spinner } from "@/components/ui/spinner";
+import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 
 function ThemeForm({
   sucessMessage,
@@ -76,10 +77,14 @@ function ThemeForm({
       {formType === "add" && (
         <SelectInput
           placeholder="Theme type"
-          options={[
-            { value: "dark", label: "Dark" },
-            { value: "light", label: "Light" },
-          ]}
+          options={mappedArrayToSelectOptions(
+            [
+              { value: "dark", label: "Dark" },
+              { value: "light", label: "Light" },
+            ],
+            "label",
+            "value"
+          )}
           label={t("ThemeType")}
           value={formik.values.typeTheme}
           onChange={(value) => formik.setFieldValue("typeTheme", value)}

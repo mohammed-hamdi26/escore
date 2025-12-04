@@ -20,7 +20,7 @@ export default async function page({ params }) {
   return (
     <TeamForm
       submit={updateTeam}
-      countries={countries}
+      countries={countries.countries}
       team={team}
       OptionsData={{ newsOptions, playersOptions, gamesOptions }}
       successMessage="Team updated"

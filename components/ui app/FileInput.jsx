@@ -67,9 +67,21 @@ function FileInput({
                 onClick={async () => {
                   setIsLoading(true);
                   try {
+                    if (file.size > 2 * 1024 * 1024) {
+                      formik.setFieldError(
+                        name,
+                        "File size must be less than 2MB"
+                      );
+                      formik.setFieldTouched(name, true, false);
+                      toast.error("File size must be less than 2MB");
+                      return;
+                    } else {
+                      formik.setFieldError(name, "");
+                      formik.setFieldTouched(name, true, false);
+                    }
                     const formData = new FormData();
-                    formData.append("file", file);
-                    console.log("Uploading file:", file);
+                    formData.append("image", file);
+                    // console.log("Uploading file:", file);
                     const url = await uploadPhoto(formData);
                     setUrl(`${url}`);
                     formik.setFieldValue(name, `${url}`);

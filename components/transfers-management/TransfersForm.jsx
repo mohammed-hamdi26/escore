@@ -12,31 +12,52 @@ import MarkDown from "../ui app/MarkDown";
 import FormRow from "../ui app/FormRow";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
+import InputApp from "../ui app/InputApp";
+import toast from "react-hot-toast";
 const validationSchema = Yup.object({
   transferDate: Yup.date().required("Transfer date is required"),
-  transferFee: Yup.number().required("Transfer fee is required"),
-  player: Yup.object().required("Player is required"),
+  fee: Yup.number().required("Transfer fee is required"),
+  player: Yup.string().required("Player is required"),
   fromTeam: Yup.string().required("From team is required"),
   toTeam: Yup.string().required("To team is required"),
 });
-function TransfersForm({ formType = "add" }) {
+function TransfersForm({
+  formType = "add",
+  gamesOptions,
+  playersOptions,
+  teamsOptions,
+  transfer,
+  submit,
+}) {
   const t = useTranslations("TransfersForm");
   const formik = useFormik({
     initialValues: {
-      transferDate: "",
-      transferFee: "",
-      player: "",
-      fromTeam: "",
-      toTeam: "",
-      description: "",
+      transferDate: transfer?.transferDate || "",
+      fee: transfer?.fee || "",
+      player: transfer?.player.id || "",
+      fromTeam: transfer?.fromTeam?.id || "",
+      toTeam: transfer?.toTeam?.id || "",
+      description: transfer?.description || "",
+      game: transfer?.game?.id || "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log("Form values", values);
+      try {
+        const dataValues = transfer ? { id: transfer.id, ...values } : values;
+        await submit(dataValues);
+        formType === "add" && formik.resetForm();
+        toast.success(
+          formType === "add"
+            ? "Transfer added successfully"
+            : "Transfer updated successfully"
+        );
+      } catch (error) {
+        toast.error("An error occurred");
+      }
     },
   });
 
-  console.log("formik values", formik.values);
+  console.log("formik values", formik.errors);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8">
       <FormSection>
@@ -47,8 +68,8 @@ function TransfersForm({ formType = "add" }) {
             formik={formik}
             placeholder={t("selectPlayerPlaceholder")}
             options={mappedArrayToSelectOptions(
-              [{ id: 1, name: "test" }],
-              "name",
+              playersOptions,
+              "nickname",
               "id"
             )}
             error={
@@ -56,6 +77,22 @@ function TransfersForm({ formType = "add" }) {
               formik.errors.player &&
               t(formik.errors.player)
             }
+            onChange={(formValue) => {
+              formik.setFieldValue("player", formValue);
+            }}
+          />
+          <SelectInput
+            name={"game"}
+            label={t("game")}
+            formik={formik}
+            placeholder={t("selectGamePlaceholder")}
+            options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
+            error={
+              formik.touched.game && formik.errors.game && t(formik.errors.game)
+            }
+            onChange={(formValue) => {
+              formik.setFieldValue("game", formValue);
+            }}
           />
           <DatePicker
             formik={formik}
@@ -80,16 +117,41 @@ function TransfersForm({ formType = "add" }) {
       </FormSection>
       <FormSection>
         <FormRow>
+          <InputApp
+            name={"fee"}
+            label={t("fee")}
+            formik={formik}
+            placeholder={t("feePlaceholder")}
+            type={"number"}
+            error={
+              formik.touched.fee && formik.errors.fee && t(formik.errors.fee)
+            }
+            className="border-0 focus:outline-none "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            disabled={formik.isSubmitting}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.fee}
+            t={t}
+          />
+        </FormRow>
+      </FormSection>
+      <FormSection>
+        <FormRow>
           <SelectInput
             name={"fromTeam"}
             label={t("from Team")}
             formik={formik}
             placeholder={t("selectFromTeamPlaceholder")}
             options={mappedArrayToSelectOptions(
-              [{ id: 1, name: "team A" }],
+              teamsOptions.filter((team) => team.id !== formik.values.toTeam),
               "name",
               "id"
             )}
+            onChange={(value) => {
+              formik.setFieldValue("fromTeam", value);
+            }}
           />
           <SelectInput
             name={"toTeam"}
@@ -97,10 +159,13 @@ function TransfersForm({ formType = "add" }) {
             formik={formik}
             placeholder={t("selectToTeamPlaceholder")}
             options={mappedArrayToSelectOptions(
-              [{ id: 1, name: "team B" }],
+              teamsOptions.filter((team) => team.id !== formik.values.fromTeam),
               "name",
               "id"
             )}
+            onChange={(value) => {
+              formik.setFieldValue("toTeam", value);
+            }}
           />
         </FormRow>
       </FormSection>

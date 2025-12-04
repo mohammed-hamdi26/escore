@@ -7,8 +7,9 @@ export async function getTeams(searchParams = {}) {
 
   try {
     const res = await apiClient.get(`/teams?${searchParamsString}`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
+    console.log(e.response);
     throw new Error("Failed to get teams");
   }
 }
@@ -16,15 +17,16 @@ export async function getTeams(searchParams = {}) {
 export async function getTeam(id) {
   try {
     const res = await apiClient.get(`/teams/${id}`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
+    console.log(e.response);
     throw new Error("Failed to get team");
   }
 }
 export async function getTeamsCount() {
   try {
     const res = await apiClient.get(`/teams/count`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
     throw new Error("Failed to get teams count");
   }

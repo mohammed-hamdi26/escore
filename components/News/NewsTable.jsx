@@ -37,7 +37,7 @@ function NewsTable({ news, columns, numOfNews }) {
             <Table.Cell>{newsItem.title}</Table.Cell>
             <Table.Cell>{newsItem.authorName}</Table.Cell>
             <Table.Cell>
-              {format(newsItem.publishDate, "yyyy-MM-dd")}
+              {newsItem.publishAt && format(newsItem.publishAt, "yyyy-MM-dd")}
             </Table.Cell>
             <Table.Cell></Table.Cell>
             <Table.Cell className="flex gap-4 justify-end">

@@ -9,7 +9,10 @@
     "Forgot Password ?": "forgot password?",
     "Login successful": "Login successful",
     "May be username or password is incorrect": "May be username or password is incorrect",
-    "Don't have an account?": "Don't have an account?"
+    "Don't have an account?": "Don't have an account?",
+    "Invalid email address": "Invalid email address",
+    "Email is Required": "Email is Required",
+    "email": "email"
   },
   "Dashboard": {
     "Matches Management": {
@@ -144,6 +147,7 @@
     "firstNameRequired": "First Name is Required",
     "lastNameRequired": "Last Name is Required",
 
+    "countryRequired": "Country is Required",
     "birthDateRequired": "Birth Date is Required",
     "nationalityRequired": "Nationality is Required",
     "photoRequired": "Photo Player is Required",
@@ -152,7 +156,15 @@
     "earningsNegative": "Earnings cannot be negative",
     "achievementsNegative": "Achievements cannot be negative",
     "rankingNegative": "Ranking cannot be negative",
-    "marketValueNegative": "Market Value cannot be negative"
+    "marketValueNegative": "Market Value cannot be negative",
+
+    "Select country Player Belong To": "Select country Player Belong To",
+    "country": "Country",
+    "Enter Team Player Belong To": "Enter Team Player Belong To",
+    "Player Team": "Player Team",
+    "Nickname": "Nickname",
+    "Enter Player Nickname": "Enter Player Nickname",
+    "nicknameRequired": "Nickname is Required"
   },
   "PlayersTable": {
     "Edit": "Edit",
@@ -303,7 +315,7 @@
     "Invalid start date": "Invalid start date",
     "Start date is required": "Start date is required",
     "End date is required": "End date is required",
-    "Venue is required": "Venue is required",
+    "location is required": "location is required",
     "Prize pool is required": "Prize pool is required",
     "Prize pool must be positive": "Prize pool must be positive",
     "Status is required": "Status is required",
@@ -339,8 +351,8 @@
     "Description": "Description",
     "Select Status": "Select Status",
     "Status": "Status",
-    "venue": "Venue",
-    "Enter Name of venue": "Enter Name of venue",
+    "location": "Location",
+    "Enter Name of location": "Enter Name of location",
     "Organizer": "Organizer",
     "Enter Name of Organizer": "Enter Name of Organizer",
     "Name": "Name",
@@ -358,7 +370,10 @@
     "knockout image (Dark)": "knockout image (Dark)",
     "The Tournament Added": "The Tournament Added",
     "The Tournament Edited": "The Tournament Edited",
-    "uploaded Photo": "uploaded Photo"
+    "uploaded Photo": "uploaded Photo",
+    "Cancelled": "cancelled",
+    "Completed": "completed",
+    "Country": "Country"
   },
   "TournamentsTable": {
     "name": "Name",
@@ -411,9 +426,9 @@
   "MatchForm": {
     "ONLINE": "ONLINE",
     "OFFLINE": "OFFLINE",
-    "BO5": "BO5",
-    "BO3": "BO3",
-    "BO1": "BO1",
+    "Best of 1": "Best of 1",
+    "Best of 3": "Best of 3",
+    "Best of 5": "Best of 5",
     "CANCELLED": "CANCELLED",
     "LIVE": "LIVE",
     "UPCOMING": "UPCOMING",
@@ -451,13 +466,13 @@
     "Player 2 Score": "Player 2 Score",
     "Enter Player 2 Score": "Enter Player 2 Score",
 
-    "Stage": "Stage",
-    "Enter Stage": "Enter Stage",
+    "round": "Round",
+    "Enter round": "Enter Round",
 
-    "Venue Type": "Venue Type",
+    "location Type": "location Type",
 
-    "Venue": "Venue",
-    "Enter Venue": "Enter Venue",
+    "location": "location",
+    "Enter location": "Enter location",
 
     "Match Date": "Match Date",
     "Enter Match Date": "Enter Match Date",
@@ -486,11 +501,11 @@
   },
   "MatchesTable": {
     "Date": "Date",
-    "Time": "Stage",
+    "Time": "round",
     "Team 1": "Team 1",
     "Team 2": "Team 2",
     "Edit": "Edit",
-    "Stage": "Stage",
+    "round": "round",
     "Delete": "Delete",
     "error in Delete": "error in Delete",
     "Add Lineup For": "Add Lineup For",
@@ -712,6 +727,12 @@
     "player": "Player",
     "selectPlayerPlaceholder": "Select Player",
 
+    "game": "Game",
+    "selectGamePlaceholder": "Select Game",
+
+    "fee": "Fee",
+    "feePlaceholder": "Enter the Fee",
+
     "transfer Date": "Transfer Date",
     "selectDatePlaceholder": "Select Transfer Date",
 
@@ -731,5 +752,13 @@
     "To team is required": "To team is required",
     "Add Transfer": "Add Transfer",
     "Edit Transfer": "Edit Transfer"
+  },
+  "TransfersTable": {
+    "player": "Player",
+    "From": "From",
+    "To": "To",
+    "fee": "Fee",
+    "Edit": "Edit",
+    "Delete": "Delete"
   }
 }

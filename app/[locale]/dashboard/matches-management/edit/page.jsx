@@ -18,14 +18,14 @@ export default async function page({ searchParams }) {
     getMatches({ size, page }),
     getPlayers(),
   ]);
-  const numOfMatches = await getMatchesCount();
-
+  // const numOfMatches = await getMatchesCount();
+  console.log(matches, "matches");
   return (
     <MatchesTable
       players={players}
       matches={matches}
       columns={columns}
-      numOfMatches={numOfMatches}
+      // numOfMatches={numOfMatches}
     />
   );
 }

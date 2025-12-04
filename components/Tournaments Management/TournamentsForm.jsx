@@ -16,6 +16,7 @@ import { useTranslations } from "use-intl";
 import MarkDown from "../ui app/MarkDown";
 import { min } from "date-fns";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
+import ComboboxInput from "../ui app/ComboBoxInput";
 
 const validateSchema = yup.object({
   name: yup.string().required("Tournament name is required"),
@@ -33,7 +34,7 @@ const validateSchema = yup.object({
     // .min(yup.ref("startDate"), "End date cannot be before start date")
     .required("End date is required"),
 
-  venue: yup.string().required("Venue is required"),
+  location: yup.string().required("location is required"),
 
   prizePool: yup
     .number()
@@ -42,10 +43,10 @@ const validateSchema = yup.object({
 
   status: yup
     .string()
-    .oneOf(["UPCOMING", "ONGOING", "FINISHED"], "Invalid status")
+    .oneOf(["upcoming", "ongoing", "completed", "cancelled"], "Invalid status")
     .required("Status is required"),
 
-  logo: yup
+  logoLight: yup
     .string()
     // .url("Invalid logo URL")
     .required("Logo is required"),
@@ -64,20 +65,20 @@ const validateSchema = yup.object({
   //   // .url("Invalid dark knockout image URL")
   //   .required("Dark knockout image is required"),
 
-  winningPoints: yup
-    .number()
-    .min(0, "Winning points must be 0 or more")
-    .required("Winning points are required"),
+  // winningPoints: yup
+  //   .number()
+  //   .min(0, "Winning points must be 0 or more")
+  //   .required("Winning points are required"),
 
-  losingPoints: yup
-    .number()
-    .min(0, "Losing points must be 0 or more")
-    .required("Losing points are required"),
+  // losingPoints: yup
+  //   .number()
+  //   .min(0, "Losing points must be 0 or more")
+  //   .required("Losing points are required"),
 
-  drawPoints: yup
-    .number()
-    .min(0, "Draw points must be 0 or more")
-    .required("Draw points are required"),
+  // drawPoints: yup
+  //   .number()
+  //   .min(0, "Draw points must be 0 or more")
+  //   .required("Draw points are required"),
 
   // description: yup.string().required("Description is required"),
 });
@@ -86,32 +87,65 @@ export default function TournamentsForm({
   tournament,
   submit,
   formType = "add",
+  countries = [],
+  gameOptions = [],
 }) {
+  console.log("tournament", tournament?.country.code);
   const t = useTranslations("TournamentForm");
+
   const formik = useFormik({
     initialValues: {
       name: tournament?.name || "",
       organizer: tournament?.organizer || "",
       startDate: tournament?.startDate || "",
       endDate: tournament?.endDate || "",
-      venue: tournament?.venue || "",
+      location: tournament?.location || "",
       prizePool: tournament?.prizePool || "",
-      status: tournament?.status || "UPCOMING",
-      logo: tournament?.logo || "",
-      logoDark: tournament?.logoDark || "",
-      winningPoints: tournament?.winningPoints || "",
-      losingPoints: tournament?.losingPoints || "",
-      drawPoints: tournament?.drawPoints || "",
+      status: tournament?.status || "upcoming",
+      logoLight: tournament?.logo.light || "",
+      country: tournament?.country?.code || "",
+      games: tournament?.games || [],
+
+      logoDark: tournament?.logo.dark || "",
+      // winningPoints: tournament?.winningPoints || "",
+      // losingPoints: tournament?.losingPoints || "",
+      // drawPoints: tournament?.drawPoints || "",
       // description: tournament?.description || "",
-      knockoutImageLight: tournament?.knockoutImageLight || "",
-      knockoutImageDark: tournament?.knockoutImageDark || "",
+      knockoutImageLight: tournament?.bracketImage?.light || "",
+      knockoutImageDark: tournament?.bracketImage?.dark || "",
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
-      let dataValues = tournament ? { id: tournament.id, ...values } : values;
-      dataValues.country = null;
-
       try {
+        let dataValues = tournament ? { id: tournament.id, ...values } : values;
+        const selectedCountry = countries.find(
+          (c) => c.value === dataValues.country
+        );
+
+        dataValues.country = {
+          name: selectedCountry.label,
+          code: selectedCountry.value,
+          flag: selectedCountry.value,
+        };
+
+        dataValues.logo = {
+          light: dataValues.logoLight,
+          dark: dataValues.logoDark,
+        };
+        dataValues.bracketImage = {
+          light: dataValues.knockoutImageLight,
+          dark: dataValues.knockoutImageDark,
+        };
+
+        dataValues.slug = dataValues.name.replace(/\s+/g, "-").toLowerCase();
+        dataValues.games = dataValues.games.map((g) => g.id);
+
+        console.log("dataValues", dataValues);
+        dataValues.logoLight = "";
+        dataValues.logoDark = "";
+        dataValues.knockoutImageLight = "";
+        dataValues.knockoutImageDark = "";
+
         await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(
@@ -126,11 +160,13 @@ export default function TournamentsForm({
   });
 
   //
+  console.log("formik errors", formik.values.games);
 
   const statusOptions = [
-    { value: "UPCOMING", label: t("Upcoming") },
-    { value: "ONGOING", label: t("Ongoing") },
-    { value: "FINISHED", label: t("Finished") },
+    { value: "upcoming", label: t("Upcoming") },
+    { value: "ongoing", label: t("Ongoing") },
+    { value: "completed", label: t("Completed") },
+    { value: "cancelled", label: t("Cancelled") },
   ];
   console.log("formik errors", formik.values);
   return (
@@ -177,21 +213,21 @@ export default function TournamentsForm({
         <FormRow>
           <InputApp
             t={t}
-            label={t("venue")}
-            name={"venue"}
+            label={t("location")}
+            name={"location"}
             type={"text"}
-            placeholder={t("Enter Name of venue")}
+            placeholder={t("Enter Name of location")}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             error={
-              formik?.errors?.venue && formik?.touched?.venue
-                ? formik?.errors?.venue
+              formik?.errors?.location && formik?.touched?.location
+                ? formik?.errors?.location
                 : ""
             }
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
-            value={formik.values.venue}
+            value={formik.values.location}
           />
           <SelectInput
             formik={formik}
@@ -211,6 +247,16 @@ export default function TournamentsForm({
                 : ""
             }
             onBlur={() => formik.setFieldTouched("status", true)}
+          />
+          <SelectInput
+            name={"country"}
+            label={t("Country")}
+            formik={formik}
+            options={mappedArrayToSelectOptions(countries, "label", "value")}
+            onChange={(value) => {
+              formik.setFieldValue("country", value);
+            }}
+            value={formik.values.country}
           />
         </FormRow>
 
@@ -276,6 +322,18 @@ export default function TournamentsForm({
 
       <FormSection>
         <FormRow>
+          <ComboboxInput
+            formik={formik}
+            label={t("Games")}
+            name={"games"}
+            options={mappedArrayToSelectOptions(gameOptions, "name", "id")}
+            placeholder={t("Select Game")}
+            initialData={mappedArrayToSelectOptions(
+              formik.values.games,
+              "name",
+              "id"
+            )}
+          />
           <InputApp
             label={t("Prize Pool")}
             name={"prizePool"}
@@ -294,7 +352,7 @@ export default function TournamentsForm({
             value={formik.values.prizePool}
             t={t}
           />
-          <InputApp
+          {/* <InputApp
             label={t("Winning Points")}
             name={"winningPoints"}
             type={"number"}
@@ -349,7 +407,7 @@ export default function TournamentsForm({
             onChange={formik.handleChange}
             value={formik.values.drawPoints}
             t={t}
-          />
+          /> */}
         </FormRow>
       </FormSection>
 
@@ -359,7 +417,7 @@ export default function TournamentsForm({
             t={t}
             formik={formik}
             label={t("Logo")}
-            name={"logo"}
+            name={"logoLight"}
             placeholder={t("Upload Tournament Logo")}
             icon={
               <ImageIcon
@@ -368,7 +426,9 @@ export default function TournamentsForm({
               />
             }
             error={
-              formik.touched.logo && formik.errors.logo && t(formik.errors.logo)
+              formik.touched.logoLight &&
+              formik.errors.logoLight &&
+              t(formik.errors.logoLight)
             }
           />
           <FileInput
@@ -382,6 +442,11 @@ export default function TournamentsForm({
                 className={"fill-[#677185]"}
                 color={"text-[#677185]"}
               />
+            }
+            error={
+              formik.touched.logoDark &&
+              formik.errors.logoDark &&
+              t(formik.errors.logoDark)
             }
           />
         </FormRow>
@@ -416,6 +481,11 @@ export default function TournamentsForm({
                 className={"fill-[#677185]"}
                 color={"text-[#677185]"}
               />
+            }
+            error={
+              formik.touched.knockoutImageDark &&
+              formik.errors.knockoutImageDark &&
+              t(formik.errors.knockoutImageDark)
             }
           />
         </FormRow>

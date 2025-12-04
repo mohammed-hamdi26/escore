@@ -23,15 +23,16 @@ import MarkDown from "../ui app/MarkDown";
 import Loading from "../ui app/Loading";
 import LoadingScreen from "../ui app/loading-screen";
 import { Spinner } from "../ui/spinner";
+import CountryIcon from "../icons/CountryIcon";
 
 const validationSchema = yup.object({
   name: yup.string().required("Required"),
   // country: yup.string().required("Required"),
-  region: yup.string().required("Required"),
-  logo: yup.string().required("Required"),
+  // region: yup.string().required("Required"),
+  logoLight: yup.string().required("Required"),
   logoDark: yup.string().required("Required"),
   description: yup.string().required("Required"),
-  foundedDate: yup.string().required("Required"),
+  founded: yup.string().required("Required"),
   // numberOfFollowers: yup.number().required("Required"),
   worldRanking: yup.number().required("Required"),
   numberOfAchievements: yup.number().required("Required"),
@@ -45,11 +46,11 @@ function TeamForm({
   countries,
   formType = "add",
   OptionsData: {
-    newsOptions,
+    newsOptions = [],
     teamsOptions,
-    gamesOptions,
+    gamesOptions = [],
     tournamentsOptions,
-    playersOptions,
+    playersOptions = [],
   },
 }) {
   const t = useTranslations("TeamForm");
@@ -58,25 +59,51 @@ function TeamForm({
       name: team?.name || "",
       country: team?.country || null,
       region: team?.region || "",
-      logo: team?.logo || "",
-      logoDark: team?.logoDark || "",
+      logoLight: team?.logo.light || "",
+      logoDark: team?.logo.dark || "",
       description: team?.description || "",
-      foundedDate: team?.foundedDate || "",
-      // numberOfFollowers: team?.numberOfFollowers || "",
+      founded: team?.founded || "",
 
       worldRanking: team?.worldRanking || "",
       numberOfAchievements: team?.numberOfAchievements || "",
-      captain: team?.captain || null,
+      country: team?.country.code || "",
+      // numberOfFollowers: team?.numberOfFollowers || "",
+      // captain: team?.captain || null,
 
-      tournaments: team?.tournaments || [],
+      // game: team?.game || "",
+
+      // tournaments: team?.tournaments || [],
       games: team?.games || [],
-      matches: team?.matches || [],
-      players: team?.players || [],
-      news: team?.news || [],
+      // matches: team?.matches || [],
+      // players: team?.players || [],
+      // news: team?.news || [],
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       let dataValues = team ? { id: team.id, ...values } : values;
+
+      const selectedCountry = countries.find(
+        (c) => c.value === dataValues.country
+      );
+
+      console.log("games", dataValues.games);
+
+      dataValues = {
+        ...dataValues,
+        slug: dataValues.name.replace(/\s+/g, "-").toLowerCase(),
+        logo: {
+          light: dataValues.logoLight,
+          dark: dataValues.logoDark,
+        },
+        country: {
+          name: selectedCountry.label,
+          code: selectedCountry.value,
+          flag: selectedCountry.value,
+        },
+        games: dataValues.games.map((g) => g.id || g.value),
+      };
+
+      // console.log("dataValues", dataValues);
 
       try {
         const res = await submit(dataValues);
@@ -93,6 +120,9 @@ function TeamForm({
       }
     },
   });
+
+  // console.log("errors", formik.errors);
+  console.log("code", formik.initialValues);
 
   return (
     <form className="space-y-8 " onSubmit={formik.handleSubmit}>
@@ -120,25 +150,28 @@ function TeamForm({
             // }}
           />
 
-          {/* <SelectInput
+          <SelectInput
+            formik={formik}
             value={formik?.values?.country}
             icon={
               <CountryIcon
-              className="fill-[#677185]"
-              color={"text-[#677185]"}
-              height="44"
-              width="44"
+                className="fill-[#677185]"
+                color={"text-[#677185]"}
+                height="44"
+                width="44"
               />
-              }
-              options={countries?.countries || []}
-              name={"country"}
-              label={t("Country")}
-              placeholder={t("Select Country")}
-              error={formik.touched.country && formik.errors.country}
-              // onBlur={formik.handleBlur}
-              onChange={(value) => formik.setFieldValue("country", value)}
-              /> */}
-          <InputApp
+            }
+            options={
+              mappedArrayToSelectOptions(countries, "label", "value") || []
+            }
+            name={"country"}
+            label={t("Country")}
+            placeholder={t("Select Country")}
+            error={formik.touched.country && formik.errors.country}
+            // onBlur={formik.handleBlur}
+            onChange={(value) => formik.setFieldValue("country", value)}
+          />
+          {/* <InputApp
             value={formik?.values?.region}
             onChange={formik.handleChange}
             label={t("Region")}
@@ -162,7 +195,7 @@ function TeamForm({
             //   formik.setFieldValue("region", e.target.value.trim());
             //   formik.setFieldTouched("region", true);
             // }}
-          />
+          /> */}
         </FormRow>
         <MarkDown
           name={"description"}
@@ -176,7 +209,7 @@ function TeamForm({
           <FileInput
             formik={formik}
             label={t("logo")}
-            name={"logo"}
+            name={"logoLight"}
             placeholder={t("Upload Team Logo")}
             icon={
               <ImageIcon
@@ -184,7 +217,7 @@ function TeamForm({
                 color={"text-[#677185]"}
               />
             }
-            error={formik.touched.logo && formik.errors.logo}
+            error={formik.touched.logoLight && formik.errors.logoLight}
           />
           <FileInput
             name={"logoDark"}
@@ -205,7 +238,7 @@ function TeamForm({
       <FormSection>
         <DatePicker
           formik={formik}
-          name={"foundedDate"}
+          name={"founded"}
           label={t("Founded Date")}
           type={"text"}
           placeholder={t("Select Founded Date")}
@@ -315,8 +348,8 @@ function TeamForm({
           />
         </FormRow>
       </FormSection>
-      <FormSection>
-        <FormRow>
+      {/*<FormSection>
+         <FormRow>
           <SelectInput
             value={formik?.values?.captain?.id}
             onChange={(value) => {
@@ -339,26 +372,10 @@ function TeamForm({
             error={formik.touched.captain?.name && formik.errors.captain?.name}
           />
         </FormRow>
-      </FormSection>
+      </FormSection> */}
 
       <FormSection>
         <FormRow>
-          <ComboboxInput
-            name={"players"}
-            formik={formik}
-            placeholder={t("Select Players for Team")}
-            options={mappedArrayToSelectOptions(
-              playersOptions || [],
-              "firstName",
-              "id"
-            )}
-            initialData={mappedArrayToSelectOptions(
-              formik?.values?.players,
-              "firstName",
-              "id"
-            )}
-            label={t("Players")}
-          />
           <ComboboxInput
             name={"games"}
             formik={formik}
@@ -375,6 +392,23 @@ function TeamForm({
             )}
             label={t("Games")}
           />
+          {/* <ComboboxInput
+            name={"players"}
+            formik={formik}
+            placeholder={t("Select Players for Team")}
+            options={mappedArrayToSelectOptions(
+              playersOptions || [],
+              "firstName",
+              "id"
+            )}
+            initialData={mappedArrayToSelectOptions(
+              formik?.values?.players,
+              "firstName",
+              "id"
+            )}
+            label={t("Players")}
+          />
+
         </FormRow>
         <FormRow>
           <ComboboxInput
@@ -402,7 +436,7 @@ function TeamForm({
                 : []
             }
             label={t("News")}
-          />
+          />*/}
         </FormRow>
       </FormSection>
 
@@ -415,7 +449,7 @@ function TeamForm({
           }
         >
           {formik.isSubmitting ? (
-            <Spinner className="w-10 h-10 text-white" />
+            <Spinner className=" text-white" />
           ) : formType === "add" ? (
             t("Submit")
           ) : (

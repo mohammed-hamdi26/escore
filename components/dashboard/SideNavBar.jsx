@@ -29,7 +29,7 @@ import NavItems from "./NavItems";
 //   );
 // }
 
-function SideNavBar() {
+function SideNavBar({ user }) {
   const t = useTranslations("nav");
   return (
     <div className="hidden lg:block  w-[290px] ">
@@ -38,8 +38,8 @@ function SideNavBar() {
           "  bg-dashboard-box  dark:bg-linear-to-b dark:from-[#00000005] dark:to-[#24397b14] flex flex-col justify-center   py-16 w-[270px]  rounded-2xl min-h-[calc(100vh-155px)]  "
         }
       >
-        <HeaderSideNavBar t={t} />
-        <NavItems t={t} />
+        <HeaderSideNavBar user={user} t={t} />
+        <NavItems user={user} t={t} />
       </nav>
     </div>
   );

@@ -125,10 +125,16 @@ const ComboboxInput = ({
                     value={option.value}
                     onSelect={() => {
                       toggleSelection(option);
-                      formik.setFieldValue(name, [
-                        ...formik.values[name],
-                        { id: option.value, name: option.name },
-                      ]);
+                      formik.setFieldValue(
+                        name,
+                        formik.values[name].find(
+                          (v) => v.value === option.value
+                        )
+                          ? formik.values[name].filter(
+                              (v) => v.value !== option.value
+                            )
+                          : [...formik.values[name], option]
+                      );
                     }}
                   >
                     {(option.image || option.logo) && (

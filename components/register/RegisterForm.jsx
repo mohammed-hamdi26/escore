@@ -10,6 +10,7 @@ import FileInput from "../ui app/FileInput";
 import { Spinner } from "../ui/spinner";
 import { Link } from "@/i18n/navigation";
 function RegisterFrom({ formik, t }) {
+  // console.log(formik.errors);
   return (
     <div className="flex flex-[1] flex-col space-y-8 ">
       <div className="space-y-8 flex flex-col items-center justify-center ">
@@ -76,7 +77,11 @@ function RegisterFrom({ formik, t }) {
             // flexGrow="flex-[0.5]"
 
             inputAuth={true}
-            // error={formik.touched.imageUrl && formik.errors.imageUrl}
+            error={
+              formik.touched.imageUrl &&
+              formik.errors.imageUrl &&
+              formik.errors.imageUrl
+            }
           />
         </FormRow>
         {/* <Link

@@ -9,7 +9,7 @@ export async function getMatches(searchParams = {}) {
   try {
     const res = await apiClient.get(`/matches?${searchParamsString}`);
 
-    return res.data;
+    return res.data.data;
   } catch (e) {
     throw new Error("Error in get Matches");
   }
@@ -18,7 +18,7 @@ export async function getMatches(searchParams = {}) {
 export async function getMatch(id) {
   try {
     const res = await apiClient.get(`/matches/${id}`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
     throw new Error("Failed to get Match");
   }

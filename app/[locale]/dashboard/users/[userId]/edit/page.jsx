@@ -1,7 +1,7 @@
-import EditUserForm from "@/components/user-management/EditUserForm";
+import EditUserForm from "@/components/user-management/UserForm";
 
 function page() {
-  return <EditUserForm />;
+  return <UserForm typeForm={"edit"} />;
 }
 
 export default page;
