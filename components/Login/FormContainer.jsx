@@ -8,8 +8,8 @@ import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { Link, redirect } from "@/i18n/navigation";
 const validationSchema = Yup.object({
-  username: Yup.string().required("username is required"),
-  // email: Yup.string().email("Invalid email address").required("Required"),
+  // : Yup.string().required("username is required"),
+  email: Yup.string().email(" ").required("Email is Required"),
   password: Yup.string().required("password is required"),
   // role: Yup.string().required("Required"),
 });
@@ -18,7 +18,7 @@ function FormContainer() {
   const t = useTranslations("Login");
   const formik = useFormik({
     initialValues: {
-      username: "",
+      email: "",
       password: "",
     },
     validationSchema: validationSchema,

@@ -1,6 +1,7 @@
 "use client";
+import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { useFormik } from "formik";
-import { Link, Newspaper, Play } from "lucide-react";
+import { Link, Newspaper } from "lucide-react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import * as yup from "yup";
@@ -10,19 +11,15 @@ import ImageIcon from "../icons/ImageIcon";
 import Title from "../icons/Title";
 import User from "../icons/User";
 import Writer from "../icons/Writer";
+import ComboboxInput from "../ui app/ComboBoxInput";
 import DatePicker from "../ui app/DatePicker";
 import FileInput from "../ui app/FileInput";
 import FormRow from "../ui app/FormRow";
 import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
-import SelectInput from "../ui app/SelectInput";
-import TextAreaInput from "../ui app/TextAreaInput";
-import { Button } from "../ui/button";
-import { tr } from "date-fns/locale";
-import { format } from "date-fns";
-import ComboboxInput from "../ui app/ComboBoxInput";
-import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import MarkDown from "../ui app/MarkDown";
+import SelectInput from "../ui app/SelectInput";
+import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 
 const validationSchema = yup.object({
@@ -32,19 +29,19 @@ const validationSchema = yup.object({
   image: yup.string().required("imageRequired"),
   imageDark: yup.string(),
   // videoUrl: yup.string(),
-  publishDate: yup.string().when("status", {
+  publishAt: yup.string().when("status", {
     is: "SCHEDULED",
-    then: yup.string().required("publishDateRequired"),
+    then: yup.string().required("publishAtRequired"),
   }),
   authorName: yup.string().required("authorNameRequired"),
   authorPicture: yup.string(),
   authorProfile: yup.string(),
-  externalUrl: yup.string(),
+  urlExternal: yup.string(),
   status: yup.string().oneOf(["SCHEDULED", "PUBLISHED"], "statusInvalid"),
   newsType: yup
     .string()
     .oneOf(["GENERAL", "MATCH_RECAP", "TRENDING"], "newsTypeInvalid"),
-  // players: yup.string(),
+  // player: yup.string(),
   // transfers: yup.string(),
 });
 
@@ -52,7 +49,13 @@ function NewsForm({
   formType = "add",
   submit,
   newData,
-  options: { playersOptions, teamsOptions, tournamentsOptions, gamesOptions },
+  options: {
+    playersOptions,
+    teamsOptions,
+    tournamentsOptions,
+    gamesOptions,
+    matchesOptions,
+  },
 }) {
   const t = useTranslations("NewsForm");
 
@@ -61,28 +64,47 @@ function NewsForm({
       title: newData?.title || "",
       content: newData?.content || "",
       summary: newData?.summary || "",
-      image: newData?.image || "",
-      imageDark: newData?.imageDark || "",
+      image: newData?.coverImage?.light || "",
+      imageDark: newData?.coverImage?.dark || "",
       videoUrl: newData?.videoUrl || "",
-      publishDate: newData?.publishDate,
+      // publishAt: newData?.publishAt || "",
       authorName: newData?.authorName || "",
-      authorPicture: newData?.authorPicture || "",
+      authorPicture: newData?.authorImage?.light || "",
       authorProfile: newData?.authorProfile || "",
-      externalUrl: newData?.externalUrl || "",
-      status: newData?.status || "PUBLISHED",
+      urlExternal: newData?.urlExternal || "",
+      // status: newData?.status || "PUBLISHED",
+      category: newData?.category || "news",
       newsType: newData?.newsType || "",
-      players: newData?.players || [],
-      transfers: newData?.transfers || [],
-      matches: newData?.matches || [],
-      tournaments: newData?.tournaments || [],
-      teams: newData?.teams || [],
-      games: newData?.games || [],
+      player: newData?.player.id || "",
+      match: newData?.match.id || "",
+      team: newData?.team.id || "",
+      game: newData?.game.id || "",
+      tournament: newData?.tournament.id || "",
+      isFeatured: newData?.isFeatured
+        ? newData?.isFeatured
+          ? "Trending"
+          : "General"
+        : "Trending",
+      // transfers: newData?.transfers || "",
     },
     validationSchema,
     onSubmit: async (values) => {
       try {
         let dataValues = newData ? { id: newData?.id, ...values } : values;
 
+        dataValues = {
+          ...dataValues,
+          slug: dataValues.title.replace(/\s+/g, "-").toLowerCase(),
+          coverImage: {
+            light: dataValues.image,
+            dark: dataValues.imageDark,
+          },
+          authorImage: {
+            light: dataValues.authorPicture,
+            dark: dataValues.authorPicture,
+          },
+          isFeatured: dataValues.isFeatured === "Trending" ? true : false,
+        };
         await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(
@@ -91,7 +113,15 @@ function NewsForm({
             : "News updated successfully"
         );
       } catch (error) {
-        toast.error(error.message || "An error occurred");
+        if (!error.toString().includes("Error: NEXT_REDIRECT")) {
+          toast.error(error.message || "An error occurred");
+        } else {
+          toast.success(
+            formType === "add"
+              ? "News added successfully"
+              : "News updated successfully"
+          );
+        }
       }
     },
   });
@@ -106,6 +136,11 @@ function NewsForm({
     // { value: "TRANSFER", label: "Transfer News" },
     { value: "MATCH_RECAP", label: "Match Recap" },
     { value: "TRENDING", label: "Trending" },
+  ];
+
+  const featuredOptions = [
+    { value: "Trending", label: "Trending" },
+    { value: "General", label: "General" },
   ];
 
   return (
@@ -273,20 +308,20 @@ function NewsForm({
       <FormSection>
         <FormRow>
           <InputApp
-            name={"externalUrl"}
+            name={"urlExternal"}
             onChange={formik.handleChange}
             label={t("External URL")}
             type={"text"}
             placeholder={t("Enter External URL")}
-            value={formik.values.externalUrl}
+            value={formik.values.urlExternal}
             className="border-0 focus:outline-none"
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<Link width={31} height={31} className={"text-[#677185]"} />}
             error={
-              formik.touched.externalUrl &&
-              formik.errors.externalUrl &&
-              t(formik.errors.externalUrl)
+              formik.touched.urlExternal &&
+              formik.errors.urlExternal &&
+              t(formik.errors.urlExternal)
             }
             onBlur={formik.handleBlur}
           />
@@ -295,8 +330,8 @@ function NewsForm({
 
       {/* Classification */}
       <FormSection>
-        <FormRow>
-          <SelectInput
+        {/* <FormRow> */}
+        {/* <SelectInput
             formik={formik}
             t={t}
             name={"status"}
@@ -323,7 +358,20 @@ function NewsForm({
               <Newspaper width={31} height={31} className="text-[#677185]" />
             }
           />
-        </FormRow>
+        </FormRow> */}
+
+        <SelectInput
+          formik={formik}
+          name={"isFeatured"}
+          label={t("Featured")}
+          options={mappedArrayToSelectOptions(
+            featuredOptions,
+            "label",
+            "value"
+          )}
+          placeholder={t("is Featured")}
+          onChange={(value) => formik.setFieldValue("tournaments", value)}
+        />
       </FormSection>
       {formik.values.status === "SCHEDULED" && (
         <FormSection>
@@ -332,7 +380,7 @@ function NewsForm({
               disabled={formik.isSubmitting}
               disabledDate={{}}
               formik={formik}
-              name={"publishDate"}
+              name={"publishAt"}
               label={t("Publish Date")}
               placeholder={t("Select Publish Date")}
               icon={
@@ -344,50 +392,38 @@ function NewsForm({
       )}
       <FormSection>
         <FormRow>
-          <ComboboxInput
-            name={"players"}
+          <SelectInput
+            name={"player"}
             formik={formik}
-            label={t("Players")}
+            label={t("player")}
             options={mappedArrayToSelectOptions(
               playersOptions,
-              "firstName",
+              "nickname",
               "id"
             )}
-            placeholder={t("Select Players")}
-            initialData={mappedArrayToSelectOptions(
-              formik.values.players,
-              "firstName",
-              "id"
-            )}
+            placeholder={t("Select player")}
+            onChange={(value) => formik.setFieldValue("player", value)}
           />
-          <ComboboxInput
-            name={"teams"}
+          <SelectInput
+            name={"team"}
             formik={formik}
             label={t("Teams")}
             options={mappedArrayToSelectOptions(teamsOptions, "name", "id")}
             placeholder={t("Select Teams")}
-            initialData={mappedArrayToSelectOptions(
-              formik.values.teams,
-              "name",
-              "id"
-            )}
+            onChange={(value) => formik.setFieldValue("team", value)}
           />
         </FormRow>
         <FormRow>
-          <ComboboxInput
-            name={"games"}
+          <SelectInput
+            name={"game"}
             formik={formik}
             label={t("Games")}
             options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
-            placeholder={t("Select Games")}
-            initialData={mappedArrayToSelectOptions(
-              formik.values.games,
-              "name",
-              "id"
-            )}
+            placeholder={t("Select Game")}
+            onChange={(value) => formik.setFieldValue("game", value)}
           />
-          <ComboboxInput
-            name={"tournaments"}
+          <SelectInput
+            name={"tournament"}
             formik={formik}
             label={t("Tournaments")}
             options={mappedArrayToSelectOptions(
@@ -396,13 +432,23 @@ function NewsForm({
               "id"
             )}
             placeholder={t("Select Tournaments")}
-            initialData={mappedArrayToSelectOptions(
-              formik.values.tournaments,
-              "name",
-              "id"
-            )}
+            onChange={(value) => formik.setFieldValue("tournament", value)}
           />
         </FormRow>
+        <SelectInput
+          name={"match"}
+          formik={formik}
+          label={t("Matches")}
+          options={mappedArrayToSelectOptions(
+            matchesOptions.map((m) => {
+              return { name: `${m.team1.name} vs ${m.team2.name}`, id: m.id };
+            }),
+            "name",
+            "id"
+          )}
+          placeholder={t("Select Match")}
+          onChange={(value) => formik.setFieldValue("match", value)}
+        />
       </FormSection>
 
       <div className="flex justify-end">

@@ -47,6 +47,7 @@ function SelectInput({
               name={name}
               placeholder={placeholder}
               onChange={onChange}
+              disabled={disabled}
             />
             {/* {value && name && (
               <div>

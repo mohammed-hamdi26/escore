@@ -22,6 +22,7 @@ async function page() {
     getTournaments(),
   ]);
 
+  // console.log(countries.countries);
   return (
     <PlayerFrom
       OptionsData={{
@@ -31,7 +32,7 @@ async function page() {
         tournamentsOptions,
       }}
       submit={addPlayer}
-      countries={countries}
+      countries={countries.countries || []}
       successMessage="Player added"
     />
   );

@@ -21,15 +21,12 @@ export default function TeamsTable({ teams, columns, numOfTeams }) {
     <div className="space-y-8">
       <TeamsFilter numOfSize={numOfTeams} />
       <Table
-        grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
+        grid_cols="grid-cols-[0.5fr_0.5fr_1fr_2fr]"
         columns={[...columns]}
         t={t}
       >
         {teams.map((team) => (
-          <Table.Row
-            key={team.id}
-            grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_2fr]"
-          >
+          <Table.Row key={team.id} grid_cols="grid-cols-[0.5fr_0.5fr_1fr_2fr]">
             <Table.Cell className="flex gap-2 items-center">
               {team?.logo && <img width={30} src={team?.logo} alt="" />}{" "}
               {team?.name}

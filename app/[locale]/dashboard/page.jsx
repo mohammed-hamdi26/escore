@@ -65,13 +65,13 @@ const links = [
       "Go to news Sectoin to Add News: Title, Description, Image/Video, Author",
     icon: <News width="57" height="56" />,
   },
-  // {
-  //   title: "Users",
-  //   href: "/users/",
-  //   description:
-  //     "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
-  //   icon: <User />,
-  // },
+  {
+    title: "Users",
+    href: "/users/",
+    description:
+      "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
+    icon: <User />,
+  },
   {
     title: "Support Center",
     href: "/support-center",

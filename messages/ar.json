@@ -9,7 +9,10 @@
     "Forgot Password ?": "هل نسيت كلمة المرور؟",
     "Login successful": "تم تسجيل الدخول بنجاح",
     "May be username or password is incorrect": "قد يكون اسم المستخدم أو كلمة المرور غير صحيحة",
-    "Don't have an account?": "ليس لديك حساب؟"
+    "Don't have an account?": "ليس لديك حساب؟",
+    "Invalid email address": "البريد الإلكتروني غير صالح",
+    "Email is Required": "البريد الإلكتروني مطلوب",
+    "email": "البريد الإلكتروني"
   },
   "Dashboard": {
     "Matches Management": {
@@ -145,7 +148,17 @@
     "earningsNegative": "لا يمكن أن تكون الأرباح رقمًا سالبًا",
     "achievementsNegative": "لا يمكن أن تكون الإنجازات رقمًا سالبًا",
     "rankingNegative": "لا يمكن أن يكون التصنيف رقمًا سالبًا",
-    "marketValueNegative": "لا يمكن أن تكون القيمة السوقية رقمًا سالبًا"
+    "marketValueNegative": "لا يمكن أن تكون القيمة السوقية رقمًا سالبًا",
+
+    "countryRequired": "البلد مطلوب",
+    "Select country Player Belong To": "اختر البلد التي ينتمي إليه اللاعب",
+    "country": "البلد",
+    "Enter Team Player Belong To": "ادخل الفريق الذي ينتمي إليه اللاعب",
+    "Player Team": "فريق اللاعب",
+
+    "Nickname": "الاسم المستخدم",
+    "Enter Player Nickname": "ادخل اسم المستخدم",
+    "nicknameRequired": "اسم المستخدم مطلوب"
   },
   "PlayersTable": {
     "Edit": "تعديل",
@@ -297,7 +310,7 @@
     "Invalid start date": "تاريخ البدء غير صالح",
     "Start date is required": "تاريخ البدء مطلوب",
     "End date is required": "تاريخ الانتهاء مطلوب",
-    "Venue is required": "مكان إقامة البطولة مطلوب",
+    "location is required": "مكان إقامة البطولة مطلوب",
     "Prize pool is required": "قيمة الجائزة مطلوبة",
     "Prize pool must be positive": "قيمة الجائزة يجب أن تكون موجبة",
     "Status is required": "الحالة مطلوبة",
@@ -338,8 +351,8 @@
     "Description": "الوصف",
     "Select Status": "اختر الحالة",
     "Status": "الحالة",
-    "venue": "المكان",
-    "Enter Name of venue": "أدخل اسم المكان",
+    "location": "المكان",
+    "Enter Name of location": "أدخل اسم المكان",
     "Organizer": "المنظم",
     "Enter Name of Organizer": "أدخل اسم المنظم",
     "Name": "الاسم",
@@ -350,7 +363,10 @@
     "The Tournament Edited": "تم تعديل البطولة",
     "The Tournament Added": "تمت إضافة البطولة",
     "uploaded Photo": "تم رفع الصورة",
-    "Knockout image is required": "صورة الشكل مطلوبة"
+    "Knockout image is required": "صورة الشكل مطلوبة",
+    "Cancelled": "ملغية",
+    "Completed": "منتهية",
+    "Country": "البلد"
   },
   "TournamentsTable": {
     "name": "الاسم",
@@ -405,9 +421,9 @@
   "MatchForm": {
     "ONLINE": "أونلاين",
     "OFFLINE": "أوفلاين",
-    "BO5": "أفضل من 5",
-    "BO3": "أفضل من 3",
-    "BO1": "مباراة واحدة",
+    "Best of 5": "أفضل من 5",
+    "Best of 3": "أفضل من 3",
+    "Best of 1": "مباراة واحدة",
     "CANCELLED": "ملغي",
     "LIVE": "مباشر",
     "UPCOMING": "قادم",
@@ -444,14 +460,14 @@
     "Player 2 Score": "نتيجة اللاعب 2",
     "Enter Player 2 Score": "أدخل نتيجة اللاعب 2",
 
-    "Stage": "المرحلة",
-    "Enter Stage": "أدخل المرحلة",
-    "Stage is required": "المرحلة مطلوبة",
+    "round": "المرحلة",
+    "Enter round": "أدخل المرحلة",
+    "round is required": "المرحلة مطلوبة",
 
-    "Venue Type": "نوع المكان",
+    "location Type": "نوع المكان",
 
-    "Venue": "المكان",
-    "Enter Venue": "أدخل المكان",
+    "location": "المكان",
+    "Enter location": "أدخل المكان",
 
     "Match Date": "تاريخ المباراة",
     "Enter Match Date": "أدخل تاريخ المباراة",
@@ -484,7 +500,7 @@
     "Team 1": "الفريق 1",
     "Team 2": "الفريق 2",
     "Edit": "تعديل",
-    "Stage": "المرحلة",
+    "round": "المرحلة",
     "Delete": "حذف",
     "error in Delete": "خطأ في الحذف",
     "Add Lineup For": "إضافة تشكيلة لـ",
@@ -709,6 +725,12 @@
     "player": "اللاعب",
     "selectPlayerPlaceholder": "اختر اللاعب",
 
+    "game": "اللعبة",
+    "selectGamePlaceholder": "اختر اللعبة",
+
+    "fee": "رسوم الانتقال",
+    "feePlaceholder": "ادخل رسوم الانتقال",
+
     "transfer Date": "تاريخ الانتقال",
     "selectDatePlaceholder": "اختر تاريخ الانتقال",
 
@@ -728,5 +750,13 @@
     "To team is required": "الفريق المستلم مطلوب",
     "Add Transfer": "إضافة انتقال",
     "Edit Transfer": "تعديل الانتقال"
+  },
+  "TransfersTable": {
+    "player": "اللاعب",
+    "From": "من",
+    "To": "إلى",
+    "fee": "رسوم",
+    "Edit": "تعديل",
+    "Delete": "حذف"
   }
 }

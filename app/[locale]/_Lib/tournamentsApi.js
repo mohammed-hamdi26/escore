@@ -1,14 +1,14 @@
 import apiClient from "./apiCLient";
 
 export async function getTournaments(searchParams = {}) {
-  const searchParamsString = Object.entries(searchParams)
-    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-    .join("&");
+  // const searchParamsString = Object.entries(searchParams)
+  //   .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+  //   .join("&");
 
   try {
-    const res = await apiClient.get(`/tournaments?${searchParamsString}`);
+    const res = await apiClient.get(`/tournaments`);
 
-    return res.data;
+    return res.data?.data;
   } catch (e) {
     throw new Error("Error in Get tournaments");
   }
@@ -17,7 +17,7 @@ export async function getTournament(id) {
   try {
     const res = await apiClient.get(`/tournaments/${id}`);
 
-    return res.data;
+    return res.data?.data;
   } catch (e) {
     throw new Error("Error in Get tournament");
   }

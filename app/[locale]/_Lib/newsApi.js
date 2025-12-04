@@ -8,7 +8,7 @@ export async function getNews(searchParams = {}) {
 
   try {
     const res = await apiClient.get(`/news?${searchParamsString}`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
     throw new Error("Error in fetching news");
   }
@@ -17,7 +17,7 @@ export async function getNews(searchParams = {}) {
 export async function getNew(id) {
   try {
     const res = await apiClient.get(`/news/${id}`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
     throw new Error("Failed to get News");
   }
@@ -26,7 +26,7 @@ export async function getNew(id) {
 export async function getNewsCount() {
   try {
     const res = await apiClient.get(`/news/count`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
     throw new Error("Failed to get news count");
   }

@@ -17,6 +17,7 @@ const validationSchema = Yup.object({
     .required("Email is required"),
   password: Yup.string().required("password is required"),
   // role: Yup.string().required("Required"),
+  imageUrl: Yup.string(),
 });
 function FormContainer() {
   const t = useTranslations("Register");
@@ -31,6 +32,8 @@ function FormContainer() {
       langKey: "username",
     },
     validationSchema,
+    validateOnChange: false,
+    validateOnBlur: true,
     onSubmit: async (values) => {
       try {
         const registerData = { ...values, login: values.email };

@@ -24,25 +24,26 @@ import { Spinner } from "../ui/spinner";
 const validateSchema = Yup.object({
   firstName: Yup.string().required("firstNameRequired"),
   lastName: Yup.string().required("lastNameRequired"),
+  nickname: Yup.string().required("nicknameRequired"),
 
-  birthDate: Yup.string().required("birthDateRequired"),
-  nationality: Yup.string().required("nationalityRequired"),
-  photo: Yup.string().required("photoRequired"),
+  dateOfBirth: Yup.string().required("birthDateRequired"),
+  country: Yup.string().required("countryRequired"),
+  photoLight: Yup.string().required("photoRequired"),
   photoDark: Yup.string().required("photoDarkRequired"),
 
   // images: Yup.array().required("Required"),
   // imagesDark: Yup.array().required("Required"),
   // socialLinks: Yup.string().required("Required"),
 
-  totalEarnings: Yup.number().min(0, "earningsNegative"),
+  // totalEarnings: Yup.number().min(0, "earningsNegative"),
   mainGame: Yup.string(),
-  numberOfAchievements: Yup.number().min(0, "achievementsNegative"),
+  // numberOfAchievements: Yup.number().min(0, "achievementsNegative"),
   // teams: Yup.array().required("Required"),
   // games: Yup.array().required("Required"),
   // tournaments: Yup.array().required("Required"),
   // news: Yup.array().required("Required"),
-  worldRanking: Yup.number().min(1, "rankingNegative"),
-  marketValue: Yup.number().min(0, "marketValueNegative"),
+  // worldRanking: Yup.number().min(1, "rankingNegative"),
+  // marketValue: Yup.number().min(0, "marketValueNegative"),
 
   // lineups: Yup.array().required("Required"),
   // favoriteCharacters: Yup.array().required("Required"),
@@ -54,11 +55,12 @@ function PlayerFrom({
   submit,
   formType = "add",
   successMessage,
+
   OptionsData: {
-    newsOptions,
-    teamsOptions,
-    gamesOptions,
-    tournamentsOptions,
+    newsOptions = [],
+    teamsOptions = [],
+    gamesOptions = [],
+    tournamentsOptions = [],
   } = {},
 }) {
   const t = useTranslations("playerForm");
@@ -69,28 +71,30 @@ function PlayerFrom({
     initialValues: {
       firstName: player?.firstName || "",
       lastName: player?.lastName || "",
-      birthDate: player?.birthDate || "",
-      nationality: player?.nationality || "",
+      nickname: player?.nickname || "",
+      dateOfBirth: player?.dateOfBirth || "",
+      country: player?.country.code || "",
 
-      photo: player?.photo || "",
-      photoDark: player?.photoDark || "",
-      images: player?.images || "",
-      imagesDark: player?.imagesDark || "",
+      photoLight: player?.photo.light || "",
+      photoDark: player?.photo.dark || "",
+      // images: player?.images || "",
+      // imagesDark: player?.imagesDark || "",
       socialLink: player?.socialLink || "",
-      totalEarnings: player?.totalEarnings || 0,
-      mainGame: player?.mainGame || "",
+      mainGame: player?.game.id || "",
+      team: player?.team?.id || "",
+      // totalEarnings: player?.totalEarnings || 0,
 
-      numberOfAchievements: 0,
-      marketValue: 0,
-      worldRanking: 1,
-      numberOfFollowers: 0,
+      // numberOfAchievements: 0,
+      // marketValue: 0,
+      // worldRanking: 1,
+      // numberOfFollowers: 0,
 
-      country: null,
-      teams: player?.teams || [],
-      games: player?.games || [],
-      tournaments: player?.tournaments || [],
-      news: player?.news || [],
-      lineups: player?.lineups || [],
+      // teams: player?.teams || [],
+      // games: player?.games || [],
+      // tournaments: player?.tournaments || [],
+      // news: player?.news || [],
+      // lineups: player?.lineups || [],
+      isActive: player?.isActive || true,
       // favoriteCharacters: player?.favoriteCharacters || [],
       // socialLinks: player?.socialLinks || [],
     },
@@ -99,7 +103,25 @@ function PlayerFrom({
       try {
         let dataValues = player ? { id: player.id, ...values } : values;
 
-        delete dataValues.country;
+        const selectedCountry = countries.find(
+          (c) => c.value === dataValues.country
+        );
+
+        console.log("selectedCountry", selectedCountry);
+        dataValues = {
+          ...dataValues,
+          photo: {
+            light: dataValues.photoLight,
+            dark: dataValues.photoDark,
+          },
+          slug: `${`${dataValues.firstName}-${dataValues.lastName}`.toLowerCase()}`,
+          game: dataValues.mainGame,
+          country: {
+            name: selectedCountry.label,
+            code: selectedCountry.value,
+            flag: selectedCountry.value,
+          },
+        };
         delete dataValues.teams;
 
         await submit(dataValues);
@@ -114,6 +136,8 @@ function PlayerFrom({
       }
     },
   });
+
+  console.log("player", formik.initialValues);
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
@@ -160,11 +184,35 @@ function PlayerFrom({
             }
             onBlur={formik.handleBlur}
           />
+          <InputApp
+            value={formik.values.nickname}
+            onChange={formik.handleChange}
+            label={t("Nickname")}
+            name={"nickname"}
+            type={"text"}
+            placeholder={t("Enter Player Nickname")}
+            className="border-0 focus:outline-none "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            icon={
+              <UserCardIcon
+                className="fill-[#677185]"
+                color={"text-[#677185]"}
+              />
+            }
+            error={
+              formik?.errors?.nickname && formik?.touched?.nickname
+                ? t(formik.errors.nickname)
+                : ""
+            }
+            onBlur={formik.handleBlur}
+          />
         </FormRow>
+
         <FormRow>
           <DatePicker
-            name={"birthDate"}
-            value={formik.values.birthDate}
+            name={"dateOfBirth"}
+            value={formik.values.dateOfBirth}
             formik={formik}
             label={t("Birth Date")}
             disabledDate={{ after: new Date() }}
@@ -175,23 +223,19 @@ function PlayerFrom({
           />
           <SelectInput
             options={
-              mappedArrayToSelectOptions(
-                countries?.countries,
-                "label",
-                "label"
-              ) || []
+              mappedArrayToSelectOptions(countries, "label", "value") || []
             }
-            name={"nationality"}
-            label={t("Nationality")}
-            placeholder={t("Select Nationality Player Belong To")}
+            name={"country"}
+            label={t("country")}
+            placeholder={t("Select country Player Belong To")}
             icon={
               <CountryIcon
                 color={"text-[#677185]"}
                 className={"fill-[#677185]"}
               />
             }
-            onChange={(value) => formik.setFieldValue("nationality", value)}
-            value={formik.values.nationality}
+            onChange={(value) => formik.setFieldValue("country", value)}
+            value={formik.values.country}
           />
         </FormRow>
       </FormSection>
@@ -200,14 +244,14 @@ function PlayerFrom({
         <FormRow>
           <FileInput
             error={
-              formik?.errors?.photo && formik?.touched?.photo
-                ? t(formik.errors.photo)
+              formik?.errors?.photoLight && formik?.touched?.photoLight
+                ? t(formik.errors.photoLight)
                 : ""
             }
             t={t}
             formik={formik}
             type={"text"}
-            name={"photo"}
+            name={"photoLight"}
             label={t("Player Photo")}
             placeholder={t("Enter Player Photo")}
             icon={
@@ -245,7 +289,7 @@ function PlayerFrom({
 
       <FormSection>
         <FormRow>
-          <InputApp
+          {/* <InputApp
             name={"totalEarnings"}
             type={"number"}
             value={formik.values.totalEarnings}
@@ -262,14 +306,15 @@ function PlayerFrom({
             }
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
-          />
+          /> */}
 
           <SelectInput
+            formik={formik}
             name={"mainGame"}
             type={"text"}
             value={formik.values.mainGame}
             label={t("Main Game")}
-            options={mappedArrayToSelectOptions(gamesOptions, "name", "name")}
+            options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
             onChange={(value) => formik.setFieldValue("mainGame", value)}
             placeholder={t("Enter Main Game")}
             className="border-0 focus:outline-none "
@@ -282,10 +327,29 @@ function PlayerFrom({
                 : ""
             }
           />
+          <SelectInput
+            formik={formik}
+            name={"team"}
+            type={"text"}
+            value={formik.values.team}
+            label={t("Player Team")}
+            options={mappedArrayToSelectOptions(teamsOptions, "name", "id")}
+            onChange={(value) => formik.setFieldValue("team", value)}
+            placeholder={t("Enter Team Player Belong To")}
+            className="border-0 focus:outline-none "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            icon={<UserCardIcon color={"text-[#677185]"} />}
+            error={
+              formik?.errors?.team && formik?.touched?.team
+                ? t(formik.errors.team)
+                : ""
+            }
+          />
         </FormRow>
       </FormSection>
 
-      <FormSection>
+      {/* <FormSection>
         <FormRow>
           <InputApp
             name={"numberOfAchievements"}
@@ -342,9 +406,9 @@ function PlayerFrom({
             onChange={formik.handleChange}
           />
         </FormRow>
-      </FormSection>
+      </FormSection> */}
 
-      <FormSection>
+      {/* <FormSection>
         <FormRow>
           <ComboboxInput
             name={"teams"}
@@ -409,7 +473,7 @@ function PlayerFrom({
             )}
           />
         </FormRow>
-      </FormSection>
+      </FormSection> */}
 
       <div className="flex justify-end">
         <Button

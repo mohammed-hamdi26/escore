@@ -20,40 +20,47 @@ import {
 } from "../ui/dialog";
 import TeamLineup from "./TeamLineup";
 
-function MatchesTable({ matches, columns, numOfMatches, players }) {
+function MatchesTable({ matches, columns, players }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
-  const numPages = getNumPages(numOfMatches, Number(searchParams.get("size")));
+  // const numPages = getNumPages(numOfMatches, Number(searchParams.get("size")));
   const t = useTranslations("MatchesTable");
+
+  const [dialogType, setDialogType] = useState(null); // هنا بنحفظ نوع المحتوى
+
+  const openDialog = (type) => {
+    setDialogType(type);
+    setOpen(true);
+  };
 
   return (
     <div className="space-y-8">
-      <FilterMatches numOfSize={numOfMatches} />
+      {/* <FilterMatches /> */}
       <Table
         t={t}
-        grid_cols="grid-cols-[1fr_1fr_0.5fr_0.5fr_2fr]"
+        grid_cols="grid-cols-[0.7fr_0.7fr_0.5fr_0.5fr_2fr]"
         columns={[...columns]}
       >
         {matches?.map((match) => (
           <Table.Row
-            grid_cols={"grid-cols-[1fr_1fr_0.5fr_0.5fr_2fr]"}
+            grid_cols={"grid-cols-[0.7fr_0.7fr_0.5fr_0.5fr_2fr]"}
             key={match.id}
           >
-            <Table.Cell className="flex gap-2 items-center">
-              {match?.teams[0]?.logo && (
-                <img width={30} src={match?.teams[0]?.logo} alt="" />
+            <Table.Cell className="flex gap-4 items-center">
+              {match?.team1?.logo?.light && (
+                <img width={30} src={match?.team1?.logo?.light} alt="" />
               )}{" "}
-              {match?.teams[0]?.name}
+              {match?.teams1?.name}
             </Table.Cell>
-            <Table.Cell className="flex gap-2 items-center">
-              {match?.teams[1]?.logo && (
-                <img width={30} src={match?.teams[1]?.logo} alt="" />
+            <Table.Cell className="flex gap-4 items-center">
+              {match?.team2?.logo && (
+                <img width={30} src={match?.team2?.logo.light} alt="" />
               )}{" "}
-              {match?.teams[1]?.name}
+              {match?.team2?.name}
             </Table.Cell>
-            <Table.Cell>{match.stage}</Table.Cell>
-            <Table.Cell>{match.matchDate}</Table.Cell>
+            <Table.Cell>{match?.stage}</Table.Cell>
+            <Table.Cell>{match?.matchDate}</Table.Cell>
             <Table.Cell className="flex gap-4 justify-end">
               <Dialog open={open} onOpenChange={setOpen}>
                 <Link href={`/dashboard/matches-management/edit/${match.id}`}>
@@ -90,9 +97,12 @@ function MatchesTable({ matches, columns, numOfMatches, players }) {
                     {
                       id: "1",
                       menuItem: (
-                        <DialogTrigger onClick={() => setOpen(true)} asChild>
+                        <DialogTrigger
+                          onClick={() => openDialog("team1")}
+                          asChild
+                        >
                           <button dir="rtl">
-                            {`${t("Add Lineup For")} ${match?.teams[0]?.name}`}
+                            {`${t("Add Lineup For")} ${match?.team1?.name}`}
                           </button>
                         </DialogTrigger>
                       ),
@@ -100,9 +110,12 @@ function MatchesTable({ matches, columns, numOfMatches, players }) {
                     {
                       id: "2",
                       menuItem: (
-                        <DialogTrigger onClick={() => setOpen(true)} asChild>
+                        <DialogTrigger
+                          onClick={() => openDialog("team2")}
+                          asChild
+                        >
                           <button dir="rtl">
-                            {`${t("Add Lineup For")} ${match?.teams[1]?.name}`}
+                            {`${t("Add Lineup For")} ${match?.teams2?.name}`}
                           </button>
                         </DialogTrigger>
                       ),
@@ -111,9 +124,10 @@ function MatchesTable({ matches, columns, numOfMatches, players }) {
                 />
                 <DialogContent>
                   <TeamLineup
+                    dialogType={dialogType}
                     players={players}
                     t={t}
-                    title={`${t("Add Lineup For")} ${match?.teams[0]?.name}`}
+                    title={`${t("Add Lineup For")} `}
                     match={match}
                     setOpen={setOpen}
                   />
@@ -123,7 +137,7 @@ function MatchesTable({ matches, columns, numOfMatches, players }) {
           </Table.Row>
         ))}
       </Table>
-      <Pagination numPages={numPages} />
+      {/* <Pagination /> */}
     </div>
   );
 }

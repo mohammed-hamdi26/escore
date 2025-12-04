@@ -9,19 +9,10 @@ import { redirect } from "next/navigation";
 // login
 export async function login(userData) {
   try {
-    const res = await apiClient.post("/authenticate", userData, {
-      headers: {
-        "apple-id": "",
-      },
-    });
+    const res = await apiClient.post("/auth/login", userData);
 
-    await saveSession(res?.data?.id_token);
+    await saveSession(res?.data?.data?.tokens?.accessToken);
   } catch (e) {
-    // if (JSON.stringify(e).contains("NEXT_REDIRECT")) {
-    //   redirect("/dashboard");
-    //   return;
-    // }
-
     throw new Error("Error in login");
   }
   redirect("/dashboard");
@@ -57,6 +48,7 @@ export async function addPlayer(playerData) {
     const res = await apiClient.post("/players", playerData);
     // return res.data;
   } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in adding player");
   }
   redirect("/dashboard/player-management/edit");
@@ -70,6 +62,7 @@ export async function editPlayer(playerData) {
     );
     return res.data;
   } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in updating player");
   }
 }
@@ -90,6 +83,7 @@ export async function addGame(gameData) {
     const res = await apiClient.post("/games", gameData);
     // return res.data;
   } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in adding game");
   }
   redirect("/dashboard/games-management/edit");
@@ -123,6 +117,7 @@ export async function addTeam(teamData) {
     const res = await apiClient.post("/teams", teamData);
     // return res.data;
   } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in adding team");
   }
   redirect("/dashboard/teams-management/edit");
@@ -154,6 +149,7 @@ export async function deleteTeam(id) {
 
 // News Actions
 export async function addNews(newsData) {
+  const locale = await getLocale();
   try {
     const newsDataWithDate = {
       ...newsData,
@@ -166,9 +162,10 @@ export async function addNews(newsData) {
 
     // return res.data;
   } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in adding news");
   }
-  redirect("/dashboard/news/edit");
+  redirect(`/${locale}/dashboard/news/edit`);
 }
 
 export async function editNews(newsData) {
@@ -195,13 +192,13 @@ export async function deleteNew(id) {
 
 export async function uploadPhoto(formData) {
   try {
-    const url = await apiClient.post("/files/upload", formData, {
+    const res = await apiClient.post("/upload/image", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
 
-    return url.data;
+    return res.data.data.url;
   } catch (e) {
     console.log(e.response);
     throw new Error("error in upload");
@@ -216,6 +213,8 @@ export async function addTournament(tournamentData) {
 
     // return res.data;
   } catch (e) {
+    console.log(e.response);
+    console.log(e.response.data.errors);
     throw new Error("Error in adding tournament");
   }
   redirect("/dashboard/tournaments-management/edit");
@@ -233,6 +232,7 @@ export async function editTournament(tournamentData) {
     );
     return res.data;
   } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in updating tournaments");
   }
 }
@@ -255,6 +255,7 @@ export async function addMatch(matchData) {
     const res = await apiClient.post("/matches", matchData);
     // return res.data;
   } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in adding game");
   }
   redirect("/dashboard/matches-management/edit");
@@ -346,9 +347,10 @@ export async function addAward(awardData) {
 // langues
 
 export async function addLanguage(language_data) {
+  console.log(language_data);
   try {
     const response = await apiClient.post(
-      `/v1/languages`,
+      `/settings/languages`,
       language_data
       // {
       //   headers: {
@@ -367,7 +369,7 @@ export async function addLanguage(language_data) {
 export async function updateLanguage(code, language_data) {
   try {
     const response = await apiClient.patch(
-      `/v1/languages/${code}`,
+      `/settings/languages/${code}`,
       language_data
       // {
       //   headers: {
@@ -385,7 +387,7 @@ export async function updateLanguage(code, language_data) {
 export async function deleteLanguage(code) {
   try {
     const response = await apiClient.delete(
-      `/v1/languages/${code}`
+      `/settings/languages/${code}`
       // {
       //   headers: {
       //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
@@ -403,10 +405,13 @@ export async function deleteLanguage(code) {
 // dictionary
 export async function addToDictionary(code, { word, translation }) {
   try {
-    const response = await apiClient.post(`/v1/languages/${code}/dictionary`, {
-      word,
-      translation,
-    });
+    const response = await apiClient.post(
+      `/settings/languages/${code}/dictionary`,
+      {
+        word,
+        translation,
+      }
+    );
     console.log("Word added:", response.data);
     return response.data;
   } catch (error) {
@@ -418,20 +423,20 @@ export async function addToDictionary(code, { word, translation }) {
 export async function updateWord(code, word, translation) {
   try {
     const response = await apiClient.put(
-      `/v1/languages/${code}/dictionary/${word}`,
+      `/settings/languages/${code}/dictionary/${word}`,
       { translation }
     );
     console.log("Word translation updated:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to update word translation", error);
+    console.error("Failed to update word translation", error.response.data);
     throw error;
   }
 }
 export async function deleteWord(code, word) {
   try {
     const response = await apiClient.delete(
-      `/v1/languages/${code}/dictionary/${word}`
+      `/settings/languages/${code}/dictionary/${word}`
     );
     return response.data;
   } catch (error) {
@@ -445,7 +450,7 @@ export async function deleteWord(code, word) {
 export async function addAboutContent(language_code, content) {
   try {
     const res = await apiClient.post(
-      `/v1/about-app`,
+      `/settings/about-app`,
       { languageCode: language_code, content: content },
       {
         headers: {
@@ -462,7 +467,7 @@ export async function addAboutContent(language_code, content) {
 
 export async function deleteAboutContent(language_code) {
   try {
-    const res = await apiClient.delete(`/v1/about-app/${language_code}`, {
+    const res = await apiClient.delete(`/settings/about-app/${language_code}`, {
       headers: {
         "ngrok-skip-browser-warning": "true",
       },
@@ -477,7 +482,7 @@ export async function deleteAboutContent(language_code) {
 export async function updateAboutContent(language_code, content) {
   try {
     const res = await apiClient.patch(
-      `/v1/about-app/${language_code}`,
+      `/settings/about-app/${language_code}`,
       { languageCode: language_code, content: content },
       {
         headers: {
@@ -494,7 +499,7 @@ export async function updateAboutContent(language_code, content) {
 
 export async function getAboutContent(language_code) {
   try {
-    const res = await apiClient.get(`/v1/about-app/${language_code}`, {
+    const res = await apiClient.get(`/settings/about-app/${language_code}`, {
       headers: {
         "ngrok-skip-browser-warning": "true",
       },
@@ -508,7 +513,7 @@ export async function getAboutContent(language_code) {
 // privacy content
 export async function getPrivacyContent(language_code) {
   try {
-    const res = await apiClient.get(`/v1/privacy/${language_code}`, {
+    const res = await apiClient.get(`/settings/privacy/${language_code}`, {
       headers: {
         "ngrok-skip-browser-warning": "true",
       },
@@ -522,7 +527,7 @@ export async function getPrivacyContent(language_code) {
 export async function addPrivacyContent(language_code, content) {
   try {
     const res = await apiClient.post(
-      `/v1/privacy`,
+      `/settings/privacy`,
       { languageCode: language_code, content: content },
       {
         headers: {
@@ -540,7 +545,7 @@ export async function addPrivacyContent(language_code, content) {
 
 export async function deletePrivacyContent(language_code) {
   try {
-    const res = await apiClient.delete(`/v1/privacy/${language_code}`, {
+    const res = await apiClient.delete(`/settings/privacy/${language_code}`, {
       headers: {
         "ngrok-skip-browser-warning": "true",
       },
@@ -555,8 +560,8 @@ export async function deletePrivacyContent(language_code) {
 
 export async function updatePrivacyContent(language_code, content) {
   try {
-    const res = await apiClient.patch(
-      `/v1/privacy/${language_code}`,
+    const res = await apiClient.put(
+      `/settings/privacy/${language_code}`,
       { languageCode: language_code, content: content },
       {
         headers: {
@@ -574,27 +579,30 @@ export async function updatePrivacyContent(language_code, content) {
 
 export async function addTheme(theme) {
   try {
-    const res = await apiClient.post(`/v1/themes`, theme);
+    const res = await apiClient.post(`/settings/themes`, theme);
     console.log("theme added", res.data);
     return res.data;
   } catch (error) {
+    console.log(error.response.data.errors || error.response.data || error);
     console.log("Failed to add theme", error);
     throw error;
   }
 }
 export async function updateTheme(theme, theme_id) {
   try {
-    const res = await apiClient.put(`/v1/themes/${theme_id}`, theme);
+    const res = await apiClient.put(`/settings/themes/${theme_id}`, theme);
     console.log("theme updated", res.data);
     return res.data;
   } catch (error) {
-    console.log("Failed to add theme", error);
+    console.log(error.response.data.errors || error.response.data || error);
+
+    // console.log("Failed to add theme", error);
     throw error;
   }
 }
 export async function deleteTheme(theme_id) {
   try {
-    const res = await apiClient.delete(`/v1/themes/${theme_id}`);
+    const res = await apiClient.delete(`/settings/themes/${theme_id}`);
     console.log("theme deleted", res.data);
     return res.data;
   } catch (error) {
@@ -606,7 +614,7 @@ export async function deleteTheme(theme_id) {
 export async function replayTicket(id, data) {
   const locale = await getLocale();
   try {
-    const res = apiClient.patch(`/support-tickets/${id}`, data);
+    const res = apiClient.patch(`/support/tickets/${id}/replay`, data);
     revalidatePath(`/${locale}/dashboard/support-center`);
     // return res.data;
   } catch (error) {
@@ -631,9 +639,10 @@ export async function addLineUp(data) {
 export async function changePassword(data) {
   console.log(data);
   try {
-    const res = await apiClient.post(`/account/change-password`, data);
+    const res = await apiClient.put(`/users/change-password`, data);
     return res.data;
   } catch (error) {
+    console.log(error.response.data.errors || error.response.data || error);
     // console.log("Failed to change password", error.response);
     throw error;
   }
@@ -642,7 +651,7 @@ export async function changePassword(data) {
 export async function addAppSocialLink(data) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.post(`/v1/escore-social-links`, data);
+    const res = await apiClient.post(`/settings/social-links`, data);
     revalidatePath(`/${locale}/dashboard/settings/links`);
     return res.data;
   } catch (error) {
@@ -653,11 +662,13 @@ export async function addAppSocialLink(data) {
 
 export async function updateAppSocialLink(data) {
   const locale = await getLocale();
+  console.log(data);
   try {
-    const res = await apiClient.put(`/v1/escore-social-links/${data.id}`, data);
+    const res = await apiClient.put(`/settings/social-links/${data.id}`, data);
     revalidatePath(`/${locale}/dashboard/settings/links`);
     return res.data;
   } catch (error) {
+    console.log(error.response.data.errors || error.response.data || error);
     // console.log("Failed to add social link", error.response);
     throw error;
   }
@@ -666,11 +677,99 @@ export async function updateAppSocialLink(data) {
 export async function deleteAppSocialLink(id) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.delete(`/v1/escore-social-links/${id}`);
+    const res = await apiClient.delete(`/settings/social-links/${id}`);
     revalidatePath(`/${locale}/dashboard/settings/links`);
     return res.data;
   } catch (error) {
     // console.log("Failed to add social link", error.response);
+    throw error;
+  }
+}
+
+// transfars
+
+export async function addTransfer(data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(`/transfers`, data);
+    // return res.data;
+  } catch (error) {
+    console.log(
+      error.response.data.errors ||
+        error.response.data ||
+        error.response ||
+        error
+    );
+    // console.log("Failed to add transfer", error);
+    throw error;
+  }
+  redirect(`/${locale}/dashboard/transfer-management/edit`);
+}
+
+export async function editTransfer(data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(`/transfers/${data.id}`, data);
+    revalidatePath(`/${locale}/dashboard/transfer-management/edit/${data.id}`);
+    // return res.data;
+  } catch (error) {
+    console.log(
+      error.response.data.errors ||
+        error.response.data ||
+        error.response ||
+        error
+    );
+    // console.log("Failed to add transfer", error);
+    throw error;
+  }
+  // redirect(`/${locale}/dashboard/transfer-management/edit/${data.id}`);
+}
+
+export async function deleteTransfer(id) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.delete(`/transfers/${id}`);
+    revalidatePath(`/${locale}/dashboard/transfer-management`);
+    // return res.data;
+  } catch (error) {
+    console.log("Failed to delete transfer", error);
+    throw error;
+  }
+  // redirect(`/${locale}/dashboard/transfer-management`);
+}
+
+export async function addUser(data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(`/admin/users`, data);
+    // return res.data;
+  } catch (error) {
+    console.log(error.response.data.errors || error.response.data || error);
+    console.log("Failed to add user", error);
+    throw error;
+  }
+  redirect(`/${locale}/dashboard/users`);
+}
+
+export async function editUser(data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(`/admin/users/${data.id}`, data);
+    // return res.data;
+  } catch (error) {
+    console.log(error.response.data.errors || error.response.data || error);
+    console.log("Failed to edit user", error);
+    throw error;
+  }
+  redirect(`/${locale}/dashboard/users`);
+}
+export async function deleteUser(id) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.delete(`/admin/users/${id}`);
+    // return res.data;
+  } catch (error) {
+    console.log("Failed to delete user", error);
     throw error;
   }
 }

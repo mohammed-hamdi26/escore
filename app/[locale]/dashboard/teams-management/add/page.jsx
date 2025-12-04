@@ -9,10 +9,15 @@ import TeamForm from "@/components/teams management/TeamForm";
 async function page() {
   const [countries, newsOptions, playersOptions, gamesOptions] =
     await Promise.all([getCountries(), getNews(), getPlayers(), getGames()]);
+
+  console.log(countries.countries, "countries");
+  console.log(newsOptions, "newsOptions");
+  console.log(playersOptions, "playersOptions");
+  console.log(gamesOptions, "gamesOptions");
   return (
     <TeamForm
       submit={addTeam}
-      countries={countries}
+      countries={countries.countries}
       OptionsData={{
         newsOptions,
         playersOptions,

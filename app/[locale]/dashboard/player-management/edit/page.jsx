@@ -27,19 +27,14 @@ const columns = [
 async function page({ searchParams }) {
   const { search, size, page } = await searchParams;
 
-  const players = await getPlayers({
-    "firstName.contains": search || "",
+  const players = await getPlayers();
 
-    size: size || 20,
-    page,
-  });
-
-  const numOfPlayers = await getPlayersCount();
+  // const numOfPlayers = await getPlayersCount();
 
   return (
     <Suspense fallback={<Loading />}>
       <PlayersTable
-        numOfPlayers={numOfPlayers}
+        // numOfPlayers={numOfPlayers}
         search={search}
         players={players}
         columns={columns}

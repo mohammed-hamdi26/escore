@@ -17,7 +17,7 @@ const validationSchema = yup.object({
   name: yup.string().required("Name is required"),
   icon: yup.string().required("Icon is required"),
   iconDark: yup.string().required("Icon (Dark) is required"),
-  description: yup.string().required("Description is required"),
+  // description: yup.string().required("Description is required"),
   // players: yup.array().required("Players is required"),
   // news: yup.array().required("News is required"),
   // teams: yup.array().required("Teams is required"),
@@ -38,10 +38,10 @@ function GamesForm({
       icon: data?.icon || "",
       iconDark: data?.iconDark || "",
       description: data?.description || "",
-      players: data?.players || [],
-      news: data?.news || [],
-      teams: data?.teams || [],
-      tournaments: data?.tournaments || [],
+      // players: data?.players || [],
+      // news: data?.news || [],
+      // teams: data?.teams || [],
+      // tournaments: data?.tournaments || [],
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -51,6 +51,15 @@ function GamesForm({
             ...values,
           }
         : values;
+
+      dataValues = {
+        ...dataValues,
+        logo: {
+          light: dataValues.icon,
+          dark: dataValues.iconDark,
+        },
+        slug: dataValues.name.replace(/\s+/g, "-").toLowerCase(),
+      };
 
       // dataValues = {
       //   ...dataValues,

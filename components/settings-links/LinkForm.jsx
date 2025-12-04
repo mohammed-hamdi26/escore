@@ -23,16 +23,21 @@ function LinkForm({ t, setOpen, link }) {
     initialValues: {
       name: link?.name || "",
       url: link?.url || "",
-      darkImage: link?.darkImage || "",
-      lightImage: link?.lightImage || "",
+      darkImage: link?.image.dark || "",
+      lightImage: link?.image.light || "",
     },
     validationSchema,
     onSubmit: async (values) => {
       const linkData = link ? { id: link.id, ...values } : values;
+
+      linkData.image = {
+        light: linkData.lightImage,
+        dark: linkData.darkImage,
+      };
       try {
-        (await link)
-          ? updateAppSocialLink(linkData)
-          : addAppSocialLink(linkData);
+        link
+          ? await updateAppSocialLink(linkData)
+          : await addAppSocialLink(linkData);
         toast.success(
           link ? t("Link updated successfully") : t("Link added successfully")
         );

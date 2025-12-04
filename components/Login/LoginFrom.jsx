@@ -10,12 +10,12 @@ function LoginFrom({ formik, t }) {
     <div className="flex flex-[0.5] flex-col space-y-8 ">
       <div className="space-y-8 flex flex-col items-center justify-center ">
         <Image src={logoImage} alt="logo" width={250} height={40} />
-        <Link
+        {/* <Link
           href="/register/form"
           className="text-gray-400 hover:text-gray-400/90 hover:underline transition-all duration-300"
         >
           {t("Don't have an account?")}
-        </Link>
+        </Link> */}
       </div>
       <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
         {/* <InputApp
@@ -28,10 +28,10 @@ function LoginFrom({ formik, t }) {
         /> */}
         <InputApp
           t={t}
-          placeholder={t("username")}
-          name="username"
+          placeholder={t("email")}
+          name="email"
           type="text"
-          error={formik.touched.username && formik.errors.username}
+          error={formik.touched.email && formik.errors.email}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           className="max-w-[400px]"

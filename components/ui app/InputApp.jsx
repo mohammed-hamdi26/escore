@@ -37,7 +37,9 @@ function InputApp({
             placeholder={placeholder}
             className={
               className +
-              ` ${backGroundColor} ${textColor} rounded-[10px] p-6 focus:outline-none focus:border-0  focus:border-green-primary`
+              ` ${backGroundColor} ${
+                textColor || "text-black"
+              } rounded-[10px] p-6 focus:outline-none focus:border-0  focus:border-green-primary`
             }
             type={type}
             name={name}

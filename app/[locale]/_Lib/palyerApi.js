@@ -6,7 +6,7 @@ export async function getPlayers(searchParams = {}) {
   //
   try {
     const res = await apiClient.get(`/players?${searchParamsString}`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
     throw new Error("Failed to get players");
   }
@@ -15,7 +15,7 @@ export async function getPlayers(searchParams = {}) {
 export async function getPlayer(id) {
   try {
     const res = await apiClient.get(`/players/${id}`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
     throw new Error("Failed to get players");
   }
@@ -24,7 +24,7 @@ export async function getPlayer(id) {
 export async function getPlayersCount() {
   try {
     const res = await apiClient.get(`/players/count`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
     throw new Error("Failed to get players count");
   }

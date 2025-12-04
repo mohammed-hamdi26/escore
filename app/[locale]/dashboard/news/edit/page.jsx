@@ -12,9 +12,9 @@ const columns = [
 async function page({ searchParams }) {
   const { size, page } = await searchParams;
   const news = await getNews({ size, page });
-  const numOfNews = await getNewsCount();
+  // const numOfNews = await getNewsCount();
 
-  return <NewsTable news={news} columns={columns} numOfNews={numOfNews} />;
+  return <NewsTable news={news} columns={columns} />;
 }
 {
   /* <Button

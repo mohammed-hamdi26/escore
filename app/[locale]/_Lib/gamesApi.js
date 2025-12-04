@@ -7,7 +7,7 @@ export async function getGames(searchParams = {}) {
 
   try {
     const res = await apiClient.get(`/games?${searchParamsString}`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
     throw new Error("Failed to get games");
   }
@@ -16,8 +16,9 @@ export async function getGames(searchParams = {}) {
 export async function getGame(id) {
   try {
     const res = await apiClient.get(`/games/${id}`);
-    return res.data;
+    return res.data.data;
   } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Failed to get game");
   }
 }

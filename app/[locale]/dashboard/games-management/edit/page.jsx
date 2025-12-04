@@ -9,10 +9,10 @@ const columns = [
 async function page({ searchParams }) {
   const { size, page, search } = await searchParams;
 
-  const games = await getGames({ size, page, "name.contains": search || "" });
-  const numOfGames = await getGamesCount();
+  const games = await getGames();
+  // const numOfGames = await getGamesCount();
 
-  return <GamesTable games={games} columns={columns} numOfGames={numOfGames} />;
+  return <GamesTable games={games} columns={columns} />;
 }
 //
 export default page;

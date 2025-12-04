@@ -34,7 +34,7 @@ async function page({ params }) {
         tournamentsOptions,
       }}
       submit={editPlayer}
-      countries={countries}
+      countries={countries.countries}
       player={player}
       formType="edit"
       successMessage="Player updated"
