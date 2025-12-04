@@ -5,11 +5,11 @@ import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import MatchesFrom from "@/components/Matches Management/MatchesFrom";
 
 async function page() {
-  const [teamsOptions, gamesOptions, tournamentsOptions] = await Promise.all([
-    getTeams(),
-    getGames(),
-    getTournaments(),
-  ]);
+  const [teamsOptions, gamesOptions, { data: tournamentsOptions }] =
+    await Promise.all([getTeams(), getGames(), getTournaments()]);
+
+  console.log(tournamentsOptions, "tournamentsOptions");
+
   return (
     <MatchesFrom
       submit={addMatch}

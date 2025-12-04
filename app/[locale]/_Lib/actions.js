@@ -5,6 +5,8 @@ import apiClient from "./apiCLient";
 
 import { deleteSession, saveSession } from "./session";
 import { redirect } from "next/navigation";
+import { getPlayersLinks } from "./palyerApi";
+import { getAwardsTeam, getTeamsLinks } from "./teamsApi";
 
 // login
 export async function login(userData) {
@@ -66,6 +68,7 @@ export async function editPlayer(playerData) {
     throw new Error("Error in updating player");
   }
 }
+
 export async function deletePlayer(id) {
   const locale = await getLocale();
 
@@ -314,33 +317,24 @@ export async function updateLink(linkData) {
   }
 }
 
-export async function deleteLink(id, idUser) {
-  const locale = await getLocale();
-  try {
-    const res = await apiClient.delete(`/social-links/${id}`);
-    // return res.data;
-  } catch (error) {
-    console.log("Failed to delete link", error);
-    throw error;
-  } finally {
-  }
-  revalidatePath(`/${locale}/dashboard/links/edit/${idUser}`);
-}
+// export async function deleteLink(id, idUser) {
+//   const locale = await getLocale();
+//   try {
+//     const res = await apiClient.delete(`/social-links/${id}`);
+//     // return res.data;
+//   } catch (error) {
+//     console.log("Failed to delete link", error);
+//     throw error;
+//   } finally {
+//   }
+//   revalidatePath(`/${locale}/dashboard/links/edit/${idUser}`);
+// }
 export async function addFavoriteCharacter(characterData) {
   try {
     const res = await apiClient.post("/favorite-characters", characterData);
     return res.data;
   } catch (e) {
     throw new Error("Error in adding favorite character");
-  }
-}
-
-export async function addAward(awardData) {
-  try {
-    const res = await apiClient.post("/achievements", awardData);
-    return res.data;
-  } catch (e) {
-    throw new Error("Error in adding favorite game");
   }
 }
 
@@ -742,26 +736,28 @@ export async function addUser(data) {
   const locale = await getLocale();
   try {
     const res = await apiClient.post(`/admin/users`, data);
-    // return res.data;
+    return res.data.data;
   } catch (error) {
     console.log(error.response.data.errors || error.response.data || error);
     console.log("Failed to add user", error);
     throw error;
   }
-  redirect(`/${locale}/dashboard/users`);
+  // redirect(`/${locale}/dashboard/users`);
 }
 
 export async function editUser(data) {
   const locale = await getLocale();
+  console.log(data);
   try {
-    const res = await apiClient.put(`/admin/users/${data.id}`, data);
+    const res = await apiClient.patch(`/admin/users/${data.id}`, data);
+    console.log(res.data.data, "response");
     // return res.data;
   } catch (error) {
     console.log(error.response.data.errors || error.response.data || error);
     console.log("Failed to edit user", error);
     throw error;
   }
-  redirect(`/${locale}/dashboard/users`);
+  // redirect(`/${locale}/dashboard/users`);
 }
 export async function deleteUser(id) {
   const locale = await getLocale();
@@ -771,5 +767,103 @@ export async function deleteUser(id) {
   } catch (error) {
     console.log("Failed to delete user", error);
     throw error;
+  }
+}
+
+export async function editAward(typeEdit, id, data) {
+  const locale = await getLocale();
+
+  console.log(typeEdit, id, data);
+  try {
+    let awards =
+      typeEdit === "players"
+        ? await getAwardsPlayer(id)
+        : await getAwardsTeam(id);
+
+    console.log(awards);
+    const isLinkExist = awards.find((award) => award.id === data.id);
+    console.log(isLinkExist);
+    if (isLinkExist) {
+      awards = awards.filter((award) => award.id !== data.id);
+    }
+    awards.forEach((award) => (award.game = award.game.id));
+
+    console.log(awards);
+
+    // const res = await apiClient.put(`/${typeEdit}/${id}`, {
+    //   awards: [...awards, data],
+    // });
+    // revalidatePath(
+    //   `${locale}/dashboard/${
+    //     typeEdit === "players" ? "player-management" : "teams-management"
+    //   }/awards/${id}`
+    // );
+    // return res.data;
+  } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
+    throw new Error("Error in updating player");
+  }
+}
+export async function editLinks(typeEdit, id, data) {
+  const locale = await getLocale();
+  console.log(typeEdit, id, data);
+
+  try {
+    let socialLinks =
+      typeEdit === "players"
+        ? await getPlayersLinks(id)
+        : await getTeamsLinks(id);
+
+    console.log(socialLinks);
+    const isLinkExist = socialLinks.find((link) => link.id === data.id);
+    console.log(isLinkExist);
+    if (isLinkExist) {
+      socialLinks = socialLinks.filter((link) => link.id !== data.id);
+    }
+    const res = await apiClient.put(`/${typeEdit}/${id}`, {
+      socialLinks: [...socialLinks, data],
+    });
+    revalidatePath(
+      `${locale}/dashboard/${
+        typeEdit === "players" ? "player-management" : "teams-management"
+      }/links/${id}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
+    throw new Error("Error in updating player");
+  }
+}
+
+export async function deleteLink(typeEdit, id, linkId) {
+  const locale = await getLocale();
+
+  try {
+    let socialLinks =
+      typeEdit === "players"
+        ? await getPlayersLinks(id)
+        : await getTeamsLinks(id);
+
+    console.log(socialLinks);
+
+    const isLinkExist = socialLinks.find((link) => link.id === linkId);
+
+    if (isLinkExist) {
+      socialLinks = socialLinks.filter((link) => link.id !== linkId);
+    }
+    const res = await apiClient.put(`/${typeEdit}/${id}`, {
+      socialLinks: socialLinks,
+    });
+    revalidatePath(
+      `${locale}/dashboard/${
+        typeEdit === "players" ? "player-management" : "teams-management"
+      }/links/${id}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log(
+      e?.response?.data?.errors || e?.response?.data || e?.response || e
+    );
+    throw new Error("Error in updating player");
   }
 }

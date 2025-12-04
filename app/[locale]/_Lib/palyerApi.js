@@ -29,3 +29,12 @@ export async function getPlayersCount() {
     throw new Error("Failed to get players count");
   }
 }
+
+export async function getPlayersLinks(id) {
+  try {
+    const res = await apiClient.get(`/players/${id}`);
+    return res.data.data.socialLinks;
+  } catch (e) {
+    throw new Error("Failed to get players links");
+  }
+}

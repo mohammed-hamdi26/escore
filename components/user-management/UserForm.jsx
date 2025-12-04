@@ -31,7 +31,13 @@ const validationSchema = yup.object({
   lastName: yup.string().required("Required"),
   // permissions: yup.array().required(" Required"),
 });
-function UserForm({ formType = "add", submit = addUser }) {
+function UserForm({
+  formType = "add",
+  submit = addUser,
+  user,
+  setRes,
+  setOpen,
+}) {
   const permissions = [
     { label: "Game", value: "AddGamePermission" },
     { label: "Player", value: "AddPlayerPermission" },
@@ -47,14 +53,15 @@ function UserForm({ formType = "add", submit = addUser }) {
 
   const formik = useFormik({
     initialValues: {
-      firstName: "",
-      lastName: "",
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
       permissions: [],
+      phone: user?.phone || "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        let dataValues = { ...values };
+        let dataValues = user ? { ...user, ...values } : { ...values };
         let permissionsUser = [];
 
         for (let i = 0; i < permissions.length; i++) {
@@ -79,13 +86,15 @@ function UserForm({ formType = "add", submit = addUser }) {
 
         console.log(dataValues);
 
-        await submit(dataValues);
+        const res = await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(
           formType === "add"
             ? "User added successfully"
             : "User updated successfully"
         );
+        setRes(res);
+        setOpen(true);
       } catch (error) {
         if (!error.toString().includes("Error: NEXT_REDIRECT")) {
           toast.error("An error occurred");
@@ -124,6 +133,7 @@ function UserForm({ formType = "add", submit = addUser }) {
             icon={<UserCardIcon color={"text-[#677185]"} />}
             error={formik.touched.name && formik.errors.name}
             onBlur={formik.handleBlur}
+            value={formik.values.firstName}
           />
 
           <InputApp
@@ -143,8 +153,30 @@ function UserForm({ formType = "add", submit = addUser }) {
             }
             error={formik.touched.lastName && formik.errors.lastName}
             onBlur={formik.handleBlur}
+            value={formik.values.lastName}
           />
         </FormRow>
+        {formType === "edit" && (
+          <InputApp
+            onChange={formik.handleChange}
+            label={"Phone"}
+            name={"phone"}
+            type={"text"}
+            placeholder={"enter phone"}
+            className="border-0 focus:outline-none "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            icon={
+              <EmailIcon
+                className={"fill-[#677185]"}
+                color={"text-[#677185]"}
+              />
+            }
+            error={formik.touched.phone && formik.errors.phone}
+            onBlur={formik.handleBlur}
+            value={formik.values.phone}
+          />
+        )}
       </FormSection>
 
       {permissions.map((item, index) => {

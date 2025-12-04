@@ -9,6 +9,7 @@ import SupportCenter from "@/components/icons/SuppotCenter";
 import TeamsManagement from "@/components/icons/TeamsManagement";
 import User from "@/components/icons/User";
 import { ArrowRightLeft, icons } from "lucide-react";
+import { getLoginUser } from "../_Lib/usersApi";
 const links = [
   {
     title: "Tournaments Management",
@@ -85,6 +86,8 @@ const links = [
   //   icon: <SettingsIcon width="41" height="49" className="icon-transition" />,
   // },
 ];
-export default function page() {
+export default async function page() {
+  const user = await getLoginUser();
+  console.log(user);
   return <ServicesContainer links={links} />;
 }

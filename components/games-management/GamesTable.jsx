@@ -33,9 +33,10 @@ function GamesTable({ games, columns, numOfGames }) {
         {games.map((game) => (
           <Table.Row key={game.id} grid_cols="grid-cols-[1fr_0.5fr_2fr]">
             <Table.Cell className="flex items-center gap-2">
-              {game?.icon && (
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_BASE_URL}${game?.icon}`}
+              {game?.logo && (
+                <imgش
+                  src={`${game.logo.light}`}
+                  className="rounded-full"
                   width={40}
                   height={40}
                   alt=""

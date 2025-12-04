@@ -11,14 +11,14 @@ export default function Pagination({ numPages }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [page, setPage] = useState(Number(searchParams.get("page")) || 0);
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
 
-  if (numPages === 0) return null;
+  if (numPages === 1) return null;
 
   return (
     <div className="flex justify-between items-center">
       <Button
-        disabled={page < 1}
+        disabled={page <= 1}
         onClick={() => {
           const params = new URLSearchParams(searchParams);
           params.set("page", page - 1);

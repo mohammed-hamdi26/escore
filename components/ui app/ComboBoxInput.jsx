@@ -28,6 +28,7 @@ const ComboboxInput = ({
   name,
   placeholder,
   label,
+  t,
 }) => {
   const id = useId();
   const [open, setOpen] = useState(false);
@@ -157,6 +158,12 @@ const ComboboxInput = ({
           </Command>
         </PopoverContent>
       </Popover>
+
+      {formik.touched[name] && formik.errors[name] && (
+        <p className="text-red-500">
+          {t ? t(formik.errors[name]) : formik.errors[name]}
+        </p>
+      )}
     </div>
   );
 };

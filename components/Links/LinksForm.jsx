@@ -1,6 +1,6 @@
 "use client";
 
-import { addLink, updateLink } from "@/app/[locale]/_Lib/actions";
+import { addLink, editLinks, updateLink } from "@/app/[locale]/_Lib/actions";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
@@ -21,7 +21,7 @@ function LinksForm({
   players,
   teams,
   id,
-  linksType = "player",
+  linksType = "players",
   link,
   setOpen,
 }) {
@@ -31,18 +31,17 @@ function LinksForm({
   const formik = useFormik({
     initialValues: {
       name: link?.name || "",
-      icon: link?.icon || "",
+      icon: link?.image?.light || "",
+      iconDark: link?.image?.iconDark || "",
       url: link?.url || "",
-      player: null,
-      team: null,
     },
     onSubmit: async (values) => {
       const linkData = link ? { id: link.id, ...values } : values;
-      linksType === "player"
-        ? (linkData.player = { id: Number(id) })
-        : (linkData.team = { id: Number(id) });
+      linkData.image = { light: values.icon, iconDark: values.iconDark };
       try {
-        link ? await updateLink(linkData) : await addLink(linkData);
+        linksType === "players"
+          ? await editLinks("players", id, linkData)
+          : await editLinks("teams", id, linkData);
         !link && formik.resetForm();
         toast.success(
           link ? t("Link updated successfully") : t("Link added successfully")

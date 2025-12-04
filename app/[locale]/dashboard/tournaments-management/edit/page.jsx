@@ -7,7 +7,7 @@ import TournamentsTable from "@/components/Tournaments Management/TournamentsTab
 
 async function page({ searchParams }) {
   const { size, page } = await searchParams;
-  const [tournaments, countries] = await Promise.all([
+  const [{ data: tournaments, meta }, countries] = await Promise.all([
     getTournaments({ size, page }),
   ]);
 

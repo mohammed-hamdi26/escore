@@ -3,7 +3,7 @@ async function layout({ children, params }) {
   const userId = await params.userId;
   return (
     <div>
-      <LinkButtonsUsers userId={userId} />
+      {/* <LinkButtonsUsers userId={userId} /> */}
       {children}
     </div>
   );

@@ -51,10 +51,13 @@ const validateSchema = yup.object({
     // .url("Invalid logo URL")
     .required("Logo is required"),
 
-  logoDark: yup
-    .string()
-    // .url("Invalid dark logo URL")
-    .required("Dark logo is required"),
+  gamesData: yup
+    .array()
+    .test("games", "Games is required", (value) => value.length > 0),
+  // logoDark: yup
+  //   .string()
+  //   // .url("Invalid dark logo URL")
+  //   .required("Dark logo is required"),
 
   knockoutImageLight: yup
     .string()
@@ -90,7 +93,6 @@ export default function TournamentsForm({
   countries = [],
   gameOptions = [],
 }) {
-  console.log("tournament", tournament?.country.code);
   const t = useTranslations("TournamentForm");
 
   const formik = useFormik({
@@ -104,7 +106,7 @@ export default function TournamentsForm({
       status: tournament?.status || "upcoming",
       logoLight: tournament?.logo.light || "",
       country: tournament?.country?.code || "",
-      games: tournament?.games || [],
+      gamesData: tournament?.games || [],
 
       logoDark: tournament?.logo.dark || "",
       // winningPoints: tournament?.winningPoints || "",
@@ -137,14 +139,10 @@ export default function TournamentsForm({
           dark: dataValues.knockoutImageDark,
         };
 
-        dataValues.slug = dataValues.name.replace(/\s+/g, "-").toLowerCase();
-        dataValues.games = dataValues.games.map((g) => g.id);
+        dataValues.slug = dataValues?.name.replace(/\s+/g, "-").toLowerCase();
+        dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value);
 
         console.log("dataValues", dataValues);
-        dataValues.logoLight = "";
-        dataValues.logoDark = "";
-        dataValues.knockoutImageLight = "";
-        dataValues.knockoutImageDark = "";
 
         await submit(dataValues);
         formType === "add" && formik.resetForm();
@@ -160,7 +158,8 @@ export default function TournamentsForm({
   });
 
   //
-  console.log("formik errors", formik.values.games);
+  console.log("formik errors", formik.errors);
+  console.log("formik errors", formik.values);
 
   const statusOptions = [
     { value: "upcoming", label: t("Upcoming") },
@@ -325,11 +324,11 @@ export default function TournamentsForm({
           <ComboboxInput
             formik={formik}
             label={t("Games")}
-            name={"games"}
+            name={"gamesData"}
             options={mappedArrayToSelectOptions(gameOptions, "name", "id")}
             placeholder={t("Select Game")}
             initialData={mappedArrayToSelectOptions(
-              formik.values.games,
+              formik.values.gamesData,
               "name",
               "id"
             )}

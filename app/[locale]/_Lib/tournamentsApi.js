@@ -8,7 +8,7 @@ export async function getTournaments(searchParams = {}) {
   try {
     const res = await apiClient.get(`/tournaments`);
 
-    return res.data?.data;
+    return { data: res.data?.data, meta: res.data?.meta };
   } catch (e) {
     throw new Error("Error in Get tournaments");
   }

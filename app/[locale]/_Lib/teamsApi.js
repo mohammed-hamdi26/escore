@@ -31,3 +31,22 @@ export async function getTeamsCount() {
     throw new Error("Failed to get teams count");
   }
 }
+
+export async function getTeamsLinks(id) {
+  try {
+    const res = await apiClient.get(`/teams/${id}`);
+    console.log(res.data.data.socialLinks);
+    return res.data.data.socialLinks;
+  } catch (e) {
+    throw new Error("Failed to get teams links");
+  }
+}
+
+export async function getAwardsTeam(id) {
+  try {
+    const res = await apiClient.get(`/teams/${id}`);
+    return res.data.data.awards;
+  } catch (e) {
+    throw new Error("Failed to get awards team");
+  }
+}

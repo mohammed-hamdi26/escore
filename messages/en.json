@@ -373,7 +373,10 @@
     "uploaded Photo": "uploaded Photo",
     "Cancelled": "cancelled",
     "Completed": "completed",
-    "Country": "Country"
+    "Country": "Country",
+
+    "Games": "Games",
+    "Select Game": "Select Game"
   },
   "TournamentsTable": {
     "name": "Name",
@@ -497,7 +500,26 @@
     "Duration": "Duration",
     "VOD URL": "VOD URL",
     "Enter VOD URL": "Enter VOD URL",
-    "Pick a date": "Pick a date"
+    "Pick a date": "Pick a date",
+
+    "Enter Highlight URL": "Enter Highlight URL",
+    "Highlight URL": "Highlight URL",
+    "Enter End Time": "Enter End Time",
+    "End Time": "End Time",
+    "Enter Start Time": "Enter Start Time",
+    "Start Time": "Start Time",
+    "Enter Venue": "Enter Venue",
+    "Venue": "Venue",
+    "Venue Type": "Venue Type",
+
+    "Venue is required": "Venue is required",
+    "End Time is required": "End Time is required",
+    "Start Time is required": "Start Time is required",
+    "Tournament is required": "Tournament is required",
+    "Game is required": "Game is required",
+    "Team 1 is required": "Team 1 is required",
+    "Team 2 is required": "Team 2 is required",
+    "Series Format is required": "Series Format is required"
   },
   "MatchesTable": {
     "Date": "Date",
