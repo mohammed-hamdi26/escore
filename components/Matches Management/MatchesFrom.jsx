@@ -37,7 +37,7 @@ const validateSchema = Yup.object({
   //   .required("Match type is required"),
 
   status: Yup.string()
-    .oneOf(["UPCOMING", "LIVE", "FINISHED", "CANCELLED"], "Invalid status")
+    .oneOf(["scheduled", "live", "completed", "cancelled"], "Invalid status")
     .required("Status is required"),
 
   bestOf: Yup.string().nullable(),
@@ -93,7 +93,7 @@ function MatchesFrom({
       time: "",
       // matchTime: match?.matchTime || "",
       // matchType: match?.matchType || "TEAM",
-      status: match?.status || "UPCOMING",
+      status: match?.status || "scheduled",
       seriesFormat: match?.seriesFormat || "",
       isOnline: match?.isOnline || "ONLINE",
       player1Score: match?.player1Score || 0,
@@ -168,10 +168,10 @@ function MatchesFrom({
     { value: "TEAM", label: t("Team") },
   ];
   const matchStateOptions = [
-    { value: "UPCOMING", label: t("UPCOMING") },
-    { value: "FINISHED", label: t("FINISHED") },
-    { value: "LIVE", label: t("LIVE") },
-    { value: "CANCELLED", label: t("CANCELLED") },
+    { value: "scheduled", label: t("UPCOMING") },
+    { value: "completed", label: t("FINISHED") },
+    { value: "live", label: t("LIVE") },
+    { value: "cancelled", label: t("CANCELLED") },
   ];
   const seriesFormatOptions = [
     { value: 1, label: t("Best of 1") },
