@@ -7,41 +7,59 @@ import SelectInput from "../ui app/SelectInput";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { Button } from "../ui/button";
 import FileInput from "../ui app/FileInput";
-import { addFavoriteCharacter } from "@/app/[locale]/_Lib/actions";
+import {
+  addFavoriteCharacter,
+  editFavoriteCharacter,
+} from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { Spinner } from "../ui/spinner";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
   icon: Yup.string().required("Icon is required"),
-  gameName: Yup.string().required("Game Name is required"),
+  game: Yup.string().required("Game Name is required"),
 });
-const initialValues = {
-  name: "",
-  icon: "",
-  gameName: "",
-  player: null,
-  team: null,
-};
 function FavoriteCharacterForm({
   id,
-  players,
-  teams,
+  character,
+
   games,
-  favoriteCharacterFor = "player",
+  favoriteCharacterFor = "players",
   t,
+  setOpen,
 }) {
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      name: character ? character.name : "",
+      icon: character ? character.icon : "",
+      game: character ? character.game.id : "",
+    },
     onSubmit: async (values) => {
-      const favoriteCharacterData = values;
-      favoriteCharacterFor === "player"
-        ? (favoriteCharacterData.player = { id: Number(id) })
-        : (favoriteCharacterData.team = { id: Number(id) });
+      const favoriteCharacterData = character
+        ? { id: character.id, ...values }
+        : values;
+
       try {
-        await addFavoriteCharacter(favoriteCharacterData);
+        if (character) {
+          await editFavoriteCharacter(
+            favoriteCharacterFor,
+            id,
+            favoriteCharacterData
+          );
+        } else {
+          await addFavoriteCharacter(
+            favoriteCharacterFor,
+            id,
+            favoriteCharacterData
+          );
+        }
         formik.resetForm();
-        toast.success("Favorite character added successfully");
+        toast.success(
+          character
+            ? "Favorite character updated successfully"
+            : "Favorite character added successfully"
+        );
+        setOpen(false);
       } catch (error) {
         toast.error(error.message);
       }
@@ -80,13 +98,13 @@ function FavoriteCharacterForm({
 
       <SelectInput
         label={t("Game Name")}
-        name={"gameName"}
+        name={"game"}
         formik={formik}
-        onChange={(value) => formik.setFieldValue("gameName", value)}
+        onChange={(value) => formik.setFieldValue("game", value)}
         placeholder={t("Game Name")}
-        value={formik.values.gameName}
+        value={formik.values.game}
         error={formik.touched.player && formik.errors.player}
-        options={mappedArrayToSelectOptions(games, "name", "name")}
+        options={mappedArrayToSelectOptions(games, "name", "id")}
         disabled={formik.isSubmitting}
       />
       {/* <SelectInput

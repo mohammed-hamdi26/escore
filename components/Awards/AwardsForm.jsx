@@ -21,37 +21,41 @@ const validationSchema = Yup.object({
   // description: Yup.string().required("description is required"),
   // achievedDate: Yup.date().required("achievedDate is required"),
 });
-const initialValues = {
-  name: "",
-  imageLight: "",
-  imageDark: "",
-  // description: "",
-  // achievedDate: new Date(),
-
-  game: null,
-};
-function AwardsForm({ awardsType, award, games, tournaments, id, t }) {
+function AwardsForm({ awardsType, award, games, tournaments, id, t, setOpen }) {
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      name: award ? award.name : "",
+      imageLight: award ? award.image.light : "",
+      imageDark: award ? award.image.iconDark : "",
+      // description: "",
+      // achievedDate: new Date(),
+
+      game: award ? award.game.id : "",
+    },
     onSubmit: async (values) => {
-      const awardsValues = {
-        ...values,
-        image: {
-          light: values.imageLight,
-          iconDark: values.imageDark,
-        },
-      };
+      const awardsValues = award
+        ? { id: award.id, ...values }
+        : {
+            ...values,
+            image: {
+              light: values.imageLight,
+              iconDark: values.imageDark,
+            },
+          };
       console.log(awardsValues);
       try {
-        awardsType === "players"
-          ? await editAward("players", id, awardsValues)
-          : await editAward("teams", id, awardsValues);
+        if (award) {
+          await editAward(awardsType, id, awardsValues);
+        } else {
+          await addAward(awardsType, id, awardsValues);
+        }
         formik.resetForm();
         toast.success(
           award
             ? t("Awards updated successfully")
             : t("Awards added successfully")
         );
+        setOpen(false);
       } catch (error) {
         toast.error(
           award ? t("Error in Awards updated") : t("Error in Awards added")
