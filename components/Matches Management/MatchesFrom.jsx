@@ -22,6 +22,8 @@ import { useTranslations } from "next-intl";
 import MarkDown from "../ui app/MarkDown";
 import SelectDateTimeInput from "../ui app/SelectDateAndTimeInput";
 import { format } from "date-fns";
+import { useRouter } from "@/i18n/navigation";
+import MatchLineupSelector from "./MatchLineupSelector";
 const validateSchema = Yup.object({
   // matchDate: Yup.date()
   //   .typeError("Invalid date format")
@@ -86,6 +88,7 @@ function MatchesFrom({
   formType = "add",
 }) {
   const t = useTranslations("MatchForm");
+  const router = useRouter();
   const formik = useFormik({
     initialValues: {
       // matchDate: match?.matchDate || "",
@@ -114,12 +117,19 @@ function MatchesFrom({
       highlightsUrl: match?.highlightsUrl || "",
       startedAt: match?.startedAt || "",
       endedAt: match?.endedAt || "",
+
+      // Lineup fields
+      team1Lineup: [],
+      team2Lineup: [],
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
       // console.log(dataValues);
       try {
-        let dataValues = match ? { id: match.id, ...values } : values;
+        // Extract lineup data before processing match data
+        const { team1Lineup, team2Lineup, ...matchValues } = values;
+
+        let dataValues = match ? { id: match.id, ...matchValues } : matchValues;
 
         dataValues = {
           ...dataValues,
@@ -150,12 +160,37 @@ function MatchesFrom({
         delete dataValues.date;
         delete dataValues.time;
 
+        // Build lineups array - only include for edit mode (API may not support on create)
+        if (formType === "edit" && (team1Lineup.length > 0 || team2Lineup.length > 0)) {
+          const lineups = [];
+          if (team1Lineup.length > 0) {
+            lineups.push({
+              team: { id: values.team1 },
+              players: team1Lineup.map((id) => ({ id })),
+            });
+          }
+          if (team2Lineup.length > 0) {
+            lineups.push({
+              team: { id: values.team2 },
+              players: team2Lineup.map((id) => ({ id })),
+            });
+          }
+          dataValues.lineups = lineups;
+        }
+
         console.log(dataValues);
-        await submit(dataValues);
+        const matchResult = await submit(dataValues);
+        const matchId = matchResult?.data?.id || matchResult?.id || match?.id;
+
         formType === "add" && formik.resetForm();
         toast.success(
           formType === "add" ? "The match Added" : "The Match Edited"
         );
+
+        // Redirect to edit page after successful add
+        if (formType === "add" && matchId) {
+          router.push(`/dashboard/matches-management/edit`);
+        }
       } catch (error) {
         toast.error(error.message);
       }
@@ -330,6 +365,54 @@ function MatchesFrom({
             />
           )} */}
         </FormRow>
+
+        {/* Team Lineups Section */}
+        {(formik.values.team1 || formik.values.team2) && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-[#BABDC4]">
+              {t("Team Lineups")}
+            </h3>
+            <FormRow>
+              {formik.values.team1 && (
+                <MatchLineupSelector
+                  teamId={formik.values.team1}
+                  teamName={
+                    teamsOptions.find((t) => t.id === formik.values.team1)?.name
+                  }
+                  teamLogo={
+                    teamsOptions.find((t) => t.id === formik.values.team1)?.logo
+                      ?.light ||
+                    teamsOptions.find((t) => t.id === formik.values.team1)?.logo
+                      ?.dark
+                  }
+                  selectedPlayers={formik.values.team1Lineup}
+                  onSelectionChange={(players) =>
+                    formik.setFieldValue("team1Lineup", players)
+                  }
+                />
+              )}
+              {formik.values.team2 && (
+                <MatchLineupSelector
+                  teamId={formik.values.team2}
+                  teamName={
+                    teamsOptions.find((t) => t.id === formik.values.team2)?.name
+                  }
+                  teamLogo={
+                    teamsOptions.find((t) => t.id === formik.values.team2)?.logo
+                      ?.light ||
+                    teamsOptions.find((t) => t.id === formik.values.team2)?.logo
+                      ?.dark
+                  }
+                  selectedPlayers={formik.values.team2Lineup}
+                  onSelectionChange={(players) =>
+                    formik.setFieldValue("team2Lineup", players)
+                  }
+                />
+              )}
+            </FormRow>
+          </div>
+        )}
+
         <FormRow>
           {/* <SelectInput
             formik={formik}

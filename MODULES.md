@@ -1,6 +1,8 @@
 # Escore Backend - Complete Module Reference
 
-This document provides comprehensive documentation for all 20 modules in the Escore Backend API.
+This document provides comprehensive documentation for all 22 modules in the Escore Backend API.
+
+> **Last Updated:** December 2024
 
 ---
 
@@ -16,16 +18,17 @@ This document provides comprehensive documentation for all 20 modules in the Esc
 8. [Matches Module](#8-matches-module)
 9. [News Module](#9-news-module)
 10. [Transfers Module](#10-transfers-module)
-11. [Rankings Module](#11-rankings-module)
-12. [Search Module](#12-search-module)
-13. [Stats Module](#13-stats-module)
-14. [Upload Module](#14-upload-module)
-15. [Follows Module](#15-follows-module)
-16. [Votes Module](#16-votes-module)
-17. [Support Module](#17-support-module)
-18. [Characters Module](#18-characters-module)
-19. [Standings Module](#19-standings-module)
-20. [Settings Module](#20-settings-module)
+11. [Search Module](#11-search-module)
+12. [Stats Module](#12-stats-module)
+13. [Upload Module](#13-upload-module)
+14. [Follows Module](#14-follows-module)
+15. [Votes Module](#15-votes-module)
+16. [Support Module](#16-support-module)
+17. [Standings Module](#17-standings-module)
+18. [Settings Module](#18-settings-module)
+19. [Translations Module](#19-translations-module)
+20. [Avatars Module](#20-avatars-module)
+21. [Notifications Module](#21-notifications-module)
 
 ---
 
@@ -53,15 +56,37 @@ Authentication uses the User model with these auth-related fields:
 
 | Method | Parameters | Returns | Description |
 |--------|-----------|---------|-------------|
-| `register()` | email, password, firstName, lastName | User + token | Create user, send verification OTP |
-| `login()` | email, password | User + token | Authenticate user credentials |
-| `loginWithApple()` | appleId, email, firstName, lastName | User + token | Apple Sign In authentication |
+| `register()` | email, password, firstName, lastName | User + token + permissions | Create user, send verification OTP |
+| `login()` | email, password | User + token + permissions | Authenticate user credentials |
+| `loginWithApple()` | appleId, email, firstName, lastName | User + token + permissions | Apple Sign In authentication |
 | `verifyEmail()` | email, otp | User | Verify email with OTP code |
 | `forgotPassword()` | email | void | Send password reset OTP |
 | `resetPassword()` | email, otp, newPassword | void | Reset password with OTP |
 | `resendOTP()` | email, type | void | Resend verification/reset OTP |
-| `createAdmin()` | email, password, secretKey | User + token | Create admin account |
+| `createAdmin()` | email, password, secretKey | User + token + permissions | Create admin account |
 | `logout()` | userId | void | Logout user session |
+
+### Response with Permissions
+
+All authentication responses include user permissions:
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": { "id": "...", "email": "...", "role": "user" },
+    "tokens": { "accessToken": "...", "refreshToken": "..." },
+    "permissions": [
+      { "entity": "News", "actions": ["create", "read", "update"] },
+      { "entity": "Game", "actions": ["read"] }
+    ]
+  }
+}
+```
+
+- **Admin users**: Returns all permissions for all entities
+- **Regular users**: Returns only assigned permissions
+- **New users**: Returns empty permissions array
 
 ### API Endpoints
 
@@ -125,19 +150,33 @@ Authentication uses the User model with these auth-related fields:
 
 | Method | Parameters | Returns | Description |
 |--------|-----------|---------|-------------|
-| `getProfile()` | userId | User | Get user profile |
-| `updateProfile()` | userId, updateData | User | Update profile fields |
+| `getProfile()` | userId | User + permissions | Get user profile with permissions |
+| `updateProfile()` | userId, updateData | User + permissions | Update profile fields |
 | `changePassword()` | userId, currentPassword, newPassword | void | Change user password |
+| `deleteAccount()` | userId, password? | void | **Hard delete** user and all related data |
 | `requestContentCreator()` | userId | User | Request content creator role |
 
 ### API Endpoints
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| GET | `/api/v1/users/profile` | authenticate | Get current user profile |
-| PUT | `/api/v1/users/profile` | authenticate | Update profile |
+| GET | `/api/v1/users/profile` | authenticate | Get current user profile (includes permissions) |
+| PUT | `/api/v1/users/profile` | authenticate | Update profile (returns permissions) |
 | PUT | `/api/v1/users/password` | authenticate | Change password |
+| DELETE | `/api/v1/users/account` | authenticate | **Hard delete** account permanently |
 | POST | `/api/v1/users/request-content` | authenticate | Request content creator status |
+
+### Account Deletion
+
+When a user deletes their account, it is a **hard delete** that permanently removes:
+- User record
+- Permissions
+- Follows
+- Votes
+- Devices (FCM tokens)
+- Support tickets
+
+This allows the user to re-register with the same email/appleId later.
 
 ### Relationships
 
@@ -250,7 +289,10 @@ Authentication uses the User model with these auth-related fields:
 
 ### Relationships
 
-- Referenced by: Teams, Players, Tournaments, Matches, News, Transfers, Rankings
+- **Has many** Teams (via Team.games[])
+- **Has many** Players (via Player.game)
+- **Has many** Tournaments (via Tournament.games[])
+- Referenced by: Matches, News, Transfers
 
 ### Indexes
 
@@ -264,7 +306,7 @@ Authentication uses the User model with these auth-related fields:
 
 **Location**: `src/modules/teams/`
 
-**Purpose**: Team management with game associations, regions, and player rosters.
+**Purpose**: Team management with multi-game support, regions, and player rosters. Teams can compete in one or multiple games (e.g., multi-game esports organizations like Team Liquid, FaZe Clan).
 
 ### Model Schema (ITeam)
 
@@ -279,7 +321,7 @@ Authentication uses the User model with these auth-related fields:
 | country | CountryObject | No | {name, code, flag} |
 | region | String | No | Geographic region |
 | founded | Date | No | Team founding date |
-| game | ObjectId | Yes | Reference to Game |
+| games | [ObjectId] | Yes | References to Games (at least one) |
 | socialLinks | Object | No | Twitter, Facebook, Instagram, YouTube, Twitch, Discord, website |
 | isActive | Boolean | Yes | Enable/disable (default: true) |
 | sortOrder | Number | No | Display ordering |
@@ -288,14 +330,43 @@ Authentication uses the User model with these auth-related fields:
 | updatedBy | ObjectId | No | User who last updated |
 | isDeleted | Boolean | Yes | Soft delete flag |
 
+### Response Fields (Additional)
+
+When fetching a single team (by ID or slug), the response includes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| tournaments | TeamTournamentInfo[] | Tournaments the team participates in, with associated game info |
+| ranking | number \| null | Team's best position from standings (null if no standings) |
+| awardsNumber | number | Total count of awards won by the team |
+
+**TeamTournamentInfo structure:**
+```typescript
+{
+  _id: ObjectId;
+  name: string;
+  slug: string;
+  logo?: ImageObject;
+  status: string;        // 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
+  startDate: Date;
+  endDate: Date;
+  game: {               // Primary game for the tournament
+    _id: ObjectId;
+    name: string;
+    slug: string;
+    logo?: ImageObject;
+  } | null;
+}
+```
+
 ### Service Methods
 
 | Method | Parameters | Returns | Description |
 |--------|-----------|---------|-------------|
 | `create()` | teamData, userId | Team | Create team (validates game exists) |
 | `findAll()` | filters, pagination | PaginatedTeams | List with filters |
-| `findById()` | teamId, userId? | Team | Get team details |
-| `findBySlug()` | slug, userId? | Team | Get team by slug |
+| `findById()` | teamId, userId? | TeamResponse | Get team with tournaments, ranking, awardsNumber |
+| `findBySlug()` | slug, userId? | TeamResponse | Get team with tournaments, ranking, awardsNumber |
 | `findByGame()` | gameId, pagination, userId? | PaginatedTeams | Teams for specific game |
 | `update()` | teamId, updateData, userId | Team | Update team |
 | `delete()` | teamId | void | Soft delete team |
@@ -305,8 +376,8 @@ Authentication uses the User model with these auth-related fields:
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | `/api/v1/teams` | optionalAuth | List all teams |
-| GET | `/api/v1/teams/:id` | optionalAuth | Get team by ID |
-| GET | `/api/v1/teams/slug/:slug` | optionalAuth | Get team by slug |
+| GET | `/api/v1/teams/:id` | optionalAuth | Get team by ID (includes tournaments, ranking, awardsNumber) |
+| GET | `/api/v1/teams/slug/:slug` | optionalAuth | Get team by slug (includes tournaments, ranking, awardsNumber) |
 | GET | `/api/v1/teams/game/:gameId` | optionalAuth | Teams for game |
 | POST | `/api/v1/teams` | requireContentOrAdmin | Create team |
 | PUT | `/api/v1/teams/:id` | requireContentOrAdmin | Update team |
@@ -314,9 +385,12 @@ Authentication uses the User model with these auth-related fields:
 
 ### Relationships
 
-- `game` → Game (required)
+- `games[]` → Games (required, at least one)
+- `tournaments` → Tournaments (derived from Tournament.teams, includes game info)
+- `ranking` → Standing.position (best position across all tournaments)
+- `awards[]` → Awards with game reference
 - Players belong to teams (via player.team)
-- Referenced by: Matches, Tournaments, Transfers, Rankings
+- Referenced by: Matches, Tournaments, Transfers, Standings
 
 ---
 
@@ -386,7 +460,7 @@ Authentication uses the User model with these auth-related fields:
 
 - `game` → Game (required)
 - `team` → Team (optional, sets isFreeAgent status)
-- Referenced by: Match lineups, Transfers, Rankings
+- Referenced by: Match lineups, Transfers
 
 ---
 
@@ -394,7 +468,7 @@ Authentication uses the User model with these auth-related fields:
 
 **Location**: `src/modules/tournaments/`
 
-**Purpose**: Tournament and competition management with status tracking.
+**Purpose**: Tournament and competition management with status tracking. Tournaments can span one or multiple games (e.g., multi-game esports festivals).
 
 ### Model Schema (ITournament)
 
@@ -406,7 +480,7 @@ Authentication uses the User model with these auth-related fields:
 | logo | ImageObject | No | Tournament logo |
 | coverImage | ImageObject | No | Cover image |
 | bracketImage | ImageObject | No | Bracket image |
-| game | ObjectId | Yes | Reference to Game |
+| games | [ObjectId] | Yes | References to Games (at least one) |
 | organizer | String | No | Tournament organizer |
 | country | CountryObject | No | {name, code, flag} |
 | location | String | No | Venue location |
@@ -446,7 +520,7 @@ Authentication uses the User model with these auth-related fields:
 | `findAll()` | filters, pagination | PaginatedTournaments | List with filters |
 | `findById()` | tournamentId, userId? | Tournament | Get tournament details |
 | `findBySlug()` | slug, userId? | Tournament | Get by slug |
-| `findByGame()` | gameId, pagination | PaginatedTournaments | Tournaments for game |
+| `findByGame()` | gameId, pagination | PaginatedTournaments | Tournaments including this game |
 | `findFeatured()` | limit? | Tournament[] | Featured tournaments |
 | `findUpcoming()` | gameId?, limit? | Tournament[] | Upcoming tournaments |
 | `findOngoing()` | gameId?, limit? | Tournament[] | Ongoing tournaments |
@@ -462,7 +536,7 @@ Authentication uses the User model with these auth-related fields:
 | GET | `/api/v1/tournaments` | optionalAuth | List tournaments |
 | GET | `/api/v1/tournaments/:id` | optionalAuth | Get tournament |
 | GET | `/api/v1/tournaments/slug/:slug` | optionalAuth | Get by slug |
-| GET | `/api/v1/tournaments/game/:gameId` | optionalAuth | Tournaments for game |
+| GET | `/api/v1/tournaments/game/:gameId` | optionalAuth | Tournaments including this game |
 | GET | `/api/v1/tournaments/featured` | optionalAuth | Featured tournaments |
 | GET | `/api/v1/tournaments/upcoming` | optionalAuth | Upcoming tournaments |
 | GET | `/api/v1/tournaments/ongoing` | optionalAuth | Ongoing tournaments |
@@ -474,7 +548,7 @@ Authentication uses the User model with these auth-related fields:
 
 ### Relationships
 
-- `game` → Game (required)
+- `games[]` → Games (required, at least one)
 - `teams[]` → Teams
 - `prizeDistribution[].team` → Team (optional)
 - Referenced by: Matches, Standings, News
@@ -514,6 +588,61 @@ Authentication uses the User model with these auth-related fields:
 | createdBy | ObjectId | No | User who created |
 | updatedBy | ObjectId | No | User who last updated |
 | isDeleted | Boolean | Yes | Soft delete flag |
+
+### Response Fields (Lineup Details)
+
+When fetching a match by ID, the `lineups` field returns complete team and player information:
+
+**CompleteLineup structure:**
+```typescript
+{
+  team: {
+    _id: ObjectId;
+    name: string;
+    slug: string;
+    shortName?: string;
+    logo?: ImageObject;
+  };
+  players: Array<{
+    _id: ObjectId;
+    nickname: string;
+    slug: string;
+    firstName?: string;
+    lastName?: string;
+    photo?: ImageObject;
+    role?: string;
+    country?: CountryObject;
+  }>;
+}
+```
+
+**Example response:**
+```json
+{
+  "lineups": [
+    {
+      "team": {
+        "_id": "...",
+        "name": "T1",
+        "slug": "t1",
+        "shortName": "T1",
+        "logo": { "light": "...", "dark": "..." }
+      },
+      "players": [
+        {
+          "_id": "...",
+          "nickname": "Faker",
+          "slug": "faker",
+          "firstName": "Sang-hyeok",
+          "lastName": "Lee",
+          "role": "Mid",
+          "country": { "name": "South Korea", "code": "KR", "flag": "🇰🇷" }
+        }
+      ]
+    }
+  ]
+}
+```
 
 ### Service Methods
 
@@ -585,7 +714,9 @@ Authentication uses the User model with these auth-related fields:
 | team | ObjectId | No | Related team |
 | player | ObjectId | No | Related player |
 | match | ObjectId | No | Related match |
-| author | ObjectId | Yes | Content creator |
+| authorName | String | No | Author display name |
+| authorImage | ImageObject | No | Author image (light/dark) |
+| urlExternal | String | No | External source URL |
 | isPublished | Boolean | Yes | Publication status |
 | publishedAt | Date | No | Auto-set when published |
 | isFeatured | Boolean | Yes | Feature flag |
@@ -645,7 +776,6 @@ Authentication uses the User model with these auth-related fields:
 
 ### Relationships
 
-- `author` → User
 - `game` → Game (optional)
 - `tournament` → Tournament (optional)
 - `team` → Team (optional)
@@ -667,9 +797,10 @@ Authentication uses the User model with these auth-related fields:
 | player | ObjectId | Yes | Player being transferred |
 | fromTeam | ObjectId | No | Origin team |
 | toTeam | ObjectId | No | Destination team |
-| game | ObjectId | Yes | Game context |
+| game | ObjectId | No | Game context |
 | type | String | Yes | transfer, loan, free_agent, retirement, return_from_loan |
 | status | String | Yes | rumor, pending, confirmed, cancelled |
+| isFeatured | Boolean | Yes | Feature flag (default: false) |
 | fee | Number | No | Transfer fee |
 | currency | String | No | Currency (default: USD) |
 | contractLength | Number | No | Contract length in months |
@@ -685,7 +816,6 @@ Authentication uses the User model with these auth-related fields:
 
 **Validation:**
 - At least one of fromTeam/toTeam required (except retirement)
-- Player, fromTeam, toTeam must belong to same game
 
 ### Service Methods
 
@@ -723,7 +853,7 @@ Authentication uses the User model with these auth-related fields:
 
 - `player` → Player (required)
 - `fromTeam`, `toTeam` → Teams
-- `game` → Game (required)
+- `game` → Game (optional)
 
 ### Notable Features
 
@@ -734,104 +864,7 @@ Authentication uses the User model with these auth-related fields:
 
 ---
 
-## 11. Rankings Module
-
-**Location**: `src/modules/rankings/`
-
-**Purpose**: Team and player rankings with multi-period tracking.
-
-### Model Schema (ITeamRanking / IPlayerRanking)
-
-**TeamRanking:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| team | ObjectId | Yes | Team reference |
-| game | ObjectId | Yes | Game context |
-| rank | Number | Yes | Current rank |
-| previousRank | Number | No | Previous rank |
-| rankChange | Number | Auto | Calculated change |
-| points | Number | No | Ranking points |
-| wins | Number | No | Win count |
-| losses | Number | No | Loss count |
-| winRate | Number | No | Win rate 0-100 |
-| tournamentWins | Number | No | Tournament wins |
-| period | String | Yes | weekly, monthly, yearly, all_time |
-| periodStart | Date | No | Period start |
-| periodEnd | Date | No | Period end |
-| region | String | No | Regional ranking |
-| isActive | Boolean | Yes | Enable/disable |
-| isDeleted | Boolean | Yes | Soft delete flag |
-
-**PlayerRanking:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| player | ObjectId | Yes | Player reference |
-| game | ObjectId | Yes | Game context |
-| rank | Number | Yes | Current rank |
-| previousRank | Number | No | Previous rank |
-| rankChange | Number | Auto | Calculated change |
-| points | Number | No | Ranking points |
-| kills | Number | No | Kill count |
-| deaths | Number | No | Death count |
-| assists | Number | No | Assist count |
-| KDA | Number | No | K/D/A ratio |
-| gamesPlayed | Number | No | Games played |
-| winRate | Number | No | Win rate 0-100 |
-| period | String | Yes | weekly, monthly, yearly, all_time |
-| periodStart | Date | No | Period start |
-| periodEnd | Date | No | Period end |
-| region | String | No | Regional ranking |
-| isActive | Boolean | Yes | Enable/disable |
-| isDeleted | Boolean | Yes | Soft delete flag |
-
-**Unique Constraints:**
-- TeamRanking: (team, game, period)
-- PlayerRanking: (player, game, period)
-
-### Service Methods
-
-| Method | Parameters | Returns | Description |
-|--------|-----------|---------|-------------|
-| `createTeamRanking()` | data | TeamRanking | Create team ranking |
-| `getTeamRankings()` | filters, pagination | Paginated | List team rankings |
-| `getTopTeams()` | gameId, period?, limit? | TeamRanking[] | Top teams |
-| `getTeamRanking()` | teamId, gameId, period? | TeamRanking | Team's ranking |
-| `updateTeamRanking()` | rankingId, data | TeamRanking | Update ranking |
-| `deleteTeamRanking()` | rankingId | void | Soft delete |
-| `createPlayerRanking()` | data | PlayerRanking | Create player ranking |
-| `getPlayerRankings()` | filters, pagination | Paginated | List player rankings |
-| `getTopPlayers()` | gameId, period?, limit? | PlayerRanking[] | Top players |
-| `getPlayerRanking()` | playerId, gameId, period? | PlayerRanking | Player's ranking |
-| `updatePlayerRanking()` | rankingId, data | PlayerRanking | Update ranking |
-| `deletePlayerRanking()` | rankingId | void | Soft delete |
-
-### API Endpoints
-
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| GET | `/api/v1/rankings/teams` | None | Team rankings |
-| GET | `/api/v1/rankings/teams/top/:gameId` | None | Top teams |
-| GET | `/api/v1/rankings/teams/:id` | None | Get team ranking |
-| POST | `/api/v1/rankings/teams` | requireContentOrAdmin | Create team ranking |
-| PUT | `/api/v1/rankings/teams/:id` | requireContentOrAdmin | Update team ranking |
-| DELETE | `/api/v1/rankings/teams/:id` | requireAdmin | Delete team ranking |
-| GET | `/api/v1/rankings/players` | None | Player rankings |
-| GET | `/api/v1/rankings/players/top/:gameId` | None | Top players |
-| GET | `/api/v1/rankings/players/:id` | None | Get player ranking |
-| POST | `/api/v1/rankings/players` | requireContentOrAdmin | Create player ranking |
-| PUT | `/api/v1/rankings/players/:id` | requireContentOrAdmin | Update player ranking |
-| DELETE | `/api/v1/rankings/players/:id` | requireAdmin | Delete player ranking |
-
-### Relationships
-
-- TeamRanking: `team` → Team, `game` → Game
-- PlayerRanking: `player` → Player, `game` → Game
-
----
-
-## 12. Search Module
+## 11. Search Module
 
 **Location**: `src/modules/search/`
 
@@ -891,7 +924,7 @@ Authentication uses the User model with these auth-related fields:
 
 ---
 
-## 13. Stats Module
+## 12. Stats Module
 
 **Location**: `src/modules/stats/`
 
@@ -949,7 +982,7 @@ Authentication uses the User model with these auth-related fields:
 
 ---
 
-## 14. Upload Module
+## 13. Upload Module
 
 **Location**: `src/modules/upload/`
 
@@ -993,7 +1026,7 @@ Authentication uses the User model with these auth-related fields:
 
 ---
 
-## 15. Follows Module
+## 14. Follows Module
 
 **Location**: `src/modules/follows/`
 
@@ -1051,7 +1084,7 @@ Authentication uses the User model with these auth-related fields:
 
 ---
 
-## 16. Votes Module
+## 15. Votes Module
 
 **Location**: `src/modules/votes/`
 
@@ -1110,7 +1143,7 @@ UserVoteStatus: { hasVoted: boolean, vote?: string, votedAt?: Date }
 
 ---
 
-## 17. Support Module
+## 16. Support Module
 
 **Location**: `src/modules/support/`
 
@@ -1170,51 +1203,8 @@ UserVoteStatus: { hasVoted: boolean, vote?: string, votedAt?: Date }
 
 ---
 
-## 18. Characters Module
 
-**Location**: `src/modules/characters/`
-
-**Purpose**: Game characters management (for games like League of Legends, Valorant).
-
-### Model Schema (ICharacter)
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| name | String | Yes | Character name |
-| slug | String | Yes | URL-friendly identifier |
-| title | String | No | Character title/epithet |
-| description | String | No | Character description |
-| image | ImageObject | No | Character image (light/dark) |
-| splashArt | ImageObject | No | Splash art image |
-| role | String | No | Character role (Tank, Support, etc.) |
-| game | ObjectId | Yes | Reference to Game |
-| abilities | Array | No | [{name, description, icon}] |
-| stats | Object | No | Character statistics |
-| difficulty | Number | No | Difficulty rating 1-10 |
-| isActive | Boolean | Yes | Enable/disable |
-| createdBy | ObjectId | No | User who created |
-| updatedBy | ObjectId | No | User who last updated |
-| isDeleted | Boolean | Yes | Soft delete flag |
-
-### API Endpoints
-
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| GET | `/api/v1/characters` | None | List characters |
-| GET | `/api/v1/characters/:id` | None | Get character |
-| GET | `/api/v1/characters/slug/:slug` | None | Get by slug |
-| GET | `/api/v1/characters/game/:gameId` | None | Characters for game |
-| POST | `/api/v1/characters` | requireContentOrAdmin | Create character |
-| PUT | `/api/v1/characters/:id` | requireContentOrAdmin | Update character |
-| DELETE | `/api/v1/characters/:id` | requireAdmin | Delete character |
-
-### Relationships
-
-- `game` → Game (required)
-
----
-
-## 19. Standings Module
+## 17. Standings Module
 
 **Location**: `src/modules/standings/`
 
@@ -1273,11 +1263,11 @@ UserVoteStatus: { hasVoted: boolean, vote?: string, votedAt?: Date }
 
 ---
 
-## 20. Settings Module
+## 18. Settings Module
 
 **Location**: `src/modules/settings/`
 
-**Purpose**: Platform settings including languages, themes, about content, privacy policy, and social links.
+**Purpose**: Platform settings including languages, themes, about content, and privacy policy.
 
 ### Sub-models
 
@@ -1320,16 +1310,6 @@ UserVoteStatus: { hasVoted: boolean, vote?: string, votedAt?: Date }
 | effectiveDate | Date | No | Effective date |
 | lastUpdated | Date | Auto | Last update |
 
-**SocialLink (ISocialLink):**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| platform | String | Yes | Platform name |
-| url | String | Yes | Link URL |
-| icon | String | No | Icon identifier |
-| sortOrder | Number | No | Display order |
-| isActive | Boolean | Yes | Enable/disable |
-
 ### API Endpoints
 
 **Languages:**
@@ -1352,7 +1332,7 @@ UserVoteStatus: { hasVoted: boolean, vote?: string, votedAt?: Date }
 | PUT | `/api/v1/settings/themes/:slug` | requireSupportOrAdmin | Update theme |
 | DELETE | `/api/v1/settings/themes/:slug` | requireAdmin | Delete theme |
 
-**About/Privacy/Social:**
+**About/Privacy:**
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -1360,10 +1340,6 @@ UserVoteStatus: { hasVoted: boolean, vote?: string, votedAt?: Date }
 | PUT | `/api/v1/settings/about` | requireSupportOrAdmin | Update about |
 | GET | `/api/v1/settings/privacy` | None | Get privacy policy |
 | PUT | `/api/v1/settings/privacy` | requireSupportOrAdmin | Update privacy |
-| GET | `/api/v1/settings/social` | None | List social links |
-| POST | `/api/v1/settings/social` | requireSupportOrAdmin | Create social link |
-| PUT | `/api/v1/settings/social/:id` | requireSupportOrAdmin | Update social link |
-| DELETE | `/api/v1/settings/social/:id` | requireAdmin | Delete social link |
 
 ---
 
@@ -1416,3 +1392,280 @@ UserVoteStatus: { hasVoted: boolean, vote?: string, votedAt?: Date }
 // Error
 { success: false, message: string, errors?: ValidationError[] }
 ```
+
+---
+
+## 19. Translations Module
+
+**Location**: `src/modules/translations/`
+
+**Purpose**: Database-driven translation overrides for i18n system.
+
+### Model Schema (ITranslation)
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| languageCode | String | Yes | Language code (en, ar) |
+| key | String | Yes | Translation key |
+| value | String | Yes | Translated text |
+| namespace | String | No | Optional namespace |
+| createdBy | ObjectId | No | User who created |
+| updatedBy | ObjectId | No | User who updated |
+| isDeleted | Boolean | Yes | Soft delete flag |
+
+**Unique Constraint:** (languageCode, key)
+
+### API Endpoints
+
+**Public:**
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/v1/translations/:lang` | None | Get translations for language |
+| GET | `/api/v1/languages` | None | Get available languages |
+
+**Admin:**
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/v1/admin/translations` | requireAdmin | List all translations |
+| POST | `/api/v1/admin/translations` | requireAdmin | Create translation |
+| PUT | `/api/v1/admin/translations/:id` | requireAdmin | Update translation |
+| DELETE | `/api/v1/admin/translations/:id` | requireAdmin | Delete translation |
+
+---
+
+## 20. Avatars Module
+
+**Location**: `src/modules/avatars/`
+
+**Purpose**: Pre-made user profile avatars for selection.
+
+### Model Schema (IAvatar)
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| name | String | Yes | Avatar name |
+| imageUrl | String | Yes | Avatar image URL |
+| category | String | No | Avatar category |
+| isActive | Boolean | Yes | Enable/disable |
+| sortOrder | Number | No | Display ordering |
+| isDeleted | Boolean | Yes | Soft delete flag |
+
+### API Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/v1/avatars` | None | List all avatars |
+| GET | `/api/v1/avatars/:id` | None | Get avatar |
+| POST | `/api/v1/avatars` | requirePermission('Avatar', 'create') | Create avatar |
+| PUT | `/api/v1/avatars/:id` | requirePermission('Avatar', 'update') | Update avatar |
+| DELETE | `/api/v1/avatars/:id` | requirePermission('Avatar', 'delete') | Delete avatar |
+
+---
+
+## 21. Notifications Module
+
+**Location**: `src/modules/notifications/`
+
+**Purpose**: Push notifications via Firebase Cloud Messaging (FCM), device management, user preferences, and notification history.
+
+### Model Schemas
+
+**UserDevice (IUserDevice):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| user | ObjectId | Yes | User reference |
+| fcmToken | String | Yes | Firebase Cloud Messaging token |
+| deviceType | String | Yes | 'ios' \| 'android' \| 'web' |
+| deviceId | String | No | Unique device identifier |
+| deviceName | String | No | Device name/model |
+| appVersion | String | No | App version |
+| osVersion | String | No | OS version |
+| isActive | Boolean | Yes | Device active status |
+| lastActiveAt | Date | Auto | Last activity timestamp |
+
+**NotificationPreferences (INotificationPreferences):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| user | ObjectId | Yes | User reference (unique) |
+| pushEnabled | Boolean | Yes | Master push toggle |
+| matchNotifications | Object | Yes | Match notification settings |
+| newsNotifications | Object | Yes | News notification settings |
+| transferNotifications | Object | Yes | Transfer notification settings |
+| tournamentNotifications | Object | Yes | Tournament notification settings |
+
+**Match Notification Settings:**
+- `enabled` - Master toggle for match notifications
+- `matchStart` - Notify when followed matches start
+- `matchEnd` - Notify when followed matches end
+- `scoreUpdate` - Notify on score changes
+- `upcomingReminder` - Notify before match starts
+- `reminderMinutes` - Minutes before match for reminder
+
+**News Notification Settings:**
+- `enabled` - Master toggle
+- `breakingNews` - Breaking news alerts
+- `followedEntities` - News about followed items
+
+**Transfer Notification Settings:**
+- `enabled` - Master toggle
+- `confirmed` - Confirmed transfers
+- `rumors` - Transfer rumors
+
+**Tournament Notification Settings:**
+- `enabled` - Master toggle
+- `newTournament` - New tournament announcements
+- `phaseChanges` - Phase/stage changes
+
+**NotificationLog (INotificationLog):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| user | ObjectId | Yes | User reference |
+| type | String | Yes | Notification type |
+| title | String | Yes | Notification title |
+| body | String | Yes | Notification body |
+| imageUrl | String | No | Optional image |
+| data | Object | No | Custom payload data |
+| entityType | String | No | Related entity type |
+| entityId | ObjectId | No | Related entity ID |
+| status | String | Yes | 'pending' \| 'sent' \| 'failed' \| 'clicked' |
+| errorMessage | String | No | Error details if failed |
+| sentAt | Date | No | When notification sent |
+| clickedAt | Date | No | When user clicked |
+
+**TTL Index:** Notifications auto-delete after 30 days.
+
+### Notification Types
+
+- `match_start` - Match starting notification
+- `match_end` - Match ended notification
+- `match_reminder` - Upcoming match reminder
+- `news` - News article notification
+- `transfer` - Transfer news notification
+- `tournament` - Tournament update notification
+- `announcement` - General announcement
+- `topic` - Topic-based notification
+
+### Service Methods
+
+**Device Management:**
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `registerDevice()` | userId, deviceData | Device | Register user device |
+| `updateDevice()` | userId, deviceId, data | Device | Update device info |
+| `removeDevice()` | userId, deviceId | void | Remove device |
+| `getUserDevices()` | userId | Device[] | Get user's devices |
+
+**Preferences:**
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `getPreferences()` | userId | Preferences | Get user preferences |
+| `updatePreferences()` | userId, data | Preferences | Update preferences |
+
+**Notification History:**
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `getNotificationHistory()` | userId, filters, pagination | PaginatedLogs | Get notification history |
+| `markAsClicked()` | userId, notificationId | Log | Mark as read/clicked |
+| `deleteNotification()` | userId, notificationId | void | Delete notification |
+
+**Sending Notifications:**
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `sendToUser()` | userId, notification | SendResult | Send to specific user |
+| `sendToTopic()` | topic, notification | SendResult | Send to topic subscribers |
+| `adminSendNotification()` | targetData, notification | SendResult | Admin bulk send |
+
+**Topic Management:**
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `subscribeToTopic()` | userId, topic | void | Subscribe user to topic |
+| `unsubscribeFromTopic()` | userId, topic | void | Unsubscribe from topic |
+
+### API Endpoints
+
+**User Routes - Devices:**
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/v1/notifications/devices` | authenticate | Register device |
+| GET | `/api/v1/notifications/devices` | authenticate | Get user's devices |
+| PUT | `/api/v1/notifications/devices/:id` | authenticate | Update device |
+| DELETE | `/api/v1/notifications/devices/:id` | authenticate | Remove device |
+
+**User Routes - Preferences:**
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/v1/notifications/preferences` | authenticate | Get preferences |
+| PUT | `/api/v1/notifications/preferences` | authenticate | Update preferences |
+| PATCH | `/api/v1/notifications/preferences` | authenticate | Partial update |
+
+**User Routes - Notification History:**
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/v1/notifications` | authenticate | Get notification history |
+| POST | `/api/v1/notifications/:id/read` | authenticate | Mark as read |
+| DELETE | `/api/v1/notifications/:id` | authenticate | Delete notification |
+
+**Admin Routes:**
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/v1/admin/notifications/send` | requireAdmin | Send notification |
+| GET | `/api/v1/admin/notifications/stats` | requireAdmin | Get statistics |
+
+### Admin Send Notification Target Types
+
+```typescript
+{
+  target: {
+    type: 'topic' | 'all' | 'users' | 'segment',
+    topic?: string,      // For type='topic'
+    userIds?: string[],  // For type='users'
+    segment?: {          // For type='segment'
+      games?: string[],
+      teams?: string[]
+    }
+  },
+  notification: {
+    title: string,
+    body: string,
+    imageUrl?: string,
+    data?: Record<string, string>
+  }
+}
+```
+
+### Topic Naming Convention
+
+Topics are auto-managed based on follows:
+- `game_{gameId}` - Game followers
+- `team_{teamId}` - Team followers
+- `player_{playerId}` - Player followers
+- `tournament_{tournamentId}` - Tournament followers
+
+### Relationships
+
+- `UserDevice.user` → User
+- `NotificationPreferences.user` → User (unique)
+- `NotificationLog.user` → User
+- `NotificationLog.entityId` → Game/Team/Player/Tournament/Match/News (polymorphic)
+
+### Notable Features
+
+- Graceful degradation when Firebase not configured
+- Batch sending for multiple users
+- Topic-based subscriptions linked to follows
+- 30-day TTL for notification history
+- Click tracking for engagement metrics

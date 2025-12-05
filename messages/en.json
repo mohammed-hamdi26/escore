@@ -519,7 +519,16 @@
     "Game is required": "Game is required",
     "Team 1 is required": "Team 1 is required",
     "Team 2 is required": "Team 2 is required",
-    "Series Format is required": "Series Format is required"
+    "Series Format is required": "Series Format is required",
+
+    "Team Lineups": "Team Lineups",
+    "Team Lineup": "Team Lineup",
+    "Select All": "Select All",
+    "Clear All": "Clear All",
+    "selected": "selected",
+    "Loading players": "Loading players...",
+    "No players available": "No players in this team",
+    "Failed to load players": "Failed to load players"
   },
   "MatchesTable": {
     "Date": "Date",
@@ -782,5 +791,18 @@
     "fee": "Fee",
     "Edit": "Edit",
     "Delete": "Delete"
+  },
+  "TeamLineups": {
+    "title": "Team Lineup",
+    "players": "Players",
+    "noPlayers": "No players in this team",
+    "columns": {
+      "photo": "Photo",
+      "name": "Name",
+      "role": "Role",
+      "country": "Country",
+      "age": "Age",
+      "actions": "Actions"
+    }
   }
 }
