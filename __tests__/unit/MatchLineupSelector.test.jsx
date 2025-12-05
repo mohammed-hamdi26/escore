@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import MatchLineupSelector from "@/components/Matches Management/MatchLineupSelector";
-import { getPlayersByTeam } from "@/app/[locale]/_Lib/palyerApi";
+import { fetchPlayersByTeam } from "@/app/[locale]/_Lib/actions";
 
 // Mock next/image
 jest.mock("next/image", () => ({
@@ -27,9 +27,9 @@ jest.mock("next-intl", () => ({
   },
 }));
 
-// Mock the player API
-jest.mock("@/app/[locale]/_Lib/palyerApi", () => ({
-  getPlayersByTeam: jest.fn(),
+// Mock the server action
+jest.mock("@/app/[locale]/_Lib/actions", () => ({
+  fetchPlayersByTeam: jest.fn(),
 }));
 
 describe("MatchLineupSelector", () => {
@@ -73,7 +73,7 @@ describe("MatchLineupSelector", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    getPlayersByTeam.mockResolvedValue(mockPlayers);
+    fetchPlayersByTeam.mockResolvedValue(mockPlayers);
   });
 
   it("returns null when no teamId is provided", () => {
@@ -84,7 +84,7 @@ describe("MatchLineupSelector", () => {
   });
 
   it("shows loading state while fetching players", async () => {
-    getPlayersByTeam.mockImplementation(
+    fetchPlayersByTeam.mockImplementation(
       () => new Promise((resolve) => setTimeout(() => resolve(mockPlayers), 100))
     );
 
@@ -97,7 +97,7 @@ describe("MatchLineupSelector", () => {
     render(<MatchLineupSelector {...defaultProps} />);
 
     await waitFor(() => {
-      expect(getPlayersByTeam).toHaveBeenCalledWith("team1");
+      expect(fetchPlayersByTeam).toHaveBeenCalledWith("team1");
     });
   });
 
@@ -259,7 +259,7 @@ describe("MatchLineupSelector", () => {
   });
 
   it("disables 'Select All' button while loading", () => {
-    getPlayersByTeam.mockImplementation(
+    fetchPlayersByTeam.mockImplementation(
       () =>
         new Promise((resolve) => setTimeout(() => resolve(mockPlayers), 1000))
     );
@@ -271,7 +271,7 @@ describe("MatchLineupSelector", () => {
   });
 
   it("displays error message when API fails", async () => {
-    getPlayersByTeam.mockRejectedValue(new Error("API Error"));
+    fetchPlayersByTeam.mockRejectedValue(new Error("API Error"));
 
     render(<MatchLineupSelector {...defaultProps} />);
 
@@ -281,7 +281,7 @@ describe("MatchLineupSelector", () => {
   });
 
   it("displays empty state when no players returned", async () => {
-    getPlayersByTeam.mockResolvedValue([]);
+    fetchPlayersByTeam.mockResolvedValue([]);
 
     render(<MatchLineupSelector {...defaultProps} />);
 
@@ -310,7 +310,7 @@ describe("MatchLineupSelector", () => {
         role: "Entry",
       },
     ];
-    getPlayersByTeam.mockResolvedValue(playersWithMongoId);
+    fetchPlayersByTeam.mockResolvedValue(playersWithMongoId);
 
     const onSelectionChange = jest.fn();
     render(
@@ -352,13 +352,13 @@ describe("MatchLineupSelector", () => {
     const { rerender } = render(<MatchLineupSelector {...defaultProps} />);
 
     await waitFor(() => {
-      expect(getPlayersByTeam).toHaveBeenCalledWith("team1");
+      expect(fetchPlayersByTeam).toHaveBeenCalledWith("team1");
     });
 
     rerender(<MatchLineupSelector {...defaultProps} teamId="team2" />);
 
     await waitFor(() => {
-      expect(getPlayersByTeam).toHaveBeenCalledWith("team2");
+      expect(fetchPlayersByTeam).toHaveBeenCalledWith("team2");
     });
   });
 

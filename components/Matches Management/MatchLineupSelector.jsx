@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Users, User, Loader2 } from "lucide-react";
-import { getPlayersByTeam } from "@/app/[locale]/_Lib/palyerApi";
+import { fetchPlayersByTeam } from "@/app/[locale]/_Lib/actions";
 
 function MatchLineupSelector({
   teamId,
@@ -31,7 +31,7 @@ function MatchLineupSelector({
       setError(null);
 
       try {
-        const data = await getPlayersByTeam(teamId);
+        const data = await fetchPlayersByTeam(teamId);
         setPlayers(data || []);
       } catch (err) {
         console.error("Failed to fetch players:", err);
