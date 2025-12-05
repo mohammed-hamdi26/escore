@@ -329,14 +329,6 @@ export async function updateLink(linkData) {
 //   }
 //   revalidatePath(`/${locale}/dashboard/links/edit/${idUser}`);
 // }
-export async function addFavoriteCharacter(characterData) {
-  try {
-    const res = await apiClient.post("/favorite-characters", characterData);
-    return res.data;
-  } catch (e) {
-    throw new Error("Error in adding favorite character");
-  }
-}
 
 // langues
 
@@ -770,40 +762,116 @@ export async function deleteUser(id) {
   }
 }
 
-export async function editAward(typeEdit, id, data) {
+export async function addAward(typeEdit, id, data) {
   const locale = await getLocale();
-
   console.log(typeEdit, id, data);
+
   try {
-    let awards =
-      typeEdit === "players"
-        ? await getAwardsPlayer(id)
-        : await getAwardsTeam(id);
-
-    console.log(awards);
-    const isLinkExist = awards.find((award) => award.id === data.id);
-    console.log(isLinkExist);
-    if (isLinkExist) {
-      awards = awards.filter((award) => award.id !== data.id);
-    }
-    awards.forEach((award) => (award.game = award.game.id));
-
-    console.log(awards);
-
-    // const res = await apiClient.put(`/${typeEdit}/${id}`, {
-    //   awards: [...awards, data],
-    // });
-    // revalidatePath(
-    //   `${locale}/dashboard/${
-    //     typeEdit === "players" ? "player-management" : "teams-management"
-    //   }/awards/${id}`
-    // );
-    // return res.data;
+    const res = await apiClient.post(`/${typeEdit}/${id}/awards`, data);
+    revalidatePath(
+      `${locale}/dashboard/${
+        typeEdit === "players" ? "player-management" : "teams-management"
+      }/awards/${id}`
+    );
+    return res.data;
   } catch (e) {
     console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in updating player");
   }
 }
+export async function editAward(typeEdit, id, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/${typeEdit}/${id}/awards/${data.id}`,
+      data
+    );
+    revalidatePath(
+      `${locale}/dashboard/${
+        typeEdit === "players" ? "player-management" : "teams-management"
+      }/awards/${id}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
+    throw new Error("Error in updating player");
+  }
+}
+
+export async function deleteAward(typeEdit, id, awardId) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.delete(`/${typeEdit}/${id}/awards/${awardId}`);
+    revalidatePath(
+      `${locale}/dashboard/${
+        typeEdit === "players" ? "player-management" : "teams-management"
+      }/awards/${id}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
+    throw new Error("Error in deleting player");
+  }
+}
+
+export async function addFavoriteCharacter(typeEdit, id, data) {
+  const locale = await getLocale();
+  console.log(typeEdit, id, data);
+  try {
+    const res = await apiClient.post(
+      `/${typeEdit}/${id}/favourite-characters`,
+      data
+    );
+    revalidatePath(
+      `${locale}/dashboard/${
+        typeEdit === "players" ? "player-management" : "teams-management"
+      }/favorite-characters/${id}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
+    throw new Error("Error in updating player");
+  }
+}
+export async function editFavoriteCharacter(typeEdit, id, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/${typeEdit}/${id}/favourite-characters/${data.id}`,
+      data
+    );
+    revalidatePath(
+      `${locale}/dashboard/${
+        typeEdit === "players" ? "player-management" : "teams-management"
+      }/favorite-characters/${id}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
+    throw new Error("Error in updating player");
+  }
+}
+
+export async function deleteFavoriteCharacter(typeEdit, id, characterId) {
+  const locale = await getLocale();
+
+  console.log(typeEdit, id, characterId);
+  try {
+    const res = await apiClient.delete(
+      `/${typeEdit}/${id}/favourite-characters/${characterId}`
+    );
+    revalidatePath(
+      `${locale}/dashboard/${
+        typeEdit === "players" ? "player-management" : "teams-management"
+      }/favorite-characters/${id}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
+    throw new Error("Error in deleting player");
+  }
+}
+export async function addLinks(typeEdit, id, data) {}
 export async function editLinks(typeEdit, id, data) {
   const locale = await getLocale();
   console.log(typeEdit, id, data);

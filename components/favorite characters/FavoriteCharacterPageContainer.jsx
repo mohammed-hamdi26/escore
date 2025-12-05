@@ -4,17 +4,21 @@ import { DialogContent, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
 import FavoriteCharacterForm from "./FavoriteCharacterForm";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import FavoriteCharacterTable from "./FavoriteCharacterTable";
 
 function FavoriteCharacterPageContainer({
   id,
   players,
   games,
-  linkType = "player",
+  favoriteCharacterFor = "players",
+  characters,
 }) {
   const t = useTranslations("FavoriteCharacter");
+  const [open, setOpen] = useState(false);
   return (
     <div className="space-y-8">
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
             className={
@@ -31,10 +35,18 @@ function FavoriteCharacterPageContainer({
             games={games}
             id={id}
             players={players}
-            linksType={linkType}
+            favoriteCharacterFor={favoriteCharacterFor}
+            setOpen={setOpen}
           />
         </DialogContent>
       </Dialog>
+      <FavoriteCharacterTable
+        t={t}
+        favoriteCharacterFor={favoriteCharacterFor}
+        characters={characters}
+        games={games}
+        idUser={id}
+      />
     </div>
   );
 }
