@@ -14,6 +14,12 @@ npm start          # Run production server
 
 # Linting
 npm run lint       # Run ESLint
+
+# Testing
+npm test                        # Run all tests
+npm run test:watch              # Run tests in watch mode
+npm run test:coverage           # Run tests with coverage report
+npx jest path/to/test.test.jsx  # Run a single test file
 ```
 
 ## Architecture
@@ -43,6 +49,10 @@ Escore is a Next.js 15 admin dashboard for managing esports content (players, te
   - `navigation.js` - Localized navigation helpers
 
 - `messages/` - Translation files (en.json, ar.json)
+
+- `__tests__/` - Test files
+  - `unit/` - Unit tests for individual components
+  - `integration/` - Integration tests
 
 ### Key Patterns
 

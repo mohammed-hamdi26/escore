@@ -1,7 +1,7 @@
 "use client";
 import Champion from "@/components/icons/Champion";
 import TeamsManagement from "@/components/icons/TeamsManagement";
-import { Gamepad2, Loader, MapPin, Trophy } from "lucide-react";
+import { Gamepad2, Loader, MapPin } from "lucide-react";
 
 import {
   combineDateAndTime,
@@ -12,17 +12,14 @@ import FormSection from "@/components/ui app/FormSection";
 import InputApp from "@/components/ui app/InputApp";
 import SelectInput from "@/components/ui app/SelectInput";
 import { Button } from "@/components/ui/button";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import Date from "../icons/Date";
-import DatePicker from "../ui app/DatePicker";
-import TextAreaInput from "../ui app/TextAreaInput";
-import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
-import MarkDown from "../ui app/MarkDown";
-import SelectDateTimeInput from "../ui app/SelectDateAndTimeInput";
-import { format } from "date-fns";
 import { useRouter } from "@/i18n/navigation";
+import { format } from "date-fns";
+import { useFormik } from "formik";
+import { useTranslations } from "next-intl";
+import toast from "react-hot-toast";
+import * as Yup from "yup";
+import SelectDateTimeInput from "../ui app/SelectDateAndTimeInput";
+import TextAreaInput from "../ui app/TextAreaInput";
 import MatchLineupSelector from "./MatchLineupSelector";
 const validateSchema = Yup.object({
   // matchDate: Yup.date()
@@ -175,13 +172,13 @@ function MatchesFrom({
           const lineups = [];
           if (team1Lineup.length > 0) {
             lineups.push({
-              team: { id: values.team1 },
+              team:  values.team1 ,
               players: team1Lineup.map((id) => ({ id })),
             });
           }
           if (team2Lineup.length > 0) {
             lineups.push({
-              team: { id: values.team2 },
+              team:  values.team2 ,
               players: team2Lineup.map((id) => ({ id })),
             });
           }
@@ -189,18 +186,18 @@ function MatchesFrom({
         }
 
         console.log(dataValues);
-        const matchResult = await submit(dataValues);
-        const matchId = matchResult?.data?.id || matchResult?.id || match?.id;
+        // const matchResult = await submit(dataValues);
+        // const matchId = matchResult?.data?.id || matchResult?.id || match?.id;
 
-        formType === "add" && formik.resetForm();
-        toast.success(
-          formType === "add" ? "The match Added" : "The Match Edited"
-        );
+        // formType === "add" && formik.resetForm();
+        // toast.success(
+        //   formType === "add" ? "The match Added" : "The Match Edited"
+        // );
 
-        // Redirect to edit page after successful add
-        if (formType === "add" && matchId) {
-          router.push(`/dashboard/matches-management/edit`);
-        }
+        // // Redirect to edit page after successful add
+        // if (formType === "add" && matchId) {
+        //   router.push(`/dashboard/matches-management/edit`);
+        // }
       } catch (error) {
         toast.error(error.message);
       }
@@ -208,7 +205,7 @@ function MatchesFrom({
   });
   console.log(
     "match",
-    match.lineups.find((lineup) => lineup.team.id === match?.team1?.id),
+    match?.lineups,
     "lineups"
   );
 

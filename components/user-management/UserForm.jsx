@@ -51,13 +51,38 @@ function UserForm({
     { label: "User", value: "AddUserPermission" },
   ];
 
+  // Build initial values for permissions from user data (edit mode)
+  const getInitialPermissionValues = () => {
+    const values = {};
+    if (user?.permissions && Array.isArray(user.permissions)) {
+      permissions.forEach((perm) => {
+        const userPerm = user.permissions.find(
+          (p) => p.entity === perm.label
+        );
+        if (userPerm) {
+          values[perm.value] = "yes";
+          values["actions" + perm.value] = userPerm.actions.map((action) => ({
+            label: action,
+            value: action,
+            name: action,
+          }));
+        } else {
+          values[perm.value] = "no";
+        }
+      });
+    }
+    return values;
+  };
+
   const formik = useFormik({
     initialValues: {
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       permissions: [],
       phone: user?.phone || "",
+      ...getInitialPermissionValues(),
     },
+    enableReinitialize: true,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
@@ -181,12 +206,13 @@ function UserForm({
 
       {permissions.map((item, index) => {
         return (
-          <FormSection>
+          <FormSection key={item.value}>
             <FormRow>
               <SelectInput
                 formik={formik}
                 label={item.label + " Permission"}
                 name={item.value}
+                value={formik.values[item.value] || ""}
                 options={mappedArrayToSelectOptions(
                   [
                     { label: "yes", value: "yes" },
@@ -203,6 +229,7 @@ function UserForm({
               {/* <div className="flex-1">{item.value}</div> */}
               {formik.values[item.value] === "yes" && (
                 <ComboboxInput
+                  key={`${item.value}-${user?.id || "new"}`}
                   formik={formik}
                   label={"Actions"}
                   name={"actions" + item.value}
@@ -211,6 +238,7 @@ function UserForm({
                     "label",
                     "value"
                   )}
+                  initialData={formik.values["actions" + item.value] || []}
                   onSelect={(value) => {
                     formik.setFieldValue("actions", value);
                   }}

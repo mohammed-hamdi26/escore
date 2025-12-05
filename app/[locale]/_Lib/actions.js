@@ -280,13 +280,15 @@ export async function addMatch(matchData) {
 export async function updateMatch(matchData) {
   const locale = await getLocale();
   try {
+    console.log("Sending match data:", JSON.stringify(matchData, null, 2));
     const res = await apiClient.put(`/matches/${matchData.id}`, matchData);
     revalidatePath(
       `/${locale}/dashboard/matches-management/edit/${matchData.id}`
     );
     return res.data;
   } catch (e) {
-    console.log(e.response.data.errors || e.response.data || e.response || e);
+    console.log("Full error response:", JSON.stringify(e.response?.data, null, 2));
+    console.log("Validation errors:", e.response?.data?.errors);
     throw new Error("Error in updating match");
   }
 }
