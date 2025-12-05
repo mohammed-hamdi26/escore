@@ -49,3 +49,21 @@ export async function getPlayersByTeam(teamId) {
     throw new Error("Failed to get team players");
   }
 }
+
+export async function getPlayersAwards(id) {
+  try {
+    const res = await apiClient.get(`/players/${id}/awards`);
+    return res.data.data;
+  } catch (e) {
+    throw new Error("Failed to get players awards");
+  }
+}
+
+export async function getPlayersFavoriteCharacters(id) {
+  try {
+    const res = await apiClient.get(`/players/${id}/favourite-characters`);
+    return res.data.data;
+  } catch (e) {
+    throw new Error("Failed to get players characters");
+  }
+}

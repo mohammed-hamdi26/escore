@@ -5,9 +5,10 @@ import { Button } from "../ui/button";
 import AwardsForm from "./AwardsForm";
 import { useTranslations } from "next-intl";
 import AwardsTable from "./AwardsTable";
+import { useState } from "react";
 
 function AwardsPageContainer({
-  awardsType = "player",
+  awardsType = "players",
   players,
   teams,
   tournaments,
@@ -16,9 +17,10 @@ function AwardsPageContainer({
   awards,
 }) {
   const t = useTranslations("Awards");
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="space-y-8   ">
-      <Dialog>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button
             className={
@@ -38,6 +40,7 @@ function AwardsPageContainer({
             players={players}
             awardsType={awardsType}
             t={t}
+            setOpen={setIsOpen}
           />
         </DialogContent>
       </Dialog>

@@ -89,5 +89,122 @@ const links = [
 export default async function page() {
   const user = await getLoginUser();
   console.log(user);
+  const links = [
+    {
+      title: "Tournaments Management",
+      href: "/tournaments-management/edit",
+      description:
+        "Go to Tournaments Section to Add Tournament: Name, Champion, Start Date, End Date, Teams, Players",
+
+      icon: (
+        <Champion
+          width="57"
+          height="56"
+          className={"text-green-primary icon-transition"}
+        />
+      ),
+      isShowed:
+        user.role === "admin"
+          ? true
+          : user.permissions.find((per) => per.entity == "Tournament")
+          ? true
+          : false,
+    },
+    {
+      title: "Matches Management",
+      href: "/matches-management/edit",
+      description:
+        "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links",
+      icon: <MatchesManagement width="57" height="56" />,
+      isShowed:
+        user.role === "admin"
+          ? true
+          : user.permissions.find((per) => per.entity == "Match"),
+    },
+    {
+      title: "Players",
+      href: "/player-management/edit",
+      description:
+        "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos",
+      icon: <Player width="57" height="56" />,
+      isShowed:
+        user.role === "admin"
+          ? true
+          : user.permissions.find((per) => per.entity == "Player"),
+    },
+
+    {
+      title: "Teams Management",
+      href: "/teams-management/edit",
+      description: "Add Team: Name, Country, Linked Players, Logo/Images",
+      icon: <TeamsManagement width="57" height="56" />,
+      isShowed:
+        user.role === "admin"
+          ? true
+          : user.permissions.find((per) => per.entity == "Team"),
+    },
+    {
+      title: "transfers Management",
+      href: "/transfers-management/edit",
+      description:
+        "Go to Transfers Section to Add Transfer: Player, From Team, To Team, Transfer Date, Transfer Fee",
+      icon: (
+        <ArrowRightLeft className="icon-transition" width="57" height="56" />
+      ),
+      isShowed:
+        user.role === "admin"
+          ? true
+          : user.permissions.find((per) => per.entity == "Transfer"),
+    },
+    {
+      title: "Games Management",
+      href: "/games-management/edit",
+      description: "go to Games Section to Add Game: Name + Icon",
+      icon: <GamesManagement width="57" height="56" />,
+      isShowed:
+        user.role === "admin"
+          ? true
+          : user.permissions.find((per) => per.entity == "Game"),
+    },
+    {
+      title: "News & Updates",
+      href: "/news/edit",
+      description:
+        "Go to news Sectoin to Add News: Title, Description, Image/Video, Author",
+      icon: <News width="57" height="56" />,
+      isShowed:
+        user.role === "admin"
+          ? true
+          : user.permissions.find((per) => per.entity == "News"),
+    },
+    {
+      title: "Users",
+      href: "/users/",
+      description:
+        "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
+      icon: <User />,
+      isShowed:
+        user.role === "admin"
+          ? true
+          : user.permissions.find((per) => per.entity == "User"),
+    },
+    {
+      title: "Support Center",
+      href: "/support-center",
+      description:
+        "Go to Support Center to view user messages and reply to them",
+      icon: <SupportCenter width="57" height="56" />,
+      isShowed:
+        user.role === "admin"
+          ? true
+          : user.permissions.find((per) => per.entity == "Support"),
+    },
+    // {
+    //   title: "Settings",
+    //   href: "/settings",
+    //   description: "Manage your preferences and account configuration settings.",
+    //   icon: <SettingsIcon width="41" height="49" className="icon-transition" />,
+    // },
+  ];
   return <ServicesContainer links={links} />;
 }

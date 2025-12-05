@@ -16,7 +16,7 @@ async function page({ params }) {
 
   return (
     <AwardsPageContainer
-      awardsType="team"
+      awardsType="teams"
       games={games}
       id={id}
       teams={teams}

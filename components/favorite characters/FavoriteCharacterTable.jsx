@@ -1,29 +1,36 @@
-"use client";
 import { useState } from "react";
-import EditDialog from "../Links/EditDialog";
-import LinksForm from "../Links/LinksForm";
 import Table from "../ui app/Table";
-import { Button } from "../ui/button";
-import AwardsForm from "./AwardsForm";
 import { useTranslations } from "next-intl";
-import { deleteAward } from "@/app/[locale]/_Lib/actions";
+import EditDialog from "../Links/EditDialog";
+import FavoriteCharacterForm from "./FavoriteCharacterForm";
+import { Button } from "../ui/button";
+import { deleteFavoriteCharacter } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 
-const columns = [{ id: "name", header: "Name" }];
-function AwardsTable({ awards, games, awardsType, idUser }) {
+function FavoriteCharacterTable({
+  favoriteCharacterFor,
+  characters,
+  games,
+  idUser,
+  setOpen,
+}) {
+  const columns = [
+    { id: "name", header: "Name" },
+    { id: "character", header: "Character" },
+  ];
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("AwardsTable");
   return (
     <div>
       <Table columns={columns} grid_cols={"grid-cols-[0.5fr_2fr]"}>
-        {awards.map((award) => (
-          <Table.Row grid_cols={"grid-cols-[0.5fr_2fr]"} key={award.id}>
-            <Table.Cell>{award.name}</Table.Cell>
+        {characters.map((character) => (
+          <Table.Row grid_cols={"grid-cols-[0.5fr_2fr]"} key={character.id}>
+            <Table.Cell>{character.name}</Table.Cell>
             {/* <Table.Cell>{award.description}</Table.Cell> */}
             <Table.Cell className="flex gap-4 justify-end">
               <EditDialog
                 idUser={idUser}
-                title={t("Edit Award")}
+                title={t("Edit Favorite Character")}
                 t={t}
                 trigger={
                   <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
@@ -31,12 +38,13 @@ function AwardsTable({ awards, games, awardsType, idUser }) {
                   </Button>
                 }
                 contentDialog={
-                  <AwardsForm
+                  <FavoriteCharacterForm
+                    character={character}
                     id={idUser}
                     t={t}
-                    award={award}
+                    setOpen={setOpen}
+                    favoriteCharacterFor={favoriteCharacterFor}
                     games={games}
-                    awardsType={awardsType}
                   />
                 }
               />
@@ -48,7 +56,11 @@ function AwardsTable({ awards, games, awardsType, idUser }) {
                 onClick={async () => {
                   try {
                     setIsLoading(true);
-                    await deleteAward(awardsType, idUser, award.id);
+                    await deleteFavoriteCharacter(
+                      favoriteCharacterFor,
+                      idUser,
+                      character.id
+                    );
                     toast.success(t("The Link is Deleted"));
                   } catch (e) {
                     toast.error(t("error in Delete"));
@@ -67,4 +79,4 @@ function AwardsTable({ awards, games, awardsType, idUser }) {
   );
 }
 
-export default AwardsTable;
+export default FavoriteCharacterTable;
