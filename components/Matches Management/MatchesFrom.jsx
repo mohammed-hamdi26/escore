@@ -24,7 +24,6 @@ import SelectDateTimeInput from "../ui app/SelectDateAndTimeInput";
 import { format } from "date-fns";
 import { useRouter } from "@/i18n/navigation";
 import MatchLineupSelector from "./MatchLineupSelector";
-import { addLineUp } from "@/app/[locale]/_Lib/actions";
 const validateSchema = Yup.object({
   // matchDate: Yup.date()
   //   .typeError("Invalid date format")
@@ -161,38 +160,27 @@ function MatchesFrom({
         delete dataValues.date;
         delete dataValues.time;
 
+        // Build lineups array - only include for edit mode (API may not support on create)
+        if (formType === "edit" && (team1Lineup.length > 0 || team2Lineup.length > 0)) {
+          const lineups = [];
+          if (team1Lineup.length > 0) {
+            lineups.push({
+              team: { id: values.team1 },
+              players: team1Lineup.map((id) => ({ id })),
+            });
+          }
+          if (team2Lineup.length > 0) {
+            lineups.push({
+              team: { id: values.team2 },
+              players: team2Lineup.map((id) => ({ id })),
+            });
+          }
+          dataValues.lineups = lineups;
+        }
+
         console.log(dataValues);
         const matchResult = await submit(dataValues);
         const matchId = matchResult?.data?.id || matchResult?.id || match?.id;
-
-        // Add lineups if players were selected
-        if (matchId) {
-          const lineupPromises = [];
-
-          if (team1Lineup.length > 0) {
-            lineupPromises.push(
-              addLineUp({
-                match: { id: matchId },
-                team: { id: values.team1 },
-                players: team1Lineup.map((id) => ({ id })),
-              })
-            );
-          }
-
-          if (team2Lineup.length > 0) {
-            lineupPromises.push(
-              addLineUp({
-                match: { id: matchId },
-                team: { id: values.team2 },
-                players: team2Lineup.map((id) => ({ id })),
-              })
-            );
-          }
-
-          if (lineupPromises.length > 0) {
-            await Promise.all(lineupPromises);
-          }
-        }
 
         formType === "add" && formik.resetForm();
         toast.success(

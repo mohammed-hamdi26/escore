@@ -61,3 +61,4 @@ Escore is a Next.js 15 admin dashboard for managing esports content (players, te
 
 ### Internationalization
 Locales: `en` (default), `ar`. All routes are prefixed with locale. Use `next-intl` for translations and `getLocale()` for server-side locale access.
+- بعد كدا متعملش كوميت ولا بوش الا لما تستأذن
