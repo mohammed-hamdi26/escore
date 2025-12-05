@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import TeamLineup from "./TeamLineup";
+import { format } from "date-fns";
 
 function MatchesTable({ matches, columns, players }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +52,7 @@ function MatchesTable({ matches, columns, players }) {
               {match?.team1?.logo?.light && (
                 <img width={30} src={match?.team1?.logo?.light} alt="" />
               )}{" "}
-              {match?.teams1?.name}
+              {match?.team1?.name}
             </Table.Cell>
             <Table.Cell className="flex gap-4 items-center">
               {match?.team2?.logo && (
@@ -59,39 +60,40 @@ function MatchesTable({ matches, columns, players }) {
               )}{" "}
               {match?.team2?.name}
             </Table.Cell>
-            <Table.Cell>{match?.stage}</Table.Cell>
-            <Table.Cell>{match?.matchDate}</Table.Cell>
+            <Table.Cell>{match?.round}</Table.Cell>
+            <Table.Cell>
+              {format(match?.scheduledDate, "yyyy-MM-dd")}
+            </Table.Cell>
             <Table.Cell className="flex gap-4 justify-end">
-              <Dialog open={open} onOpenChange={setOpen}>
-                <Link href={`/dashboard/matches-management/edit/${match.id}`}>
-                  <Button
-                    className={
-                      "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
-                    }
-                  >
-                    {t("Edit")}{" "}
-                  </Button>
-                </Link>
+              <Link href={`/dashboard/matches-management/edit/${match.id}`}>
                 <Button
-                  disabled={isLoading}
                   className={
-                    "text-white bg-[#3A469D] rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
+                    "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
                   }
-                  onClick={async () => {
-                    try {
-                      setIsLoading(true);
-                      await deleteMatch(match.id);
-                      toast.success(t("The Match is Deleted"));
-                    } catch (e) {
-                      toast.error(t("error in Delete"));
-                    } finally {
-                      setIsLoading(false);
-                    }
-                  }}
                 >
-                  {t("Delete")}
+                  {t("Edit")}{" "}
                 </Button>
-                <DropMenu
+              </Link>
+              <Button
+                disabled={isLoading}
+                className={
+                  "text-white bg-[#3A469D] rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
+                }
+                onClick={async () => {
+                  try {
+                    setIsLoading(true);
+                    await deleteMatch(match.id);
+                    toast.success(t("The Match is Deleted"));
+                  } catch (e) {
+                    toast.error(t("error in Delete"));
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+              >
+                {t("Delete")}
+              </Button>
+              {/* <DropMenu
                   menuTrigger={<EllipsisVertical />}
                   menuContent={[
                     {
@@ -132,7 +134,7 @@ function MatchesTable({ matches, columns, players }) {
                     setOpen={setOpen}
                   />
                 </DialogContent>
-              </Dialog>
+              </Dialog> */}
             </Table.Cell>
           </Table.Row>
         ))}

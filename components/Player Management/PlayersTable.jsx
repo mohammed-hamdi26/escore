@@ -39,11 +39,15 @@ function PlayersTable({ players, columns, search, numOfPlayers }) {
           >
             <Table.Cell>{player.nickname}</Table.Cell>
             <Table.Cell>
-              <img
-                className="rounded-full overflow-hidden size-12"
-                src={`${process.env.NEXT_PUBLIC_BASE_URL}${player?.photo}`}
-                alt=""
-              />
+              {(player?.team?.logo?.light || player?.team?.logo?.dark) && (
+                <img
+                  className="rounded-full overflow-hidden size-12"
+                  src={`${
+                    player?.team?.logo?.light || player?.team?.logo?.dark
+                  }`}
+                  alt=""
+                />
+              )}
             </Table.Cell>
             <Table.Cell>{player.dateOfBirth}</Table.Cell>
             <Table.Cell>{player.country.name}</Table.Cell>
