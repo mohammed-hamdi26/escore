@@ -76,7 +76,9 @@ export async function fetchPlayersByTeam(teamId) {
     });
     return res.data.data;
   } catch (e) {
-    console.log(e.response?.data?.errors || e.response?.data || e.response || e);
+    console.log(
+      e.response?.data?.errors || e.response?.data || e.response || e
+    );
     throw new Error("Failed to get team players");
   }
 }
@@ -284,7 +286,8 @@ export async function updateMatch(matchData) {
     );
     return res.data;
   } catch (e) {
-    throw new Error("Error in updating game");
+    console.log(e.response.data.errors || e.response.data || e.response || e);
+    throw new Error("Error in updating match");
   }
 }
 export async function deleteMatch(id) {

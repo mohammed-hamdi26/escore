@@ -119,8 +119,15 @@ function MatchesFrom({
       endedAt: match?.endedAt || "",
 
       // Lineup fields
-      team1Lineup: [],
-      team2Lineup: [],
+      team1Lineup:
+        match?.lineups
+          ?.find((lineup) => lineup.team.id === match?.team1?.id)
+          ?.players.map((player) => player.id) || [],
+
+      team2Lineup:
+        match?.lineups
+          ?.find((lineup) => lineup.team.id === match?.team2?.id)
+          ?.players.map((player) => player.id) || [],
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
@@ -161,7 +168,10 @@ function MatchesFrom({
         delete dataValues.time;
 
         // Build lineups array - only include for edit mode (API may not support on create)
-        if (formType === "edit" && (team1Lineup.length > 0 || team2Lineup.length > 0)) {
+        if (
+          formType === "edit" &&
+          (team1Lineup.length > 0 || team2Lineup.length > 0)
+        ) {
           const lineups = [];
           if (team1Lineup.length > 0) {
             lineups.push({
@@ -196,7 +206,11 @@ function MatchesFrom({
       }
     },
   });
-  console.log(formik.errors);
+  console.log(
+    "match",
+    match.lineups.find((lineup) => lineup.team.id === match?.team1?.id),
+    "lineups"
+  );
 
   const matchTypeOptions = [
     { value: "SOLO", label: t("Solo") },
@@ -217,8 +231,6 @@ function MatchesFrom({
     { value: "ONLINE", label: t("ONLINE") },
     { value: "OFFLINE", label: t("OFFLINE") },
   ];
-
-  console.log("find", tournamentsOptions[0]?.games);
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
