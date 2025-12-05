@@ -256,12 +256,11 @@ export async function deleteTournament(id) {
 export async function addMatch(matchData) {
   try {
     const res = await apiClient.post("/matches", matchData);
-    // return res.data;
+    return res.data;
   } catch (e) {
     console.log(e.response.data.errors || e.response.data || e.response || e);
-    throw new Error("Error in adding game");
+    throw new Error("Error in adding match");
   }
-  redirect("/dashboard/matches-management/edit");
 }
 
 export async function updateMatch(matchData) {

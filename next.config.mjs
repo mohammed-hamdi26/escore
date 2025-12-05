@@ -34,6 +34,10 @@ const nextConfig = {
         // port: "8000",
         // pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "www.esports.net",
+      },
       // {
       //   protocol: "https",
       //   hostname: "digitalhub.fifa.com",

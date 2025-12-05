@@ -514,7 +514,16 @@
     "Game is required": "اللعبة مطلوبة",
     "Team 1 is required": "الفريق 1 مطلوب",
     "Team 2 is required": "الفريق 2 مطلوب",
-    "Series Format is required": "تنسيق السلسلة مطلوب"
+    "Series Format is required": "تنسيق السلسلة مطلوب",
+
+    "Team Lineups": "تشكيلات الفرق",
+    "Team Lineup": "تشكيلة الفريق",
+    "Select All": "اختيار الكل",
+    "Clear All": "إلغاء الكل",
+    "selected": "مختار",
+    "Loading players": "جاري تحميل اللاعبين...",
+    "No players available": "لا يوجد لاعبون في هذا الفريق",
+    "Failed to load players": "فشل في تحميل اللاعبين"
   },
   "MatchesTable": {
     "Date": "التاريخ",
