@@ -38,3 +38,14 @@ export async function getPlayersLinks(id) {
     throw new Error("Failed to get players links");
   }
 }
+
+export async function getPlayersByTeam(teamId) {
+  try {
+    const res = await apiClient.get(`/players`, {
+      params: { "team.id.equals": teamId },
+    });
+    return res.data.data;
+  } catch (e) {
+    throw new Error("Failed to get team players");
+  }
+}

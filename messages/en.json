@@ -782,5 +782,18 @@
     "fee": "Fee",
     "Edit": "Edit",
     "Delete": "Delete"
+  },
+  "TeamLineups": {
+    "title": "Team Lineup",
+    "players": "Players",
+    "noPlayers": "No players in this team",
+    "columns": {
+      "photo": "Photo",
+      "name": "Name",
+      "role": "Role",
+      "country": "Country",
+      "age": "Age",
+      "actions": "Actions"
+    }
   }
 }

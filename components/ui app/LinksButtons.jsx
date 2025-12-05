@@ -11,7 +11,8 @@ function LinksButtons() {
   if (
     pathname.includes("links") ||
     pathname.includes("favorites-characters") ||
-    pathname.includes("awards")
+    pathname.includes("awards") ||
+    pathname.includes("lineups")
   )
     return null;
 
