@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 const columns = [
   { id: "team1", header: "Team 1" },
   { id: "team2", header: "Team 2" },
-  { id: "stage", header: "Stage" },
+  { id: "round", header: "Round" },
   { id: "date", header: "Date" },
 ];
 
@@ -19,7 +19,7 @@ export default async function page({ searchParams }) {
     getPlayers(),
   ]);
   // const numOfMatches = await getMatchesCount();
-  console.log(matches, "matches");
+
   return (
     <MatchesTable
       players={players}

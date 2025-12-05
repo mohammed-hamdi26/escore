@@ -7,7 +7,7 @@ import MatchesFrom from "@/components/Matches Management/MatchesFrom";
 
 async function page({ params }) {
   const { id } = await params;
-  const [match, teamsOptions, gamesOptions, tournamentsOptions] =
+  const [match, teamsOptions, gamesOptions, { data: tournamentsOptions }] =
     await Promise.all([getMatch(id), getTeams(), getGames(), getTournaments()]);
 
   return (
