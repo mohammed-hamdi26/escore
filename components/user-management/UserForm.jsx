@@ -45,13 +45,33 @@ function UserForm({
     { label: "Game", value: "AddGamePermission", translationKey: "Game" },
     { label: "Player", value: "AddPlayerPermission", translationKey: "Player" },
     { label: "Team", value: "AddTeamPermission", translationKey: "Team" },
-    { label: "Tournament", value: "AddTournamentPermission", translationKey: "Tournament" },
+    {
+      label: "Tournament",
+      value: "AddTournamentPermission",
+      translationKey: "Tournament",
+    },
     { label: "News", value: "AddNewsPermission", translationKey: "News" },
-    { label: "Transfer", value: "AddTransferPermission", translationKey: "Transfer" },
-    { label: "Standing", value: "AddStandingPermission", translationKey: "Standing" },
-    { label: "Settings", value: "AddSettingsPermission", translationKey: "Settings" },
-    { label: "Support", value: "AddSupportPermission", translationKey: "Support" },
-    { label: "User", value: "AddUserPermission", translationKey: "User" },
+    {
+      label: "Transfer",
+      value: "AddTransferPermission",
+      translationKey: "Transfer",
+    },
+    {
+      label: "Standing",
+      value: "AddStandingPermission",
+      translationKey: "Standing",
+    },
+    {
+      label: "Settings",
+      value: "AddSettingsPermission",
+      translationKey: "Settings",
+    },
+    {
+      label: "Support",
+      value: "AddSupportPermission",
+      translationKey: "Support",
+    },
+    // { label: "User", value: "AddUserPermission", translationKey: "User" },
   ];
 
   // Build initial values for permissions from user data (edit mode)
@@ -159,7 +179,11 @@ function UserForm({
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<UserCardIcon color={"text-[#677185]"} />}
-            error={formik.touched.firstName && formik.errors.firstName && t("First name is required")}
+            error={
+              formik.touched.firstName &&
+              formik.errors.firstName &&
+              t("First name is required")
+            }
             onBlur={formik.handleBlur}
             value={formik.values.firstName}
           />
@@ -179,7 +203,11 @@ function UserForm({
                 color={"text-[#677185]"}
               />
             }
-            error={formik.touched.lastName && formik.errors.lastName && t("Last name is required")}
+            error={
+              formik.touched.lastName &&
+              formik.errors.lastName &&
+              t("Last name is required")
+            }
             onBlur={formik.handleBlur}
             value={formik.values.lastName}
           />

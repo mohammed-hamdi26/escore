@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 
@@ -31,7 +31,10 @@ const SelectInputCombox = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(formik?.values[name] || "");
-
+  console.log(formik?.values[name]);
+  useEffect(() => {
+    setValue(formik?.values[name]);
+  }, [formik?.values[name]]);
   //   console.log("SelectInputCombox value", options);
 
   return (

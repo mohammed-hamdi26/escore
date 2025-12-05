@@ -36,8 +36,8 @@ function GamesForm({
     initialValues: {
       name: data?.name || "",
       icon: data?.icon || "",
-      iconDark: data?.iconDark || "",
-      description: data?.description || "",
+      iconDark: data?.logo?.iconDark || "",
+      description: data?.logo?.description || "",
       // players: data?.players || [],
       // news: data?.news || [],
       // teams: data?.teams || [],
@@ -61,41 +61,7 @@ function GamesForm({
         slug: dataValues.name.replace(/\s+/g, "-").toLowerCase(),
       };
 
-      // dataValues = {
-      //   ...dataValues,
-      //   players: dataValues.players.map((player) => {
-      //     return {
-      //       id:
-      //         typeof player === "string"
-      //           ? +JSON.parse(player).value
-      //           : player.value || player.id,
-      //     };
-      //   }),
-      //   news: dataValues.news.map((news) => {
-      //     return {
-      //       id:
-      //         typeof news === "string"
-      //           ? +JSON.parse(news).value
-      //           : news.value || news.id,
-      //     };
-      //   }),
-      //   teams: dataValues.teams.map((team) => {
-      //     return {
-      //       id:
-      //         typeof team === "string"
-      //           ? +JSON.parse(team).value
-      //           : team.value || team.id,
-      //     };
-      //   }),
-      //   tournaments: dataValues.tournaments.map((tournament) => {
-      //     return {
-      //       id:
-      //         typeof tournament === "string"
-      //           ? +JSON.parse(tournament).value
-      //           : tournament.value || tournament.id,
-      //     };
-      //   }),
-      // };
+      console.log("dataValues", dataValues);
 
       try {
         const res = await submitFunction(dataValues);

@@ -17,7 +17,17 @@ function AwardsTable({ awards, games, awardsType, idUser }) {
       <Table columns={columns} grid_cols={"grid-cols-[0.5fr_2fr]"}>
         {awards.map((award) => (
           <Table.Row grid_cols={"grid-cols-[0.5fr_2fr]"} key={award.id}>
-            <Table.Cell>{award.name}</Table.Cell>
+            <Table.Cell className="flex items-center gap-4">
+              {" "}
+              {(award?.image?.light || award?.image?.dark) && (
+                <img
+                  className="rounded-full size-10 overflow-hidden"
+                  src={award?.image?.light || award?.image?.dark}
+                  alt=""
+                />
+              )}{" "}
+              {award.name}
+            </Table.Cell>
             {/* <Table.Cell>{award.description}</Table.Cell> */}
             <Table.Cell className="flex gap-4 justify-end">
               <EditDialog

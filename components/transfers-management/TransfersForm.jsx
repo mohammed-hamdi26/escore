@@ -57,7 +57,9 @@ function TransfersForm({
     },
   });
 
+  console.log("formik values", formik.values);
   console.log("formik values", formik.errors);
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8">
       <FormSection>
@@ -79,6 +81,12 @@ function TransfersForm({
             }
             onChange={(formValue) => {
               formik.setFieldValue("player", formValue);
+              const player = playersOptions.find((p) => p.id === formValue);
+              if (player) {
+                formik.setFieldValue("fromTeam", player.team.id);
+              } else {
+                formik.setFieldValue("fromTeam", "");
+              }
             }}
           />
           <SelectInput
@@ -140,18 +148,22 @@ function TransfersForm({
       <FormSection>
         <FormRow>
           <SelectInput
+            value={formik.values.fromTeam}
             name={"fromTeam"}
             label={t("from Team")}
             formik={formik}
             placeholder={t("selectFromTeamPlaceholder")}
             options={mappedArrayToSelectOptions(
-              teamsOptions.filter((team) => team.id !== formik.values.toTeam),
+              teamsOptions
+                // .filter((team) => team.id === formik.values.fromTeam)
+                .filter((team) => team.id !== formik.values.toTeam),
               "name",
               "id"
             )}
             onChange={(value) => {
               formik.setFieldValue("fromTeam", value);
             }}
+            disabled={true}
           />
           <SelectInput
             name={"toTeam"}

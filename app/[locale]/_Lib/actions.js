@@ -188,7 +188,7 @@ export async function addNews(newsData) {
 export async function editNews(newsData) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.patch(`/news/${newsData.id}`, newsData);
+    const res = await apiClient.put(`/news/${newsData.id}`, newsData);
     revalidatePath(`/${locale}/dashboard/news/edit/${newsData.id}`);
     return res.data;
   } catch (e) {
@@ -499,6 +499,7 @@ export async function updateAboutContent(language_code, content) {
     console.log(res.data);
     return res.data;
   } catch (error) {
+    console.log(error.response.data.errors || error.response.data || error);
     throw error;
   }
 }
@@ -577,7 +578,9 @@ export async function updatePrivacyContent(language_code, content) {
     );
     console.log(res.data);
     return res.data;
+    // console.log(res.data);
   } catch (error) {
+    console.log(error.response.data.errors || error.response.data || error);
     console.log("Failed to get language privacy and policy", error);
     throw error;
   }
@@ -709,7 +712,7 @@ export async function addTransfer(data) {
     // console.log("Failed to add transfer", error);
     throw error;
   }
-  redirect(`/${locale}/dashboard/transfer-management/edit`);
+  redirect(`/${locale}/dashboard/transfers-management/edit`);
 }
 
 export async function editTransfer(data) {
@@ -775,6 +778,7 @@ export async function deleteUser(id) {
   const locale = await getLocale();
   try {
     const res = await apiClient.delete(`/admin/users/${id}`);
+    revalidatePath(`/${locale}/dashboard/users`);
     // return res.data;
   } catch (error) {
     console.log("Failed to delete user", error);

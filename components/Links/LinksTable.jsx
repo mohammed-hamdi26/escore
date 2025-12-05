@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { useState } from "react";
 import { deleteLink, deleteTournament } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { getNumPages } from "@/app/[locale]/_Lib/helps";
 import Image from "next/image";
@@ -31,33 +31,34 @@ function LinksTable({ links, numOfLinks, idUser, linksType = "players" }) {
   const t = useTranslations("LinksTable");
   const searchParams = useSearchParams();
   const numPages = getNumPages(numOfLinks, Number(searchParams.get("size")));
-
+  const locale = useLocale();
+  console.log("links", links);
   return (
     <div className="space-y-8">
       {/* <LinksFilter numOfSize={numOfLinks} /> */}
 
       <Table
         t={t}
-        grid_cols="grid-cols-[0.5fr_0.5fr_2fr]"
+        grid_cols="grid-cols-[0.7fr_0.7fr_2fr]"
         columns={columns}
         // data={tournaments}
       >
         {links.map((link) => (
-          <Table.Row key={link.id} grid_cols="grid-cols-[0.5fr_0.5fr_2fr]">
-            <Table.Cell className="flex gap-2 items-center text-lg">
-              {link?.icon && (
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_BASE_URL}${link?.icon}`}
-                  width={40}
-                  height={40}
+          <Table.Row key={link.id} grid_cols="grid-cols-[0.7fr_0.7fr_2fr]">
+            <Table.Cell className="flex gap-4 items-center text-lg">
+              {link?.image?.light && (
+                <img
+                  src={`${link?.image?.light}`}
                   alt=""
-                  className="rounded-full"
+                  className="rounded-full size-10"
                 />
               )}
               {link?.name}
             </Table.Cell>
             <Table.Cell>
-              <a href={link?.url}>{link?.url}</a>
+              <a className="text-[#3A469D] hover:underline" href={link?.url}>
+                {link?.url}
+              </a>
             </Table.Cell>
 
             <Table.Cell className="flex gap-4 justify-end">

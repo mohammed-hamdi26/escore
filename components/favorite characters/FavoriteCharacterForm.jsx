@@ -132,7 +132,13 @@ function FavoriteCharacterForm({
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          {formik.isSubmitting ? <Spinner /> : t("Add Favorite Character")}
+          {formik.isSubmitting ? (
+            <Spinner />
+          ) : character ? (
+            t("Edit")
+          ) : (
+            t("Add Favorite Character")
+          )}
         </Button>
       </div>
     </form>

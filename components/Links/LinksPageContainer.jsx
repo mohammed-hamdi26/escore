@@ -1,5 +1,5 @@
 "use client";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -21,6 +21,7 @@ function LinksPageContainer({
   linkType = "players",
 }) {
   const t = useTranslations("Links");
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   return (
     <div className="space-y-8">
@@ -34,7 +35,7 @@ function LinksPageContainer({
             {t("Add new link")}
           </Button>
         </DialogTrigger>
-        <DialogContent dir="rtl">
+        <DialogContent dir={locale === "en" ? "ltr" : "rtl"}>
           <DialogTitle>{t("Add new link")}</DialogTitle>
           <LinksForm
             setOpen={setOpen}

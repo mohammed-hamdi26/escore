@@ -17,7 +17,7 @@ function FavoriteCharacterTable({
   const t = useTranslations("FavoriteCharacter");
   const columns = [
     { id: "name", header: t("Name") },
-    { id: "character", header: t("Character") },
+    // { id: "character", header: t("Character") },
   ];
   const [isLoading, setIsLoading] = useState(false);
   return (
