@@ -7,15 +7,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import PrivacyEditor from "./privacy-editor";
+
 function PrivacyContainer({ languages }) {
+  const t = useTranslations("PrivacyPage");
   const [languageCode, setLanguageCode] = useState("");
+
   return (
     <div>
       <div className="mb-5">
         <Select onValueChange={value => setLanguageCode(value)}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select language" />
+            <SelectValue placeholder={t("Select language")} />
           </SelectTrigger>
           <SelectContent>
             {languages.map(lang => (

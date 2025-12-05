@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import EditDialog from "../Links/EditDialog";
-import LinksForm from "../Links/LinksForm";
 import Table from "../ui app/Table";
 import { Button } from "../ui/button";
 import AwardsForm from "./AwardsForm";
@@ -9,10 +8,10 @@ import { useTranslations } from "next-intl";
 import { deleteAward } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 
-const columns = [{ id: "name", header: "Name" }];
 function AwardsTable({ awards, games, awardsType, idUser }) {
+  const t = useTranslations("Awards");
+  const columns = [{ id: "name", header: t("Name") }];
   const [isLoading, setIsLoading] = useState(false);
-  const t = useTranslations("AwardsTable");
   return (
     <div>
       <Table columns={columns} grid_cols={"grid-cols-[0.5fr_2fr]"}>
@@ -49,9 +48,9 @@ function AwardsTable({ awards, games, awardsType, idUser }) {
                   try {
                     setIsLoading(true);
                     await deleteAward(awardsType, idUser, award.id);
-                    toast.success(t("The Link is Deleted"));
+                    toast.success(t("Award deleted successfully"));
                   } catch (e) {
-                    toast.error(t("error in Delete"));
+                    toast.error(t("Error deleting award"));
                   } finally {
                     setIsLoading(false);
                   }

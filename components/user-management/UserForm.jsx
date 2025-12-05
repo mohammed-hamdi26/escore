@@ -26,6 +26,7 @@ import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
 import toast from "react-hot-toast";
 import { addUser } from "@/app/[locale]/_Lib/actions";
+import { useTranslations } from "next-intl";
 const validationSchema = yup.object({
   firstName: yup.string().required("Required"),
   lastName: yup.string().required("Required"),
@@ -38,17 +39,19 @@ function UserForm({
   setRes,
   setOpen,
 }) {
+  const t = useTranslations("UserForm");
+
   const permissions = [
-    { label: "Game", value: "AddGamePermission" },
-    { label: "Player", value: "AddPlayerPermission" },
-    { label: "Team", value: "AddTeamPermission" },
-    { label: "Tournament", value: "AddTournamentPermission" },
-    { label: "News", value: "AddNewsPermission" },
-    { label: "Transfer", value: "AddTransferPermission" },
-    { label: "Standing", value: "AddStandingPermission" },
-    { label: "Settings", value: "AddSettingsPermission" },
-    { label: "Support", value: "AddSupportPermission" },
-    { label: "User", value: "AddUserPermission" },
+    { label: "Game", value: "AddGamePermission", translationKey: "Game" },
+    { label: "Player", value: "AddPlayerPermission", translationKey: "Player" },
+    { label: "Team", value: "AddTeamPermission", translationKey: "Team" },
+    { label: "Tournament", value: "AddTournamentPermission", translationKey: "Tournament" },
+    { label: "News", value: "AddNewsPermission", translationKey: "News" },
+    { label: "Transfer", value: "AddTransferPermission", translationKey: "Transfer" },
+    { label: "Standing", value: "AddStandingPermission", translationKey: "Standing" },
+    { label: "Settings", value: "AddSettingsPermission", translationKey: "Settings" },
+    { label: "Support", value: "AddSupportPermission", translationKey: "Support" },
+    { label: "User", value: "AddUserPermission", translationKey: "User" },
   ];
 
   // Build initial values for permissions from user data (edit mode)
@@ -115,19 +118,19 @@ function UserForm({
         formType === "add" && formik.resetForm();
         toast.success(
           formType === "add"
-            ? "User added successfully"
-            : "User updated successfully"
+            ? t("User added successfully")
+            : t("User updated successfully")
         );
         setRes(res);
         setOpen(true);
       } catch (error) {
         if (!error.toString().includes("Error: NEXT_REDIRECT")) {
-          toast.error("An error occurred");
+          toast.error(t("An error occurred"));
         } else {
           toast.success(
             formType === "add"
-              ? "User added successfully"
-              : "User updated successfully"
+              ? t("User added successfully")
+              : t("User updated successfully")
           );
         }
       }
@@ -136,10 +139,10 @@ function UserForm({
   });
 
   const actions = [
-    { label: "create", value: "create" },
-    { label: "read", value: "read" },
-    { label: "update", value: "update" },
-    { label: "delete", value: "delete" },
+    { label: t("create"), value: "create", name: t("create") },
+    { label: t("read"), value: "read", name: t("read") },
+    { label: t("update"), value: "update", name: t("update") },
+    { label: t("delete"), value: "delete", name: t("delete") },
   ];
 
   return (
@@ -148,25 +151,25 @@ function UserForm({
         <FormRow>
           <InputApp
             onChange={formik.handleChange}
-            label={"first name"}
+            label={t("First Name")}
             name={"firstName"}
             type={"text"}
-            placeholder={"enter first name"}
+            placeholder={t("Enter first name")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<UserCardIcon color={"text-[#677185]"} />}
-            error={formik.touched.name && formik.errors.name}
+            error={formik.touched.firstName && formik.errors.firstName && t("First name is required")}
             onBlur={formik.handleBlur}
             value={formik.values.firstName}
           />
 
           <InputApp
             onChange={formik.handleChange}
-            label={"Last Name"}
+            label={t("Last Name")}
             name={"lastName"}
             type={"text"}
-            placeholder={"enter last name"}
+            placeholder={t("Enter last name")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -176,7 +179,7 @@ function UserForm({
                 color={"text-[#677185]"}
               />
             }
-            error={formik.touched.lastName && formik.errors.lastName}
+            error={formik.touched.lastName && formik.errors.lastName && t("Last name is required")}
             onBlur={formik.handleBlur}
             value={formik.values.lastName}
           />
@@ -184,10 +187,10 @@ function UserForm({
         {formType === "edit" && (
           <InputApp
             onChange={formik.handleChange}
-            label={"Phone"}
+            label={t("Phone")}
             name={"phone"}
             type={"text"}
-            placeholder={"enter phone"}
+            placeholder={t("Enter phone")}
             className="border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -210,13 +213,13 @@ function UserForm({
             <FormRow>
               <SelectInput
                 formik={formik}
-                label={item.label + " Permission"}
+                label={t(item.translationKey) + " " + t("Permission")}
                 name={item.value}
                 value={formik.values[item.value] || ""}
                 options={mappedArrayToSelectOptions(
                   [
-                    { label: "yes", value: "yes" },
-                    { label: "no", value: "no" },
+                    { label: t("yes"), value: "yes" },
+                    { label: t("no"), value: "no" },
                   ],
                   "label",
                   "value"
@@ -231,7 +234,7 @@ function UserForm({
                 <ComboboxInput
                   key={`${item.value}-${user?.id || "new"}`}
                   formik={formik}
-                  label={"Actions"}
+                  label={t("Actions")}
                   name={"actions" + item.value}
                   options={mappedArrayToSelectOptions(
                     actions,
@@ -243,7 +246,8 @@ function UserForm({
                     formik.setFieldValue("actions", value);
                   }}
                   error={formik.touched.actions && formik.errors.actions}
-                  placeholder={"Select actions"}
+                  placeholder={t("Select actions")}
+                  noResultsText={t("No results found")}
                   icon={
                     <PasswordIcon
                       className={"fill-[#677185]"}
@@ -267,9 +271,9 @@ function UserForm({
           {formik.isSubmitting ? (
             <Spinner />
           ) : formType === "add" ? (
-            "Submit"
+            t("Submit")
           ) : (
-            "Edit"
+            t("Edit")
           )}
         </Button>
       </div>
@@ -285,6 +289,7 @@ function ComboboxInput({
   initialData,
   placeholder,
   onSelect,
+  noResultsText = "No results found",
 }) {
   const id = useId();
   const [open, setOpen] = useState(false);
@@ -374,7 +379,7 @@ function ComboboxInput({
           <Command>
             <CommandInput placeholder={placeholder} />
             <CommandList>
-              <CommandEmpty>No framework found.</CommandEmpty>
+              <CommandEmpty>{noResultsText}</CommandEmpty>
               <CommandGroup>
                 {options.map((option) => (
                   <CommandItem
