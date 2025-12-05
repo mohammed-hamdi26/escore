@@ -75,11 +75,11 @@ function NewsForm({
       // status: newData?.status || "PUBLISHED",
       category: newData?.category || "news",
       newsType: newData?.newsType || "",
-      player: newData?.player.id || "",
-      match: newData?.match.id || "",
-      team: newData?.team.id || "",
-      game: newData?.game.id || "",
-      tournament: newData?.tournament.id || "",
+      player: newData?.player?.id || "",
+      match: newData?.match?.id || "",
+      team: newData?.team?.id || "",
+      game: newData?.game?.id || "",
+      tournament: newData?.tournament?.id || "",
       isFeatured: newData?.isFeatured
         ? newData?.isFeatured
           ? "Trending"
@@ -104,7 +104,14 @@ function NewsForm({
             dark: dataValues.authorPicture,
           },
           isFeatured: dataValues.isFeatured === "Trending" ? true : false,
+          player: dataValues.player ? dataValues.player : null,
+          match: dataValues.match ? dataValues.match : null,
+          team: dataValues.team ? dataValues.team : null,
+          game: dataValues.game ? dataValues.game : null,
+          tournament: dataValues.tournament ? dataValues.tournament : null,
+          // transfers: dataValues.transfers ? dataValues.transfers : null,
         };
+        console.log(dataValues);
         await submit(dataValues);
         formType === "add" && formik.resetForm();
         toast.success(
