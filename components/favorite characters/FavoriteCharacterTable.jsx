@@ -14,12 +14,12 @@ function FavoriteCharacterTable({
   idUser,
   setOpen,
 }) {
+  const t = useTranslations("FavoriteCharacter");
   const columns = [
-    { id: "name", header: "Name" },
-    { id: "character", header: "Character" },
+    { id: "name", header: t("Name") },
+    { id: "character", header: t("Character") },
   ];
   const [isLoading, setIsLoading] = useState(false);
-  const t = useTranslations("AwardsTable");
   return (
     <div>
       <Table columns={columns} grid_cols={"grid-cols-[0.5fr_2fr]"}>
@@ -61,9 +61,9 @@ function FavoriteCharacterTable({
                       idUser,
                       character.id
                     );
-                    toast.success(t("The Link is Deleted"));
+                    toast.success(t("Character deleted successfully"));
                   } catch (e) {
-                    toast.error(t("error in Delete"));
+                    toast.error(t("Error deleting character"));
                   } finally {
                     setIsLoading(false);
                   }

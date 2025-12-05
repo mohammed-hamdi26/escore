@@ -13,15 +13,19 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Trash, TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
+
 function AboutDeleteDialog({
   languageCode,
   contentCache,
   setHasAbout,
   setContent,
 }) {
+  const t = useTranslations("AboutPage");
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+
   async function handleDelete() {
     setIsLoading(true);
     try {
@@ -29,20 +33,21 @@ function AboutDeleteDialog({
       setContent("");
       contentCache.delete(languageCode);
       setHasAbout(false);
-      toast.success("Privacy content deleted successfully");
+      toast.success(t("Content deleted successfully"));
     } catch (error) {
-      toast.error(error.message || "Failed to delete content");
+      toast.error(error.message || t("Failed to delete content"));
     } finally {
       setIsLoading(false);
     }
   }
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <button
           disabled={isLoading}
           className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
-          title="Delete Content"
+          title={t("Delete Content")}
         >
           <Trash size={18} />
         </button>
@@ -53,21 +58,20 @@ function AboutDeleteDialog({
             <TriangleAlertIcon className="text-destructive size-6" />
           </div>
           <AlertDialogTitle>
-            Are you absolutely sure you want to delete this About page content?
+            {t("Delete confirmation title")}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            This action cannot be undone. This will permanently delete the about
-            page content and remove it from the system.
+            {t("Delete confirmation description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>{t("Cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isLoading}
             className="bg-destructive dark:bg-destructive/60 hover:bg-destructive focus-visible:ring-destructive text-white"
           >
-            {isLoading ? "Deleting..." : "Delete"}
+            {isLoading ? t("Deleting") : t("Delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

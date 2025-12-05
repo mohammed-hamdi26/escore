@@ -125,9 +125,9 @@ export default function TournamentsForm({
         );
 
         dataValues.country = {
-          name: selectedCountry.label,
-          code: selectedCountry.value,
-          flag: selectedCountry.value,
+          name: selectedCountry?.label,
+          code: selectedCountry?.value,
+          flag: selectedCountry?.value,
         };
 
         dataValues.logo = {

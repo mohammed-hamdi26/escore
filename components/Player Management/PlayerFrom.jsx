@@ -16,9 +16,7 @@ import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import ListInput from "../ui app/ListInput";
 import FileInput from "../ui app/FileInput";
-import ComboboxInput from "../ui app/ComboBoxInput";
 import { Spinner } from "../ui/spinner";
 
 const validateSchema = Yup.object({
@@ -114,7 +112,7 @@ function PlayerFrom({
             light: dataValues.photoLight,
             dark: dataValues.photoDark,
           },
-          slug: `${`${dataValues.firstName}-${dataValues.lastName}`.toLowerCase()}`,
+          slug: `${`${dataValues.firstName}-${dataValues.lastName}`.replace(/\s+/g, "-").toLowerCase()}`,
           game: dataValues.mainGame,
           country: {
             name: selectedCountry.label,
@@ -310,25 +308,6 @@ function PlayerFrom({
 
           <SelectInput
             formik={formik}
-            name={"mainGame"}
-            type={"text"}
-            value={formik.values.mainGame}
-            label={t("Main Game")}
-            options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
-            onChange={(value) => formik.setFieldValue("mainGame", value)}
-            placeholder={t("Enter Main Game")}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            icon={<UserCardIcon color={"text-[#677185]"} />}
-            error={
-              formik?.errors?.mainGame && formik?.touched?.mainGame
-                ? t(formik.errors.mainGame)
-                : ""
-            }
-          />
-          <SelectInput
-            formik={formik}
             name={"team"}
             type={"text"}
             value={formik.values.team}
@@ -342,10 +321,29 @@ function PlayerFrom({
             icon={<UserCardIcon color={"text-[#677185]"} />}
             error={
               formik?.errors?.team && formik?.touched?.team
-                ? t(formik.errors.team)
-                : ""
+              ? t(formik.errors.team)
+              : ""
             }
           />
+      <SelectInput
+        formik={formik}
+        name={"mainGame"}
+        type={"text"}
+        value={formik.values.mainGame}
+        label={t("Main Game")}
+        options={mappedArrayToSelectOptions(teamsOptions.find((team) => team.id === formik.values.team)?.games || [], "name", "id")}
+        onChange={(value) => formik.setFieldValue("mainGame", value)}
+        placeholder={t("Enter Main Game")}
+        className="border-0 focus:outline-none "
+        backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+        textColor="text-[#677185]"
+        icon={<UserCardIcon color={"text-[#677185]"} />}
+        error={
+          formik?.errors?.mainGame && formik?.touched?.mainGame
+            ? t(formik.errors.mainGame)
+            : ""
+        }
+      />
         </FormRow>
       </FormSection>
 

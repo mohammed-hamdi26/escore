@@ -17,11 +17,13 @@ import {
   ListOrdered,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import PrivacyDeleteDialog from "./privacy-delete-dialog";
 
 const contentCache = new Map();
 export default function PrivacyEditor({ languageCode }) {
+  const t = useTranslations("PrivacyPage");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasPrivacy, setHasPrivacy] = useState(false);
@@ -65,11 +67,11 @@ export default function PrivacyEditor({ languageCode }) {
     try {
       if (!hasPrivacy) {
         await addPrivacyContent(languageCode, content);
-        toast.success("Privacy content has created sucessfully");
+        toast.success(t("Content created successfully"));
         contentCache.set(languageCode, content);
       } else if (hasPrivacy) {
         await updatePrivacyContent(languageCode, content);
-        toast.success("Privacy content has updated sucessfully");
+        toast.success(t("Content updated successfully"));
         contentCache.set(languageCode, content);
       }
     } catch (error) {
@@ -81,7 +83,7 @@ export default function PrivacyEditor({ languageCode }) {
 
   const handleSubmit = async () => {
     if (!content.trim()) {
-      toast.error("Please enter some content before submitting");
+      toast.error(t("Please enter content"));
       return;
     }
     await submitContent(languageCode);
@@ -188,21 +190,21 @@ export default function PrivacyEditor({ languageCode }) {
   };
 
   const toolbarButtons = [
-    { icon: Bold, action: () => insertMarkdown("**", "**"), title: "Bold" },
-    { icon: Italic, action: () => insertMarkdown("*", "*"), title: "Italic" },
-    { icon: Heading1, action: () => insertMarkdown("# "), title: "Heading 1" },
-    { icon: Heading2, action: () => insertMarkdown("## "), title: "Heading 2" },
-    { icon: List, action: () => insertMarkdown("- "), title: "Bullet List" },
+    { icon: Bold, action: () => insertMarkdown("**", "**"), title: t("Bold") },
+    { icon: Italic, action: () => insertMarkdown("*", "*"), title: t("Italic") },
+    { icon: Heading1, action: () => insertMarkdown("# "), title: t("Heading 1") },
+    { icon: Heading2, action: () => insertMarkdown("## "), title: t("Heading 2") },
+    { icon: List, action: () => insertMarkdown("- "), title: t("Bullet List") },
     {
       icon: ListOrdered,
       action: () => insertMarkdown("1. "),
-      title: "Numbered List",
+      title: t("Numbered List"),
     },
-    { icon: Link, action: () => insertMarkdown("[", "](url)"), title: "Link" },
+    { icon: Link, action: () => insertMarkdown("[", "](url)"), title: t("Link") },
     {
       icon: Code,
       action: () => insertMarkdown("`", "`"),
-      title: "Inline Code",
+      title: t("Inline Code"),
     },
   ];
 
@@ -267,7 +269,7 @@ export default function PrivacyEditor({ languageCode }) {
               disabled={isLoading || !languageCode}
               className="rounded-full min-w-[50px] bg-blue-600 hover:bg-blue-500 text-amber-50 cursor-pointer transition-all duration-300 font-medium text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {hasPrivacy ? "Update" : "Submit"}
+              {hasPrivacy ? t("Update") : t("Submit")}
             </Button>
             {hasPrivacy && (
               <PrivacyDeleteDialog
@@ -282,21 +284,21 @@ export default function PrivacyEditor({ languageCode }) {
           <div className="flex-1 flex overflow-hidden">
             <div className={`w-1/2 flex flex-col`}>
               <div className="bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 flex justify-between">
-                <span>Markdown</span>
+                <span>{t("Markdown")}</span>
               </div>
               <textarea
                 ref={textareaRef}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Select language first then start typing..."
+                placeholder={t("Select language first")}
                 disabled={isLoading}
                 className="flex-1 p-4 font-mono text-sm resize-none focus:outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
             <div className="w-1/2 flex flex-col border-l border-gray-300">
               <div className="bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
-                Preview
+                {t("Preview")}
               </div>
               <div
                 className="flex-1 p-4 overflow-auto bg-white prose prose-sm max-w-none"
@@ -306,9 +308,9 @@ export default function PrivacyEditor({ languageCode }) {
           </div>
 
           <div className="bg-gray-200 px-4 py-2 text-xs text-gray-600 flex justify-between">
-            <span>{content.length} characters</span>
+            <span>{content.length} {t("characters")}</span>
             <span>
-              {content.split(/\s+/).filter((w) => w.length > 0).length} words
+              {content.split(/\s+/).filter((w) => w.length > 0).length} {t("words")}
             </span>
           </div>
         </div>

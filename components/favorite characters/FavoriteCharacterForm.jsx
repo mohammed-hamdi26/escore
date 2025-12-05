@@ -56,8 +56,8 @@ function FavoriteCharacterForm({
         formik.resetForm();
         toast.success(
           character
-            ? "Favorite character updated successfully"
-            : "Favorite character added successfully"
+            ? t("Favorite character updated successfully")
+            : t("Favorite character added successfully")
         );
         setOpen(false);
       } catch (error) {
