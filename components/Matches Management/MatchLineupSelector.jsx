@@ -70,7 +70,7 @@ function MatchLineupSelector({
   if (!teamId) return null;
 
   return (
-    <div className="rounded-lg border border-[#2a2f3e] bg-[#1a1f2e]/30 p-4">
+    <div className="rounded-lg border border-[#2a2f3e] bg-[#1a1f2e]/30 flex-1 p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -126,7 +126,9 @@ function MatchLineupSelector({
           <span className="ml-2 text-[#677185]">{t("Loading players")}</span>
         </div>
       ) : error ? (
-        <div className="text-center py-8 text-red-400">{t("Failed to load players")}</div>
+        <div className="text-center py-8 text-red-400">
+          {t("Failed to load players")}
+        </div>
       ) : players.length === 0 ? (
         <div className="text-center py-8 text-[#677185]">
           <User className="w-10 h-10 mx-auto mb-2 opacity-50" />
@@ -177,15 +179,15 @@ function MatchLineupSelector({
                   )}
                 </div>
 
-                {player.role && (
+                {/* {player.role && (
                   <span className="px-2 py-1 rounded-full bg-[#1a1f2e] text-xs text-[#677185]">
                     {player.role}
                   </span>
-                )}
+                )} */}
 
-                {player.country?.flag && (
-                  <span className="text-sm">{player.country.flag}</span>
-                )}
+                {/* {player.country?.flag && (
+                  <span className="text-sm">{player.country.code}</span>
+                )} */}
               </label>
             );
           })}
