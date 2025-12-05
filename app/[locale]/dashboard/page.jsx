@@ -119,7 +119,9 @@ export default async function page() {
       isShowed:
         user.role === "admin"
           ? true
-          : user.permissions.find((per) => per.entity == "Match"),
+          : user.permissions.find((per) => per.entity == "Match")
+          ? true
+          : false,
     },
     {
       title: "Players",
@@ -130,7 +132,9 @@ export default async function page() {
       isShowed:
         user.role === "admin"
           ? true
-          : user.permissions.find((per) => per.entity == "Player"),
+          : user.permissions.find((per) => per.entity == "Player")
+          ? true
+          : false,
     },
 
     {
@@ -141,7 +145,9 @@ export default async function page() {
       isShowed:
         user.role === "admin"
           ? true
-          : user.permissions.find((per) => per.entity == "Team"),
+          : user.permissions.find((per) => per.entity == "Team")
+          ? true
+          : false,
     },
     {
       title: "transfers Management",
@@ -154,7 +160,9 @@ export default async function page() {
       isShowed:
         user.role === "admin"
           ? true
-          : user.permissions.find((per) => per.entity == "Transfer"),
+          : user.permissions.find((per) => per.entity == "Transfer")
+          ? true
+          : false,
     },
     {
       title: "Games Management",
@@ -164,7 +172,9 @@ export default async function page() {
       isShowed:
         user.role === "admin"
           ? true
-          : user.permissions.find((per) => per.entity == "Game"),
+          : user.permissions.find((per) => per.entity == "Game")
+          ? true
+          : false,
     },
     {
       title: "News & Updates",
@@ -175,7 +185,9 @@ export default async function page() {
       isShowed:
         user.role === "admin"
           ? true
-          : user.permissions.find((per) => per.entity == "News"),
+          : user.permissions.find((per) => per.entity == "News")
+          ? true
+          : false,
     },
     {
       title: "Users",
@@ -183,10 +195,7 @@ export default async function page() {
       description:
         "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
       icon: <User />,
-      isShowed:
-        user.role === "admin"
-          ? true
-          : user.permissions.find((per) => per.entity == "User"),
+      isShowed: user.role === "admin" ? true : false,
     },
     {
       title: "Support Center",
@@ -197,7 +206,9 @@ export default async function page() {
       isShowed:
         user.role === "admin"
           ? true
-          : user.permissions.find((per) => per.entity == "Support"),
+          : user.permissions.find((per) => per.entity == "Support")
+          ? true
+          : false,
     },
     // {
     //   title: "Settings",
