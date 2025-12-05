@@ -54,11 +54,10 @@ function UserForm({
   // Build initial values for permissions from user data (edit mode)
   const getInitialPermissionValues = () => {
     const values = {};
+    console.log(user);
     if (user?.permissions && Array.isArray(user.permissions)) {
       permissions.forEach((perm) => {
-        const userPerm = user.permissions.find(
-          (p) => p.entity === perm.label
-        );
+        const userPerm = user.permissions.find((p) => p.entity === perm.label);
         if (userPerm) {
           values[perm.value] = "yes";
           values["actions" + perm.value] = userPerm.actions.map((action) => ({
@@ -73,6 +72,7 @@ function UserForm({
     }
     return values;
   };
+  console.log(getInitialPermissionValues());
 
   const formik = useFormik({
     initialValues: {
