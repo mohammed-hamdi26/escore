@@ -12,12 +12,14 @@ import toast from "react-hot-toast";
 import NewFilter from "./NewFilter";
 import Pagination from "../ui app/Pagination";
 import { useSearchParams } from "next/navigation";
-import { getNumPages } from "@/app/[locale]/_Lib/helps";
+import { getFirst10Words, getNumPages } from "@/app/[locale]/_Lib/helps";
 function NewsTable({ news, columns, numOfNews }) {
   const t = useTranslations("NewsTable");
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
   const numPages = getNumPages(numOfNews, Number(searchParams.get("size")));
+
+  console.log(news);
 
   return (
     <div className="space-y-8">
@@ -34,10 +36,11 @@ function NewsTable({ news, columns, numOfNews }) {
             grid_cols={"grid-cols-[0.5fr_0.5fr_0.5fr_0.5fr_2fr]"}
             key={newsItem.id}
           >
-            <Table.Cell>{newsItem.title}</Table.Cell>
+            <Table.Cell>{getFirst10Words(newsItem.title)}</Table.Cell>
             <Table.Cell>{newsItem.authorName}</Table.Cell>
             <Table.Cell>
-              {newsItem.publishAt && format(newsItem.publishAt, "yyyy-MM-dd")}
+              {newsItem.publishedAt &&
+                format(newsItem.publishedAt, "yyyy-MM-dd")}
             </Table.Cell>
             <Table.Cell></Table.Cell>
             <Table.Cell className="flex gap-4 justify-end">

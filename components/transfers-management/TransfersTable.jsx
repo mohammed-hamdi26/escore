@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import Pagination from "../ui app/Pagination";
 import Table from "../ui app/Table";
+import { deleteTransfer } from "@/app/[locale]/_Lib/actions";
+import toast from "react-hot-toast";
 const columns = [
   {
     id: "player",

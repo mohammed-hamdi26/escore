@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import { deletePlayer } from "@/app/[locale]/_Lib/actions";
 import DropMenu from "../ui app/DropMenu";
 import { Award, EllipsisVertical, Heart, Link2 } from "lucide-react";
-import { getNumPages } from "@/app/[locale]/_Lib/helps";
+import { calculateAge, getNumPages } from "@/app/[locale]/_Lib/helps";
 import { useSearchParams } from "next/navigation";
 
 function PlayersTable({ players, columns, search, numOfPlayers }) {
@@ -20,6 +20,8 @@ function PlayersTable({ players, columns, search, numOfPlayers }) {
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
   const numPages = getNumPages(numOfPlayers, Number(searchParams.get("size")));
+
+  console.log("players", players);
 
   return (
     <div className="space-y-8">
@@ -37,11 +39,20 @@ function PlayersTable({ players, columns, search, numOfPlayers }) {
             grid_cols={"grid-cols-[1fr_0.5fr_0.5fr_0.5fr_2fr]"}
             key={player.id}
           >
-            <Table.Cell>{player.nickname}</Table.Cell>
+            <Table.Cell className="flex items-center gap-2">
+              {(player?.photo?.light || player?.photo?.dark) && (
+                <img
+                  src={`${player?.photo?.light || player?.photo?.dark}`}
+                  className="rounded-full overflow-hidden size-10"
+                  alt=""
+                />
+              )}{" "}
+              {player.nickname}
+            </Table.Cell>
             <Table.Cell>
               {(player?.team?.logo?.light || player?.team?.logo?.dark) && (
                 <img
-                  className="rounded-full overflow-hidden size-12"
+                  className="rounded-full overflow-hidden size-10"
                   src={`${
                     player?.team?.logo?.light || player?.team?.logo?.dark
                   }`}
@@ -49,7 +60,7 @@ function PlayersTable({ players, columns, search, numOfPlayers }) {
                 />
               )}
             </Table.Cell>
-            <Table.Cell>{player.dateOfBirth}</Table.Cell>
+            <Table.Cell>{calculateAge(player.dateOfBirth)}</Table.Cell>
             <Table.Cell>{player.country.name}</Table.Cell>
             <Table.Cell>
               <div className="flex justify-end gap-4">

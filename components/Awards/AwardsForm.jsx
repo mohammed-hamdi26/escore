@@ -158,7 +158,13 @@ function AwardsForm({ awardsType, award, games, tournaments, id, t, setOpen }) {
             "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
           }
         >
-          {formik.isSubmitting ? <Spinner /> : t("Add Award")}
+          {formik.isSubmitting ? (
+            <Spinner />
+          ) : award ? (
+            t("Edit Award")
+          ) : (
+            t("Add Award")
+          )}
         </Button>
       </div>
     </form>
