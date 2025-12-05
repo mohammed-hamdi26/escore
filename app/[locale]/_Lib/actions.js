@@ -188,10 +188,11 @@ export async function addNews(newsData) {
 export async function editNews(newsData) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.put(`/news/${newsData.id}`, newsData);
+    const res = await apiClient.patch(`/news/${newsData.id}`, newsData);
     revalidatePath(`/${locale}/dashboard/news/edit/${newsData.id}`);
     return res.data;
   } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in updating news");
   }
 }
@@ -287,7 +288,10 @@ export async function updateMatch(matchData) {
     );
     return res.data;
   } catch (e) {
-    console.log("Full error response:", JSON.stringify(e.response?.data, null, 2));
+    console.log(
+      "Full error response:",
+      JSON.stringify(e.response?.data, null, 2)
+    );
     console.log("Validation errors:", e.response?.data?.errors);
     throw new Error("Error in updating match");
   }

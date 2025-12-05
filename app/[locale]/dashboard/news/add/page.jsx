@@ -10,7 +10,7 @@ async function page() {
   const [
     playersOptions,
     teamsOptions,
-    tournamentsOptions,
+    { data: tournamentsOptions },
     gamesOptions,
     matchesOptions,
   ] = await Promise.all([

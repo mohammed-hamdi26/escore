@@ -12,7 +12,7 @@ async function page({ params }) {
   const [
     newData,
     teamsOptions,
-    tournamentsOptions,
+    { data: tournamentsOptions },
     gamesOptions,
     playersOptions,
     matchesOptions,
