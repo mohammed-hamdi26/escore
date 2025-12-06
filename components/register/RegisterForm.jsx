@@ -57,20 +57,21 @@ function RegisterFrom({ formik, t }) {
           onBlur={formik.handleBlur}
           className="max-w-[400px]"
         />
-        <FileInput
-          t={t}
-          disabled={formik.isSubmitting}
-          formik={formik}
-          name="avatar"
-          placeholder={t("Image")}
-          inputAuth={true}
-          className="max-w-[400px]"
-          error={
-            formik.touched.avatar &&
-            formik.errors.avatar &&
-            formik.errors.avatar
-          }
-        />
+        <div className="max-w-[400px]">
+          <FileInput
+            t={t}
+            disabled={formik.isSubmitting}
+            formik={formik}
+            name="avatar"
+            placeholder={t("Image")}
+            inputAuth={true}
+            error={
+              formik.touched.avatar &&
+              formik.errors.avatar &&
+              formik.errors.avatar
+            }
+          />
+        </div>
         <Button
           disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
