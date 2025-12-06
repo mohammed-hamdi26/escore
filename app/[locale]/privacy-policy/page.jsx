@@ -1,5 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import logoImage from "../../../public/images/logo.png";
 import { Shield, ArrowLeft, FileText, Globe, Lock, Eye, Mail, Trash2, Bell, UserCheck, Database, Calendar } from "lucide-react";

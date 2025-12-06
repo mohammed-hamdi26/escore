@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Home, ArrowLeft, AlertCircle } from "lucide-react";
 
 export default function GlobalNotFound() {
@@ -40,21 +39,21 @@ export default function GlobalNotFound() {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/en/dashboard"
+              <a
+                href="/dashboard"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all duration-200"
               >
                 <Home className="w-5 h-5" />
                 Go to Dashboard
-              </Link>
+              </a>
 
-              <Link
-                href="/en/login"
+              <a
+                href="/login"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all duration-200"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Go to Login
-              </Link>
+              </a>
             </div>
           </div>
         </div>

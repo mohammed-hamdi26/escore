@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { cloneElement } from "react";
 
 function NavItem({ icon, label, href, isActive, children }) {

@@ -1,8 +1,7 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { Button } from "../ui/button";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 function LinksButtons() {
