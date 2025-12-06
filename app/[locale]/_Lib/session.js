@@ -27,9 +27,14 @@ import { cookies } from "next/headers";
 export async function saveSession(token) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const cookieStore = await cookies();
+
+  // Only use secure cookies in production with HTTPS
+  const isProduction = process.env.NODE_ENV === "production";
+  const isHttps = process.env.NEXT_PUBLIC_BASE_URL?.startsWith("https://");
+
   cookieStore.set("session", token, {
     httpOnly: true,
-    secure: true,
+    secure: isProduction && isHttps,
     expires: expiresAt,
     sameSite: "lax",
     path: "/",
