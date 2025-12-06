@@ -48,13 +48,13 @@ function ForgetPasswordPage() {
     },
     validationSchema: emailValidationSchema,
     onSubmit: async (values) => {
-      try {
-        await forgotPassword(values.email);
+      const result = await forgotPassword(values.email);
+      if (result.success) {
         setEmail(values.email);
         setStep(2);
         toast.success(t("otpSent"));
-      } catch (error) {
-        toast.error(error.message || t("error"));
+      } else {
+        toast.error(result.error || t("error"));
       }
     },
   });
@@ -68,26 +68,25 @@ function ForgetPasswordPage() {
     },
     validationSchema: resetValidationSchema,
     onSubmit: async (values) => {
-      try {
-        await resetPassword(email, values.otp, values.newPassword);
+      const result = await resetPassword(email, values.otp, values.newPassword);
+      if (result.success) {
         setStep(3);
         toast.success(t("passwordResetSuccess"));
-      } catch (error) {
-        toast.error(error.message || t("resetError"));
+      } else {
+        toast.error(result.error || t("resetError"));
       }
     },
   });
 
   const handleResendOTP = async () => {
-    try {
-      setIsResending(true);
-      await resendOTP(email, "reset");
+    setIsResending(true);
+    const result = await resendOTP(email, "reset");
+    if (result.success) {
       toast.success(t("otpResent"));
-    } catch (error) {
-      toast.error(error.message || t("resendError"));
-    } finally {
-      setIsResending(false);
+    } else {
+      toast.error(result.error || t("resendError"));
     }
+    setIsResending(false);
   };
 
   // Step 3: Success

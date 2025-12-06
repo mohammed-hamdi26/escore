@@ -885,30 +885,39 @@ export async function resetUserPassword(userId) {
 export async function forgotPassword(email) {
   try {
     const res = await apiClient.post("/auth/forgot-password", { email });
-    return res.data;
+    return { success: true, data: res.data };
   } catch (error) {
     console.log("Failed to send reset email", error);
-    throw new Error(error.response?.data?.message || "Failed to send reset email");
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to send reset email"
+    };
   }
 }
 
 export async function resetPassword(email, otp, newPassword) {
   try {
     const res = await apiClient.post("/auth/reset-password", { email, otp, newPassword });
-    return res.data;
+    return { success: true, data: res.data };
   } catch (error) {
     console.log("Failed to reset password", error);
-    throw new Error(error.response?.data?.message || "Failed to reset password");
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to reset password"
+    };
   }
 }
 
 export async function resendOTP(email, type) {
   try {
     const res = await apiClient.post("/auth/resend-otp", { email, type });
-    return res.data;
+    return { success: true, data: res.data };
   } catch (error) {
     console.log("Failed to resend OTP", error);
-    throw new Error(error.response?.data?.message || "Failed to resend OTP");
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to resend OTP"
+    };
   }
 }
 
