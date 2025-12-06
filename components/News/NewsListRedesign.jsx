@@ -1,7 +1,6 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Plus, RefreshCw } from "lucide-react";
 import { Button } from "../ui/button";
@@ -79,12 +78,13 @@ function NewsListRedesign({
           >
             <RefreshCw className={`size-4 ${isPending ? "animate-spin" : ""}`} />
           </Button>
-          <Link href="/dashboard/news/add">
-            <Button className="bg-green-primary hover:bg-green-primary/80 text-white">
-              <Plus className="size-4 mr-2" />
-              {t("addNews")}
-            </Button>
-          </Link>
+          <Button
+            className="bg-green-primary hover:bg-green-primary/80 text-white"
+            onClick={() => router.push("/dashboard/news/add")}
+          >
+            <Plus className="size-4 mr-2" />
+            {t("addNews")}
+          </Button>
         </div>
       </div>
 
@@ -103,12 +103,13 @@ function NewsListRedesign({
               {t("noNews")}
             </h3>
             <p className="text-[#677185] mb-4">{t("noNewsDescription")}</p>
-            <Link href="/dashboard/news/add">
-              <Button className="bg-green-primary hover:bg-green-primary/80">
-                <Plus className="size-4 mr-2" />
-                {t("addFirstNews")}
-              </Button>
-            </Link>
+            <Button
+              className="bg-green-primary hover:bg-green-primary/80"
+              onClick={() => router.push("/dashboard/news/add")}
+            >
+              <Plus className="size-4 mr-2" />
+              {t("addFirstNews")}
+            </Button>
           </div>
         ) : (
           news.map((item) => (
