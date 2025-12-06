@@ -2,10 +2,8 @@ import { getTickets, getTicketStats } from "../../_Lib/supportCenterApi";
 import SupportStatsCards from "@/components/Support Center/SupportStatsCards";
 import SupportFilter from "@/components/Support Center/SupportFilter";
 import SupportTicketsTable from "@/components/Support Center/SupportCenterTable";
-import { getTranslations } from "next-intl/server";
 
 async function SupportCenterPage({ searchParams }) {
-  const t = await getTranslations("SupportCenter");
   const params = await searchParams;
   const { page, limit, status, category, priority, search } = params || {};
 
@@ -25,10 +23,10 @@ async function SupportCenterPage({ searchParams }) {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <SupportStatsCards stats={stats} t={t} />
+      <SupportStatsCards stats={stats} />
 
       {/* Filters */}
-      <SupportFilter t={t} />
+      <SupportFilter />
 
       {/* Tickets Table */}
       <SupportTicketsTable

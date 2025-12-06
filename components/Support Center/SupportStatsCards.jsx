@@ -7,6 +7,7 @@ import {
   MessageSquare,
   XCircle
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 function StatCard({ title, value, icon: Icon, color, bgColor }) {
   return (
@@ -22,7 +23,9 @@ function StatCard({ title, value, icon: Icon, color, bgColor }) {
   );
 }
 
-export default function SupportStatsCards({ stats, t }) {
+export default function SupportStatsCards({ stats }) {
+  const t = useTranslations("SupportCenter");
+
   if (!stats) return null;
 
   const cards = [

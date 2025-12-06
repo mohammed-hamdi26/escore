@@ -2,6 +2,7 @@
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import InputApp from "../ui app/InputApp";
 import {
   Select,
@@ -36,7 +37,8 @@ const PRIORITY_OPTIONS = [
   { value: "urgent", label: "Urgent" },
 ];
 
-export default function SupportFilter({ t }) {
+export default function SupportFilter() {
+  const t = useTranslations("SupportCenter");
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();

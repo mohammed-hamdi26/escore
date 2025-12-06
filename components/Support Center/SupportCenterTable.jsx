@@ -147,7 +147,6 @@ export default function SupportTicketsTable({ tickets, pagination }) {
         <TicketDetailsModal
           ticketId={selectedTicketId}
           onClose={() => setSelectedTicketId(null)}
-          t={t}
         />
       )}
     </div>

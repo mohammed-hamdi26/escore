@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { X, Send, RefreshCw, User, UserCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
@@ -22,7 +23,8 @@ import {
 } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 
-export default function TicketDetailsModal({ ticketId, onClose, t }) {
+export default function TicketDetailsModal({ ticketId, onClose }) {
+  const t = useTranslations("SupportCenter");
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [replyMessage, setReplyMessage] = useState("");
