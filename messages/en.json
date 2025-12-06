@@ -1130,5 +1130,15 @@
       "of": "of",
       "page": "Page"
     }
+  },
+  "imageCropper": {
+    "title": "Crop Image",
+    "aspectRatio": "Aspect Ratio",
+    "free": "Free",
+    "zoom": "Zoom",
+    "cancel": "Cancel",
+    "apply": "Apply Crop",
+    "reset": "Reset",
+    "fileTooLarge": "File size must be less than 5MB"
   }
 }
