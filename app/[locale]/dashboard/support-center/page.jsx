@@ -6,13 +6,21 @@ import { getTranslations } from "next-intl/server";
 
 async function SupportCenterPage({ searchParams }) {
   const t = await getTranslations("SupportCenter");
-  const { page, limit, status, category, priority, search } = await searchParams;
+  const params = await searchParams;
+  const { page, limit, status, category, priority, search } = params || {};
 
-  // Fetch tickets and stats in parallel
-  const [ticketsData, stats] = await Promise.all([
-    getTickets({ page, limit: limit || 10, status, category, priority, search }),
-    getTicketStats().catch(() => null), // Don't fail page if stats fail
-  ]);
+  // Fetch tickets and stats in parallel with error handling
+  let ticketsData = { data: [], pagination: { totalPages: 1, total: 0 } };
+  let stats = null;
+
+  try {
+    [ticketsData, stats] = await Promise.all([
+      getTickets({ page, limit: limit || 10, status, category, priority, search }).catch(() => ({ data: [], pagination: { totalPages: 1, total: 0 } })),
+      getTicketStats().catch(() => null),
+    ]);
+  } catch (error) {
+    console.error("Error fetching support data:", error);
+  }
 
   return (
     <div className="space-y-6">
@@ -24,8 +32,8 @@ async function SupportCenterPage({ searchParams }) {
 
       {/* Tickets Table */}
       <SupportTicketsTable
-        tickets={ticketsData.data || []}
-        pagination={ticketsData.pagination}
+        tickets={ticketsData?.data || []}
+        pagination={ticketsData?.pagination || { totalPages: 1, total: 0 }}
       />
     </div>
   );
