@@ -71,9 +71,8 @@ export async function editPlayer(playerData) {
 
 export async function fetchPlayersByTeam(teamId) {
   try {
-    const res = await apiClient.get(`/players`, {
-      params: { "team.id.equals": teamId },
-    });
+    // Use the correct endpoint to get players by team
+    const res = await apiClient.get(`/players/team/${teamId}`);
     return res.data.data;
   } catch (e) {
     console.log(
@@ -361,6 +360,22 @@ export async function toggleMatchFeatured(id) {
   } catch (e) {
     console.log("Error toggling featured:", e.response?.data);
     throw new Error(e.response?.data?.message || "Error toggling featured status");
+  }
+}
+
+export async function setMatchLineup(matchId, teamId, players) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.post(`/matches/${matchId}/lineup`, {
+      team: teamId,
+      players: players,
+    });
+    revalidatePath(`/${locale}/dashboard/matches-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log("Error setting lineup:", e.response?.data);
+    throw new Error(e.response?.data?.message || "Error setting match lineup");
   }
 }
 

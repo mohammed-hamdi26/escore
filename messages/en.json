@@ -529,7 +529,8 @@
     "Match Result": "Match Result",
     "The match Added": "Match added successfully",
     "The Match Edited": "Match updated successfully",
-    "Error saving match": "Error saving match"
+    "Error saving match": "Error saving match",
+    "Match saved but lineup could not be saved": "Match saved but lineup could not be saved"
   },
   "MatchesTable": {
     "Date": "Date",

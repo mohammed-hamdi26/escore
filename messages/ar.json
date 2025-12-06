@@ -512,7 +512,8 @@
     "Match Result": "نتيجة المباراة",
     "The match Added": "تمت إضافة المباراة بنجاح",
     "The Match Edited": "تم تعديل المباراة بنجاح",
-    "Error saving match": "خطأ في حفظ المباراة"
+    "Error saving match": "خطأ في حفظ المباراة",
+    "Match saved but lineup could not be saved": "تم حفظ المباراة لكن لم يتم حفظ التشكيلة"
   },
   "MatchesTable": {
     "Date": "التاريخ",

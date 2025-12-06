@@ -2,6 +2,7 @@
 import Champion from "@/components/icons/Champion";
 import TeamsManagement from "@/components/icons/TeamsManagement";
 import { Gamepad2, Loader, MapPin, Star, Eye, Wifi } from "lucide-react";
+import { setMatchLineup } from "@/app/[locale]/_Lib/actions";
 
 import {
   combineDateAndTime,
@@ -201,6 +202,24 @@ function MatchesFrom({
         // SUBMIT THE FORM
         const matchResult = await submit(dataValues);
         const matchId = matchResult?.data?.id || matchResult?.id || match?.id;
+
+        // Save lineups if matchId exists and lineups are selected
+        if (matchId) {
+          try {
+            // Save Team 1 lineup if players are selected
+            if (team1Lineup && team1Lineup.length > 0 && values.team1) {
+              await setMatchLineup(matchId, values.team1, team1Lineup);
+            }
+            // Save Team 2 lineup if players are selected
+            if (team2Lineup && team2Lineup.length > 0 && values.team2) {
+              await setMatchLineup(matchId, values.team2, team2Lineup);
+            }
+          } catch (lineupError) {
+            console.error("Error saving lineups:", lineupError);
+            // Don't fail the whole form, just show a warning
+            toast.error(t("Match saved but lineup could not be saved"));
+          }
+        }
 
         if (formType === "add") {
           formik.resetForm();
