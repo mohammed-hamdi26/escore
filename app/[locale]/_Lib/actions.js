@@ -870,6 +870,18 @@ export async function deleteUser(id) {
   }
 }
 
+export async function resetUserPassword(userId) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(`/admin/users/${userId}/reset-password`);
+    revalidatePath(`/${locale}/dashboard/users`);
+    return res.data.data;
+  } catch (error) {
+    console.log("Failed to reset password", error);
+    throw new Error(error.response?.data?.message || "Failed to reset password");
+  }
+}
+
 export async function addAward(typeEdit, id, data) {
   const locale = await getLocale();
   console.log(typeEdit, id, data);

@@ -62,19 +62,19 @@ export default function ContentRequestForm({ user, contentStatus }) {
   const canRequest = contentStatus?.canRequest !== false;
   const StatusIcon = currentStatus ? statusConfig[currentStatus]?.icon : null;
 
-  // Check if user is already a content creator
-  if (user?.role === "content") {
+  // Check if user is already an approved content creator
+  if (user?.role === "content" && contentStatus?.contentStatus === "approved") {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Newspaper className="w-8 h-8 text-purple-500" />
-          <h1 className="text-2xl font-bold text-white">{t("title")}</h1>
+          <h1 className="text-2xl font-bold text-white dark:text-white">{t("title")}</h1>
         </div>
 
         <div className="bg-green-500/10 border-2 border-green-500/50 rounded-2xl p-8 text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">{t("alreadyContentCreator")}</h2>
-          <p className="text-[#677185]">{t("alreadyContentCreatorDesc")}</p>
+          <h2 className="text-xl font-bold text-white dark:text-white mb-2">{t("alreadyContentCreator")}</h2>
+          <p className="text-[#677185] dark:text-[#677185]">{t("alreadyContentCreatorDesc")}</p>
         </div>
       </div>
     );
@@ -85,7 +85,7 @@ export default function ContentRequestForm({ user, contentStatus }) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Newspaper className="w-8 h-8 text-purple-500" />
-        <h1 className="text-2xl font-bold text-white">{t("title")}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("title")}</h1>
       </div>
 
       {/* Current Status Card */}
@@ -96,10 +96,10 @@ export default function ContentRequestForm({ user, contentStatus }) {
           <div className="flex items-start gap-4">
             <StatusIcon className={`w-8 h-8 ${statusConfig[currentStatus].color}`} />
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-white mb-1">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
                 {t(`status.${currentStatus}`)}
               </h3>
-              <p className="text-[#677185] text-sm mb-3">
+              <p className="text-gray-600 dark:text-[#677185] text-sm mb-3">
                 {contentStatus?.message}
               </p>
 
@@ -137,18 +137,18 @@ export default function ContentRequestForm({ user, contentStatus }) {
       )}
 
       {/* Benefits Section */}
-      <div className="bg-[#0F1017] rounded-2xl border border-[#1a1f2e] p-6">
-        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+      <div className="bg-gray-50 dark:bg-[#0F1017] rounded-2xl border border-gray-200 dark:border-[#1a1f2e] p-6">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-purple-500" />
           {t("benefits.title")}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {["createNews", "editContent", "manageArticles", "buildAudience"].map((benefit) => (
-            <div key={benefit} className="flex items-start gap-3 p-3 bg-[#1a1f2e]/50 rounded-xl">
+            <div key={benefit} className="flex items-start gap-3 p-3 bg-gray-100 dark:bg-[#1a1f2e]/50 rounded-xl">
               <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
               <div>
-                <p className="text-white font-medium">{t(`benefits.${benefit}.title`)}</p>
-                <p className="text-sm text-[#677185]">{t(`benefits.${benefit}.desc`)}</p>
+                <p className="text-gray-900 dark:text-white font-medium">{t(`benefits.${benefit}.title`)}</p>
+                <p className="text-sm text-gray-600 dark:text-[#677185]">{t(`benefits.${benefit}.desc`)}</p>
               </div>
             </div>
           ))}
@@ -156,14 +156,14 @@ export default function ContentRequestForm({ user, contentStatus }) {
       </div>
 
       {/* Requirements Section */}
-      <div className="bg-[#0F1017] rounded-2xl border border-[#1a1f2e] p-6">
-        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+      <div className="bg-gray-50 dark:bg-[#0F1017] rounded-2xl border border-gray-200 dark:border-[#1a1f2e] p-6">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-yellow-500" />
           {t("requirements.title")}
         </h3>
         <ul className="space-y-3">
           {["verifiedEmail", "activeAccount", "followGuidelines"].map((req) => (
-            <li key={req} className="flex items-center gap-3 text-[#677185]">
+            <li key={req} className="flex items-center gap-3 text-gray-600 dark:text-[#677185]">
               <div className="w-2 h-2 rounded-full bg-yellow-500" />
               {t(`requirements.${req}`)}
             </li>

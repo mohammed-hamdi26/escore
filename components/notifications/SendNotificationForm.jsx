@@ -129,7 +129,7 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
           <Form className="space-y-8">
             {/* Target Type Selection */}
             <div>
-              <h2 className="text-lg font-semibold text-white mb-4">Target Audience</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Target Audience</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {targetTypes.map((type) => {
                   const Icon = type.icon;
@@ -142,11 +142,11 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
                       className={`p-4 rounded-xl border-2 transition-all text-left ${
                         isSelected
                           ? "border-green-primary bg-green-primary/10"
-                          : "border-gray-700 bg-gray-800/50 hover:border-gray-600"
+                          : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600"
                       }`}
                     >
-                      <Icon className={`w-6 h-6 mb-2 ${isSelected ? "text-green-primary" : "text-gray-400"}`} />
-                      <p className={`font-medium ${isSelected ? "text-white" : "text-gray-300"}`}>{type.label}</p>
+                      <Icon className={`w-6 h-6 mb-2 ${isSelected ? "text-green-primary" : "text-gray-500 dark:text-gray-400"}`} />
+                      <p className={`font-medium ${isSelected ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"}`}>{type.label}</p>
                       <p className="text-xs text-gray-500 mt-1">{type.description}</p>
                     </button>
                   );
@@ -157,14 +157,14 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
             {/* Topic Input */}
             {values.targetType === "topic" && (
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Topic Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Topic Name</label>
                 <Field
                   name="topic"
                   placeholder="e.g., game_123, team_456, breaking_news"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-green-primary"
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-green-primary"
                 />
                 {errors.topic && touched.topic && (
-                  <p className="text-red-400 text-sm mt-1">{errors.topic}</p>
+                  <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.topic}</p>
                 )}
               </div>
             )}
@@ -172,14 +172,14 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
             {/* Users Selection */}
             {values.targetType === "users" && (
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Select Users</label>
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 max-h-60 overflow-y-auto">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Users</label>
+                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 max-h-60 overflow-y-auto">
                   {users.length === 0 ? (
                     <p className="text-gray-500">No users available</p>
                   ) : (
                     <div className="space-y-2">
                       {users.map((user) => (
-                        <label key={user.id} className="flex items-center gap-3 p-2 rounded hover:bg-gray-700 cursor-pointer">
+                        <label key={user.id} className="flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={values.userIds.includes(user.id)}
@@ -190,9 +190,9 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
                                 setFieldValue("userIds", values.userIds.filter((id) => id !== user.id));
                               }
                             }}
-                            className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-green-primary focus:ring-green-primary"
+                            className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-green-primary focus:ring-green-primary"
                           />
-                          <span className="text-white">{user.email}</span>
+                          <span className="text-gray-900 dark:text-white">{user.email}</span>
                           {user.username && <span className="text-gray-500">(@{user.username})</span>}
                         </label>
                       ))}
@@ -200,19 +200,19 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
                   )}
                 </div>
                 {errors.userIds && touched.userIds && (
-                  <p className="text-red-400 text-sm mt-1">{errors.userIds}</p>
+                  <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.userIds}</p>
                 )}
               </div>
             )}
 
             {/* Segment Filters */}
             {values.targetType === "segment" && (
-              <div className="space-y-6 bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-                <h3 className="text-md font-semibold text-white">Segment Filters</h3>
+              <div className="space-y-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-md font-semibold text-gray-900 dark:text-white">Segment Filters</h3>
 
                 {/* Games */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Follows Game</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Follows Game</label>
                   <div className="flex flex-wrap gap-2">
                     {games.map((game) => (
                       <button
@@ -229,7 +229,7 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
                         className={`px-3 py-1.5 rounded-full text-sm transition-all ${
                           values.segmentFilters.followsGame.includes(game.id)
                             ? "bg-green-primary text-white"
-                            : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
                         }`}
                       >
                         {game.name}
@@ -240,7 +240,7 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
 
                 {/* Teams */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Follows Team</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Follows Team</label>
                   <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                     {teams.map((team) => (
                       <button
@@ -257,7 +257,7 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
                         className={`px-3 py-1.5 rounded-full text-sm transition-all ${
                           values.segmentFilters.followsTeam.includes(team.id)
                             ? "bg-green-primary text-white"
-                            : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
                         }`}
                       >
                         {team.name}
@@ -268,7 +268,7 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
 
                 {/* Tournaments */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Follows Tournament</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Follows Tournament</label>
                   <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                     {tournaments.map((tournament) => (
                       <button
@@ -285,7 +285,7 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
                         className={`px-3 py-1.5 rounded-full text-sm transition-all ${
                           values.segmentFilters.followsTournament.includes(tournament.id)
                             ? "bg-green-primary text-white"
-                            : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
                         }`}
                       >
                         {tournament.name}
@@ -296,7 +296,7 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
 
                 {/* Platform */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Platform</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Platform</label>
                   <div className="flex gap-4">
                     {platforms.map((platform) => (
                       <label key={platform.id} className="flex items-center gap-2 cursor-pointer">
@@ -311,9 +311,9 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
                               setFieldValue("segmentFilters.platform", current.filter((id) => id !== platform.id));
                             }
                           }}
-                          className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-green-primary focus:ring-green-primary"
+                          className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-green-primary focus:ring-green-primary"
                         />
-                        <span className="text-gray-300">{platform.label}</span>
+                        <span className="text-gray-700 dark:text-gray-300">{platform.label}</span>
                       </label>
                     ))}
                   </div>
@@ -321,13 +321,13 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
 
                 {/* Last Active Within */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Last Active Within (days)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Last Active Within (days)</label>
                   <Field
                     name="segmentFilters.lastActiveWithin"
                     type="number"
                     min="1"
                     placeholder="e.g., 7"
-                    className="w-40 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-green-primary"
+                    className="w-40 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-green-primary"
                   />
                 </div>
               </div>
@@ -335,48 +335,48 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
 
             {/* Notification Content */}
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-white">Notification Content</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Notification Content</h2>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Title *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title *</label>
                 <Field
                   name="title"
                   placeholder="Notification title"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-green-primary"
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-green-primary"
                 />
                 {errors.title && touched.title && (
-                  <p className="text-red-400 text-sm mt-1">{errors.title}</p>
+                  <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.title}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Body *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Body *</label>
                 <Field
                   as="textarea"
                   name="body"
                   rows={4}
                   placeholder="Notification message"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-green-primary resize-none"
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-green-primary resize-none"
                 />
                 {errors.body && touched.body && (
-                  <p className="text-red-400 text-sm mt-1">{errors.body}</p>
+                  <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.body}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Image URL (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Image URL (optional)</label>
                 <Field
                   name="imageUrl"
                   placeholder="https://example.com/image.jpg"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-green-primary"
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-green-primary"
                 />
                 {errors.imageUrl && touched.imageUrl && (
-                  <p className="text-red-400 text-sm mt-1">{errors.imageUrl}</p>
+                  <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.imageUrl}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Priority</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priority</label>
                 <div className="flex gap-4">
                   {["high", "normal"].map((priority) => (
                     <label key={priority} className="flex items-center gap-2 cursor-pointer">
@@ -384,9 +384,9 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
                         type="radio"
                         checked={values.priority === priority}
                         onChange={() => setFieldValue("priority", priority)}
-                        className="w-4 h-4 border-gray-600 bg-gray-700 text-green-primary focus:ring-green-primary"
+                        className="w-4 h-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-green-primary focus:ring-green-primary"
                       />
-                      <span className="text-gray-300 capitalize">{priority}</span>
+                      <span className="text-gray-700 dark:text-gray-300 capitalize">{priority}</span>
                     </label>
                   ))}
                 </div>
