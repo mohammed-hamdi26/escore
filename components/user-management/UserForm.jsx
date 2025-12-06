@@ -1,37 +1,44 @@
 "use client";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import EmailIcon from "../icons/EmailIcon";
-import PasswordIcon from "../icons/PasswordIcon";
 import UserCardIcon from "../icons/UserCardIcon";
 import FormRow from "../ui app/FormRow";
 import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
-import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
-import SelectInput from "../ui app/SelectInput";
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Label } from "../ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
-import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react";
-import { Badge } from "../ui/badge";
+import { Switch } from "../ui/switch";
+import { Checkbox } from "../ui/checkbox";
 import toast from "react-hot-toast";
 import { addUser } from "@/app/[locale]/_Lib/actions";
 import { useTranslations } from "next-intl";
+import {
+  User,
+  Phone,
+  Shield,
+  Gamepad2,
+  Users,
+  Trophy,
+  Newspaper,
+  ArrowRightLeft,
+  BarChart3,
+  Settings,
+  HeadphonesIcon,
+  Plus,
+  Eye,
+  Pencil,
+  Trash2,
+  Save,
+  UserPlus,
+} from "lucide-react";
+
 const validationSchema = yup.object({
   firstName: yup.string().required("Required"),
   lastName: yup.string().required("Required"),
-  // permissions: yup.array().required(" Required"),
 });
+
 function UserForm({
   formType = "add",
   submit = addUser,
@@ -42,66 +49,51 @@ function UserForm({
   const t = useTranslations("UserForm");
 
   const permissions = [
-    { label: "Game", value: "AddGamePermission", translationKey: "Game" },
-    { label: "Player", value: "AddPlayerPermission", translationKey: "Player" },
-    { label: "Team", value: "AddTeamPermission", translationKey: "Team" },
-    {
-      label: "Tournament",
-      value: "AddTournamentPermission",
-      translationKey: "Tournament",
-    },
-    { label: "News", value: "AddNewsPermission", translationKey: "News" },
-    {
-      label: "Transfer",
-      value: "AddTransferPermission",
-      translationKey: "Transfer",
-    },
-    {
-      label: "Standing",
-      value: "AddStandingPermission",
-      translationKey: "Standing",
-    },
-    {
-      label: "Settings",
-      value: "AddSettingsPermission",
-      translationKey: "Settings",
-    },
-    {
-      label: "Support",
-      value: "AddSupportPermission",
-      translationKey: "Support",
-    },
-    // { label: "User", value: "AddUserPermission", translationKey: "User" },
+    { label: "Game", value: "AddGamePermission", translationKey: "Game", icon: Gamepad2, color: "text-purple-500", bgColor: "bg-purple-500/10" },
+    { label: "Player", value: "AddPlayerPermission", translationKey: "Player", icon: User, color: "text-blue-500", bgColor: "bg-blue-500/10" },
+    { label: "Team", value: "AddTeamPermission", translationKey: "Team", icon: Users, color: "text-green-500", bgColor: "bg-green-500/10" },
+    { label: "Tournament", value: "AddTournamentPermission", translationKey: "Tournament", icon: Trophy, color: "text-yellow-500", bgColor: "bg-yellow-500/10" },
+    { label: "News", value: "AddNewsPermission", translationKey: "News", icon: Newspaper, color: "text-pink-500", bgColor: "bg-pink-500/10" },
+    { label: "Transfer", value: "AddTransferPermission", translationKey: "Transfer", icon: ArrowRightLeft, color: "text-orange-500", bgColor: "bg-orange-500/10" },
+    { label: "Standing", value: "AddStandingPermission", translationKey: "Standing", icon: BarChart3, color: "text-cyan-500", bgColor: "bg-cyan-500/10" },
+    { label: "Settings", value: "AddSettingsPermission", translationKey: "Settings", icon: Settings, color: "text-gray-500", bgColor: "bg-gray-500/10" },
+    { label: "Support", value: "AddSupportPermission", translationKey: "Support", icon: HeadphonesIcon, color: "text-red-500", bgColor: "bg-red-500/10" },
+  ];
+
+  const actions = [
+    { label: "create", value: "create", icon: Plus, color: "text-green-500" },
+    { label: "read", value: "read", icon: Eye, color: "text-blue-500" },
+    { label: "update", value: "update", icon: Pencil, color: "text-yellow-500" },
+    { label: "delete", value: "delete", icon: Trash2, color: "text-red-500" },
   ];
 
   // Build initial values for permissions from user data (edit mode)
   const getInitialPermissionValues = () => {
     const values = {};
-    console.log(user);
     if (user?.permissions && Array.isArray(user.permissions)) {
       permissions.forEach((perm) => {
         const userPerm = user.permissions.find((p) => p.entity === perm.label);
         if (userPerm) {
-          values[perm.value] = "yes";
-          values["actions" + perm.value] = userPerm.actions.map((action) => ({
-            label: action,
-            value: action,
-            name: action,
-          }));
+          values[perm.value] = true;
+          values["actions" + perm.value] = userPerm.actions || [];
         } else {
-          values[perm.value] = "no";
+          values[perm.value] = false;
+          values["actions" + perm.value] = [];
         }
+      });
+    } else {
+      permissions.forEach((perm) => {
+        values[perm.value] = false;
+        values["actions" + perm.value] = [];
       });
     }
     return values;
   };
-  console.log(getInitialPermissionValues());
 
   const formik = useFormik({
     initialValues: {
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
-      permissions: [],
       phone: user?.phone || "",
       ...getInitialPermissionValues(),
     },
@@ -113,26 +105,21 @@ function UserForm({
         let permissionsUser = [];
 
         for (let i = 0; i < permissions.length; i++) {
-          const permissionsData = {};
-          if (dataValues?.[permissions[i].value] === "yes") {
-            permissionsData.entity = permissions[i].label;
-            if (dataValues?.["actions" + permissions[i].value]) {
-              permissionsData.actions = dataValues?.[
-                "actions" + permissions[i].value
-              ].map((a) => a.value);
+          if (dataValues?.[permissions[i].value] === true) {
+            const permissionsData = {
+              entity: permissions[i].label,
+              actions: dataValues?.["actions" + permissions[i].value] || [],
+            };
+            if (permissionsData.actions.length > 0) {
+              permissionsUser.push(permissionsData);
             }
-          } else {
-            continue;
           }
-          if (permissionsData) permissionsUser.push(permissionsData);
         }
 
         dataValues = {
           ...dataValues,
           permissions: permissionsUser,
         };
-
-        console.log(dataValues);
 
         const res = await submit(dataValues);
         formType === "add" && formik.resetForm();
@@ -154,20 +141,44 @@ function UserForm({
           );
         }
       }
-      //
     },
   });
 
-  const actions = [
-    { label: t("create"), value: "create", name: t("create") },
-    { label: t("read"), value: "read", name: t("read") },
-    { label: t("update"), value: "update", name: t("update") },
-    { label: t("delete"), value: "delete", name: t("delete") },
-  ];
+  const handlePermissionToggle = (permValue, checked) => {
+    formik.setFieldValue(permValue, checked);
+    if (!checked) {
+      formik.setFieldValue("actions" + permValue, []);
+    }
+  };
+
+  const handleActionToggle = (permValue, actionValue, checked) => {
+    const currentActions = formik.values["actions" + permValue] || [];
+    if (checked) {
+      formik.setFieldValue("actions" + permValue, [...currentActions, actionValue]);
+    } else {
+      formik.setFieldValue(
+        "actions" + permValue,
+        currentActions.filter((a) => a !== actionValue)
+      );
+    }
+  };
+
+  const handleSelectAllActions = (permValue) => {
+    const allActions = actions.map((a) => a.value);
+    formik.setFieldValue("actions" + permValue, allActions);
+  };
+
+  const handleDeselectAllActions = (permValue) => {
+    formik.setFieldValue("actions" + permValue, []);
+  };
 
   return (
-    <form className="space-y-8 " onSubmit={formik.handleSubmit}>
-      <FormSection>
+    <form className="space-y-6" onSubmit={formik.handleSubmit}>
+      {/* User Info Section */}
+      <FormSection
+        title={t("User Information")}
+        icon={<User className="size-5" />}
+      >
         <FormRow>
           <InputApp
             onChange={formik.handleChange}
@@ -175,8 +186,8 @@ function UserForm({
             name={"firstName"}
             type={"text"}
             placeholder={t("Enter first name")}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            className="border-0 focus:outline-none"
+            backGroundColor={"bg-dashboard-box dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
             icon={<UserCardIcon color={"text-[#677185]"} />}
             error={
@@ -186,6 +197,7 @@ function UserForm({
             }
             onBlur={formik.handleBlur}
             value={formik.values.firstName}
+            required
           />
 
           <InputApp
@@ -194,15 +206,10 @@ function UserForm({
             name={"lastName"}
             type={"text"}
             placeholder={t("Enter last name")}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            className="border-0 focus:outline-none"
+            backGroundColor={"bg-dashboard-box dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
-            icon={
-              <EmailIcon
-                className={"fill-[#677185]"}
-                color={"text-[#677185]"}
-              />
-            }
+            icon={<User className="size-5 text-[#677185]" />}
             error={
               formik.touched.lastName &&
               formik.errors.lastName &&
@@ -210,250 +217,159 @@ function UserForm({
             }
             onBlur={formik.handleBlur}
             value={formik.values.lastName}
+            required
           />
         </FormRow>
         {formType === "edit" && (
-          <InputApp
-            onChange={formik.handleChange}
-            label={t("Phone")}
-            name={"phone"}
-            type={"text"}
-            placeholder={t("Enter phone")}
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            icon={
-              <EmailIcon
-                className={"fill-[#677185]"}
-                color={"text-[#677185]"}
-              />
-            }
-            error={formik.touched.phone && formik.errors.phone}
-            onBlur={formik.handleBlur}
-            value={formik.values.phone}
-          />
+          <FormRow>
+            <InputApp
+              onChange={formik.handleChange}
+              label={t("Phone")}
+              name={"phone"}
+              type={"text"}
+              placeholder={t("Enter phone")}
+              className="border-0 focus:outline-none"
+              backGroundColor={"bg-dashboard-box dark:bg-[#0F1017]"}
+              textColor="text-[#677185]"
+              icon={<Phone className="size-5 text-[#677185]" />}
+              error={formik.touched.phone && formik.errors.phone}
+              onBlur={formik.handleBlur}
+              value={formik.values.phone}
+            />
+          </FormRow>
         )}
       </FormSection>
 
-      {permissions.map((item, index) => {
-        return (
-          <FormSection key={item.value}>
-            <FormRow>
-              <SelectInput
-                formik={formik}
-                label={t(item.translationKey) + " " + t("Permission")}
-                name={item.value}
-                value={formik.values[item.value] || ""}
-                options={mappedArrayToSelectOptions(
-                  [
-                    { label: t("yes"), value: "yes" },
-                    { label: t("no"), value: "no" },
-                  ],
-                  "label",
-                  "value"
+      {/* Permissions Section */}
+      <FormSection
+        title={t("Permissions")}
+        icon={<Shield className="size-5" />}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {permissions.map((item) => {
+            const IconComponent = item.icon;
+            const isEnabled = formik.values[item.value] === true;
+            const selectedActions = formik.values["actions" + item.value] || [];
+
+            return (
+              <div
+                key={item.value}
+                className={`rounded-xl border-2 transition-all duration-200 ${
+                  isEnabled
+                    ? "border-green-500/50 bg-green-500/5"
+                    : "border-[#1a1f2e] bg-[#0F1017]"
+                }`}
+              >
+                {/* Permission Header */}
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${item.bgColor}`}>
+                      <IconComponent className={`size-5 ${item.color}`} />
+                    </div>
+                    <div>
+                      <Label className="text-white font-medium cursor-pointer">
+                        {t(item.translationKey)}
+                      </Label>
+                      <p className="text-xs text-[#677185]">
+                        {isEnabled
+                          ? `${selectedActions.length} ${t("actions selected")}`
+                          : t("Disabled")}
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={isEnabled}
+                    onCheckedChange={(checked) =>
+                      handlePermissionToggle(item.value, checked)
+                    }
+                  />
+                </div>
+
+                {/* Actions */}
+                {isEnabled && (
+                  <div className="px-4 pb-4 border-t border-[#1a1f2e] pt-3">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs text-[#677185] uppercase tracking-wide">
+                        {t("Actions")}
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleSelectAllActions(item.value)}
+                          className="text-xs text-green-500 hover:text-green-400 transition-colors"
+                        >
+                          {t("All")}
+                        </button>
+                        <span className="text-[#677185]">|</span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeselectAllActions(item.value)}
+                          className="text-xs text-red-500 hover:text-red-400 transition-colors"
+                        >
+                          {t("None")}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {actions.map((action) => {
+                        const ActionIcon = action.icon;
+                        const isChecked = selectedActions.includes(action.value);
+
+                        return (
+                          <label
+                            key={action.value}
+                            className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${
+                              isChecked
+                                ? "bg-[#1a1f2e] border border-[#2a2f3e]"
+                                : "hover:bg-[#1a1f2e]/50"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={isChecked}
+                              onCheckedChange={(checked) =>
+                                handleActionToggle(item.value, action.value, checked)
+                              }
+                              className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                            />
+                            <ActionIcon className={`size-3.5 ${action.color}`} />
+                            <span className="text-sm text-white capitalize">
+                              {t(action.label)}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
-                error={formik.touched.actions && formik.errors.actions}
-                onChange={(value) => {
-                  formik.setFieldValue(item.value, value);
-                }}
-              />
-              {/* <div className="flex-1">{item.value}</div> */}
-              {formik.values[item.value] === "yes" && (
-                <ComboboxInput
-                  key={`${item.value}-${user?.id || "new"}`}
-                  formik={formik}
-                  label={t("Actions")}
-                  name={"actions" + item.value}
-                  options={mappedArrayToSelectOptions(
-                    actions,
-                    "label",
-                    "value"
-                  )}
-                  initialData={formik.values["actions" + item.value] || []}
-                  onSelect={(value) => {
-                    formik.setFieldValue("actions", value);
-                  }}
-                  error={formik.touched.actions && formik.errors.actions}
-                  placeholder={t("Select actions")}
-                  noResultsText={t("No results found")}
-                  icon={
-                    <PasswordIcon
-                      className={"fill-[#677185]"}
-                      color={"text-[#677185]"}
-                    />
-                  }
-                />
-              )}
-            </FormRow>
-          </FormSection>
-        );
-      })}
-      <div className="flex justify-end">
+              </div>
+            );
+          })}
+        </div>
+      </FormSection>
+
+      {/* Submit Button */}
+      <div className="flex justify-end pt-4">
         <Button
-          // disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
-          className={
-            "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
-          }
+          disabled={formik.isSubmitting}
+          className="bg-green-primary hover:bg-green-primary/80 text-white min-w-[140px] disabled:opacity-50"
         >
           {formik.isSubmitting ? (
             <Spinner />
           ) : formType === "add" ? (
-            t("Submit")
+            <>
+              <UserPlus className="size-4 mr-2" />
+              {t("Submit")}
+            </>
           ) : (
-            t("Edit")
+            <>
+              <Save className="size-4 mr-2" />
+              {t("Edit")}
+            </>
           )}
         </Button>
       </div>
     </form>
-  );
-}
-
-function ComboboxInput({
-  formik,
-  label,
-  name,
-  options,
-  initialData,
-  placeholder,
-  onSelect,
-  noResultsText = "No results found",
-}) {
-  const id = useId();
-  const [open, setOpen] = useState(false);
-  const [selectedValues, setSelectedValues] = useState(initialData || []);
-
-  const toggleSelection = (value) => {
-    setSelectedValues((prev) =>
-      prev.find((v) => v.value === value.value)
-        ? prev.filter((v) => v.value !== value.value)
-        : [...prev, value]
-    );
-  };
-
-  const removeSelection = (value) => {
-    setSelectedValues((prev) => prev.filter((v) => v.value !== value.value));
-  };
-
-  return (
-    <div className="w-full  space-y-2 flex-1">
-      {label && (
-        <Label className={"mb-4 text-[#677185] dark:text-white"} htmlFor={id}>
-          {label}
-        </Label>
-      )}
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            id={id}
-            // variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="h-auto min-h-12 w-full   justify-between bg-dashboard-box  dark:bg-[#0F1017] hover:bg-dashboard-box dark:hover:bg-[#0F1017] "
-          >
-            <div className="flex flex-wrap items-center gap-1 pr-2.5">
-              {selectedValues.length > 0 ? (
-                selectedValues.map((val) => {
-                  const option = options.find((c) => c.value === val.value);
-
-                  return option ? (
-                    <Badge
-                      className="text-sm"
-                      key={val.value}
-                      variant="outline"
-                    >
-                      {option.image && (
-                        <img
-                          width={20}
-                          //   height={16}
-                          src={option.image}
-                          alt={option.name}
-                        />
-                      )}
-                      {option.name}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-4"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeSelection(val);
-                          formik.setFieldValue(
-                            name,
-                            selectedValues.filter((v) => v.value !== val.value)
-                          );
-                        }}
-                        asChild
-                      >
-                        <span>
-                          <XIcon className="size-4" />
-                        </span>
-                      </Button>
-                    </Badge>
-                  ) : null;
-                })
-              ) : (
-                <span className="text-muted-foreground">{placeholder}</span>
-              )}
-            </div>
-            <ChevronsUpDownIcon
-              size={16}
-              className="text-muted-foreground/80 shrink-0"
-              aria-hidden="true"
-            />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-(--radix-popper-anchor-width) p-0">
-          <Command>
-            <CommandInput placeholder={placeholder} />
-            <CommandList>
-              <CommandEmpty>{noResultsText}</CommandEmpty>
-              <CommandGroup>
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value}
-                    onSelect={() => {
-                      toggleSelection(option);
-                      console.log(formik.values[name]);
-                      formik.values[name]
-                        ? !formik.values[name].find(
-                            (v) => v.value === option.value
-                          )
-                          ? formik.setFieldValue(name, [
-                              ...formik.values[name],
-                              option,
-                            ])
-                          : formik.setFieldValue(
-                              name,
-                              formik.values[name].filter(
-                                (v) => v.value !== option.value
-                              )
-                            )
-                        : formik.setFieldValue(name, [option]);
-                    }}
-                  >
-                    {(option.image || option.logo) && (
-                      <img
-                        width={20}
-                        //   height={16}
-                        src={option.image || option.logo}
-                        alt={""}
-                        className="mr-2"
-                      />
-                    )}{" "}
-                    <span className="truncate">{option.name}</span>
-                    {selectedValues.find((value) => {
-                      return value.value === option.value;
-                    }) && <CheckIcon size={16} className="ml-auto" />}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
   );
 }
 
