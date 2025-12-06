@@ -907,6 +907,70 @@ export async function sendNotificationAction(data) {
     throw new Error(e.response?.data?.message || "Failed to send notification");
   }
 }
+
+// Content Creator Requests
+export async function approveContentRequest(userId) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(`/admin/content-requests/${userId}/approve`);
+    revalidatePath(`/${locale}/dashboard/users/content-requests`);
+    revalidatePath(`/${locale}/dashboard/users`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response?.data || e);
+    throw new Error(e.response?.data?.message || "Failed to approve request");
+  }
+}
+
+export async function rejectContentRequest(userId, reason) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(`/admin/content-requests/${userId}/reject`, { reason });
+    revalidatePath(`/${locale}/dashboard/users/content-requests`);
+    revalidatePath(`/${locale}/dashboard/users`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response?.data || e);
+    throw new Error(e.response?.data?.message || "Failed to reject request");
+  }
+}
+
+// User Permissions
+export async function setUserPermissions(userId, permissions) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(`/admin/users/${userId}/permissions`, { permissions });
+    revalidatePath(`/${locale}/dashboard/users/${userId}/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response?.data || e);
+    throw new Error(e.response?.data?.message || "Failed to set permissions");
+  }
+}
+
+export async function addUserPermission(userId, permission) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.patch(`/admin/users/${userId}/permissions`, permission);
+    revalidatePath(`/${locale}/dashboard/users/${userId}/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response?.data || e);
+    throw new Error(e.response?.data?.message || "Failed to add permission");
+  }
+}
+
+export async function removeUserPermission(userId, entity) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.delete(`/admin/users/${userId}/permissions/${entity}`);
+    revalidatePath(`/${locale}/dashboard/users/${userId}/edit`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response?.data || e);
+    throw new Error(e.response?.data?.message || "Failed to remove permission");
+  }
+}
 export async function editLinks(typeEdit, id, data) {
   const locale = await getLocale();
   console.log(typeEdit, id, data);
