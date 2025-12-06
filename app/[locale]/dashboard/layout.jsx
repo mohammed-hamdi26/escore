@@ -21,8 +21,8 @@ export default async function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="p-16 pt-8 min-h-dvh">
-      <TopNav />
+    <div className="p-4 md:p-8 lg:p-16 pt-4 md:pt-8 min-h-dvh">
+      <TopNav user={user} />
       <div className="flex gap-5 h-full">
         <SideNavBar user={user} />
         <div className="flex-1">{children}</div>

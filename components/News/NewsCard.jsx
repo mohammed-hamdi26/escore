@@ -5,7 +5,6 @@ import { Link } from "@/i18n/navigation";
 import { format } from "date-fns";
 import {
   Star,
-  Eye,
   Clock,
   Edit,
   Trash2,
@@ -137,24 +136,18 @@ function NewsCard({
                   </Button>
                 </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <Link href={`/dashboard/news/edit/${news.id}`}>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Edit className="size-4 mr-2" />
-                    {t("edit")}
-                  </DropdownMenuItem>
-                </Link>
-
                 {news.urlExternal && (
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => window.open(news.urlExternal, "_blank")}
-                  >
-                    <ExternalLink className="size-4 mr-2" />
-                    {t("viewSource")}
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => window.open(news.urlExternal, "_blank")}
+                    >
+                      <ExternalLink className="size-4 mr-2" />
+                      {t("viewSource")}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
                 )}
-
-                <DropdownMenuSeparator />
 
                 {isPublished ? (
                   <DropdownMenuItem
@@ -221,12 +214,6 @@ function NewsCard({
                 </span>
               </div>
             )}
-
-            {/* Views */}
-            <div className="flex items-center gap-1">
-              <Eye className="size-3" />
-              <span>{news.viewsCount?.toLocaleString() || 0}</span>
-            </div>
 
             {/* Published Date */}
             {news.publishedAt && (
