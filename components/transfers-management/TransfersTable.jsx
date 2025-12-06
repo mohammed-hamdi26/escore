@@ -7,14 +7,13 @@ import { useTranslations } from "next-intl";
 import Pagination from "../ui app/Pagination";
 import { deleteTransfer } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
-import { StatusBadge, TypeBadge, FeaturedBadge } from "./TransfersBadges";
+import { FeaturedBadge } from "./TransfersBadges";
 import TransferDetailsModal from "./TransferDetailsModal";
 import TransfersFilter from "./TransfersFilter";
 import { Eye, Trash2, Edit, ArrowRight } from "lucide-react";
 import Image from "next/image";
 
 export default function TransfersTable({ transfers, pagination, games = [] }) {
-  const [isLoading, setIsLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [selectedTransferId, setSelectedTransferId] = useState(null);
   const t = useTranslations("TransfersManagement");
@@ -58,12 +57,6 @@ export default function TransfersTable({ transfers, pagination, games = [] }) {
                 </th>
                 <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
                   {t("Transfer")}
-                </th>
-                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
-                  {t("Type")}
-                </th>
-                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
-                  {t("Status")}
                 </th>
                 <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
                   {t("Fee")}
@@ -160,20 +153,10 @@ export default function TransfersTable({ transfers, pagination, games = [] }) {
                             />
                           )}
                           <span className="text-sm text-gray-700 dark:text-gray-300 max-w-[80px] truncate">
-                            {transfer.toTeam?.name || (transfer.type === "retirement" ? t("Retired") : "-")}
+                            {transfer.toTeam?.name || "-"}
                           </span>
                         </div>
                       </div>
-                    </td>
-
-                    {/* Type */}
-                    <td className="px-4 py-3">
-                      <TypeBadge type={transfer.type} t={t} />
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-4 py-3">
-                      <StatusBadge status={transfer.status} t={t} />
                     </td>
 
                     {/* Fee */}
@@ -231,7 +214,7 @@ export default function TransfersTable({ transfers, pagination, games = [] }) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center">
+                  <td colSpan={5} className="px-4 py-12 text-center">
                     <ArrowRight className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
                     <p className="text-gray-500 dark:text-gray-400">
                       {t("No transfers found")}

@@ -5,18 +5,18 @@ import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import TransfersForm from "@/components/transfers-management/TransfersForm";
 
 async function AddTransferPage() {
-  const [games, players, teams] = await Promise.all([
+  const [games, playersData, teamsData] = await Promise.all([
     getGames().catch(() => []),
-    getPlayers().catch(() => []),
-    getTeams().catch(() => []),
+    getPlayers().catch(() => ({ data: [] })),
+    getTeams().catch(() => ({ data: [] })),
   ]);
 
   return (
     <TransfersForm
       submit={addTransfer}
       gamesOptions={games || []}
-      playersOptions={players || []}
-      teamsOptions={teams || []}
+      playersOptions={playersData?.data || []}
+      teamsOptions={teamsData?.data || []}
       formType="add"
     />
   );

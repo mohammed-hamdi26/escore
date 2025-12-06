@@ -17,21 +17,6 @@ import { Label } from "../ui/label";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import toast from "react-hot-toast";
 
-const STATUS_OPTIONS = [
-  { value: "rumor", label: "Rumor" },
-  { value: "pending", label: "Pending" },
-  { value: "confirmed", label: "Confirmed" },
-  { value: "cancelled", label: "Cancelled" },
-];
-
-const TYPE_OPTIONS = [
-  { value: "transfer", label: "Transfer" },
-  { value: "loan", label: "Loan" },
-  { value: "free_agent", label: "Free Agent" },
-  { value: "retirement", label: "Retirement" },
-  { value: "return_from_loan", label: "Return from Loan" },
-];
-
 const CURRENCY_OPTIONS = [
   { value: "USD", label: "USD" },
   { value: "EUR", label: "EUR" },
@@ -53,38 +38,31 @@ function TransfersForm({
 
   const validationSchema = Yup.object({
     player: Yup.string().required(t("Player is required")),
-    type: Yup.string().required(t("Type is required")),
-    status: Yup.string().required(t("Status is required")),
-    fromTeam: Yup.string().when("type", {
-      is: (type) => type !== "free_agent",
-      then: (schema) => schema.required(t("From Team is required")),
-      otherwise: (schema) => schema.nullable(),
-    }),
-    toTeam: Yup.string().when("type", {
-      is: (type) => type !== "retirement",
-      then: (schema) => schema.required(t("To Team is required")),
-      otherwise: (schema) => schema.nullable(),
-    }),
+    fromTeam: Yup.string().nullable(),
+    toTeam: Yup.string().nullable(),
     fee: Yup.number().min(0, t("Fee must be positive")).nullable(),
     contractLength: Yup.number()
       .min(1, t("Contract length must be at least 1 month"))
       .max(120, t("Contract length cannot exceed 120 months"))
       .nullable(),
-  });
+  }).test(
+    "at-least-one-team",
+    t("At least one team (From or To) is required"),
+    function (values) {
+      return values.fromTeam || values.toTeam;
+    }
+  );
 
   const formik = useFormik({
     initialValues: {
       player: transfer?.player?.id || transfer?.player?._id || "",
       game: transfer?.game?.id || transfer?.game?._id || "",
-      type: transfer?.type || "transfer",
-      status: transfer?.status || "rumor",
       fromTeam: transfer?.fromTeam?.id || transfer?.fromTeam?._id || "",
       toTeam: transfer?.toTeam?.id || transfer?.toTeam?._id || "",
       fee: transfer?.fee || "",
       currency: transfer?.currency || "USD",
       contractLength: transfer?.contractLength || "",
       transferDate: transfer?.transferDate ? transfer.transferDate.split("T")[0] : "",
-      endDate: transfer?.endDate ? transfer.endDate.split("T")[0] : "",
       source: transfer?.source || "",
       notes: transfer?.notes || "",
       isFeatured: transfer?.isFeatured || false,
@@ -101,7 +79,6 @@ function TransfersForm({
           toTeam: values.toTeam || undefined,
           game: values.game || undefined,
           transferDate: values.transferDate || undefined,
-          endDate: values.endDate || undefined,
           source: values.source || undefined,
           notes: values.notes || undefined,
         };
@@ -143,11 +120,6 @@ function TransfersForm({
     }
   };
 
-  // Show/hide fields based on type
-  const showFromTeam = formik.values.type !== "free_agent";
-  const showToTeam = formik.values.type !== "retirement";
-  const showEndDate = formik.values.type === "loan";
-
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8">
       {/* Basic Info */}
@@ -173,76 +145,45 @@ function TransfersForm({
             onChange={(value) => formik.setFieldValue("game", value)}
           />
         </FormRow>
-        <FormRow>
-          <SelectInput
-            name="type"
-            label={t("Transfer Type")}
-            formik={formik}
-            placeholder={t("Select Type")}
-            options={TYPE_OPTIONS.map((opt) => ({
-              value: opt.value,
-              label: t(opt.label),
-            }))}
-            error={formik.touched.type && formik.errors.type}
-            onChange={(value) => formik.setFieldValue("type", value)}
-            required
-          />
-          <SelectInput
-            name="status"
-            label={t("Status")}
-            formik={formik}
-            placeholder={t("Select Status")}
-            options={STATUS_OPTIONS.map((opt) => ({
-              value: opt.value,
-              label: t(opt.label),
-            }))}
-            error={formik.touched.status && formik.errors.status}
-            onChange={(value) => formik.setFieldValue("status", value)}
-            required
-          />
-        </FormRow>
       </FormSection>
 
       {/* Teams */}
       <FormSection title={t("Teams")}>
         <FormRow>
-          {showFromTeam && (
-            <SelectInput
-              name="fromTeam"
-              label={t("From Team")}
-              formik={formik}
-              placeholder={t("Select From Team")}
-              options={mappedArrayToSelectOptions(
-                teamsOptions.filter(
-                  (team) => (team.id || team._id) !== formik.values.toTeam
-                ),
-                "name",
-                "id"
-              )}
-              error={formik.touched.fromTeam && formik.errors.fromTeam}
-              onChange={(value) => formik.setFieldValue("fromTeam", value)}
-              required={showFromTeam}
-            />
-          )}
-          {showToTeam && (
-            <SelectInput
-              name="toTeam"
-              label={t("To Team")}
-              formik={formik}
-              placeholder={t("Select To Team")}
-              options={mappedArrayToSelectOptions(
-                teamsOptions.filter(
-                  (team) => (team.id || team._id) !== formik.values.fromTeam
-                ),
-                "name",
-                "id"
-              )}
-              error={formik.touched.toTeam && formik.errors.toTeam}
-              onChange={(value) => formik.setFieldValue("toTeam", value)}
-              required={showToTeam}
-            />
-          )}
+          <SelectInput
+            name="fromTeam"
+            label={t("From Team")}
+            formik={formik}
+            placeholder={t("Select From Team")}
+            options={mappedArrayToSelectOptions(
+              teamsOptions.filter(
+                (team) => (team.id || team._id) !== formik.values.toTeam
+              ),
+              "name",
+              "id"
+            )}
+            error={formik.touched.fromTeam && formik.errors.fromTeam}
+            onChange={(value) => formik.setFieldValue("fromTeam", value)}
+          />
+          <SelectInput
+            name="toTeam"
+            label={t("To Team")}
+            formik={formik}
+            placeholder={t("Select To Team")}
+            options={mappedArrayToSelectOptions(
+              teamsOptions.filter(
+                (team) => (team.id || team._id) !== formik.values.fromTeam
+              ),
+              "name",
+              "id"
+            )}
+            error={formik.touched.toTeam && formik.errors.toTeam}
+            onChange={(value) => formik.setFieldValue("toTeam", value)}
+          />
         </FormRow>
+        {formik.errors["at-least-one-team"] && (
+          <p className="text-red-500 text-sm mt-2">{t("At least one team (From or To) is required")}</p>
+        )}
       </FormSection>
 
       {/* Financial Details */}
@@ -299,15 +240,6 @@ function TransfersForm({
             disabled={formik.isSubmitting}
             placeholder={t("Select Transfer Date")}
           />
-          {showEndDate && (
-            <DatePicker
-              formik={formik}
-              name="endDate"
-              label={t("End Date (for loans)")}
-              disabled={formik.isSubmitting}
-              placeholder={t("Select End Date")}
-            />
-          )}
         </FormRow>
       </FormSection>
 

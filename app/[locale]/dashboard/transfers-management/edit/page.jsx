@@ -5,7 +5,7 @@ import TransfersTable from "@/components/transfers-management/TransfersTable";
 
 async function TransfersListPage({ searchParams }) {
   const params = await searchParams;
-  const { page, limit, status, type, game, search } = params || {};
+  const { page, limit, game, search } = params || {};
 
   // Fetch transfers, stats, and games in parallel
   let transfersData = { data: [], pagination: { totalPages: 1, total: 0 } };
@@ -14,7 +14,7 @@ async function TransfersListPage({ searchParams }) {
 
   try {
     [transfersData, stats, games] = await Promise.all([
-      getTransfers({ page, limit: limit || 10, status, type, game, search }).catch(() => ({
+      getTransfers({ page, limit: limit || 10, game, search }).catch(() => ({
         data: [],
         pagination: { totalPages: 1, total: 0 },
       })),

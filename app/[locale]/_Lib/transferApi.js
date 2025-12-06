@@ -14,8 +14,6 @@ export async function getTransfers(searchParams = {}) {
 
     // Filters
     if (searchParams.search) params.set("search", searchParams.search);
-    if (searchParams.status) params.set("status", searchParams.status);
-    if (searchParams.type) params.set("type", searchParams.type);
     if (searchParams.game) params.set("game", searchParams.game);
     if (searchParams.player) params.set("player", searchParams.player);
     if (searchParams.team) params.set("team", searchParams.team);
@@ -54,7 +52,7 @@ export async function getTransfer(id) {
 }
 
 /**
- * Get recent confirmed transfers
+ * Get recent transfers
  */
 export async function getRecentTransfers(limit = 10) {
   try {
@@ -62,19 +60,6 @@ export async function getRecentTransfers(limit = 10) {
     return res.data?.data || [];
   } catch (e) {
     console.error("Failed to get recent transfers:", e.response?.data || e.message);
-    return [];
-  }
-}
-
-/**
- * Get transfer rumors
- */
-export async function getTransferRumors() {
-  try {
-    const res = await apiClient.get("/transfers/rumors");
-    return res.data?.data || [];
-  } catch (e) {
-    console.error("Failed to get transfer rumors:", e.response?.data || e.message);
     return [];
   }
 }
@@ -110,21 +95,9 @@ export async function getTransfersByTeam(teamId) {
  */
 export async function getTransferStats() {
   try {
-    // Get counts for each status
-    const [allRes, confirmedRes, pendingRes, rumorsRes, cancelledRes] = await Promise.all([
-      apiClient.get("/transfers?limit=1"),
-      apiClient.get("/transfers?status=confirmed&limit=1"),
-      apiClient.get("/transfers?status=pending&limit=1"),
-      apiClient.get("/transfers?status=rumor&limit=1"),
-      apiClient.get("/transfers?status=cancelled&limit=1"),
-    ]);
-
+    const res = await apiClient.get("/transfers?limit=1");
     return {
-      total: allRes.data?.pagination?.total || 0,
-      confirmed: confirmedRes.data?.pagination?.total || 0,
-      pending: pendingRes.data?.pagination?.total || 0,
-      rumor: rumorsRes.data?.pagination?.total || 0,
-      cancelled: cancelledRes.data?.pagination?.total || 0,
+      total: res.data?.pagination?.total || 0,
     };
   } catch (e) {
     console.error("Failed to get transfer stats:", e.response?.data || e.message);

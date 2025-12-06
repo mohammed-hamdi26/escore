@@ -20,19 +20,19 @@ async function EditTransferPage({ params }) {
     notFound();
   }
 
-  const [games, players, teams] = await Promise.all([
+  const [games, playersData, teamsData] = await Promise.all([
     getGames().catch(() => []),
-    getPlayers().catch(() => []),
-    getTeams().catch(() => []),
+    getPlayers().catch(() => ({ data: [] })),
+    getTeams().catch(() => ({ data: [] })),
   ]);
 
   return (
     <TransfersForm
       submit={editTransfer}
-      playersOptions={players || []}
+      playersOptions={playersData?.data || []}
       transfer={transfer}
       formType="edit"
-      teamsOptions={teams || []}
+      teamsOptions={teamsData?.data || []}
       gamesOptions={games || []}
     />
   );

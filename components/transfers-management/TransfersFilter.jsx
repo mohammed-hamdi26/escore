@@ -14,21 +14,6 @@ import {
 import { Button } from "../ui/button";
 import { X } from "lucide-react";
 
-const STATUS_OPTIONS = [
-  { value: "rumor", label: "Rumor" },
-  { value: "pending", label: "Pending" },
-  { value: "confirmed", label: "Confirmed" },
-  { value: "cancelled", label: "Cancelled" },
-];
-
-const TYPE_OPTIONS = [
-  { value: "transfer", label: "Transfer" },
-  { value: "loan", label: "Loan" },
-  { value: "free_agent", label: "Free Agent" },
-  { value: "retirement", label: "Retirement" },
-  { value: "return_from_loan", label: "Return from Loan" },
-];
-
 export default function TransfersFilter({ games = [] }) {
   const t = useTranslations("TransfersManagement");
   const pathname = usePathname();
@@ -54,8 +39,6 @@ export default function TransfersFilter({ games = [] }) {
   };
 
   const hasFilters =
-    searchParams.get("status") ||
-    searchParams.get("type") ||
     searchParams.get("game") ||
     searchParams.get("search");
 
@@ -82,42 +65,6 @@ export default function TransfersFilter({ games = [] }) {
             flexGrow="flex-0"
           />
         </div>
-
-        {/* Status Filter */}
-        <Select
-          value={searchParams.get("status") || "all"}
-          onValueChange={(value) => updateFilter("status", value)}
-        >
-          <SelectTrigger className="w-[150px] bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
-            <SelectValue placeholder={t("Status")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("All Status")}</SelectItem>
-            {STATUS_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Type Filter */}
-        <Select
-          value={searchParams.get("type") || "all"}
-          onValueChange={(value) => updateFilter("type", value)}
-        >
-          <SelectTrigger className="w-[170px] bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
-            <SelectValue placeholder={t("Type")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("All Types")}</SelectItem>
-            {TYPE_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
 
         {/* Game Filter */}
         {games.length > 0 && (

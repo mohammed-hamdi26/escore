@@ -1,23 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { X, CheckCircle, ArrowRight, DollarSign, Calendar, FileText, Link as LinkIcon } from "lucide-react";
+import { X, ArrowRight, DollarSign, Calendar, FileText, Link as LinkIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { StatusBadge, TypeBadge, FeaturedBadge } from "./TransfersBadges";
-import {
-  getTransferByIdAction,
-  updateTransferStatus,
-  confirmTransfer,
-} from "@/app/[locale]/_Lib/actions";
+import { FeaturedBadge } from "./TransfersBadges";
+import { getTransferByIdAction } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import Image from "next/image";
 
@@ -25,7 +13,6 @@ export default function TransferDetailsModal({ transferId, onClose }) {
   const t = useTranslations("TransfersManagement");
   const [transfer, setTransfer] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (transferId) {
@@ -47,30 +34,6 @@ export default function TransferDetailsModal({ transferId, onClose }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleStatusChange = async (newStatus) => {
-    setUpdating(true);
-    const result = await updateTransferStatus(transferId, newStatus);
-    if (result.success) {
-      toast.success(t("Status updated"));
-      fetchTransfer();
-    } else {
-      toast.error(result.error || t("Failed to update status"));
-    }
-    setUpdating(false);
-  };
-
-  const handleConfirm = async () => {
-    setUpdating(true);
-    const result = await confirmTransfer(transferId);
-    if (result.success) {
-      toast.success(t("Transfer confirmed"));
-      fetchTransfer();
-    } else {
-      toast.error(result.error || t("Failed to confirm transfer"));
-    }
-    setUpdating(false);
   };
 
   const formatFee = (fee, currency = "USD") => {
@@ -103,8 +66,6 @@ export default function TransferDetailsModal({ transferId, onClose }) {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               {t("Transfer Details")}
             </h2>
-            <StatusBadge status={transfer.status} t={t} />
-            <TypeBadge type={transfer.type} t={t} />
             {transfer.isFeatured && <FeaturedBadge t={t} />}
           </div>
           <button
@@ -183,9 +144,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
                     </span>
                   </>
                 ) : (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {transfer.type === "retirement" ? t("Retired") : "-"}
-                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">-</span>
                 )}
               </div>
             </div>
@@ -257,21 +216,6 @@ export default function TransferDetailsModal({ transferId, onClose }) {
                   : "-"}
               </p>
             </div>
-
-            {/* End Date (for loans) */}
-            {transfer.type === "loan" && (
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
-                  <Calendar className="w-4 h-4" />
-                  <span className="text-xs">{t("End Date")}</span>
-                </div>
-                <p className="font-semibold text-gray-900 dark:text-white">
-                  {transfer.endDate
-                    ? format(new Date(transfer.endDate), "yyyy-MM-dd")
-                    : "-"}
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Source */}
@@ -297,40 +241,6 @@ export default function TransferDetailsModal({ transferId, onClose }) {
               </p>
             </div>
           )}
-
-          {/* Admin Controls */}
-          <div className="flex flex-wrap items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("Update Status")}:
-            </span>
-            <Select
-              value={transfer.status}
-              onValueChange={handleStatusChange}
-              disabled={updating}
-            >
-              <SelectTrigger className="w-[150px] bg-white dark:bg-gray-700">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="rumor">{t("Rumor")}</SelectItem>
-                <SelectItem value="pending">{t("Pending")}</SelectItem>
-                <SelectItem value="confirmed">{t("Confirmed")}</SelectItem>
-                <SelectItem value="cancelled">{t("Cancelled")}</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {transfer.status !== "confirmed" && transfer.status !== "cancelled" && (
-              <Button
-                size="sm"
-                onClick={handleConfirm}
-                disabled={updating}
-                className="flex items-center gap-1 bg-green-primary hover:bg-green-primary/80"
-              >
-                <CheckCircle className="w-4 h-4" />
-                {t("Confirm & Update Player")}
-              </Button>
-            )}
-          </div>
 
           {/* Timestamps */}
           <div className="text-xs text-gray-500 dark:text-gray-400 flex gap-4">

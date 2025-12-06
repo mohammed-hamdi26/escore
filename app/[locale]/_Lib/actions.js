@@ -886,30 +886,6 @@ export async function deleteTransfer(id) {
   }
 }
 
-export async function updateTransferStatus(id, status) {
-  const locale = await getLocale();
-  try {
-    const res = await apiClient.patch(`/transfers/${id}/status`, { status });
-    revalidatePath(`/${locale}/dashboard/transfers-management/edit`);
-    return { success: true, data: res.data.data };
-  } catch (error) {
-    console.error("Failed to update transfer status:", error.response?.data || error);
-    return { success: false, error: error.response?.data?.message || "Failed to update status" };
-  }
-}
-
-export async function confirmTransfer(id) {
-  const locale = await getLocale();
-  try {
-    const res = await apiClient.patch(`/transfers/${id}/confirm`);
-    revalidatePath(`/${locale}/dashboard/transfers-management/edit`);
-    return { success: true, data: res.data.data };
-  } catch (error) {
-    console.error("Failed to confirm transfer:", error.response?.data || error);
-    return { success: false, error: error.response?.data?.message || "Failed to confirm transfer" };
-  }
-}
-
 export async function getTransferByIdAction(id) {
   try {
     const res = await apiClient.get(`/transfers/${id}`);
