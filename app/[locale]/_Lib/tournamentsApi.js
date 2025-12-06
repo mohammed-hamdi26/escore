@@ -1,14 +1,25 @@
 import apiClient from "./apiCLient";
 
 export async function getTournaments(searchParams = {}) {
-  // const searchParamsString = Object.entries(searchParams)
-  //   .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-  //   .join("&");
-
   try {
-    const res = await apiClient.get(`/tournaments`);
+    const params = new URLSearchParams();
 
-    return { data: res.data?.data, meta: res.data?.meta };
+    // Add pagination params
+    if (searchParams.page) params.set("page", searchParams.page);
+    if (searchParams.size) params.set("limit", searchParams.size);
+
+    // Add search param
+    if (searchParams.search) params.set("search", searchParams.search);
+
+    const queryString = params.toString();
+    const url = queryString ? `/tournaments?${queryString}` : "/tournaments";
+
+    const res = await apiClient.get(url);
+
+    return {
+      data: res.data?.data,
+      pagination: res.data?.pagination || { totalPages: 1, total: res.data?.data?.length || 0 }
+    };
   } catch (e) {
     throw new Error("Error in Get tournaments");
   }

@@ -72,15 +72,13 @@ function RegisterFrom({ formik, t }) {
             t={t}
             disabled={formik.isSubmitting}
             formik={formik}
-            name="imageUrl"
+            name="avatar"
             placeholder={t("Image")}
-            // flexGrow="flex-[0.5]"
-
             inputAuth={true}
             error={
-              formik.touched.imageUrl &&
-              formik.errors.imageUrl &&
-              formik.errors.imageUrl
+              formik.touched.avatar &&
+              formik.errors.avatar &&
+              formik.errors.avatar
             }
           />
         </FormRow>

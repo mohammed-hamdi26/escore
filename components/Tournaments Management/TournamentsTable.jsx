@@ -9,9 +9,6 @@ import { useState } from "react";
 import { deleteTournament } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { getNumPages } from "@/app/[locale]/_Lib/helps";
-import Image from "next/image";
 
 const columns = [
   {
@@ -36,18 +33,15 @@ const columns = [
   },
 ];
 
-function TournamentsTable({ tournaments, numOfTournaments, countries }) {
+function TournamentsTable({ tournaments, pagination }) {
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("TournamentsTable");
-  const searchParams = useSearchParams();
-  const numPages = getNumPages(
-    numOfTournaments,
-    Number(searchParams.get("size"))
-  );
+  const numPages = pagination?.totalPages || 1;
+  const totalItems = pagination?.total || tournaments.length;
 
   return (
     <div className="space-y-8">
-      <TournamentsFilter numOfSize={numOfTournaments} />
+      <TournamentsFilter numOfSize={totalItems} />
 
       <Table
         t={t}

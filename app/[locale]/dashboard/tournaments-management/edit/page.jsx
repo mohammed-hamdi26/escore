@@ -1,22 +1,18 @@
-import { getCountries } from "@/app/[locale]/_Lib/countriesApi";
-import {
-  getNumOfTournaments,
-  getTournaments,
-} from "@/app/[locale]/_Lib/tournamentsApi";
+import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import TournamentsTable from "@/components/Tournaments Management/TournamentsTable";
 
 async function page({ searchParams }) {
-  const { size, page } = await searchParams;
-  const [{ data: tournaments, meta }, countries] = await Promise.all([
-    getTournaments({ size, page }),
-  ]);
+  const { size, page, search } = await searchParams;
+  const { data: tournaments, pagination } = await getTournaments({
+    size,
+    page,
+    search,
+  });
 
-  // const numOfTournaments = await getNumOfTournaments();
   return (
     <TournamentsTable
-      tournaments={tournaments}
-
-      // numOfTournaments={numOfTournaments}
+      tournaments={tournaments || []}
+      pagination={pagination}
     />
   );
 }

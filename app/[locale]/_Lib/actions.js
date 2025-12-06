@@ -21,23 +21,40 @@ export async function login(userData) {
 }
 export async function register(userData) {
   try {
-    await apiClient.post("/register", userData);
-  } catch (e) {
-    console.log(e.response);
-    throw new Error("Maybe Email already exists");
-  }
+    // Format the data for the backend
+    const registerData = {
+      email: userData.email,
+      password: userData.password,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+    };
 
-  redirect("/register/code-verification");
-}
-export async function verifyAccount(code) {
-  console.log("code", code);
-  try {
-    await apiClient.get(`/activate?key=${code}`);
+    // Add avatar if provided
+    if (userData.avatar) {
+      registerData.avatar = { light: userData.avatar };
+    }
+
+    await apiClient.post("/auth/register", registerData);
+    return { success: true };
   } catch (e) {
-    console.log(e.response);
-    throw new Error("Error in verify account");
+    console.log("Register error:", e.response?.data);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Registration failed. Email may already exist."
+    };
   }
-  redirect("/login");
+}
+export async function verifyAccount(email, otp) {
+  try {
+    await apiClient.post("/auth/verify-email", { email, otp });
+    return { success: true };
+  } catch (e) {
+    console.log("Verify error:", e.response?.data);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Invalid or expired code"
+    };
+  }
 }
 export async function logout() {
   await deleteSession();
