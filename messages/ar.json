@@ -815,7 +815,8 @@
     "Resending...": "جاري إعادة الإرسال...",
     "Resend Code": "إعادة إرسال الرمز",
     "Verifying...": "جاري التحقق...",
-    "Verify": "تأكيد"
+    "Verify": "تأكيد",
+    "privacyPolicy": "سياسة الخصوصية"
   },
   "SupportCenter": {
     "Answer": "الرد",

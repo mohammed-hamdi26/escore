@@ -55,7 +55,7 @@ function FormContainer() {
   });
 
   return (
-    <div className="flex flex-col-reverse gap-4 md:flex-row items-center justify-center w-full relative">
+    <div className="flex flex-col-reverse gap-4 md:flex-row items-center justify-between w-full relative">
       <div className="flex flex-col md:flex-row items-center gap-14">
         <h1 className="hidden md:block md:w-[400px] text-green-primary dark:text-white lg:w-[600px] text-6xl font-bold z-10">
           {t("Register to Go to Dashboard")}
