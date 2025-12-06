@@ -1184,6 +1184,22 @@
     "error": "حدث خطأ",
     "addNews": "إضافة خبر",
     "editNews": "تعديل الخبر",
-    "editing": "تعديل"
+    "editing": "تعديل",
+    "required": "مطلوب",
+    "optional": "اختياري",
+    "requiredFields": "الحقول المطلوبة",
+    "requiredFieldsNotice": "الحقول المميزة بـ * مطلوبة. يرجى ملء جميع الحقول المطلوبة قبل الإرسال.",
+    "validationErrors": "خطأ/أخطاء في التحقق",
+    "titleRequired": "العنوان مطلوب",
+    "titleTooLong": "لا يمكن أن يتجاوز العنوان 300 حرف",
+    "contentRequired": "المحتوى مطلوب",
+    "contentTooShort": "يجب أن يكون المحتوى 10 أحرف على الأقل",
+    "coverImageRequired": "صورة الغلاف مطلوبة",
+    "authorNameRequired": "اسم الكاتب مطلوب",
+    "authorNameTooLong": "لا يمكن أن يتجاوز اسم الكاتب 100 حرف",
+    "authorImageRequired": "صورة الكاتب مطلوبة",
+    "invalidUrl": "يرجى إدخال رابط صحيح",
+    "coverImage": "صورة الغلاف",
+    "externalLink": "رابط خارجي"
   }
 }

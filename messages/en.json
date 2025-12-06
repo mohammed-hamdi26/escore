@@ -1241,6 +1241,22 @@
     "error": "An error occurred",
     "addNews": "Add News",
     "editNews": "Edit News",
-    "editing": "Editing"
+    "editing": "Editing",
+    "required": "Required",
+    "optional": "Optional",
+    "requiredFields": "Required fields",
+    "requiredFieldsNotice": "Fields marked with * are required. Please fill in all required fields before submitting.",
+    "validationErrors": "validation error(s)",
+    "titleRequired": "Title is required",
+    "titleTooLong": "Title cannot exceed 300 characters",
+    "contentRequired": "Content is required",
+    "contentTooShort": "Content must be at least 10 characters",
+    "coverImageRequired": "Cover image is required",
+    "authorNameRequired": "Author name is required",
+    "authorNameTooLong": "Author name cannot exceed 100 characters",
+    "authorImageRequired": "Author image is required",
+    "invalidUrl": "Please enter a valid URL",
+    "coverImage": "Cover Image",
+    "externalLink": "External Link"
   }
 }
