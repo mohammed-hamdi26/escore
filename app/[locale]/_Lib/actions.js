@@ -708,15 +708,79 @@ export async function deleteTheme(theme_id) {
   }
 }
 
-export async function replayTicket(id, data) {
+// Add reply to ticket
+export async function addTicketReply(id, message) {
   const locale = await getLocale();
   try {
-    const res = apiClient.patch(`/support/tickets/${id}/replay`, data);
+    const res = await apiClient.post(`/support/tickets/${id}/reply`, { message });
     revalidatePath(`/${locale}/dashboard/support-center`);
-    // return res.data;
+    return { success: true, data: res.data?.data };
   } catch (error) {
-    console.log("Failed to get replay ticket", error);
-    throw error;
+    console.log("Failed to add reply:", error.response?.data);
+    return { success: false, error: error.response?.data?.message || "Failed to add reply" };
+  }
+}
+
+// Update ticket (status, priority, assignedTo)
+export async function updateTicket(id, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.patch(`/support/admin/tickets/${id}`, data);
+    revalidatePath(`/${locale}/dashboard/support-center`);
+    return { success: true, data: res.data?.data };
+  } catch (error) {
+    console.log("Failed to update ticket:", error.response?.data);
+    return { success: false, error: error.response?.data?.message || "Failed to update ticket" };
+  }
+}
+
+// Close ticket
+export async function closeTicket(id) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.patch(`/support/tickets/${id}/close`);
+    revalidatePath(`/${locale}/dashboard/support-center`);
+    return { success: true, data: res.data?.data };
+  } catch (error) {
+    console.log("Failed to close ticket:", error.response?.data);
+    return { success: false, error: error.response?.data?.message || "Failed to close ticket" };
+  }
+}
+
+// Reopen ticket
+export async function reopenTicket(id) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.patch(`/support/tickets/${id}/reopen`);
+    revalidatePath(`/${locale}/dashboard/support-center`);
+    return { success: true, data: res.data?.data };
+  } catch (error) {
+    console.log("Failed to reopen ticket:", error.response?.data);
+    return { success: false, error: error.response?.data?.message || "Failed to reopen ticket" };
+  }
+}
+
+// Delete ticket (admin only)
+export async function deleteSupportTicket(id) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(`/support/admin/tickets/${id}`);
+    revalidatePath(`/${locale}/dashboard/support-center`);
+    return { success: true };
+  } catch (error) {
+    console.log("Failed to delete ticket:", error.response?.data);
+    return { success: false, error: error.response?.data?.message || "Failed to delete ticket" };
+  }
+}
+
+// Get ticket by ID (for client components)
+export async function getTicketByIdAction(id) {
+  try {
+    const res = await apiClient.get(`/support/tickets/${id}`);
+    return { success: true, data: res.data?.data };
+  } catch (error) {
+    console.log("Failed to get ticket:", error.response?.data);
+    return { success: false, error: error.response?.data?.message || "Failed to get ticket" };
   }
 }
 

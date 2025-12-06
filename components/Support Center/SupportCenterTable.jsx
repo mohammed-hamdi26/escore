@@ -1,67 +1,155 @@
 "use client";
+import { useState } from "react";
 import { format } from "date-fns";
-import AnswerBox from "../ui app/AnswerBox";
-import Model from "../ui app/Model";
-import Table from "../ui app/Table";
+import { Eye, Trash2, MessageSquare } from "lucide-react";
 import { Button } from "../ui/button";
-import imagePerson from "../../public/images/dashboard/avatar.jpg";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { StatusBadge, PriorityBadge, CategoryBadge } from "./TicketBadges";
+import TicketDetailsModal from "./TicketDetailsModal";
+import Pagination from "../ui app/Pagination";
+import { deleteSupportTicket } from "@/app/[locale]/_Lib/actions";
+import toast from "react-hot-toast";
 
-function SupportCenterTable({ tickets }) {
+export default function SupportTicketsTable({ tickets, pagination }) {
   const t = useTranslations("SupportCenter");
-  return (
-    <div>
-      <Table
-        columns={[
-          { id: "date", header: t("Date") },
-          { id: "email", header: t("Email") },
-          { id: "description", header: t("Description") },
-          { id: "status", header: t("Status") },
-        ]}
-        // showHeader={false}
-        grid_cols="grid-cols-[0.5fr_0.9fr_0.7fr_0.5fr_2fr]"
-      >
-        {tickets.map((ticket) => (
-          <Table.Row
-            key={ticket.id}
-            grid_cols="grid-cols-[0.5fr_0.5fr_0.7fr_0.5fr_2fr]"
-          >
-            <Table.Cell>{format(ticket.createdAt, "yyyy-MM-dd")}</Table.Cell>
+  const [selectedTicketId, setSelectedTicketId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
-            <Table.Cell className="flex gap-2 items-center">
-              {/* <Image
-                src={imagePerson}
-                width={30}
-                height={30}
-                alt=""
-                className="rounded-full"
-              />{" "} */}
-              {ticket?.email}
-            </Table.Cell>
-            <Table.Cell>{ticket.description}</Table.Cell>
-            <Table.Cell>{ticket.status}</Table.Cell>
-            <Table.Cell className="flex gap-4 justify-end">
-              <Model>
-                <Model.Open name={"answer"}>
-                  <Button
-                    className={
-                      "bg-green-primary text-white rounded-full min-w-[100px] cursor-pointer hover:bg-green-primary/70"
-                    }
+  const numPages = pagination?.totalPages || 1;
+
+  const handleDelete = async (id) => {
+    if (!confirm(t("Are you sure you want to delete this ticket?"))) return;
+
+    setDeletingId(id);
+    const result = await deleteSupportTicket(id);
+    if (result.success) {
+      toast.success(t("Ticket deleted successfully"));
+    } else {
+      toast.error(result.error || t("Failed to delete ticket"));
+    }
+    setDeletingId(null);
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Table */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 dark:bg-gray-900">
+              <tr>
+                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
+                  {t("Ticket")}
+                </th>
+                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
+                  {t("User")}
+                </th>
+                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
+                  {t("Category")}
+                </th>
+                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
+                  {t("Status")}
+                </th>
+                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
+                  {t("Priority")}
+                </th>
+                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
+                  {t("Date")}
+                </th>
+                <th className="px-4 py-3 text-end text-sm font-medium text-gray-600 dark:text-gray-300">
+                  {t("Actions")}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+              {tickets.length > 0 ? (
+                tickets.map((ticket) => (
+                  <tr
+                    key={ticket.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                   >
-                    {t("Answer")}
-                  </Button>
-                </Model.Open>
-                <Model.Window openName={"answer"}>
-                  <AnswerBox t={t} ticket={ticket} />
-                </Model.Window>
-              </Model>
-            </Table.Cell>
-          </Table.Row>
-        ))}
-      </Table>
+                    <td className="px-4 py-3">
+                      <div className="space-y-1">
+                        <p className="font-medium text-gray-900 dark:text-white text-sm">
+                          {ticket.ticketNumber}
+                        </p>
+                        <p className="text-gray-600 dark:text-gray-400 text-xs line-clamp-1 max-w-[200px]">
+                          {ticket.subject}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="text-sm text-gray-900 dark:text-white">
+                        {ticket.user?.email || "-"}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <CategoryBadge category={ticket.category} t={t} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={ticket.status} t={t} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <PriorityBadge priority={ticket.priority} t={t} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        {format(new Date(ticket.createdAt), "yyyy-MM-dd")}
+                        <div className="text-xs text-gray-500">
+                          {format(new Date(ticket.createdAt), "HH:mm")}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedTicketId(ticket.id)}
+                          className="flex items-center gap-1"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span className="hidden md:inline">{t("View")}</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDelete(ticket.id)}
+                          disabled={deletingId === ticket.id}
+                          className="flex items-center gap-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="px-4 py-12 text-center">
+                    <MessageSquare className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
+                    <p className="text-gray-500 dark:text-gray-400">
+                      {t("No tickets found")}
+                    </p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Pagination */}
+      {numPages > 1 && <Pagination numPages={numPages} />}
+
+      {/* Ticket Details Modal */}
+      {selectedTicketId && (
+        <TicketDetailsModal
+          ticketId={selectedTicketId}
+          onClose={() => setSelectedTicketId(null)}
+          t={t}
+        />
+      )}
     </div>
   );
 }
-
-export default SupportCenterTable;
