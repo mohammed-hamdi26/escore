@@ -5,13 +5,11 @@ import { Link } from "@/i18n/navigation";
 import { format } from "date-fns";
 import {
   Star,
-  Pin,
   Eye,
   Clock,
   Edit,
   Trash2,
   Send,
-  SendHorizontal,
   MoreVertical,
   ExternalLink,
   User,
@@ -29,31 +27,10 @@ import {
 import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
 
-const CATEGORY_COLORS = {
-  news: "bg-blue-500/20 text-blue-400",
-  announcement: "bg-orange-500/20 text-orange-400",
-  interview: "bg-purple-500/20 text-purple-400",
-  analysis: "bg-cyan-500/20 text-cyan-400",
-  guide: "bg-green-500/20 text-green-400",
-  review: "bg-pink-500/20 text-pink-400",
-  opinion: "bg-yellow-500/20 text-yellow-400",
-};
-
-const CATEGORY_LABELS = {
-  news: { en: "News", ar: "أخبار" },
-  announcement: { en: "Announcement", ar: "إعلان" },
-  interview: { en: "Interview", ar: "مقابلة" },
-  analysis: { en: "Analysis", ar: "تحليل" },
-  guide: { en: "Guide", ar: "دليل" },
-  review: { en: "Review", ar: "مراجعة" },
-  opinion: { en: "Opinion", ar: "رأي" },
-};
-
 function NewsCard({
   news,
   onDelete,
   onToggleFeatured,
-  onTogglePinned,
   onPublish,
   onUnpublish,
   t,
@@ -96,21 +73,15 @@ function NewsCard({
               <span className="text-4xl text-[#677185]">📰</span>
             </div>
           )}
-          {/* Status Badges */}
-          <div className="absolute top-2 left-2 flex gap-1">
-            {news.isPinned && (
-              <Badge className="bg-purple-600 text-white text-xs">
-                <Pin className="size-3 mr-1" />
-                {t("pinned")}
-              </Badge>
-            )}
-            {news.isFeatured && (
+          {/* Featured Badge */}
+          {news.isFeatured && (
+            <div className="absolute top-2 left-2">
               <Badge className="bg-yellow-600 text-white text-xs">
                 <Star className="size-3 mr-1" />
                 {t("featured")}
               </Badge>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -118,15 +89,8 @@ function NewsCard({
           {/* Header */}
           <div className="flex items-start justify-between gap-4 mb-2">
             <div className="flex-1">
-              {/* Category & Game */}
+              {/* Game & Status */}
               <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <Badge
-                  className={`${
-                    CATEGORY_COLORS[news.category] || CATEGORY_COLORS.news
-                  } text-xs`}
-                >
-                  {CATEGORY_LABELS[news.category]?.[locale] || news.category}
-                </Badge>
                 {news.game && (
                   <Badge variant="outline" className="text-xs border-[#677185] text-[#677185]">
                     {news.game.name}
@@ -140,16 +104,9 @@ function NewsCard({
               </div>
 
               {/* Title */}
-              <h3 className="text-lg font-semibold text-white line-clamp-2 mb-2">
+              <h3 className="text-lg font-semibold text-white line-clamp-2">
                 {news.title}
               </h3>
-
-              {/* Excerpt */}
-              {news.excerpt && (
-                <p className="text-sm text-[#677185] line-clamp-2 mb-3">
-                  {news.excerpt}
-                </p>
-              )}
             </div>
 
             {/* Actions Dropdown */}
@@ -221,19 +178,6 @@ function NewsCard({
                   {news.isFeatured ? t("removeFeatured") : t("makeFeatured")}
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => handleAction(() => onTogglePinned(news.id), "togglePinned")}
-                  disabled={loadingAction === "togglePinned"}
-                >
-                  <Pin
-                    className={`size-4 mr-2 ${
-                      news.isPinned ? "fill-purple-500 text-purple-500" : ""
-                    }`}
-                  />
-                  {news.isPinned ? t("unpin") : t("pin")}
-                </DropdownMenuItem>
-
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
@@ -282,29 +226,6 @@ function NewsCard({
               </div>
             )}
           </div>
-
-          {/* Tags */}
-          {news.tags && news.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-3">
-              {news.tags.slice(0, 5).map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="outline"
-                  className="text-xs border-[#677185]/30 text-[#677185]"
-                >
-                  #{tag}
-                </Badge>
-              ))}
-              {news.tags.length > 5 && (
-                <Badge
-                  variant="outline"
-                  className="text-xs border-[#677185]/30 text-[#677185]"
-                >
-                  +{news.tags.length - 5}
-                </Badge>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>

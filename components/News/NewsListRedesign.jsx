@@ -2,15 +2,13 @@
 import { useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { Plus, RefreshCw } from "lucide-react";
+import { Plus, RefreshCw, Search } from "lucide-react";
 import { Button } from "../ui/button";
-import NewsStats from "./NewsStats";
-import NewsFilters from "./NewsFilters";
+import { Input } from "../ui/input";
 import NewsCard from "./NewsCard";
 import Pagination from "../ui app/Pagination";
 import {
   toggleNewsFeatured,
-  toggleNewsPinned,
   publishNews,
   unpublishNews,
 } from "@/app/[locale]/_Lib/newsApi";
@@ -19,8 +17,6 @@ import { deleteNew } from "@/app/[locale]/_Lib/actions";
 function NewsListRedesign({
   news,
   pagination,
-  stats,
-  gamesOptions = [],
   locale = "en",
 }) {
   const t = useTranslations("news");
@@ -42,11 +38,6 @@ function NewsListRedesign({
 
   const handleToggleFeatured = async (id) => {
     await toggleNewsFeatured(id);
-    handleRefresh();
-  };
-
-  const handleTogglePinned = async (id) => {
-    await toggleNewsPinned(id);
     handleRefresh();
   };
 
@@ -88,11 +79,14 @@ function NewsListRedesign({
         </div>
       </div>
 
-      {/* Stats */}
-      <NewsStats stats={stats} t={t} />
-
-      {/* Filters */}
-      <NewsFilters gamesOptions={gamesOptions} t={t} locale={locale} />
+      {/* Simple Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#677185]" />
+        <Input
+          placeholder={t("searchPlaceholder")}
+          className="pl-10 bg-dashboard-box dark:bg-[#0F1017] border-0 text-white placeholder:text-[#677185]"
+        />
+      </div>
 
       {/* News List */}
       <div className="space-y-4">
@@ -118,7 +112,6 @@ function NewsListRedesign({
               news={item}
               onDelete={handleDelete}
               onToggleFeatured={handleToggleFeatured}
-              onTogglePinned={handleTogglePinned}
               onPublish={handlePublish}
               onUnpublish={handleUnpublish}
               t={t}

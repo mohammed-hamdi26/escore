@@ -7,22 +7,17 @@ import {
   Image as ImageIcon,
   User,
   Calendar,
-  Tag,
   Gamepad2,
   Trophy,
   Users,
   Swords,
   Star,
-  Pin,
   ArrowLeft,
   Save,
   Plus,
-  Eye,
-  EyeOff,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 import FileInput from "../ui app/FileInput";
@@ -36,8 +31,6 @@ import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
-import { Textarea } from "../ui/textarea";
-import { Badge } from "../ui/badge";
 
 
 const validationSchema = yup.object({
@@ -46,7 +39,6 @@ const validationSchema = yup.object({
     .required("titleRequired")
     .max(300, "titleTooLong"),
   content: yup.string().required("contentRequired"),
-  excerpt: yup.string().max(500, "excerptTooLong"),
   coverImageLight: yup.string(),
   coverImageDark: yup.string(),
   authorName: yup.string().max(100, "authorNameTooLong"),
@@ -59,7 +51,6 @@ const validationSchema = yup.object({
   match: yup.string().nullable(),
   publishedAt: yup.date().nullable(),
   isFeatured: yup.boolean(),
-  isPinned: yup.boolean(),
 });
 
 
@@ -78,12 +69,10 @@ function NewsFormRedesign({
 }) {
   const t = useTranslations("newsForm");
   const router = useRouter();
-  const [previewMode, setPreviewMode] = useState(false);
 
   const formik = useFormik({
     initialValues: {
       title: newData?.title || "",
-      excerpt: newData?.excerpt || "",
       content: newData?.content || "",
       coverImageLight: newData?.coverImage?.light || "",
       coverImageDark: newData?.coverImage?.dark || "",
@@ -97,7 +86,6 @@ function NewsFormRedesign({
       match: newData?.match?.id || "",
       publishedAt: newData?.publishedAt ? new Date(newData.publishedAt) : null,
       isFeatured: newData?.isFeatured || false,
-      isPinned: newData?.isPinned || false,
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -105,7 +93,6 @@ function NewsFormRedesign({
         const dataValues = {
           ...(newData ? { id: newData.id } : {}),
           title: values.title,
-          excerpt: values.excerpt || undefined,
           content: values.content,
           coverImage: {
             light: values.coverImageLight || undefined,
@@ -123,7 +110,6 @@ function NewsFormRedesign({
           match: values.match || null,
           publishedAt: values.publishedAt || new Date().toISOString(),
           isFeatured: values.isFeatured,
-          isPinned: values.isPinned,
         };
 
         await submit(dataValues);
@@ -162,30 +148,31 @@ function NewsFormRedesign({
             <ArrowLeft className="size-5" />
           </Button>
           <div>
-            <h1 className="text-xl font-bold text-white">
-              {formType === "add" ? t("addNews") : t("editNews")}
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold text-white">
+                {formType === "add" ? t("addNews") : t("editNews")}
+              </h1>
+              {/* Featured Switch in Header */}
+              <div className="flex items-center gap-2 px-3 py-1 bg-[#1a1f2e] rounded-lg">
+                <Switch
+                  id="isFeaturedHeader"
+                  checked={formik.values.isFeatured}
+                  onCheckedChange={(checked) => formik.setFieldValue("isFeatured", checked)}
+                />
+                <Label htmlFor="isFeaturedHeader" className="flex items-center gap-1 cursor-pointer text-sm">
+                  <Star className={`size-4 ${formik.values.isFeatured ? "fill-yellow-500 text-yellow-500" : "text-[#677185]"}`} />
+                  <span className={formik.values.isFeatured ? "text-yellow-500" : "text-[#677185]"}>
+                    {t("featured")}
+                  </span>
+                </Label>
+              </div>
+            </div>
             {newData && (
-              <p className="text-sm text-[#677185]">
+              <p className="text-sm text-[#677185] mt-1">
                 {t("editing")}: {newData.title?.substring(0, 50)}...
               </p>
             )}
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Status indicators */}
-          {formik.values.isFeatured && (
-            <Badge className="bg-yellow-600 text-white">
-              <Star className="size-3 mr-1 fill-white" />
-              {t("featured")}
-            </Badge>
-          )}
-          {formik.values.isPinned && (
-            <Badge className="bg-purple-600 text-white">
-              <Pin className="size-3 mr-1 fill-white" />
-              {t("pinned")}
-            </Badge>
-          )}
         </div>
       </div>
 
@@ -205,27 +192,6 @@ function NewsFormRedesign({
             textColor="text-[#677185]"
             error={formik.touched.title && formik.errors.title && t(formik.errors.title)}
           />
-        </FormRow>
-
-        <FormRow>
-          <div className="flex-1 space-y-2">
-            <Label className="text-[#677185] dark:text-white">{t("excerpt")}</Label>
-            <Textarea
-              name="excerpt"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.excerpt}
-              placeholder={t("excerptPlaceholder")}
-              className="bg-dashboard-box dark:bg-[#0F1017] border-0 text-white placeholder:text-[#677185] min-h-[80px] resize-none"
-              maxLength={500}
-            />
-            <div className="flex justify-between text-xs text-[#677185]">
-              {formik.touched.excerpt && formik.errors.excerpt && (
-                <span className="text-red-500">{t(formik.errors.excerpt)}</span>
-              )}
-              <span className="ml-auto">{formik.values.excerpt.length}/500</span>
-            </div>
-          </div>
         </FormRow>
 
         <FormRow>
@@ -273,38 +239,7 @@ function NewsFormRedesign({
         </FormRow>
       </FormSection>
 
-        {/* Section 3: Classification */}
-        <FormSection title={t("classification")} icon={<Tag className="size-5" />}>
-          <FormRow>
-            <div className="flex items-center gap-8 p-4 bg-dashboard-box dark:bg-[#1a1f2e] rounded-lg">
-              <div className="flex items-center gap-3">
-                <Switch
-                  id="isFeatured"
-                  checked={formik.values.isFeatured}
-                  onCheckedChange={(checked) => formik.setFieldValue("isFeatured", checked)}
-                />
-                <Label htmlFor="isFeatured" className="flex items-center gap-2 cursor-pointer text-white">
-                  <Star className={`size-4 ${formik.values.isFeatured ? "fill-yellow-500 text-yellow-500" : "text-[#677185]"}`} />
-                  {t("featured")}
-                </Label>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Switch
-                  id="isPinned"
-                  checked={formik.values.isPinned}
-                  onCheckedChange={(checked) => formik.setFieldValue("isPinned", checked)}
-                />
-                <Label htmlFor="isPinned" className="flex items-center gap-2 cursor-pointer text-white">
-                  <Pin className={`size-4 ${formik.values.isPinned ? "fill-purple-500 text-purple-500" : "text-[#677185]"}`} />
-                  {t("pinned")}
-                </Label>
-              </div>
-            </div>
-          </FormRow>
-        </FormSection>
-
-        {/* Section 4: Author */}
+        {/* Section 3: Author */}
         <FormSection title={t("authorInfo")} icon={<User className="size-5" />}>
           <FormRow>
             <InputApp
@@ -329,7 +264,7 @@ function NewsFormRedesign({
           </FormRow>
         </FormSection>
 
-        {/* Section 5: Related Entities */}
+        {/* Section 4: Related Entities */}
         <FormSection title={t("relatedEntities")} icon={<Gamepad2 className="size-5" />}>
           <FormRow>
             <SelectInput
@@ -393,7 +328,7 @@ function NewsFormRedesign({
           </FormRow>
         </FormSection>
 
-        {/* Section 6: Publishing */}
+        {/* Section 5: Publishing */}
         <FormSection title={t("publishing")} icon={<Calendar className="size-5" />}>
           <FormRow>
             <DatePicker
