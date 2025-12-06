@@ -896,6 +896,17 @@ export async function deleteFavoriteCharacter(typeEdit, id, characterId) {
   }
 }
 export async function addLinks(typeEdit, id, data) {}
+
+// notifications
+export async function sendNotificationAction(data) {
+  try {
+    const res = await apiClient.post("/admin/notifications/send", data);
+    return res.data;
+  } catch (e) {
+    console.log(e.response?.data || e);
+    throw new Error(e.response?.data?.message || "Failed to send notification");
+  }
+}
 export async function editLinks(typeEdit, id, data) {
   const locale = await getLocale();
   console.log(typeEdit, id, data);

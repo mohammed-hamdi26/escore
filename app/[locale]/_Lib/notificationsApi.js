@@ -93,3 +93,20 @@ export async function getUsersForFilter() {
     return [];
   }
 }
+
+/**
+ * Send notification (server-side action)
+ * @param {Object} data - Notification data
+ * @param {Object} data.target - Target { type, topic?, userIds?, filters? }
+ * @param {Object} data.notification - { title, body, imageUrl?, data? }
+ * @param {Object} data.options - { priority?, ttl?, dryRun? }
+ */
+export async function sendNotification(data) {
+  try {
+    const res = await apiClient.post("/admin/notifications/send", data);
+    return res.data;
+  } catch (e) {
+    console.error("Failed to send notification:", e);
+    throw new Error(e.response?.data?.message || "Failed to send notification");
+  }
+}

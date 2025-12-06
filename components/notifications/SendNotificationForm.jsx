@@ -5,13 +5,7 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { Send, Users, Radio, UserCheck, Filter, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import clientApi from "@/app/[locale]/_Lib/clientApi";
-
-// Client-side send notification function
-async function sendNotification(data) {
-  const res = await clientApi.post("/admin/notifications/send", data);
-  return res.data;
-}
+import { sendNotificationAction } from "@/app/[locale]/_Lib/actions";
 
 const targetTypes = [
   { id: "all", label: "All Users", icon: Users, description: "Send to all registered users" },
@@ -114,7 +108,7 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
         },
       };
 
-      const response = await sendNotification(data);
+      const response = await sendNotificationAction(data);
       setResult(response.data);
       // resetForm();
     } catch (e) {
