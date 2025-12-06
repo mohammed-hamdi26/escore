@@ -308,6 +308,62 @@ export async function deleteMatch(id) {
   }
 }
 
+// Start a match (scheduled -> live)
+export async function startMatch(id) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.patch(`/matches/${id}/start`);
+    revalidatePath(`/${locale}/dashboard/matches-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log("Error starting match:", e.response?.data);
+    throw new Error(e.response?.data?.message || "Error starting match");
+  }
+}
+
+// End a match with result
+export async function endMatch(id, result) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.patch(`/matches/${id}/end`, result);
+    revalidatePath(`/${locale}/dashboard/matches-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log("Error ending match:", e.response?.data);
+    throw new Error(e.response?.data?.message || "Error ending match");
+  }
+}
+
+// Update match status
+export async function updateMatchStatus(id, status) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.patch(`/matches/${id}/status`, { status });
+    revalidatePath(`/${locale}/dashboard/matches-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log("Error updating match status:", e.response?.data);
+    throw new Error(e.response?.data?.message || "Error updating match status");
+  }
+}
+
+// Toggle featured status
+export async function toggleMatchFeatured(id) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.patch(`/matches/${id}/toggle-featured`);
+    revalidatePath(`/${locale}/dashboard/matches-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log("Error toggling featured:", e.response?.data);
+    throw new Error(e.response?.data?.message || "Error toggling featured status");
+  }
+}
+
 export async function addLink(linkData) {
   const locale = await getLocale();
   try {

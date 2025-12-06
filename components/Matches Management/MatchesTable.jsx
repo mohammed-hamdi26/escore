@@ -5,141 +5,343 @@ import Table from "../ui app/Table";
 import FilterMatches from "./FilterMatches";
 import { Button } from "../ui/button";
 import { useState } from "react";
-import { deleteMatch } from "@/app/[locale]/_Lib/actions";
+import {
+  deleteMatch,
+  startMatch,
+  updateMatchStatus,
+  toggleMatchFeatured,
+} from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
-import { getNumPages } from "@/app/[locale]/_Lib/helps";
 import { useTranslations } from "next-intl";
-import DropMenu from "../ui app/DropMenu";
-import { EllipsisVertical, Link2 } from "lucide-react";
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import TeamLineup from "./TeamLineup";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import {
+  EllipsisVertical,
+  Play,
+  Square,
+  Star,
+  StarOff,
+  Clock,
+  XCircle,
+  CheckCircle,
+} from "lucide-react";
 import { format } from "date-fns";
+import { Badge } from "../ui/badge";
 
-function MatchesTable({ matches, columns, players }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const searchParams = useSearchParams();
-  // const numPages = getNumPages(numOfMatches, Number(searchParams.get("size")));
-  const t = useTranslations("MatchesTable");
-
-  const [dialogType, setDialogType] = useState(null); // هنا بنحفظ نوع المحتوى
-
-  const openDialog = (type) => {
-    setDialogType(type);
-    setOpen(true);
+// Status badge component
+function StatusBadge({ status }) {
+  const statusConfig = {
+    scheduled: {
+      label: "Scheduled",
+      className: "bg-blue-500/20 text-blue-500 border-blue-500/30",
+      icon: Clock,
+    },
+    live: {
+      label: "LIVE",
+      className: "bg-red-500/20 text-red-500 border-red-500/30 animate-pulse",
+      icon: Play,
+    },
+    completed: {
+      label: "Completed",
+      className: "bg-green-500/20 text-green-500 border-green-500/30",
+      icon: CheckCircle,
+    },
+    postponed: {
+      label: "Postponed",
+      className: "bg-yellow-500/20 text-yellow-500 border-yellow-500/30",
+      icon: Clock,
+    },
+    cancelled: {
+      label: "Cancelled",
+      className: "bg-gray-500/20 text-gray-500 border-gray-500/30",
+      icon: XCircle,
+    },
   };
 
+  const config = statusConfig[status] || statusConfig.scheduled;
+  const Icon = config.icon;
+
   return (
-    <div className="space-y-8">
-      {/* <FilterMatches /> */}
+    <Badge
+      variant="outline"
+      className={`${config.className} flex items-center gap-1 px-2 py-1`}
+    >
+      <Icon className="w-3 h-3" />
+      {config.label}
+    </Badge>
+  );
+}
+
+function MatchesTable({ matches, columns, players, pagination }) {
+  const [loadingId, setLoadingId] = useState(null);
+  const searchParams = useSearchParams();
+  const t = useTranslations("MatchesTable");
+
+  // Handle start match
+  const handleStartMatch = async (matchId) => {
+    try {
+      setLoadingId(matchId);
+      await startMatch(matchId);
+      toast.success(t("Match started successfully"));
+    } catch (e) {
+      toast.error(e.message || t("Error starting match"));
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  // Handle update status
+  const handleUpdateStatus = async (matchId, status) => {
+    try {
+      setLoadingId(matchId);
+      await updateMatchStatus(matchId, status);
+      toast.success(t("Status updated successfully"));
+    } catch (e) {
+      toast.error(e.message || t("Error updating status"));
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  // Handle toggle featured
+  const handleToggleFeatured = async (matchId) => {
+    try {
+      setLoadingId(matchId);
+      await toggleMatchFeatured(matchId);
+      toast.success(t("Featured status toggled"));
+    } catch (e) {
+      toast.error(e.message || t("Error toggling featured"));
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  // Handle delete
+  const handleDelete = async (matchId) => {
+    if (!confirm(t("Are you sure you want to delete this match?"))) return;
+    try {
+      setLoadingId(matchId);
+      await deleteMatch(matchId);
+      toast.success(t("The Match is Deleted"));
+    } catch (e) {
+      toast.error(t("error in Delete"));
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  // Calculate number of pages
+  const numPages = pagination?.pages || 1;
+
+  return (
+    <div className="space-y-6">
+      {/* Filter section */}
+      <FilterMatches />
+
+      {/* Table */}
       <Table
         t={t}
-        grid_cols="grid-cols-[0.7fr_0.7fr_0.5fr_0.5fr_2fr]"
+        grid_cols="grid-cols-[1fr_1fr_0.6fr_0.5fr_0.6fr_1.5fr]"
         columns={[...columns]}
       >
         {matches?.map((match) => (
           <Table.Row
-            grid_cols={"grid-cols-[0.7fr_0.7fr_0.5fr_0.5fr_2fr]"}
+            grid_cols="grid-cols-[1fr_1fr_0.6fr_0.5fr_0.6fr_1.5fr]"
             key={match.id}
           >
-            <Table.Cell className="flex gap-4 items-center">
+            {/* Team 1 */}
+            <Table.Cell className="flex gap-3 items-center">
               {match?.team1?.logo?.light && (
-                <img width={30} src={match?.team1?.logo?.light} alt="" />
-              )}{" "}
-              {match?.team1?.name}
+                <img
+                  width={28}
+                  height={28}
+                  src={match?.team1?.logo?.light}
+                  alt={match?.team1?.name}
+                  className="rounded"
+                />
+              )}
+              <span className="truncate">{match?.team1?.name}</span>
+              {match?.result && (
+                <span className="text-sm font-bold text-green-primary">
+                  {match.result.team1Score}
+                </span>
+              )}
             </Table.Cell>
-            <Table.Cell className="flex gap-4 items-center">
-              {match?.team2?.logo && (
-                <img width={30} src={match?.team2?.logo.light} alt="" />
-              )}{" "}
-              {match?.team2?.name}
+
+            {/* Team 2 */}
+            <Table.Cell className="flex gap-3 items-center">
+              {match?.team2?.logo?.light && (
+                <img
+                  width={28}
+                  height={28}
+                  src={match?.team2?.logo?.light}
+                  alt={match?.team2?.name}
+                  className="rounded"
+                />
+              )}
+              <span className="truncate">{match?.team2?.name}</span>
+              {match?.result && (
+                <span className="text-sm font-bold text-green-primary">
+                  {match.result.team2Score}
+                </span>
+              )}
             </Table.Cell>
-            <Table.Cell>{match?.round}</Table.Cell>
+
+            {/* Status */}
             <Table.Cell>
-              {format(match?.scheduledDate, "yyyy-MM-dd")}
+              <StatusBadge status={match?.status} />
             </Table.Cell>
-            <Table.Cell className="flex gap-4 justify-end">
+
+            {/* Round */}
+            <Table.Cell className="text-sm text-gray-400">
+              {match?.round || "-"}
+            </Table.Cell>
+
+            {/* Date */}
+            <Table.Cell className="text-sm">
+              {match?.scheduledDate
+                ? format(new Date(match.scheduledDate), "MMM dd, HH:mm")
+                : "-"}
+            </Table.Cell>
+
+            {/* Actions */}
+            <Table.Cell className="flex gap-2 justify-end items-center">
+              {/* Featured indicator */}
+              {match?.isFeatured && (
+                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+              )}
+
+              {/* Edit Button */}
               <Link href={`/dashboard/matches-management/edit/${match.id}`}>
                 <Button
-                  className={
-                    "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
-                  }
+                  size="sm"
+                  className="text-white bg-green-primary rounded-full px-4 cursor-pointer hover:bg-green-primary/80"
                 >
-                  {t("Edit")}{" "}
+                  {t("Edit")}
                 </Button>
               </Link>
-              <Button
-                disabled={isLoading}
-                className={
-                  "text-white bg-[#3A469D] rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
-                }
-                onClick={async () => {
-                  try {
-                    setIsLoading(true);
-                    await deleteMatch(match.id);
-                    toast.success(t("The Match is Deleted"));
-                  } catch (e) {
-                    toast.error(t("error in Delete"));
-                  } finally {
-                    setIsLoading(false);
-                  }
-                }}
-              >
-                {t("Delete")}
-              </Button>
-              {/* <DropMenu
-                  menuTrigger={<EllipsisVertical />}
-                  menuContent={[
-                    {
-                      id: "1",
-                      menuItem: (
-                        <DialogTrigger
-                          onClick={() => openDialog("team1")}
-                          asChild
-                        >
-                          <button dir="rtl">
-                            {`${t("Add Lineup For")} ${match?.team1?.name}`}
-                          </button>
-                        </DialogTrigger>
-                      ),
-                    },
-                    {
-                      id: "2",
-                      menuItem: (
-                        <DialogTrigger
-                          onClick={() => openDialog("team2")}
-                          asChild
-                        >
-                          <button dir="rtl">
-                            {`${t("Add Lineup For")} ${match?.teams2?.name}`}
-                          </button>
-                        </DialogTrigger>
-                      ),
-                    },
-                  ]}
-                />
-                <DialogContent>
-                  <TeamLineup
-                    dialogType={dialogType}
-                    players={players}
-                    t={t}
-                    title={`${t("Add Lineup For")} `}
-                    match={match}
-                    setOpen={setOpen}
-                  />
-                </DialogContent>
-              </Dialog> */}
+
+              {/* Quick Actions Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    disabled={loadingId === match.id}
+                  >
+                    <EllipsisVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {/* Start Match - only for scheduled */}
+                  {match?.status === "scheduled" && (
+                    <DropdownMenuItem
+                      onClick={() => handleStartMatch(match.id)}
+                      className="cursor-pointer"
+                    >
+                      <Play className="w-4 h-4 mr-2 text-green-500" />
+                      {t("Start Match")}
+                    </DropdownMenuItem>
+                  )}
+
+                  {/* End Match - only for live */}
+                  {match?.status === "live" && (
+                    <DropdownMenuItem
+                      onClick={() => handleUpdateStatus(match.id, "completed")}
+                      className="cursor-pointer"
+                    >
+                      <Square className="w-4 h-4 mr-2 text-red-500" />
+                      {t("End Match")}
+                    </DropdownMenuItem>
+                  )}
+
+                  {/* Status changes */}
+                  <DropdownMenuSeparator />
+
+                  {match?.status !== "postponed" && (
+                    <DropdownMenuItem
+                      onClick={() => handleUpdateStatus(match.id, "postponed")}
+                      className="cursor-pointer"
+                    >
+                      <Clock className="w-4 h-4 mr-2 text-yellow-500" />
+                      {t("Postpone")}
+                    </DropdownMenuItem>
+                  )}
+
+                  {match?.status !== "cancelled" && (
+                    <DropdownMenuItem
+                      onClick={() => handleUpdateStatus(match.id, "cancelled")}
+                      className="cursor-pointer"
+                    >
+                      <XCircle className="w-4 h-4 mr-2 text-gray-500" />
+                      {t("Cancel")}
+                    </DropdownMenuItem>
+                  )}
+
+                  {(match?.status === "postponed" ||
+                    match?.status === "cancelled") && (
+                    <DropdownMenuItem
+                      onClick={() => handleUpdateStatus(match.id, "scheduled")}
+                      className="cursor-pointer"
+                    >
+                      <Clock className="w-4 h-4 mr-2 text-blue-500" />
+                      {t("Reschedule")}
+                    </DropdownMenuItem>
+                  )}
+
+                  <DropdownMenuSeparator />
+
+                  {/* Toggle Featured */}
+                  <DropdownMenuItem
+                    onClick={() => handleToggleFeatured(match.id)}
+                    className="cursor-pointer"
+                  >
+                    {match?.isFeatured ? (
+                      <>
+                        <StarOff className="w-4 h-4 mr-2 text-yellow-500" />
+                        {t("Remove Featured")}
+                      </>
+                    ) : (
+                      <>
+                        <Star className="w-4 h-4 mr-2 text-yellow-500" />
+                        {t("Mark Featured")}
+                      </>
+                    )}
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+
+                  {/* Delete */}
+                  <DropdownMenuItem
+                    onClick={() => handleDelete(match.id)}
+                    className="cursor-pointer text-red-500 focus:text-red-500"
+                  >
+                    <XCircle className="w-4 h-4 mr-2" />
+                    {t("Delete")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </Table.Cell>
           </Table.Row>
         ))}
       </Table>
-      {/* <Pagination /> */}
+
+      {/* Pagination */}
+      {numPages > 1 && <Pagination numPages={numPages} />}
+
+      {/* Empty state */}
+      {(!matches || matches.length === 0) && (
+        <div className="text-center py-10 text-gray-400">
+          {t("No matches found")}
+        </div>
+      )}
     </div>
   );
 }
