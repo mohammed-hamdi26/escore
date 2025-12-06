@@ -833,17 +833,30 @@ export async function addUser(data) {
 
 export async function editUser(data) {
   const locale = await getLocale();
-  console.log(data);
   try {
-    const res = await apiClient.patch(`/admin/users/${data.id}`, data);
-    console.log(res.data.data, "response");
-    // return res.data;
+    // Update user basic info (role, isVerified)
+    const userUpdateData = {};
+    if (data.role) userUpdateData.role = data.role;
+    if (data.isVerified !== undefined) userUpdateData.isVerified = data.isVerified;
+
+    if (Object.keys(userUpdateData).length > 0) {
+      await apiClient.patch(`/admin/users/${data.id}`, userUpdateData);
+    }
+
+    // Update permissions if they exist
+    if (data.permissions && Array.isArray(data.permissions)) {
+      await apiClient.put(`/admin/users/${data.id}/permissions`, {
+        permissions: data.permissions,
+      });
+    }
+
+    revalidatePath(`/${locale}/dashboard/users`);
+    revalidatePath(`/${locale}/dashboard/users/${data.id}/edit`);
   } catch (error) {
-    console.log(error.response.data.errors || error.response.data || error);
+    console.log(error.response?.data?.errors || error.response?.data || error);
     console.log("Failed to edit user", error);
     throw error;
   }
-  // redirect(`/${locale}/dashboard/users`);
 }
 export async function deleteUser(id) {
   const locale = await getLocale();

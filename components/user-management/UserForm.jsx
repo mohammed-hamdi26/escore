@@ -32,12 +32,22 @@ import {
   Trash2,
   Save,
   UserPlus,
+  CheckCircle,
+  UserCog,
+  Swords,
 } from "lucide-react";
 
 const validationSchema = yup.object({
   firstName: yup.string().required("Required"),
   lastName: yup.string().required("Required"),
 });
+
+const roleOptions = [
+  { value: "user", label: "User", color: "text-gray-400", icon: User },
+  { value: "admin", label: "Admin", color: "text-red-400", icon: Shield },
+  { value: "content", label: "Content Creator", color: "text-purple-400", icon: Newspaper },
+  { value: "support", label: "Support", color: "text-cyan-400", icon: HeadphonesIcon },
+];
 
 function UserForm({
   formType = "add",
@@ -49,6 +59,7 @@ function UserForm({
   const t = useTranslations("UserForm");
 
   const permissions = [
+    { label: "Match", value: "AddMatchPermission", translationKey: "Match", icon: Swords, color: "text-indigo-500", bgColor: "bg-indigo-500/10" },
     { label: "Game", value: "AddGamePermission", translationKey: "Game", icon: Gamepad2, color: "text-purple-500", bgColor: "bg-purple-500/10" },
     { label: "Player", value: "AddPlayerPermission", translationKey: "Player", icon: User, color: "text-blue-500", bgColor: "bg-blue-500/10" },
     { label: "Team", value: "AddTeamPermission", translationKey: "Team", icon: Users, color: "text-green-500", bgColor: "bg-green-500/10" },
@@ -95,6 +106,8 @@ function UserForm({
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       phone: user?.phone || "",
+      role: user?.role || "user",
+      isVerified: user?.isVerified ?? true,
       ...getInitialPermissionValues(),
     },
     enableReinitialize: true,
@@ -239,6 +252,80 @@ function UserForm({
           </FormRow>
         )}
       </FormSection>
+
+      {/* Role & Status Section - Only in edit mode */}
+      {formType === "edit" && (
+        <FormSection
+          title={t("Role & Status")}
+          icon={<UserCog className="size-5" />}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Role Selection */}
+            <div className="space-y-3">
+              <Label className="text-[#677185] text-sm">{t("Role")}</Label>
+              <div className="grid grid-cols-2 gap-3">
+                {roleOptions.map((option) => {
+                  const RoleIcon = option.icon;
+                  const isSelected = formik.values.role === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => formik.setFieldValue("role", option.value)}
+                      className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                        isSelected
+                          ? "border-green-500/50 bg-green-500/10"
+                          : "border-[#1a1f2e] bg-[#0F1017] hover:border-gray-600"
+                      }`}
+                    >
+                      <RoleIcon className={`size-5 ${option.color}`} />
+                      <span className={`text-sm font-medium ${isSelected ? "text-white" : "text-[#677185]"}`}>
+                        {t(option.label)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Verification Status */}
+            <div className="space-y-3">
+              <Label className="text-[#677185] text-sm">{t("Verification Status")}</Label>
+              <div
+                className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
+                  formik.values.isVerified
+                    ? "border-green-500/50 bg-green-500/10"
+                    : "border-yellow-500/50 bg-yellow-500/10"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <CheckCircle
+                    className={`size-6 ${
+                      formik.values.isVerified ? "text-green-500" : "text-yellow-500"
+                    }`}
+                  />
+                  <div>
+                    <p className="text-white font-medium">
+                      {formik.values.isVerified ? t("Verified") : t("Unverified")}
+                    </p>
+                    <p className="text-xs text-[#677185]">
+                      {formik.values.isVerified
+                        ? t("Email has been verified")
+                        : t("Email not verified yet")}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={formik.values.isVerified}
+                  onCheckedChange={(checked) =>
+                    formik.setFieldValue("isVerified", checked)
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </FormSection>
+      )}
 
       {/* Permissions Section */}
       <FormSection

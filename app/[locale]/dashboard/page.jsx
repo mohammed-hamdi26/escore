@@ -1,5 +1,4 @@
 import ServicesContainer from "@/components/dashboard/ServicesContainer";
-import SettingsIcon from "@/components/dashboard/SettingsIcon";
 import Champion from "@/components/icons/Champion";
 import GamesManagement from "@/components/icons/GamesManagement";
 import MatchesManagement from "@/components/icons/MatchesManagement";
@@ -8,94 +7,25 @@ import Player from "@/components/icons/Player";
 import SupportCenter from "@/components/icons/SuppotCenter";
 import TeamsManagement from "@/components/icons/TeamsManagement";
 import User from "@/components/icons/User";
-import { ArrowRightLeft, Bell, icons } from "lucide-react";
+import { ArrowRightLeft, Bell } from "lucide-react";
 import { getLoginUser } from "../_Lib/usersApi";
-const links = [
-  {
-    title: "Tournaments Management",
-    href: "/tournaments-management/edit",
-    description:
-      "Go to Tournaments Section to Add Tournament: Name, Champion, Start Date, End Date, Teams, Players",
 
-    icon: (
-      <Champion
-        width="57"
-        height="56"
-        className={"text-green-primary icon-transition"}
-      />
-    ),
-  },
-  {
-    title: "Matches Management",
-    href: "/matches-management/edit",
-    description:
-      "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links",
-    icon: <MatchesManagement width="57" height="56" />,
-  },
-  {
-    title: "Players",
-    href: "/player-management/edit",
-    description:
-      "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos",
-    icon: <Player width="57" height="56" />,
-  },
+/**
+ * Check if user has permission for an entity
+ */
+function hasPermission(user, entity) {
+  if (user?.role === "admin") return true;
+  return user?.permissions?.some((perm) => perm.entity === entity) || false;
+}
 
-  {
-    title: "Teams Management",
-    href: "/teams-management/edit",
-    description: "Add Team: Name, Country, Linked Players, Logo/Images",
-    icon: <TeamsManagement width="57" height="56" />,
-  },
-  {
-    title: "transfers Management",
-    href: "/transfers-management/edit",
-    description:
-      "Go to Transfers Section to Add Transfer: Player, From Team, To Team, Transfer Date, Transfer Fee",
-    icon: <ArrowRightLeft className="icon-transition" width="57" height="56" />,
-  },
-  {
-    title: "Games Management",
-    href: "/games-management/edit",
-    description: "go to Games Section to Add Game: Name + Icon",
-    icon: <GamesManagement width="57" height="56" />,
-  },
-  {
-    title: "News & Updates",
-    href: "/news/edit",
-    description:
-      "Go to news Sectoin to Add News: Title, Description, Image/Video, Author",
-    icon: <News width="57" height="56" />,
-  },
-  {
-    title: "Users",
-    href: "/users/",
-    description:
-      "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
-    icon: <User />,
-  },
-  {
-    title: "Support Center",
-    href: "/support-center",
-    description: "Go to Support Center to view user messages and reply to them",
-    icon: <SupportCenter width="57" height="56" />,
-  },
-  // {
-  //   title: "Settings",
-  //   href: "/settings",
-  //   description: "Manage your preferences and account configuration settings.",
-  //   icon: <SettingsIcon width="41" height="49" className="icon-transition" />,
-  // },
-];
 export default async function page() {
   const user = await getLoginUser();
-  console.log(user);
+  const isAdmin = user?.role === "admin";
+
   const links = [
     {
       title: "Tournaments Management",
       href: "/tournaments-management/edit",
-      description:
-        "Go to Tournaments Section to Add Tournament: Name, Champion, Start Date, End Date, Teams, Players",
-
       icon: (
         <Champion
           width="57"
@@ -103,127 +33,65 @@ export default async function page() {
           className={"text-green-primary icon-transition"}
         />
       ),
-      isShowed:
-        user.role === "admin"
-          ? true
-          : user.permissions.find((per) => per.entity == "Tournament")
-          ? true
-          : false,
+      isShowed: hasPermission(user, "Tournament"),
     },
     {
       title: "Matches Management",
       href: "/matches-management/edit",
-      description:
-        "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links",
       icon: <MatchesManagement width="57" height="56" />,
-      isShowed:
-        user.role === "admin"
-          ? true
-          : user.permissions.find((per) => per.entity == "Match")
-          ? true
-          : false,
+      isShowed: hasPermission(user, "Match"),
     },
     {
       title: "Players",
       href: "/player-management/edit",
-      description:
-        "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos",
       icon: <Player width="57" height="56" />,
-      isShowed:
-        user.role === "admin"
-          ? true
-          : user.permissions.find((per) => per.entity == "Player")
-          ? true
-          : false,
+      isShowed: hasPermission(user, "Player"),
     },
-
     {
       title: "Teams Management",
       href: "/teams-management/edit",
-      description: "Add Team: Name, Country, Linked Players, Logo/Images",
       icon: <TeamsManagement width="57" height="56" />,
-      isShowed:
-        user.role === "admin"
-          ? true
-          : user.permissions.find((per) => per.entity == "Team")
-          ? true
-          : false,
+      isShowed: hasPermission(user, "Team"),
     },
     {
       title: "transfers Management",
       href: "/transfers-management/edit",
-      description:
-        "Go to Transfers Section to Add Transfer: Player, From Team, To Team, Transfer Date, Transfer Fee",
       icon: (
         <ArrowRightLeft className="icon-transition" width="57" height="56" />
       ),
-      isShowed:
-        user.role === "admin"
-          ? true
-          : user.permissions.find((per) => per.entity == "Transfer")
-          ? true
-          : false,
+      isShowed: hasPermission(user, "Transfer"),
     },
     {
       title: "Games Management",
       href: "/games-management/edit",
-      description: "go to Games Section to Add Game: Name + Icon",
       icon: <GamesManagement width="57" height="56" />,
-      isShowed:
-        user.role === "admin"
-          ? true
-          : user.permissions.find((per) => per.entity == "Game")
-          ? true
-          : false,
+      isShowed: hasPermission(user, "Game"),
     },
     {
       title: "News & Updates",
       href: "/news/edit",
-      description:
-        "Go to news Sectoin to Add News: Title, Description, Image/Video, Author",
       icon: <News width="57" height="56" />,
-      isShowed:
-        user.role === "admin"
-          ? true
-          : user.permissions.find((per) => per.entity == "News")
-          ? true
-          : false,
+      isShowed: hasPermission(user, "News"),
     },
     {
       title: "Users",
       href: "/users/",
-      description:
-        "Go to user Section to view Users , Edit email and password , see favorite teams for each user  ",
       icon: <User />,
-      isShowed: user.role === "admin" ? true : false,
+      isShowed: isAdmin,
     },
     {
       title: "Support Center",
       href: "/support-center",
-      description:
-        "Go to Support Center to view user messages and reply to them",
       icon: <SupportCenter width="57" height="56" />,
-      isShowed:
-        user.role === "admin"
-          ? true
-          : user.permissions.find((per) => per.entity == "Support")
-          ? true
-          : false,
+      isShowed: hasPermission(user, "Support"),
     },
     {
       title: "Notifications",
       href: "/notifications",
-      description:
-        "Send push notifications and manage registered devices",
       icon: <Bell className="icon-transition" width="57" height="56" />,
-      isShowed: user.role === "admin" ? true : false,
+      isShowed: isAdmin,
     },
-    // {
-    //   title: "Settings",
-    //   href: "/settings",
-    //   description: "Manage your preferences and account configuration settings.",
-    //   icon: <SettingsIcon width="41" height="49" className="icon-transition" />,
-    // },
   ];
+
   return <ServicesContainer links={links} />;
 }
