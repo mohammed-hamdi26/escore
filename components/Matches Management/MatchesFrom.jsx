@@ -1,7 +1,7 @@
 "use client";
 import Champion from "@/components/icons/Champion";
 import TeamsManagement from "@/components/icons/TeamsManagement";
-import { Gamepad2, Loader, MapPin, Star, Eye, Hash } from "lucide-react";
+import { Gamepad2, Loader, MapPin, Star, Eye, Wifi } from "lucide-react";
 
 import {
   combineDateAndTime,
@@ -37,16 +37,14 @@ const validateSchema = Yup.object({
 
   bestOf: Yup.number().nullable(),
 
-  isOnline: Yup.string()
-    .oneOf(["ONLINE", "OFFLINE"], "Invalid venue type")
-    .required("Venue type is required"),
+  isOnline: Yup.boolean().default(true),
 
   player1Score: Yup.number().min(0, "Score cannot be negative").default(0),
 
   player2Score: Yup.number().min(0, "Score cannot be negative").default(0),
 
   venue: Yup.string().when("isOnline", {
-    is: "OFFLINE",
+    is: false,
     then: (schema) => schema.required("Venue is required"),
     otherwise: (schema) => schema.notRequired(),
   }),
@@ -56,7 +54,6 @@ const validateSchema = Yup.object({
 
   // Optional fields
   round: Yup.string().nullable(),
-  matchNumber: Yup.number().nullable(),
   startedAt: Yup.string().nullable(),
   endedAt: Yup.string().nullable(),
   tournament: Yup.string().nullable(),
@@ -90,7 +87,7 @@ function MatchesFrom({
         : "",
       status: match?.status || "scheduled",
       bestOf: match?.bestOf || 1,
-      isOnline: match?.isOnline === false ? "OFFLINE" : "ONLINE",
+      isOnline: match?.isOnline !== false, // Default to true (online)
       player1Score: match?.result?.team1Score || 0,
       player2Score: match?.result?.team2Score || 0,
       venue: match?.venue || "",
@@ -98,7 +95,6 @@ function MatchesFrom({
       streamUrl: match?.streamUrl || "",
 
       round: match?.round || "",
-      matchNumber: match?.matchNumber || "",
       tournament: match?.tournament?.id || "",
       game: match?.game?.id || "",
 
@@ -151,7 +147,7 @@ function MatchesFrom({
                   ? dataValues.team2
                   : undefined,
           },
-          isOnline: dataValues.isOnline === "ONLINE",
+          // isOnline is already a boolean from the toggle
           scheduledDate: format(
             combineDateAndTime(dataValues.date, dataValues.time),
             "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
@@ -196,13 +192,6 @@ function MatchesFrom({
           dataValues.bestOf = Number(dataValues.bestOf);
         }
 
-        // Convert matchNumber to number or remove if empty
-        if (dataValues.matchNumber) {
-          dataValues.matchNumber = Number(dataValues.matchNumber);
-        } else {
-          delete dataValues.matchNumber;
-        }
-
         // Remove lineup fields from main data (handle separately via API)
         delete dataValues.team1Lineup;
         delete dataValues.team2Lineup;
@@ -244,10 +233,6 @@ function MatchesFrom({
     { value: 3, label: t("Best of 3") },
     { value: 5, label: t("Best of 5") },
     { value: 7, label: t("Best of 7") },
-  ];
-  const venueTypeOptions = [
-    { value: "ONLINE", label: t("ONLINE") },
-    { value: "OFFLINE", label: t("OFFLINE") },
   ];
 
   return (
@@ -460,46 +445,25 @@ function MatchesFrom({
           />
         </FormRow>
 
-        {/* Round & Match Number */}
-        <FormRow>
-          <InputApp
-            label={t("Round")}
-            value={formik.values.round}
-            onChange={formik.handleChange}
-            name={"round"}
-            type={"text"}
-            placeholder={t("Enter Round (e.g. Quarter Finals)")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            error={
-              formik?.errors?.round && formik?.touched?.round
-                ? t(formik?.errors?.round)
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            disabled={formik.isSubmitting}
-          />
-          <InputApp
-            label={t("Match Number")}
-            value={formik.values.matchNumber}
-            onChange={formik.handleChange}
-            name={"matchNumber"}
-            type={"number"}
-            placeholder={t("Enter Match Number")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            icon={<Hash className="text-[#677185]" height={20} width={20} />}
-            error={
-              formik?.errors?.matchNumber && formik?.touched?.matchNumber
-                ? t(formik?.errors?.matchNumber)
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            disabled={formik.isSubmitting}
-          />
-        </FormRow>
+        {/* Round */}
+        <InputApp
+          label={t("Round")}
+          value={formik.values.round}
+          onChange={formik.handleChange}
+          name={"round"}
+          type={"text"}
+          placeholder={t("Enter Round (e.g. Quarter Finals)")}
+          className=" border-0 focus:outline-none "
+          backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+          textColor="text-[#677185]"
+          error={
+            formik?.errors?.round && formik?.touched?.round
+              ? t(formik?.errors?.round)
+              : ""
+          }
+          onBlur={formik.handleBlur}
+          disabled={formik.isSubmitting}
+        />
 
         {/* Featured & Active Toggles */}
         <FormRow>
@@ -596,27 +560,27 @@ function MatchesFrom({
       {/* Venue Section */}
       <FormSection>
         <FormRow>
-          <SelectInput
-            label={t("Venue Type")}
-            options={mappedArrayToSelectOptions(
-              venueTypeOptions,
-              "label",
-              "value"
-            )}
-            onChange={(value) => formik.setFieldValue("isOnline", value)}
-            value={formik.values.isOnline}
-            error={
-              formik?.errors?.isOnline && formik?.touched?.isOnline
-                ? formik?.errors?.isOnline
-                : ""
-            }
-            icon={<MapPin className="text-[#677185]" height={35} width={35} />}
-            name={"venueType"}
-            onBlur={(open) => {
-              if (!open) formik.setFieldTouched("isOnline", true);
-            }}
-            disabled={formik.isSubmitting}
-          />
+          <div className="flex items-center gap-6 p-4 bg-dashboard-box dark:bg-[#0F1017] rounded-lg">
+            <div className="flex items-center gap-3">
+              <Switch
+                id="isOnline"
+                checked={formik.values.isOnline}
+                onCheckedChange={(checked) =>
+                  formik.setFieldValue("isOnline", checked)
+                }
+                disabled={formik.isSubmitting}
+              />
+              <Label
+                htmlFor="isOnline"
+                className="flex items-center gap-2 cursor-pointer text-[#677185]"
+              >
+                <Wifi
+                  className={`h-4 w-4 ${formik.values.isOnline ? "text-green-500" : "text-gray-400"}`}
+                />
+                {formik.values.isOnline ? t("Online") : t("Offline")}
+              </Label>
+            </div>
+          </div>
           <InputApp
             label={t("Venue")}
             name={"venue"}
@@ -634,9 +598,7 @@ function MatchesFrom({
             }
             icon={<MapPin className="text-[#677185]" height={35} width={35} />}
             onBlur={formik.handleBlur}
-            disabled={
-              formik.values.isOnline === "ONLINE" || formik.isSubmitting
-            }
+            disabled={formik.values.isOnline || formik.isSubmitting}
           />
         </FormRow>
       </FormSection>

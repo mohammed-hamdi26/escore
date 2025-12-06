@@ -416,6 +416,8 @@
   "MatchForm": {
     "ONLINE": "أونلاين",
     "OFFLINE": "أوفلاين",
+    "Online": "أونلاين",
+    "Offline": "أوفلاين",
     "Best of 5": "أفضل من 5",
     "Best of 3": "أفضل من 3",
     "Best of 1": "مباراة واحدة",
