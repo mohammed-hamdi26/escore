@@ -38,17 +38,7 @@ import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import { Badge } from "../ui/badge";
-import TagsInput from "./TagsInput";
 
-const CATEGORY_OPTIONS = [
-  { value: "news", label: "News", labelAr: "أخبار" },
-  { value: "announcement", label: "Announcement", labelAr: "إعلان" },
-  { value: "interview", label: "Interview", labelAr: "مقابلة" },
-  { value: "analysis", label: "Analysis", labelAr: "تحليل" },
-  { value: "guide", label: "Guide", labelAr: "دليل" },
-  { value: "review", label: "Review", labelAr: "مراجعة" },
-  { value: "opinion", label: "Opinion", labelAr: "رأي" },
-];
 
 const validationSchema = yup.object({
   title: yup
@@ -62,11 +52,6 @@ const validationSchema = yup.object({
   authorName: yup.string().max(100, "authorNameTooLong"),
   authorPicture: yup.string(),
   urlExternal: yup.string().url("invalidUrl"),
-  category: yup.string().oneOf(
-    ["news", "announcement", "interview", "analysis", "guide", "review", "opinion"],
-    "invalidCategory"
-  ),
-  tags: yup.array().of(yup.string()).max(10, "tooManyTags"),
   game: yup.string().nullable(),
   tournament: yup.string().nullable(),
   team: yup.string().nullable(),
@@ -77,15 +62,6 @@ const validationSchema = yup.object({
   isPinned: yup.boolean(),
 });
 
-const CATEGORY_COLORS = {
-  news: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  announcement: "bg-orange-500/20 text-orange-400 border-orange-500/30",
-  interview: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-  analysis: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-  guide: "bg-green-500/20 text-green-400 border-green-500/30",
-  review: "bg-pink-500/20 text-pink-400 border-pink-500/30",
-  opinion: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-};
 
 function NewsFormRedesign({
   formType = "add",
@@ -114,8 +90,6 @@ function NewsFormRedesign({
       authorName: newData?.authorName || "",
       authorPicture: newData?.authorImage?.light || "",
       urlExternal: newData?.urlExternal || "",
-      category: newData?.category || "news",
-      tags: newData?.tags || [],
       game: newData?.game?.id || "",
       tournament: newData?.tournament?.id || "",
       team: newData?.team?.id || "",
@@ -142,8 +116,6 @@ function NewsFormRedesign({
             ? { light: values.authorPicture, dark: values.authorPicture }
             : undefined,
           urlExternal: values.urlExternal || undefined,
-          category: values.category,
-          tags: values.tags.length > 0 ? values.tags : undefined,
           game: values.game || null,
           tournament: values.tournament || null,
           team: values.team || null,
@@ -174,16 +146,6 @@ function NewsFormRedesign({
       }
     },
   });
-
-  const categoryOptions = CATEGORY_OPTIONS.map((opt) => ({
-    value: opt.value,
-    name: locale === "ar" ? opt.labelAr : opt.label,
-  }));
-
-  // Get selected category label
-  const selectedCategoryLabel = categoryOptions.find(
-    (opt) => opt.value === formik.values.category
-  )?.name;
 
   return (
     <div className="space-y-6">
@@ -222,11 +184,6 @@ function NewsFormRedesign({
             <Badge className="bg-purple-600 text-white">
               <Pin className="size-3 mr-1 fill-white" />
               {t("pinned")}
-            </Badge>
-          )}
-          {formik.values.category && (
-            <Badge className={CATEGORY_COLORS[formik.values.category] || CATEGORY_COLORS.news}>
-              {selectedCategoryLabel}
             </Badge>
           )}
         </div>
@@ -318,38 +275,6 @@ function NewsFormRedesign({
 
         {/* Section 3: Classification */}
         <FormSection title={t("classification")} icon={<Tag className="size-5" />}>
-          {/* Category Selection - Visual Buttons */}
-          <div className="space-y-3">
-            <Label className="text-[#677185] dark:text-white">{t("category")}</Label>
-            <div className="flex flex-wrap gap-2">
-              {categoryOptions.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => formik.setFieldValue("category", option.value)}
-                  className={`px-4 py-2 rounded-lg border transition-all text-sm font-medium ${
-                    formik.values.category === option.value
-                      ? CATEGORY_COLORS[option.value]
-                      : "bg-dashboard-box dark:bg-[#1a1f2e] border-[#677185]/30 text-[#677185] hover:border-green-primary/50 hover:text-white"
-                  }`}
-                >
-                  {option.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <FormRow>
-            <TagsInput
-              value={formik.values.tags}
-              onChange={(tags) => formik.setFieldValue("tags", tags)}
-              label={t("tags")}
-              placeholder={t("tagsPlaceholder")}
-              maxTags={10}
-              error={formik.touched.tags && formik.errors.tags && t(formik.errors.tags)}
-            />
-          </FormRow>
-
           <FormRow>
             <div className="flex items-center gap-8 p-4 bg-dashboard-box dark:bg-[#1a1f2e] rounded-lg">
               <div className="flex items-center gap-3">
