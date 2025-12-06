@@ -892,6 +892,26 @@ export async function forgotPassword(email) {
   }
 }
 
+export async function resetPassword(email, otp, newPassword) {
+  try {
+    const res = await apiClient.post("/auth/reset-password", { email, otp, newPassword });
+    return res.data;
+  } catch (error) {
+    console.log("Failed to reset password", error);
+    throw new Error(error.response?.data?.message || "Failed to reset password");
+  }
+}
+
+export async function resendOTP(email, type) {
+  try {
+    const res = await apiClient.post("/auth/resend-otp", { email, type });
+    return res.data;
+  } catch (error) {
+    console.log("Failed to resend OTP", error);
+    throw new Error(error.response?.data?.message || "Failed to resend OTP");
+  }
+}
+
 export async function addAward(typeEdit, id, data) {
   const locale = await getLocale();
   console.log(typeEdit, id, data);
