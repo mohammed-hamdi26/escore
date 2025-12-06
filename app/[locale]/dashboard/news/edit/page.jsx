@@ -1,29 +1,38 @@
-import { getNews, getNewsCount } from "@/app/[locale]/_Lib/newsApi";
-import NewsTable from "@/components/News/NewsTable";
-import Table from "@/components/ui app/Table";
-import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
-const columns = [
-  { id: "title", header: "title" },
-  { id: "Author", header: "Author" },
-  { id: "date", header: "Date" },
-  // { id: "link", header: "Link" },
-];
-async function page({ searchParams }) {
-  const { size, page } = await searchParams;
-  const news = await getNews({ size, page });
-  // const numOfNews = await getNewsCount();
+import { getNews, getNewsStats } from "@/app/[locale]/_Lib/newsApi";
+import { getGames } from "@/app/[locale]/_Lib/gamesApi";
+import NewsListRedesign from "@/components/News/NewsListRedesign";
+import { getLocale } from "next-intl/server";
 
-  return <NewsTable news={news} columns={columns} />;
-}
-{
-  /* <Button
-          className={
-            "text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer"
-          }
-        >
-          Edit
-        </Button> */
+async function page({ searchParams }) {
+  const params = await searchParams;
+  const locale = await getLocale();
+
+  const [newsResponse, stats, gamesOptions] = await Promise.all([
+    getNews({
+      page: params.page || 1,
+      limit: params.limit || 10,
+      search: params.search,
+      category: params.category,
+      game: params.game,
+      isFeatured: params.isFeatured,
+      isPinned: params.isPinned,
+    }),
+    getNewsStats(),
+    getGames(),
+  ]);
+
+  const news = newsResponse.data || [];
+  const pagination = newsResponse.pagination || null;
+
+  return (
+    <NewsListRedesign
+      news={news}
+      pagination={pagination}
+      stats={stats}
+      gamesOptions={gamesOptions}
+      locale={locale}
+    />
+  );
 }
 
 export default page;

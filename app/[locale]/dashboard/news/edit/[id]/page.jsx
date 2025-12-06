@@ -5,10 +5,13 @@ import { getNew } from "@/app/[locale]/_Lib/newsApi";
 import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
-import NewsForm from "@/components/News/NewsForm";
+import NewsFormRedesign from "@/components/News/NewsFormRedesign";
+import { getLocale } from "next-intl/server";
 
 async function page({ params }) {
   const { id } = await params;
+  const locale = await getLocale();
+
   const [
     newData,
     teamsOptions,
@@ -24,10 +27,9 @@ async function page({ params }) {
     getPlayers(),
     getMatches(),
   ]);
-  // const newData = await getNew(id);
 
   return (
-    <NewsForm
+    <NewsFormRedesign
       options={{
         teamsOptions,
         tournamentsOptions,
@@ -38,6 +40,7 @@ async function page({ params }) {
       newData={newData}
       formType="edit"
       submit={editNews}
+      locale={locale}
     />
   );
 }

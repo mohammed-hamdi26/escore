@@ -4,9 +4,12 @@ import { getMatches } from "@/app/[locale]/_Lib/matchesApi";
 import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
-import NewsForm from "@/components/News/NewsForm";
+import NewsFormRedesign from "@/components/News/NewsFormRedesign";
+import { getLocale } from "next-intl/server";
 
 async function page() {
+  const locale = await getLocale();
+
   const [
     playersOptions,
     teamsOptions,
@@ -22,7 +25,7 @@ async function page() {
   ]);
 
   return (
-    <NewsForm
+    <NewsFormRedesign
       options={{
         playersOptions,
         teamsOptions,
@@ -31,6 +34,7 @@ async function page() {
         matchesOptions,
       }}
       submit={addNews}
+      locale={locale}
     />
   );
 }
