@@ -14,8 +14,15 @@ import {
   Swords,
   Star,
   Pin,
+  ArrowLeft,
+  Save,
+  Plus,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 import FileInput from "../ui app/FileInput";
@@ -30,6 +37,7 @@ import { Spinner } from "../ui/spinner";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
+import { Badge } from "../ui/badge";
 import TagsInput from "./TagsInput";
 
 const CATEGORY_OPTIONS = [
@@ -69,6 +77,16 @@ const validationSchema = yup.object({
   isPinned: yup.boolean(),
 });
 
+const CATEGORY_COLORS = {
+  news: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  announcement: "bg-orange-500/20 text-orange-400 border-orange-500/30",
+  interview: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+  analysis: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+  guide: "bg-green-500/20 text-green-400 border-green-500/30",
+  review: "bg-pink-500/20 text-pink-400 border-pink-500/30",
+  opinion: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+};
+
 function NewsFormRedesign({
   formType = "add",
   submit,
@@ -83,6 +101,8 @@ function NewsFormRedesign({
   locale = "en",
 }) {
   const t = useTranslations("newsForm");
+  const router = useRouter();
+  const [previewMode, setPreviewMode] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -157,13 +177,64 @@ function NewsFormRedesign({
 
   const categoryOptions = CATEGORY_OPTIONS.map((opt) => ({
     value: opt.value,
-    label: locale === "ar" ? opt.labelAr : opt.label,
+    name: locale === "ar" ? opt.labelAr : opt.label,
   }));
 
+  // Get selected category label
+  const selectedCategoryLabel = categoryOptions.find(
+    (opt) => opt.value === formik.values.category
+  )?.name;
+
   return (
-    <form className="space-y-6" onSubmit={formik.handleSubmit}>
-      {/* Section 1: Basic Information */}
-      <FormSection title={t("basicInfo")} icon={<FileText className="size-5" />}>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between bg-dashboard-box dark:bg-[#0F1017] rounded-xl p-4">
+        <div className="flex items-center gap-4">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="text-[#677185] hover:text-white"
+          >
+            <ArrowLeft className="size-5" />
+          </Button>
+          <div>
+            <h1 className="text-xl font-bold text-white">
+              {formType === "add" ? t("addNews") : t("editNews")}
+            </h1>
+            {newData && (
+              <p className="text-sm text-[#677185]">
+                {t("editing")}: {newData.title?.substring(0, 50)}...
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Status indicators */}
+          {formik.values.isFeatured && (
+            <Badge className="bg-yellow-600 text-white">
+              <Star className="size-3 mr-1 fill-white" />
+              {t("featured")}
+            </Badge>
+          )}
+          {formik.values.isPinned && (
+            <Badge className="bg-purple-600 text-white">
+              <Pin className="size-3 mr-1 fill-white" />
+              {t("pinned")}
+            </Badge>
+          )}
+          {formik.values.category && (
+            <Badge className={CATEGORY_COLORS[formik.values.category] || CATEGORY_COLORS.news}>
+              {selectedCategoryLabel}
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      <form className="space-y-6" onSubmit={formik.handleSubmit}>
+        {/* Section 1: Basic Information */}
+        <FormSection title={t("basicInfo")} icon={<FileText className="size-5" />}>
         <FormRow>
           <InputApp
             name="title"
@@ -245,186 +316,207 @@ function NewsFormRedesign({
         </FormRow>
       </FormSection>
 
-      {/* Section 3: Classification */}
-      <FormSection title={t("classification")} icon={<Tag className="size-5" />}>
-        <FormRow>
-          <SelectInput
-            name="category"
-            formik={formik}
-            label={t("category")}
-            options={categoryOptions}
-            placeholder={t("selectCategory")}
-            onChange={(value) => formik.setFieldValue("category", value)}
-          />
-          <TagsInput
-            value={formik.values.tags}
-            onChange={(tags) => formik.setFieldValue("tags", tags)}
-            label={t("tags")}
-            placeholder={t("tagsPlaceholder")}
-            maxTags={10}
-            error={formik.touched.tags && formik.errors.tags && t(formik.errors.tags)}
-          />
-        </FormRow>
-
-        <FormRow>
-          <div className="flex items-center gap-8 p-4 bg-dashboard-box dark:bg-[#0F1017] rounded-lg">
-            <div className="flex items-center gap-3">
-              <Switch
-                id="isFeatured"
-                checked={formik.values.isFeatured}
-                onCheckedChange={(checked) => formik.setFieldValue("isFeatured", checked)}
-              />
-              <Label htmlFor="isFeatured" className="flex items-center gap-2 cursor-pointer text-white">
-                <Star className={`size-4 ${formik.values.isFeatured ? "fill-yellow-500 text-yellow-500" : "text-[#677185]"}`} />
-                {t("featured")}
-              </Label>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Switch
-                id="isPinned"
-                checked={formik.values.isPinned}
-                onCheckedChange={(checked) => formik.setFieldValue("isPinned", checked)}
-              />
-              <Label htmlFor="isPinned" className="flex items-center gap-2 cursor-pointer text-white">
-                <Pin className={`size-4 ${formik.values.isPinned ? "fill-purple-500 text-purple-500" : "text-[#677185]"}`} />
-                {t("pinned")}
-              </Label>
+        {/* Section 3: Classification */}
+        <FormSection title={t("classification")} icon={<Tag className="size-5" />}>
+          {/* Category Selection - Visual Buttons */}
+          <div className="space-y-3">
+            <Label className="text-[#677185] dark:text-white">{t("category")}</Label>
+            <div className="flex flex-wrap gap-2">
+              {categoryOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => formik.setFieldValue("category", option.value)}
+                  className={`px-4 py-2 rounded-lg border transition-all text-sm font-medium ${
+                    formik.values.category === option.value
+                      ? CATEGORY_COLORS[option.value]
+                      : "bg-dashboard-box dark:bg-[#1a1f2e] border-[#677185]/30 text-[#677185] hover:border-green-primary/50 hover:text-white"
+                  }`}
+                >
+                  {option.name}
+                </button>
+              ))}
             </div>
           </div>
-        </FormRow>
-      </FormSection>
 
-      {/* Section 4: Author */}
-      <FormSection title={t("authorInfo")} icon={<User className="size-5" />}>
-        <FormRow>
-          <InputApp
-            name="authorName"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.authorName}
-            label={t("authorName")}
-            placeholder={t("authorNamePlaceholder")}
-            className="border-0 focus:outline-none"
-            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-            textColor="text-[#677185]"
-            icon={<User className="size-5 text-[#677185]" />}
-            error={formik.touched.authorName && formik.errors.authorName && t(formik.errors.authorName)}
-          />
-          <FileInput
-            formik={formik}
-            name="authorPicture"
-            label={t("authorPicture")}
-            placeholder={t("authorPicturePlaceholder")}
-          />
-        </FormRow>
-      </FormSection>
+          <FormRow>
+            <TagsInput
+              value={formik.values.tags}
+              onChange={(tags) => formik.setFieldValue("tags", tags)}
+              label={t("tags")}
+              placeholder={t("tagsPlaceholder")}
+              maxTags={10}
+              error={formik.touched.tags && formik.errors.tags && t(formik.errors.tags)}
+            />
+          </FormRow>
 
-      {/* Section 5: Related Entities */}
-      <FormSection title={t("relatedEntities")} icon={<Gamepad2 className="size-5" />}>
-        <FormRow>
-          <SelectInput
-            name="game"
-            formik={formik}
-            label={t("game")}
-            options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
-            placeholder={t("selectGame")}
-            onChange={(value) => formik.setFieldValue("game", value)}
-            icon={<Gamepad2 className="size-5 text-[#677185]" />}
-          />
-          <SelectInput
-            name="tournament"
-            formik={formik}
-            label={t("tournament")}
-            options={mappedArrayToSelectOptions(tournamentsOptions, "name", "id")}
-            placeholder={t("selectTournament")}
-            onChange={(value) => formik.setFieldValue("tournament", value)}
-            icon={<Trophy className="size-5 text-[#677185]" />}
-          />
-        </FormRow>
+          <FormRow>
+            <div className="flex items-center gap-8 p-4 bg-dashboard-box dark:bg-[#1a1f2e] rounded-lg">
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="isFeatured"
+                  checked={formik.values.isFeatured}
+                  onCheckedChange={(checked) => formik.setFieldValue("isFeatured", checked)}
+                />
+                <Label htmlFor="isFeatured" className="flex items-center gap-2 cursor-pointer text-white">
+                  <Star className={`size-4 ${formik.values.isFeatured ? "fill-yellow-500 text-yellow-500" : "text-[#677185]"}`} />
+                  {t("featured")}
+                </Label>
+              </div>
 
-        <FormRow>
-          <SelectInput
-            name="team"
-            formik={formik}
-            label={t("team")}
-            options={mappedArrayToSelectOptions(teamsOptions, "name", "id")}
-            placeholder={t("selectTeam")}
-            onChange={(value) => formik.setFieldValue("team", value)}
-            icon={<Users className="size-5 text-[#677185]" />}
-          />
-          <SelectInput
-            name="player"
-            formik={formik}
-            label={t("player")}
-            options={mappedArrayToSelectOptions(playersOptions, "nickname", "id")}
-            placeholder={t("selectPlayer")}
-            onChange={(value) => formik.setFieldValue("player", value)}
-            icon={<User className="size-5 text-[#677185]" />}
-          />
-        </FormRow>
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="isPinned"
+                  checked={formik.values.isPinned}
+                  onCheckedChange={(checked) => formik.setFieldValue("isPinned", checked)}
+                />
+                <Label htmlFor="isPinned" className="flex items-center gap-2 cursor-pointer text-white">
+                  <Pin className={`size-4 ${formik.values.isPinned ? "fill-purple-500 text-purple-500" : "text-[#677185]"}`} />
+                  {t("pinned")}
+                </Label>
+              </div>
+            </div>
+          </FormRow>
+        </FormSection>
 
-        <FormRow>
-          <SelectInput
-            name="match"
-            formik={formik}
-            label={t("match")}
-            options={mappedArrayToSelectOptions(
-              matchesOptions.map((m) => ({
-                name: `${m.team1?.name || "TBD"} vs ${m.team2?.name || "TBD"}`,
-                id: m.id,
-              })),
-              "name",
-              "id"
+        {/* Section 4: Author */}
+        <FormSection title={t("authorInfo")} icon={<User className="size-5" />}>
+          <FormRow>
+            <InputApp
+              name="authorName"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.authorName}
+              label={t("authorName")}
+              placeholder={t("authorNamePlaceholder")}
+              className="border-0 focus:outline-none"
+              backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
+              textColor="text-[#677185]"
+              icon={<User className="size-5 text-[#677185]" />}
+              error={formik.touched.authorName && formik.errors.authorName && t(formik.errors.authorName)}
+            />
+            <FileInput
+              formik={formik}
+              name="authorPicture"
+              label={t("authorPicture")}
+              placeholder={t("authorPicturePlaceholder")}
+            />
+          </FormRow>
+        </FormSection>
+
+        {/* Section 5: Related Entities */}
+        <FormSection title={t("relatedEntities")} icon={<Gamepad2 className="size-5" />}>
+          <FormRow>
+            <SelectInput
+              name="game"
+              formik={formik}
+              label={t("game")}
+              options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
+              placeholder={t("selectGame")}
+              onChange={(value) => formik.setFieldValue("game", value)}
+              icon={<Gamepad2 className="size-5 text-[#677185]" />}
+            />
+            <SelectInput
+              name="tournament"
+              formik={formik}
+              label={t("tournament")}
+              options={mappedArrayToSelectOptions(tournamentsOptions, "name", "id")}
+              placeholder={t("selectTournament")}
+              onChange={(value) => formik.setFieldValue("tournament", value)}
+              icon={<Trophy className="size-5 text-[#677185]" />}
+            />
+          </FormRow>
+
+          <FormRow>
+            <SelectInput
+              name="team"
+              formik={formik}
+              label={t("team")}
+              options={mappedArrayToSelectOptions(teamsOptions, "name", "id")}
+              placeholder={t("selectTeam")}
+              onChange={(value) => formik.setFieldValue("team", value)}
+              icon={<Users className="size-5 text-[#677185]" />}
+            />
+            <SelectInput
+              name="player"
+              formik={formik}
+              label={t("player")}
+              options={mappedArrayToSelectOptions(playersOptions, "nickname", "id")}
+              placeholder={t("selectPlayer")}
+              onChange={(value) => formik.setFieldValue("player", value)}
+              icon={<User className="size-5 text-[#677185]" />}
+            />
+          </FormRow>
+
+          <FormRow>
+            <SelectInput
+              name="match"
+              formik={formik}
+              label={t("match")}
+              options={mappedArrayToSelectOptions(
+                matchesOptions.map((m) => ({
+                  name: `${m.team1?.name || "TBD"} vs ${m.team2?.name || "TBD"}`,
+                  id: m.id,
+                })),
+                "name",
+                "id"
+              )}
+              placeholder={t("selectMatch")}
+              onChange={(value) => formik.setFieldValue("match", value)}
+              icon={<Swords className="size-5 text-[#677185]" />}
+            />
+          </FormRow>
+        </FormSection>
+
+        {/* Section 6: Publishing */}
+        <FormSection title={t("publishing")} icon={<Calendar className="size-5" />}>
+          <FormRow>
+            <DatePicker
+              formik={formik}
+              name="publishedAt"
+              label={t("publishDate")}
+              placeholder={t("publishDatePlaceholder")}
+              icon={<Calendar className="size-5 text-[#677185]" />}
+            />
+          </FormRow>
+          <p className="text-xs text-[#677185] mt-2">
+            {t("publishDateHint")}
+          </p>
+        </FormSection>
+
+        {/* Submit Button */}
+        <div className="flex justify-end gap-4 pt-4 sticky bottom-0 bg-gradient-to-t from-[#0a0c10] via-[#0a0c10] to-transparent py-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            className="border-[#677185] text-[#677185] hover:text-white hover:border-white"
+          >
+            <ArrowLeft className="size-4 mr-2" />
+            {t("cancel")}
+          </Button>
+          <Button
+            type="submit"
+            disabled={formik.isSubmitting || !formik.isValid}
+            className="bg-green-primary hover:bg-green-primary/80 text-white min-w-[140px]"
+          >
+            {formik.isSubmitting ? (
+              <Spinner />
+            ) : formType === "add" ? (
+              <>
+                <Plus className="size-4 mr-2" />
+                {t("submit")}
+              </>
+            ) : (
+              <>
+                <Save className="size-4 mr-2" />
+                {t("save")}
+              </>
             )}
-            placeholder={t("selectMatch")}
-            onChange={(value) => formik.setFieldValue("match", value)}
-            icon={<Swords className="size-5 text-[#677185]" />}
-          />
-        </FormRow>
-      </FormSection>
-
-      {/* Section 6: Publishing */}
-      <FormSection title={t("publishing")} icon={<Calendar className="size-5" />}>
-        <FormRow>
-          <DatePicker
-            formik={formik}
-            name="publishedAt"
-            label={t("publishDate")}
-            placeholder={t("publishDatePlaceholder")}
-            icon={<Calendar className="size-5 text-[#677185]" />}
-          />
-        </FormRow>
-        <p className="text-xs text-[#677185] mt-2">
-          {t("publishDateHint")}
-        </p>
-      </FormSection>
-
-      {/* Submit Button */}
-      <div className="flex justify-end gap-4 pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => window.history.back()}
-          className="border-[#677185] text-[#677185] hover:text-white"
-        >
-          {t("cancel")}
-        </Button>
-        <Button
-          type="submit"
-          disabled={formik.isSubmitting || !formik.isValid}
-          className="bg-green-primary hover:bg-green-primary/80 text-white min-w-[120px]"
-        >
-          {formik.isSubmitting ? (
-            <Spinner />
-          ) : formType === "add" ? (
-            t("submit")
-          ) : (
-            t("save")
-          )}
-        </Button>
-      </div>
-    </form>
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
 

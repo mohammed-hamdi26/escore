@@ -1238,6 +1238,9 @@
     "save": "Save Changes",
     "addSuccess": "News created successfully",
     "editSuccess": "News updated successfully",
-    "error": "An error occurred"
+    "error": "An error occurred",
+    "addNews": "Add News",
+    "editNews": "Edit News",
+    "editing": "Editing"
   }
 }
