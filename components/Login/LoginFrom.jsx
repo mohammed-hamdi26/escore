@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import logoImage from "../../public/images/logo.png";
 import InputApp from "../ui app/InputApp";
 import { Button } from "../ui/button";
+import { Shield } from "lucide-react";
+
 function LoginFrom({ formik, t }) {
   return (
     <div className="flex flex-[0.5] flex-col space-y-8 ">
@@ -59,6 +61,17 @@ function LoginFrom({ formik, t }) {
         >
           {t("Login")}
         </Button>
+
+        {/* Privacy Policy Link */}
+        <div className="flex justify-center max-w-[400px]">
+          <Link
+            href="/privacy-policy"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-green-primary transition-colors duration-300"
+          >
+            <Shield className="w-4 h-4" />
+            {t("privacyPolicy")}
+          </Link>
+        </div>
       </form>
     </div>
   );

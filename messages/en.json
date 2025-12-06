@@ -12,7 +12,26 @@
     "Don't have an account?": "Don't have an account?",
     "Invalid email address": "Invalid email address",
     "Email is Required": "Email is Required",
-    "email": "email"
+    "email": "email",
+    "privacyPolicy": "Privacy Policy"
+  },
+  "PrivacyPolicyPublic": {
+    "pageTitle": "Privacy Policy - Escore",
+    "pageDescription": "Learn about how Escore handles your data and protects your privacy",
+    "title": "Privacy Policy",
+    "subtitle": "Your privacy is important to us. This policy explains how we collect, use, and protect your personal information.",
+    "backToLogin": "Back to Login",
+    "dataProtection": "Data Protection",
+    "dataProtectionDesc": "Your data is encrypted and stored securely",
+    "transparency": "Transparency",
+    "transparencyDesc": "We clearly explain how we use your data",
+    "userRights": "Your Rights",
+    "userRightsDesc": "You control your personal information",
+    "policyContent": "Privacy Policy Content",
+    "noContent": "No Privacy Policy Available",
+    "noContentDesc": "The privacy policy content has not been added yet. Please check back later.",
+    "copyright": "Escore. All rights reserved.",
+    "login": "Login"
   },
   "Dashboard": {
     "Matches Management": {
