@@ -22,24 +22,14 @@ import SelectDateTimeInput from "../ui app/SelectDateAndTimeInput";
 import TextAreaInput from "../ui app/TextAreaInput";
 import MatchLineupSelector from "./MatchLineupSelector";
 const validateSchema = Yup.object({
-  // matchDate: Yup.date()
-  //   .typeError("Invalid date format")
-  //   .required("Match date is required"),
   date: Yup.date().required("Match date is required"),
-
   time: Yup.string().required("Match time is required"),
 
-  // matchTime: Yup.string().required("Match time is required"),
-
-  // matchType: Yup.string()
-  //   .oneOf(["SOLO", "TEAM"], "Invalid match type")
-  //   .required("Match type is required"),
-
   status: Yup.string()
-    .oneOf(["scheduled", "live", "completed", "cancelled"], "Invalid status")
+    .oneOf(["scheduled", "live", "completed", "postponed", "cancelled"], "Invalid status")
     .required("Status is required"),
 
-  bestOf: Yup.string().nullable(),
+  bestOf: Yup.number().nullable(),
 
   isOnline: Yup.string()
     .oneOf(["ONLINE", "OFFLINE"], "Invalid venue type")
@@ -47,11 +37,11 @@ const validateSchema = Yup.object({
 
   player1Score: Yup.number()
     .min(0, "Score cannot be negative")
-    .required("Player 1 score is required"),
+    .default(0),
 
   player2Score: Yup.number()
     .min(0, "Score cannot be negative")
-    .required("Player 2 score is required"),
+    .default(0),
 
   summary: Yup.string().nullable(),
 
@@ -62,19 +52,18 @@ const validateSchema = Yup.object({
   }),
 
   streamUrl: Yup.string().url("Invalid URL").nullable(),
-
   highlightsUrl: Yup.string().url("Invalid URL").nullable(),
 
-  round: Yup.string().required("round is required"),
+  // Optional fields
+  round: Yup.string().nullable(),
+  startedAt: Yup.string().nullable(),
+  endedAt: Yup.string().nullable(),
+  tournament: Yup.string().nullable(),
 
-  startedAt: Yup.string().required("Start Time is required"),
-  endedAt: Yup.string().required("End Time is required"),
-
-  tournament: Yup.string().required("Tournament is required"),
+  // Required fields
   game: Yup.string().required("Game is required"),
   team1: Yup.string().required("Team 1 is required"),
   team2: Yup.string().required("Team 2 is required"),
-  // seriesFormat: Yup.string().required("Series Format is required"),
 });
 function MatchesFrom({
   teamsOptions,
@@ -88,16 +77,18 @@ function MatchesFrom({
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
-      // matchDate: match?.matchDate || "",
-      date: "",
-      time: "",
-      // matchTime: match?.matchTime || "",
-      // matchType: match?.matchType || "TEAM",
+      // Parse date and time from scheduledDate for edit mode
+      date: match?.scheduledDate
+        ? format(new Date(match.scheduledDate), "yyyy-MM-dd")
+        : "",
+      time: match?.scheduledDate
+        ? format(new Date(match.scheduledDate), "HH:mm")
+        : "",
       status: match?.status || "scheduled",
-      seriesFormat: match?.seriesFormat || "",
-      isOnline: match?.isOnline || "ONLINE",
-      player1Score: match?.player1Score || 0,
-      player2Score: match?.player2Score || 0,
+      bestOf: match?.bestOf || 1,
+      isOnline: match?.isOnline === false ? "OFFLINE" : "ONLINE",
+      player1Score: match?.result?.team1Score || 0,
+      player2Score: match?.result?.team2Score || 0,
       summary: match?.summary || "",
       venue: match?.venue || "",
 
@@ -105,109 +96,129 @@ function MatchesFrom({
 
       round: match?.round || "",
       tournament: match?.tournament?.id || "",
-      // winningTeam: match?.winningTeam || null,
       game: match?.game?.id || "",
 
       team1: match?.team1?.id || "",
       team2: match?.team2?.id || "",
 
       highlightsUrl: match?.highlightsUrl || "",
-      startedAt: match?.startedAt || "",
-      endedAt: match?.endedAt || "",
+      startedAt: match?.startedAt
+        ? format(new Date(match.startedAt), "HH:mm")
+        : "",
+      endedAt: match?.endedAt
+        ? format(new Date(match.endedAt), "HH:mm")
+        : "",
 
       // Lineup fields
       team1Lineup:
         match?.lineups
-          ?.find((lineup) => lineup.team.id === match?.team1?.id)
-          ?.players.map((player) => player.id) || [],
+          ?.find((lineup) => lineup.team?.id === match?.team1?.id)
+          ?.players?.map((player) => player.id) || [],
 
       team2Lineup:
         match?.lineups
-          ?.find((lineup) => lineup.team.id === match?.team2?.id)
-          ?.players.map((player) => player.id) || [],
+          ?.find((lineup) => lineup.team?.id === match?.team2?.id)
+          ?.players?.map((player) => player.id) || [],
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
-      // console.log(dataValues);
       try {
         // Extract lineup data before processing match data
         const { team1Lineup, team2Lineup, ...matchValues } = values;
 
         let dataValues = match ? { id: match.id, ...matchValues } : matchValues;
 
+        // Build result object with proper winner handling (including draw)
+        const team1Score = Number(dataValues.player1Score) || 0;
+        const team2Score = Number(dataValues.player2Score) || 0;
+
         dataValues = {
           ...dataValues,
           result: {
-            team1Score: dataValues.player1Score,
-            team2Score: dataValues.player2Score,
+            team1Score,
+            team2Score,
+            // Handle draw case - no winner when scores are equal
             winner:
-              dataValues.player1Score > dataValues.player2Score
+              team1Score > team2Score
                 ? dataValues.team1
-                : dataValues.team2,
+                : team1Score < team2Score
+                  ? dataValues.team2
+                  : undefined,
           },
-          isOnline: dataValues.isOnline === "ONLINE" ? true : false,
-
+          isOnline: dataValues.isOnline === "ONLINE",
           scheduledDate: format(
             combineDateAndTime(dataValues.date, dataValues.time),
             "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
           ),
-          startedAt: format(
-            combineDateAndTime(dataValues.date, dataValues.startedAt),
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-          ),
-          endedAt: format(
-            combineDateAndTime(dataValues.date, dataValues.endedAt),
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-          ),
         };
 
-        delete dataValues.date;
-        delete dataValues.time;
-
-        // Build lineups array - only include for edit mode (API may not support on create)
-        if (
-          formType === "edit" &&
-          (team1Lineup.length > 0 || team2Lineup.length > 0)
-        ) {
-          const lineups = [];
-          if (team1Lineup.length > 0) {
-            lineups.push({
-              team:  values.team1 ,
-              players: team1Lineup.map((id) => ({ id })),
-            });
-          }
-          if (team2Lineup.length > 0) {
-            lineups.push({
-              team:  values.team2 ,
-              players: team2Lineup.map((id) => ({ id })),
-            });
-          }
-          dataValues.lineups = lineups;
+        // Only include startedAt if provided
+        if (dataValues.startedAt) {
+          dataValues.startedAt = format(
+            combineDateAndTime(dataValues.date, dataValues.startedAt),
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+          );
+        } else {
+          delete dataValues.startedAt;
         }
 
-        console.log(dataValues);
-        // const matchResult = await submit(dataValues);
-        // const matchId = matchResult?.data?.id || matchResult?.id || match?.id;
+        // Only include endedAt if provided
+        if (dataValues.endedAt) {
+          dataValues.endedAt = format(
+            combineDateAndTime(dataValues.date, dataValues.endedAt),
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+          );
+        } else {
+          delete dataValues.endedAt;
+        }
 
-        // formType === "add" && formik.resetForm();
-        // toast.success(
-        //   formType === "add" ? "The match Added" : "The Match Edited"
-        // );
+        // Clean up temp fields
+        delete dataValues.date;
+        delete dataValues.time;
+        delete dataValues.player1Score;
+        delete dataValues.player2Score;
+        delete dataValues.summary; // Not in backend schema
 
-        // // Redirect to edit page after successful add
-        // if (formType === "add" && matchId) {
-        //   router.push(`/dashboard/matches-management/edit`);
-        // }
+        // Remove empty optional fields
+        if (!dataValues.tournament) delete dataValues.tournament;
+        if (!dataValues.round) delete dataValues.round;
+        if (!dataValues.venue) delete dataValues.venue;
+        if (!dataValues.streamUrl) delete dataValues.streamUrl;
+        if (!dataValues.highlightsUrl) delete dataValues.highlightsUrl;
+
+        // Convert bestOf to number
+        if (dataValues.bestOf) {
+          dataValues.bestOf = Number(dataValues.bestOf);
+        }
+
+        // Remove lineup fields from main data (handle separately via API)
+        delete dataValues.team1Lineup;
+        delete dataValues.team2Lineup;
+
+        console.log("Submitting match data:", dataValues);
+
+        // SUBMIT THE FORM
+        const matchResult = await submit(dataValues);
+        const matchId = matchResult?.data?.id || matchResult?.id || match?.id;
+
+        if (formType === "add") {
+          formik.resetForm();
+        }
+
+        toast.success(
+          formType === "add" ? t("The match Added") : t("The Match Edited")
+        );
+
+        // Redirect to edit page after successful add
+        if (formType === "add" && matchId) {
+          router.push(`/dashboard/matches-management/edit`);
+        }
       } catch (error) {
-        toast.error(error.message);
+        console.error("Match submit error:", error);
+        toast.error(error.message || t("Error saving match"));
       }
     },
   });
-  console.log(
-    "match",
-    match?.lineups,
-    "lineups"
-  );
 
   const matchTypeOptions = [
     { value: "SOLO", label: t("Solo") },
@@ -215,8 +226,9 @@ function MatchesFrom({
   ];
   const matchStateOptions = [
     { value: "scheduled", label: t("UPCOMING") },
-    { value: "completed", label: t("FINISHED") },
     { value: "live", label: t("LIVE") },
+    { value: "completed", label: t("FINISHED") },
+    { value: "postponed", label: t("POSTPONED") },
     { value: "cancelled", label: t("CANCELLED") },
   ];
   const seriesFormatOptions = [
@@ -474,8 +486,8 @@ function MatchesFrom({
             name={"bestOf"}
             placeholder={t("Select Series Format")}
             error={
-              formik?.errors?.seriesFormat && formik?.touched?.seriesFormat
-                ? t(formik.errors.seriesFormat)
+              formik?.errors?.bestOf && formik?.touched?.bestOf
+                ? t(formik.errors.bestOf)
                 : ""
             }
             // onBlur={formik.handleBlur}
