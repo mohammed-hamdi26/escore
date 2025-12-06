@@ -14,11 +14,11 @@ async function page({ params }) {
 
   const [
     newData,
-    teamsOptions,
+    { data: teamsOptions },
     { data: tournamentsOptions },
     gamesOptions,
-    playersOptions,
-    matchesOptions,
+    { data: playersOptions },
+    { data: matchesOptions },
   ] = await Promise.all([
     getNew(id),
     getTeams(),

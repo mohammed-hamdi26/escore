@@ -11,11 +11,11 @@ async function page() {
   const locale = await getLocale();
 
   const [
-    playersOptions,
-    teamsOptions,
+    { data: playersOptions },
+    { data: teamsOptions },
     { data: tournamentsOptions },
     gamesOptions,
-    matchesOptions,
+    { data: matchesOptions },
   ] = await Promise.all([
     getPlayers(),
     getTeams(),

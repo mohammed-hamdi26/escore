@@ -10,10 +10,10 @@ import PlayerFrom from "@/components/Player Management/PlayerFrom";
 async function page() {
   const [
     countries,
-    newsOptions,
-    teamsOptions,
+    { data: newsOptions },
+    { data: teamsOptions },
     gamesOptions,
-    tournamentsOptions,
+    { data: tournamentsOptions },
   ] = await Promise.all([
     getCountries(),
     getNews(),
