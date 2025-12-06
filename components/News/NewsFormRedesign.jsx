@@ -123,12 +123,12 @@ function NewsFormRedesign({
             dark: values.authorPicture,
           },
           urlExternal: values.urlExternal || undefined,
-          game: values.game || null,
-          tournament: values.tournament || null,
-          team: values.team || null,
-          player: values.player || null,
-          match: values.match || null,
-          publishedAt: values.publishedAt || new Date().toISOString(),
+          game: values.game || undefined,
+          tournament: values.tournament || undefined,
+          team: values.team || undefined,
+          player: values.player || undefined,
+          match: values.match || undefined,
+          publishedAt: values.publishedAt ? values.publishedAt.toISOString() : undefined,
           isFeatured: values.isFeatured,
         };
 
