@@ -20,7 +20,6 @@ const validationSchema = Yup.object({
       "Password must contain uppercase, lowercase and number"
     )
     .required("Password is required"),
-  avatar: Yup.string(),
 });
 
 function FormContainer() {
@@ -31,7 +30,6 @@ function FormContainer() {
     initialValues: {
       firstName: "",
       lastName: "",
-      avatar: "",
       email: "",
       password: "",
     },

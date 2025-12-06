@@ -5,7 +5,6 @@ import Image from "next/image";
 import logoImage from "../../public/images/logo.png";
 import InputApp from "../ui app/InputApp";
 import { Button } from "../ui/button";
-import FileInput from "../ui app/FileInput";
 import { Spinner } from "../ui/spinner";
 import { Link } from "@/i18n/navigation";
 import { Shield } from "lucide-react";
@@ -57,21 +56,6 @@ function RegisterFrom({ formik, t }) {
           onBlur={formik.handleBlur}
           className="max-w-[400px]"
         />
-        <div className="max-w-[400px]">
-          <FileInput
-            t={t}
-            disabled={formik.isSubmitting}
-            formik={formik}
-            name="avatar"
-            placeholder={t("Image")}
-            inputAuth={true}
-            error={
-              formik.touched.avatar &&
-              formik.errors.avatar &&
-              formik.errors.avatar
-            }
-          />
-        </div>
         <Button
           disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
