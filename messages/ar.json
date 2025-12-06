@@ -75,6 +75,10 @@
     "transfers Management": {
       "title": "إدارة التحويلات",
       "description": "اذهب إلى قسم الانتقالات لإضافة انتقال: اللاعب، من الفريق، إلى الفريق، تاريخ الانتقال، رسوم الانتقال"
+    },
+    "Notifications": {
+      "title": "الإشعارات",
+      "description": "إرسال إشعارات وإدارة الأجهزة المسجلة"
     }
   },
   "nav": {
@@ -361,7 +365,10 @@
     "Completed": "منتهية",
     "Country": "البلد",
     "Games": "الألعاب",
-    "Select Game": "اختر اللعبة"
+    "Select Game": "اختر اللعبة",
+    "Invalid knockout image URL": "رابط صورة الشكل غير صالح",
+    "Invalid dark knockout image URL": "رابط صورة الشكل المظلمة غير صالح",
+    "Dark knockout image is required": "صورة الشكل المظلمة مطلوبة"
   },
   "TournamentsTable": {
     "name": "الاسم",
@@ -563,7 +570,8 @@
     "Theme updated successfully": "تم تحديث الثيم بنجاح",
     "Update": "تحديث",
     "Submit": "ارسال",
-    "ThemeType": "نوع الثيم"
+    "ThemeType": "نوع الثيم",
+    "EditTheme": "تعديل الثيم"
   },
   "languages": {
     "Word": "الكلمة",
@@ -1137,7 +1145,7 @@
     "title": "العنوان",
     "titlePlaceholder": "أدخل عنوان الخبر...",
     "titleRequired": "العنوان مطلوب",
-    "titleTooLong": "العنوان لا يمكن أن يتجاوز 300 حرف",
+    "titleTooLong": "لا يمكن أن يتجاوز العنوان 300 حرف",
     "excerpt": "الملخص",
     "excerptPlaceholder": "ملخص مختصر للخبر (بحد أقصى 500 حرف)",
     "excerptTooLong": "الملخص لا يمكن أن يتجاوز 500 حرف",
@@ -1151,7 +1159,7 @@
     "coverImageDarkPlaceholder": "أدخل رابط صورة الوضع الداكن",
     "externalUrl": "الرابط الخارجي (المصدر)",
     "externalUrlPlaceholder": "https://example.com/article",
-    "invalidUrl": "صيغة الرابط غير صحيحة",
+    "invalidUrl": "يرجى إدخال رابط صحيح",
     "classification": "التصنيف",
     "category": "الفئة",
     "selectCategory": "اختر الفئة",
@@ -1164,7 +1172,7 @@
     "authorInfo": "معلومات الكاتب",
     "authorName": "اسم الكاتب",
     "authorNamePlaceholder": "أدخل اسم الكاتب",
-    "authorNameTooLong": "اسم الكاتب لا يمكن أن يتجاوز 100 حرف",
+    "authorNameTooLong": "لا يمكن أن يتجاوز اسم الكاتب 100 حرف",
     "authorPicture": "صورة الكاتب",
     "authorPicturePlaceholder": "أدخل رابط صورة الكاتب",
     "relatedEntities": "الكيانات المرتبطة",
@@ -1196,15 +1204,10 @@
     "requiredFields": "الحقول المطلوبة",
     "requiredFieldsNotice": "الحقول المميزة بـ * مطلوبة. يرجى ملء جميع الحقول المطلوبة قبل الإرسال.",
     "validationErrors": "خطأ/أخطاء في التحقق",
-    "titleRequired": "العنوان مطلوب",
-    "titleTooLong": "لا يمكن أن يتجاوز العنوان 300 حرف",
-    "contentRequired": "المحتوى مطلوب",
     "contentTooShort": "يجب أن يكون المحتوى 10 أحرف على الأقل",
     "coverImageRequired": "صورة الغلاف مطلوبة",
     "authorNameRequired": "اسم الكاتب مطلوب",
-    "authorNameTooLong": "لا يمكن أن يتجاوز اسم الكاتب 100 حرف",
     "authorImageRequired": "صورة الكاتب مطلوبة",
-    "invalidUrl": "يرجى إدخال رابط صحيح",
     "coverImage": "صورة الغلاف",
     "externalLink": "رابط خارجي"
   }

@@ -50,17 +50,14 @@
       "title": "Teams Management",
       "description": "Add Team: Name, Country, Linked Players, Logo/Images"
     },
-
     "Games Management": {
       "title": "Games Management",
       "description": "go to Games Section to Add Game: Name + Icon"
     },
-
     "News & Updates": {
       "title": "News & Updates",
       "description": "Go to news Section to Add News: Title, Description, Image/Video, Author"
     },
-
     "Users": {
       "title": "Users",
       "description": "Go to user Section to view Users , Edit email and password , see favorite teams for each user"
@@ -96,6 +93,10 @@
     "transfers Management": {
       "title": "Transfers Management",
       "description": "Go to Transfers Section to Add Transfer: Player, From Team, To Team, Transfer Date, Transfer Fee"
+    },
+    "Notifications": {
+      "title": "Notifications",
+      "description": "Send push notifications and manage registered devices"
     }
   },
   "nav": {
@@ -162,21 +163,17 @@
     "Enter Player Photo": "Enter Player Photo",
     "Yes": "Yes",
     "No": "No",
-
     "firstNameRequired": "First Name is Required",
     "lastNameRequired": "Last Name is Required",
-
     "countryRequired": "Country is Required",
     "birthDateRequired": "Birth Date is Required",
     "nationalityRequired": "Nationality is Required",
     "photoRequired": "Photo Player is Required",
     "photoDarkRequired": "Photo Player (Dark) is Required",
-
     "earningsNegative": "Earnings cannot be negative",
     "achievementsNegative": "Achievements cannot be negative",
     "rankingNegative": "Ranking cannot be negative",
     "marketValueNegative": "Market Value cannot be negative",
-
     "Select country Player Belong To": "Select country Player Belong To",
     "country": "Country",
     "Enter Team Player Belong To": "Enter Team Player Belong To",
@@ -308,19 +305,14 @@
     "Transfer News": "Transfer News",
     "Match Recap": "Match Recap",
     "Trending": "Trending",
-
     "Players": "Players",
     "Select Players": "Select Players",
-
     "Teams": "Teams",
     "Select Teams": "Select Teams",
-
     "Games": "Games",
     "Select Games": "Select Games",
-
     "Tournaments": "Tournaments",
     "Select Tournaments": "Select Tournaments",
-
     "newsTypeInvalid": "news type must be general or match recap or trending",
     "statusInvalid": "Status must be Published or Scheduled",
     "authorNameRequired": "author name is required",
@@ -393,7 +385,6 @@
     "Cancelled": "cancelled",
     "Completed": "completed",
     "Country": "Country",
-
     "Games": "Games",
     "Select Game": "Select Game"
   },
@@ -425,22 +416,17 @@
     "Dictionary": "Dictionary",
     "Cancel": "Cancel",
     "No languages found": "No languages found",
-
     "Edit Language": "Edit Language",
-
     "DialogAddDescription": "Add a new language to the system. Fill in all the required fields.",
     "DialogEditDescription": "Update the language information. Modify the fields as needed.",
     "DialogEditTitle": "Edit Language",
-
     "Language added successfully": "Language added successfully",
     "Language updated successfully": "Language updated successfully",
     "Language deleted successfully": "Language deleted successfully",
-
     "Enter local name": "Enter local name",
     "Enter language name": "Enter language name",
     "Enter language code": "Enter language code",
     "Local Name": "Local Name",
-
     "Local name is required": "Local name is required",
     "Name is required": "Name is required",
     "Code is required": "Code is required"
@@ -457,48 +443,33 @@
     "FINISHED": "FINISHED",
     "Team": "Team",
     "Solo": "Solo",
-
     "Tournaments": "Tournaments",
     "Write Champion Name": "Write Champion Name",
-
     "Game": "Game",
     "Write Game Name": "Write Game Name",
-
     "Team 1": "Team 1",
     "Write Team Name": "Write Team Name",
-
     "Team 2": "Team 2",
     "Select Team Name": "Select Team Name",
-
     "Winning Team": "Winning Team",
     "Select Winning Team": "Select Winning Team",
-
     "Match Type": "Match Type",
     "Select Match Type": "Select Match Type",
-
     "Match State": "Match State",
     "Select Match State": "Select Match State",
-
     "Series Format": "Series Format",
     "Select Series Format": "Select Series Format",
-
     "Player 1 Score": "Player 1 Score",
     "Enter Player 1 Score": "Enter Player 1 Score",
-
     "Player 2 Score": "Player 2 Score",
     "Enter Player 2 Score": "Enter Player 2 Score",
-
     "round": "Round",
     "Enter round": "Enter Round",
-
     "location Type": "location Type",
-
     "location": "location",
     "Enter location": "Enter location",
-
     "Match Date": "Match Date",
     "Enter Match Date": "Enter Match Date",
-
     "time": "Time",
     "Enter Match Time": "Enter Match Time",
     "Stream URL": "Stream URL",
@@ -520,7 +491,6 @@
     "VOD URL": "VOD URL",
     "Enter VOD URL": "Enter VOD URL",
     "Pick a date": "Pick a date",
-
     "Enter Highlight URL": "Enter Highlight URL",
     "Highlight URL": "Highlight URL",
     "Enter End Time": "Enter End Time",
@@ -530,7 +500,6 @@
     "Enter Venue": "Enter Venue",
     "Venue": "Venue",
     "Venue Type": "Venue Type",
-
     "Venue is required": "Venue is required",
     "End Time is required": "End Time is required",
     "Start Time is required": "Start Time is required",
@@ -539,7 +508,6 @@
     "Team 1 is required": "Team 1 is required",
     "Team 2 is required": "Team 2 is required",
     "Series Format is required": "Series Format is required",
-
     "Team Lineups": "Team Lineups",
     "Team Lineup": "Team Lineup",
     "Select All": "Select All",
@@ -547,7 +515,8 @@
     "selected": "selected",
     "Loading players": "Loading players...",
     "No players available": "No players in this team",
-    "Failed to load players": "Failed to load players"
+    "Failed to load players": "Failed to load players",
+    "round is required": "Round is required"
   },
   "MatchesTable": {
     "Date": "Date",
@@ -609,7 +578,11 @@
     "dashboard": "Dashboard",
     "allUsers": "All Users",
     "addUser": "Add User",
-    "contentRequests": "Content Requests",
+    "contentRequests": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
     "stats": {
       "userStats": "User Statistics",
       "totalUsers": "Total Users",
@@ -625,11 +598,6 @@
       "admin": "Admin",
       "content": "Content Creator",
       "support": "Support"
-    },
-    "contentRequests": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected"
     },
     "filters": {
       "search": "Search",
@@ -730,16 +698,15 @@
     "DialogDeleteTitle": "Are you absolutely sure you want to delete this theme?",
     "DialogDeleteDescription": "This action cannot be undone. This will permanently delete the theme and remove it from the system.",
     "ThemeType": "Theme Type",
-
     "Cancel": "Cancel",
     "EditTheme": "Edit Theme",
     "AddTheme": "Add Theme",
     "DialogAddDescription": "Add a new theme to the system. Fill in all the required fields.",
-
     "Add New theme": "Add New theme",
     "Theme added successfully": "Theme added successfully",
     "Theme updated successfully": "Theme updated successfully",
-    "Update": "Update"
+    "Update": "Update",
+    "Submit": "Submit"
   },
   "languages": {
     "Word": "Word",
@@ -755,14 +722,15 @@
     "Edit": "Edit",
     "Update": "Update",
     "Cancel": "Cancel",
-
     "No words found": "No words found",
-
     "word deleted successfully": "word deleted successfully",
     "Word translation updated successfully": "Word translation updated successfully",
     "Word added successfully": "Word added successfully",
-
-    "translation is required": "translation is required"
+    "translation is required": "translation is required",
+    "DialogDeleteDescription": "This action cannot be undone. This will permanently delete the word and remove it from the system.",
+    "DialogDeleteTitle": "Are you absolutely sure you want to delete this word?",
+    "DialogEditTitle": "Edit Word",
+    "DialogEditDescription": "Update the word translation. Modify the fields as needed."
   },
   "LinksTable": {
     "URL": "URL",
@@ -808,23 +776,17 @@
   "Awards": {
     "title": "Title",
     "titlePlaceholder": "Title",
-
     "image": "Image",
     "imagePlaceholder": "Image Link",
-
     "game": "Game",
     "gamePlaceholder": "Games",
-
     "tournament": "Tournament",
     "tournamentPlaceholder": "Tournament",
-
     "achievedDate": "Achieved Date",
     "datePlaceholder": "Date",
-
     "description": "Description",
     "descriptionPlaceholder": "Description",
     "Add new Award": "Add new Award",
-
     "Add Award": "Add Award",
     "Awards added successfully": "Award added successfully",
     "title is required": "Title is required",
@@ -864,16 +826,13 @@
     "First name is required": "First name is required",
     "The Code is Send To Your Email": "The Code is Send To Your Email",
     "Registration successful": "Registration successful",
-
     "Code must contain only numbers": "Code must contain only numbers",
     "Code must be 6 numbers": "Code must be 6 numbers",
     "Code is required": "Code is required",
-
     "Registration failed": "Registration failed",
     "Login": "Login",
     "Already have an account?": "Already have an account?"
   },
-
   "SupportCenter": {
     "Answer": "Answer",
     "Type your message": "Type your message...",
@@ -922,29 +881,21 @@
     "Change Password": "Change Password",
     "Passwords must match": "Passwords must match"
   },
-
   "TransfersForm": {
     "player": "Player",
     "selectPlayerPlaceholder": "Select Player",
-
     "game": "Game",
     "selectGamePlaceholder": "Select Game",
-
     "fee": "Fee",
     "feePlaceholder": "Enter the Fee",
-
     "transfer Date": "Transfer Date",
     "selectDatePlaceholder": "Select Transfer Date",
-
     "description": "Description",
     "descriptionPlaceholder": "Enter Description",
-
     "from Team": "From Team",
     "selectFromTeamPlaceholder": "Select From Team",
-
     "to Team": "To Team",
     "selectToTeamPlaceholder": "Select To Team",
-
     "Transfer date is required": "Transfer date is required",
     "Transfer fee is required": "Transfer fee is required",
     "Player is required": "Player is required",
@@ -1208,7 +1159,7 @@
     "coverImageDarkPlaceholder": "Enter dark mode image URL",
     "externalUrl": "External URL (Source)",
     "externalUrlPlaceholder": "https://example.com/article",
-    "invalidUrl": "Invalid URL format",
+    "invalidUrl": "Please enter a valid URL",
     "classification": "Classification",
     "category": "Category",
     "selectCategory": "Select Category",
@@ -1253,15 +1204,10 @@
     "requiredFields": "Required fields",
     "requiredFieldsNotice": "Fields marked with * are required. Please fill in all required fields before submitting.",
     "validationErrors": "validation error(s)",
-    "titleRequired": "Title is required",
-    "titleTooLong": "Title cannot exceed 300 characters",
-    "contentRequired": "Content is required",
     "contentTooShort": "Content must be at least 10 characters",
     "coverImageRequired": "Cover image is required",
     "authorNameRequired": "Author name is required",
-    "authorNameTooLong": "Author name cannot exceed 100 characters",
     "authorImageRequired": "Author image is required",
-    "invalidUrl": "Please enter a valid URL",
     "coverImage": "Cover Image",
     "externalLink": "External Link"
   }
