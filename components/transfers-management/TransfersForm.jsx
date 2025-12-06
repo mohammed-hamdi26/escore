@@ -2,200 +2,380 @@
 
 import { useFormik } from "formik";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import * as Yup from "yup";
 import FormSection from "../ui app/FormSection";
-import SelectInputCombox from "../ui app/SelectInputCombox";
-import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import SelectInput from "../ui app/SelectInput";
 import DatePicker from "../ui app/DatePicker";
-import MarkDown from "../ui app/MarkDown";
 import FormRow from "../ui app/FormRow";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import InputApp from "../ui app/InputApp";
+import { Textarea } from "../ui/textarea";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
+import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import toast from "react-hot-toast";
-const validationSchema = Yup.object({
-  transferDate: Yup.date().required("Transfer date is required"),
-  fee: Yup.number().required("Transfer fee is required"),
-  player: Yup.string().required("Player is required"),
-  fromTeam: Yup.string().required("From team is required"),
-  toTeam: Yup.string().required("To team is required"),
-});
+
+const STATUS_OPTIONS = [
+  { value: "rumor", label: "Rumor" },
+  { value: "pending", label: "Pending" },
+  { value: "confirmed", label: "Confirmed" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+const TYPE_OPTIONS = [
+  { value: "transfer", label: "Transfer" },
+  { value: "loan", label: "Loan" },
+  { value: "free_agent", label: "Free Agent" },
+  { value: "retirement", label: "Retirement" },
+  { value: "return_from_loan", label: "Return from Loan" },
+];
+
+const CURRENCY_OPTIONS = [
+  { value: "USD", label: "USD" },
+  { value: "EUR", label: "EUR" },
+  { value: "GBP", label: "GBP" },
+  { value: "SAR", label: "SAR" },
+  { value: "AED", label: "AED" },
+];
+
 function TransfersForm({
   formType = "add",
-  gamesOptions,
-  playersOptions,
-  teamsOptions,
+  gamesOptions = [],
+  playersOptions = [],
+  teamsOptions = [],
   transfer,
   submit,
 }) {
-  const t = useTranslations("TransfersForm");
+  const t = useTranslations("TransfersManagement");
+  const router = useRouter();
+
+  const validationSchema = Yup.object({
+    player: Yup.string().required(t("Player is required")),
+    type: Yup.string().required(t("Type is required")),
+    status: Yup.string().required(t("Status is required")),
+    fromTeam: Yup.string().when("type", {
+      is: (type) => type !== "free_agent",
+      then: (schema) => schema.required(t("From Team is required")),
+      otherwise: (schema) => schema.nullable(),
+    }),
+    toTeam: Yup.string().when("type", {
+      is: (type) => type !== "retirement",
+      then: (schema) => schema.required(t("To Team is required")),
+      otherwise: (schema) => schema.nullable(),
+    }),
+    fee: Yup.number().min(0, t("Fee must be positive")).nullable(),
+    contractLength: Yup.number()
+      .min(1, t("Contract length must be at least 1 month"))
+      .max(120, t("Contract length cannot exceed 120 months"))
+      .nullable(),
+  });
+
   const formik = useFormik({
     initialValues: {
-      transferDate: transfer?.transferDate || "",
+      player: transfer?.player?.id || transfer?.player?._id || "",
+      game: transfer?.game?.id || transfer?.game?._id || "",
+      type: transfer?.type || "transfer",
+      status: transfer?.status || "rumor",
+      fromTeam: transfer?.fromTeam?.id || transfer?.fromTeam?._id || "",
+      toTeam: transfer?.toTeam?.id || transfer?.toTeam?._id || "",
       fee: transfer?.fee || "",
-      player: transfer?.player.id || "",
-      fromTeam: transfer?.fromTeam?.id || "",
-      toTeam: transfer?.toTeam?.id || "",
-      description: transfer?.description || "",
-      game: transfer?.game?.id || "",
+      currency: transfer?.currency || "USD",
+      contractLength: transfer?.contractLength || "",
+      transferDate: transfer?.transferDate ? transfer.transferDate.split("T")[0] : "",
+      endDate: transfer?.endDate ? transfer.endDate.split("T")[0] : "",
+      source: transfer?.source || "",
+      notes: transfer?.notes || "",
+      isFeatured: transfer?.isFeatured || false,
     },
-    validationSchema: validationSchema,
+    validationSchema,
     onSubmit: async (values) => {
       try {
-        const dataValues = transfer ? { id: transfer.id, ...values } : values;
-        await submit(dataValues);
-        formType === "add" && formik.resetForm();
-        toast.success(
-          formType === "add"
-            ? "Transfer added successfully"
-            : "Transfer updated successfully"
-        );
+        // Clean up data
+        const dataValues = {
+          ...values,
+          fee: values.fee ? Number(values.fee) : undefined,
+          contractLength: values.contractLength ? Number(values.contractLength) : undefined,
+          fromTeam: values.fromTeam || undefined,
+          toTeam: values.toTeam || undefined,
+          game: values.game || undefined,
+          transferDate: values.transferDate || undefined,
+          endDate: values.endDate || undefined,
+          source: values.source || undefined,
+          notes: values.notes || undefined,
+        };
+
+        if (transfer) {
+          dataValues.id = transfer.id || transfer._id;
+        }
+
+        const result = await submit(dataValues);
+
+        if (result?.success) {
+          toast.success(
+            formType === "add"
+              ? t("Transfer added successfully")
+              : t("Transfer updated successfully")
+          );
+          if (formType === "add") {
+            formik.resetForm();
+            router.push("/dashboard/transfers-management/edit");
+          }
+        } else {
+          toast.error(result?.error || t("An error occurred"));
+        }
       } catch (error) {
-        toast.error("An error occurred");
+        toast.error(t("An error occurred"));
       }
     },
   });
 
-  console.log("formik values", formik.values);
-  console.log("formik values", formik.errors);
+  // Auto-set fromTeam when player is selected
+  const handlePlayerChange = (playerId) => {
+    formik.setFieldValue("player", playerId);
+    const player = playersOptions.find((p) => p.id === playerId || p._id === playerId);
+    if (player?.team) {
+      formik.setFieldValue("fromTeam", player.team.id || player.team._id || player.team);
+    }
+    if (player?.game) {
+      formik.setFieldValue("game", player.game.id || player.game._id || player.game);
+    }
+  };
+
+  // Show/hide fields based on type
+  const showFromTeam = formik.values.type !== "free_agent";
+  const showToTeam = formik.values.type !== "retirement";
+  const showEndDate = formik.values.type === "loan";
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8">
-      <FormSection>
+      {/* Basic Info */}
+      <FormSection title={t("Basic Information")}>
         <FormRow>
           <SelectInput
-            name={"player"}
-            label={t("player")}
+            name="player"
+            label={t("Player")}
             formik={formik}
-            placeholder={t("selectPlayerPlaceholder")}
-            options={mappedArrayToSelectOptions(
-              playersOptions,
-              "nickname",
-              "id"
-            )}
-            error={
-              formik.touched.player &&
-              formik.errors.player &&
-              t(formik.errors.player)
-            }
-            onChange={(formValue) => {
-              formik.setFieldValue("player", formValue);
-              const player = playersOptions.find((p) => p.id === formValue);
-              if (player) {
-                formik.setFieldValue("fromTeam", player.team.id);
-              } else {
-                formik.setFieldValue("fromTeam", "");
-              }
-            }}
+            placeholder={t("Select Player")}
+            options={mappedArrayToSelectOptions(playersOptions, "nickname", "id")}
+            error={formik.touched.player && formik.errors.player}
+            onChange={handlePlayerChange}
+            required
           />
           <SelectInput
-            name={"game"}
-            label={t("game")}
+            name="game"
+            label={t("Game")}
             formik={formik}
-            placeholder={t("selectGamePlaceholder")}
+            placeholder={t("Select Game")}
             options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
-            error={
-              formik.touched.game && formik.errors.game && t(formik.errors.game)
-            }
-            onChange={(formValue) => {
-              formik.setFieldValue("game", formValue);
-            }}
-          />
-          <DatePicker
-            formik={formik}
-            name="transferDate"
-            label={t("transfer Date")}
-            disabled={formik.isSubmitting}
-            placeholder={t("selectDatePlaceholder")}
-            disabledDate={{}}
+            error={formik.touched.game && formik.errors.game}
+            onChange={(value) => formik.setFieldValue("game", value)}
           />
         </FormRow>
-        <MarkDown
-          formik={formik}
-          placeholder={t("descriptionPlaceholder")}
-          name="description"
-          label={t("description")}
-          error={
-            formik.touched.description &&
-            formik.errors.description &&
-            t(formik.errors.description)
-          }
-        />
+        <FormRow>
+          <SelectInput
+            name="type"
+            label={t("Transfer Type")}
+            formik={formik}
+            placeholder={t("Select Type")}
+            options={TYPE_OPTIONS.map((opt) => ({
+              value: opt.value,
+              label: t(opt.label),
+            }))}
+            error={formik.touched.type && formik.errors.type}
+            onChange={(value) => formik.setFieldValue("type", value)}
+            required
+          />
+          <SelectInput
+            name="status"
+            label={t("Status")}
+            formik={formik}
+            placeholder={t("Select Status")}
+            options={STATUS_OPTIONS.map((opt) => ({
+              value: opt.value,
+              label: t(opt.label),
+            }))}
+            error={formik.touched.status && formik.errors.status}
+            onChange={(value) => formik.setFieldValue("status", value)}
+            required
+          />
+        </FormRow>
       </FormSection>
-      <FormSection>
+
+      {/* Teams */}
+      <FormSection title={t("Teams")}>
+        <FormRow>
+          {showFromTeam && (
+            <SelectInput
+              name="fromTeam"
+              label={t("From Team")}
+              formik={formik}
+              placeholder={t("Select From Team")}
+              options={mappedArrayToSelectOptions(
+                teamsOptions.filter(
+                  (team) => (team.id || team._id) !== formik.values.toTeam
+                ),
+                "name",
+                "id"
+              )}
+              error={formik.touched.fromTeam && formik.errors.fromTeam}
+              onChange={(value) => formik.setFieldValue("fromTeam", value)}
+              required={showFromTeam}
+            />
+          )}
+          {showToTeam && (
+            <SelectInput
+              name="toTeam"
+              label={t("To Team")}
+              formik={formik}
+              placeholder={t("Select To Team")}
+              options={mappedArrayToSelectOptions(
+                teamsOptions.filter(
+                  (team) => (team.id || team._id) !== formik.values.fromTeam
+                ),
+                "name",
+                "id"
+              )}
+              error={formik.touched.toTeam && formik.errors.toTeam}
+              onChange={(value) => formik.setFieldValue("toTeam", value)}
+              required={showToTeam}
+            />
+          )}
+        </FormRow>
+      </FormSection>
+
+      {/* Financial Details */}
+      <FormSection title={t("Financial Details")}>
         <FormRow>
           <InputApp
-            name={"fee"}
-            label={t("fee")}
+            name="fee"
+            label={t("Transfer Fee")}
             formik={formik}
-            placeholder={t("feePlaceholder")}
-            type={"number"}
-            error={
-              formik.touched.fee && formik.errors.fee && t(formik.errors.fee)
-            }
-            className="border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            placeholder={t("Enter Fee")}
+            type="number"
+            error={formik.touched.fee && formik.errors.fee}
+            className="border-0 focus:outline-none"
+            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
             textColor="text-[#677185]"
             disabled={formik.isSubmitting}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.fee}
-            t={t}
-          />
-        </FormRow>
-      </FormSection>
-      <FormSection>
-        <FormRow>
-          <SelectInput
-            value={formik.values.fromTeam}
-            name={"fromTeam"}
-            label={t("from Team")}
-            formik={formik}
-            placeholder={t("selectFromTeamPlaceholder")}
-            options={mappedArrayToSelectOptions(
-              teamsOptions
-                // .filter((team) => team.id === formik.values.fromTeam)
-                .filter((team) => team.id !== formik.values.toTeam),
-              "name",
-              "id"
-            )}
-            onChange={(value) => {
-              formik.setFieldValue("fromTeam", value);
-            }}
-            disabled={true}
           />
           <SelectInput
-            name={"toTeam"}
-            label={t("to Team")}
+            name="currency"
+            label={t("Currency")}
             formik={formik}
-            placeholder={t("selectToTeamPlaceholder")}
-            options={mappedArrayToSelectOptions(
-              teamsOptions.filter((team) => team.id !== formik.values.fromTeam),
-              "name",
-              "id"
-            )}
-            onChange={(value) => {
-              formik.setFieldValue("toTeam", value);
-            }}
+            placeholder={t("Select Currency")}
+            options={CURRENCY_OPTIONS}
+            onChange={(value) => formik.setFieldValue("currency", value)}
+          />
+          <InputApp
+            name="contractLength"
+            label={t("Contract Length (months)")}
+            formik={formik}
+            placeholder={t("Enter Contract Length")}
+            type="number"
+            error={formik.touched.contractLength && formik.errors.contractLength}
+            className="border-0 focus:outline-none"
+            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
+            textColor="text-[#677185]"
+            disabled={formik.isSubmitting}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.contractLength}
           />
         </FormRow>
       </FormSection>
 
-      <div className="flex justify-end">
+      {/* Dates */}
+      <FormSection title={t("Dates")}>
+        <FormRow>
+          <DatePicker
+            formik={formik}
+            name="transferDate"
+            label={t("Transfer Date")}
+            disabled={formik.isSubmitting}
+            placeholder={t("Select Transfer Date")}
+          />
+          {showEndDate && (
+            <DatePicker
+              formik={formik}
+              name="endDate"
+              label={t("End Date (for loans)")}
+              disabled={formik.isSubmitting}
+              placeholder={t("Select End Date")}
+            />
+          )}
+        </FormRow>
+      </FormSection>
+
+      {/* Additional Information */}
+      <FormSection title={t("Additional Information")}>
+        <FormRow>
+          <InputApp
+            name="source"
+            label={t("Source")}
+            formik={formik}
+            placeholder={t("Enter Source (e.g., Official announcement)")}
+            className="border-0 focus:outline-none"
+            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
+            textColor="text-[#677185]"
+            disabled={formik.isSubmitting}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.source}
+          />
+        </FormRow>
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t("Notes")}
+          </Label>
+          <Textarea
+            name="notes"
+            placeholder={t("Enter additional notes...")}
+            value={formik.values.notes}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            disabled={formik.isSubmitting}
+            className="min-h-[100px] bg-dashboard-box dark:bg-[#0F1017] border-0"
+          />
+        </div>
+        <div className="flex items-center gap-3 pt-4">
+          <Switch
+            id="isFeatured"
+            checked={formik.values.isFeatured}
+            onCheckedChange={(checked) => formik.setFieldValue("isFeatured", checked)}
+            disabled={formik.isSubmitting}
+          />
+          <Label htmlFor="isFeatured" className="text-sm text-gray-700 dark:text-gray-300">
+            {t("Featured Transfer")}
+          </Label>
+        </div>
+      </FormSection>
+
+      {/* Submit Button */}
+      <div className="flex justify-end gap-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={formik.isSubmitting}
+        >
+          {t("Cancel")}
+        </Button>
         <Button
           disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
-          className={
-            "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
-          }
+          className="text-white text-center min-w-[120px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
         >
           {formik.isSubmitting ? (
             <Spinner />
           ) : formType === "add" ? (
             t("Add Transfer")
           ) : (
-            t("Edit Transfer")
+            t("Save Changes")
           )}
         </Button>
       </div>

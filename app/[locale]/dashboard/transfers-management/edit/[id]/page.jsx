@@ -2,28 +2,40 @@ import { editTransfer } from "@/app/[locale]/_Lib/actions";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
-import { getTournament } from "@/app/[locale]/_Lib/tournamentsApi";
-import { getTransfer, getTransfers } from "@/app/[locale]/_Lib/transferApi";
+import { getTransfer } from "@/app/[locale]/_Lib/transferApi";
 import TransfersForm from "@/components/transfers-management/TransfersForm";
+import { notFound } from "next/navigation";
 
-async function page({ params }) {
+async function EditTransferPage({ params }) {
   const { id } = await params;
-  const [games, players, teams, transfer] = await Promise.all([
-    getGames(),
-    getPlayers(),
-    getTeams(),
-    getTransfer(id),
+
+  let transfer;
+  try {
+    [transfer] = await Promise.all([getTransfer(id)]);
+    if (!transfer) {
+      notFound();
+    }
+  } catch (error) {
+    console.error("Error fetching transfer:", error);
+    notFound();
+  }
+
+  const [games, players, teams] = await Promise.all([
+    getGames().catch(() => []),
+    getPlayers().catch(() => []),
+    getTeams().catch(() => []),
   ]);
+
   return (
     <TransfersForm
       submit={editTransfer}
-      playersOptions={players}
+      playersOptions={players || []}
       transfer={transfer}
       formType="edit"
-      teamsOptions={teams}
-      gamesOptions={games}
+      teamsOptions={teams || []}
+      gamesOptions={games || []}
     />
   );
 }
 
-export default page;
+export default EditTransferPage;

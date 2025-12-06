@@ -847,56 +847,77 @@ export async function deleteAppSocialLink(id) {
   }
 }
 
-// transfars
+// transfers
 
 export async function addTransfer(data) {
   const locale = await getLocale();
   try {
     const res = await apiClient.post(`/transfers`, data);
-    // return res.data;
+    revalidatePath(`/${locale}/dashboard/transfers-management/edit`);
+    return { success: true, data: res.data.data };
   } catch (error) {
-    console.log(
-      error.response.data.errors ||
-        error.response.data ||
-        error.response ||
-        error
-    );
-    // console.log("Failed to add transfer", error);
-    throw error;
+    console.error("Failed to add transfer:", error.response?.data || error);
+    return { success: false, error: error.response?.data?.message || "Failed to add transfer" };
   }
-  redirect(`/${locale}/dashboard/transfers-management/edit`);
 }
 
 export async function editTransfer(data) {
   const locale = await getLocale();
   try {
     const res = await apiClient.put(`/transfers/${data.id}`, data);
-    revalidatePath(`/${locale}/dashboard/transfer-management/edit/${data.id}`);
-    // return res.data;
+    revalidatePath(`/${locale}/dashboard/transfers-management/edit`);
+    revalidatePath(`/${locale}/dashboard/transfers-management/edit/${data.id}`);
+    return { success: true, data: res.data.data };
   } catch (error) {
-    console.log(
-      error.response.data.errors ||
-        error.response.data ||
-        error.response ||
-        error
-    );
-    // console.log("Failed to add transfer", error);
-    throw error;
+    console.error("Failed to edit transfer:", error.response?.data || error);
+    return { success: false, error: error.response?.data?.message || "Failed to edit transfer" };
   }
-  // redirect(`/${locale}/dashboard/transfer-management/edit/${data.id}`);
 }
 
 export async function deleteTransfer(id) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.delete(`/transfers/${id}`);
-    revalidatePath(`/${locale}/dashboard/transfer-management`);
-    // return res.data;
+    await apiClient.delete(`/transfers/${id}`);
+    revalidatePath(`/${locale}/dashboard/transfers-management/edit`);
+    return { success: true };
   } catch (error) {
-    console.log("Failed to delete transfer", error);
-    throw error;
+    console.error("Failed to delete transfer:", error.response?.data || error);
+    return { success: false, error: error.response?.data?.message || "Failed to delete transfer" };
   }
-  // redirect(`/${locale}/dashboard/transfer-management`);
+}
+
+export async function updateTransferStatus(id, status) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.patch(`/transfers/${id}/status`, { status });
+    revalidatePath(`/${locale}/dashboard/transfers-management/edit`);
+    return { success: true, data: res.data.data };
+  } catch (error) {
+    console.error("Failed to update transfer status:", error.response?.data || error);
+    return { success: false, error: error.response?.data?.message || "Failed to update status" };
+  }
+}
+
+export async function confirmTransfer(id) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.patch(`/transfers/${id}/confirm`);
+    revalidatePath(`/${locale}/dashboard/transfers-management/edit`);
+    return { success: true, data: res.data.data };
+  } catch (error) {
+    console.error("Failed to confirm transfer:", error.response?.data || error);
+    return { success: false, error: error.response?.data?.message || "Failed to confirm transfer" };
+  }
+}
+
+export async function getTransferByIdAction(id) {
+  try {
+    const res = await apiClient.get(`/transfers/${id}`);
+    return { success: true, data: res.data.data };
+  } catch (error) {
+    console.error("Failed to get transfer:", error.response?.data || error);
+    return { success: false, error: error.response?.data?.message || "Failed to get transfer" };
+  }
 }
 
 export async function addUser(data) {

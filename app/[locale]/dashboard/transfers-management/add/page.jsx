@@ -4,20 +4,22 @@ import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import TransfersForm from "@/components/transfers-management/TransfersForm";
 
-async function page() {
+async function AddTransferPage() {
   const [games, players, teams] = await Promise.all([
-    getGames(),
-    getPlayers(),
-    getTeams(),
+    getGames().catch(() => []),
+    getPlayers().catch(() => []),
+    getTeams().catch(() => []),
   ]);
+
   return (
     <TransfersForm
       submit={addTransfer}
-      gamesOptions={games}
-      playersOptions={players}
-      teamsOptions={teams}
+      gamesOptions={games || []}
+      playersOptions={players || []}
+      teamsOptions={teams || []}
+      formType="add"
     />
   );
 }
 
-export default page;
+export default AddTransferPage;
