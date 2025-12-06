@@ -8,7 +8,7 @@ import Player from "@/components/icons/Player";
 import SupportCenter from "@/components/icons/SuppotCenter";
 import TeamsManagement from "@/components/icons/TeamsManagement";
 import User from "@/components/icons/User";
-import { ArrowRightLeft, icons } from "lucide-react";
+import { ArrowRightLeft, Bell, icons } from "lucide-react";
 import { getLoginUser } from "../_Lib/usersApi";
 const links = [
   {
@@ -209,6 +209,14 @@ export default async function page() {
           : user.permissions.find((per) => per.entity == "Support")
           ? true
           : false,
+    },
+    {
+      title: "Notifications",
+      href: "/notifications",
+      description:
+        "Send push notifications and manage registered devices",
+      icon: <Bell className="icon-transition" width="57" height="56" />,
+      isShowed: user.role === "admin" ? true : false,
     },
     // {
     //   title: "Settings",

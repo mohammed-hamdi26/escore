@@ -917,5 +917,69 @@
     "Settings": "Settings",
     "Support": "Support",
     "User": "User"
+  },
+  "Notifications": {
+    "title": "Notifications Management",
+    "dashboard": "Dashboard",
+    "send": "Send Notification",
+    "devices": "Registered Devices",
+    "description": "Send push notifications and manage registered devices",
+    "stats": {
+      "totalSent": "Total Sent",
+      "totalDelivered": "Total Delivered",
+      "totalClicked": "Total Clicked",
+      "deliveryRate": "Delivery Rate",
+      "clickRate": "Click Rate",
+      "totalDevices": "Total Devices",
+      "activeDevices": "Active Devices"
+    },
+    "target": {
+      "type": "Target Type",
+      "all": "All Users",
+      "allDesc": "Send to all registered users",
+      "topic": "Topic",
+      "topicDesc": "Send to a specific topic",
+      "users": "Specific Users",
+      "usersDesc": "Select specific users",
+      "segment": "Segment",
+      "segmentDesc": "Filter by criteria"
+    },
+    "form": {
+      "title": "Notification Title",
+      "body": "Notification Body",
+      "imageUrl": "Image URL",
+      "priority": "Priority",
+      "high": "High",
+      "normal": "Normal",
+      "send": "Send Notification",
+      "sending": "Sending...",
+      "success": "Notification sent successfully",
+      "error": "Failed to send notification"
+    },
+    "segment": {
+      "followsGame": "Follows Game",
+      "followsTeam": "Follows Team",
+      "followsTournament": "Follows Tournament",
+      "platform": "Platform",
+      "lastActiveWithin": "Active within (days)"
+    },
+    "devicesTable": {
+      "user": "User",
+      "deviceType": "Device Type",
+      "deviceName": "Device Name",
+      "appVersion": "App Version",
+      "lastActive": "Last Active",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "allPlatforms": "All Platforms",
+      "allStatus": "All Status",
+      "clearFilters": "Clear Filters",
+      "noDevices": "No devices found",
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "page": "Page"
+    }
   }
 }

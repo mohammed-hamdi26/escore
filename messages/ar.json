@@ -919,5 +919,69 @@
     "Settings": "الإعدادات",
     "Support": "الدعم",
     "User": "المستخدم"
+  },
+  "Notifications": {
+    "title": "إدارة الإشعارات",
+    "dashboard": "لوحة التحكم",
+    "send": "إرسال إشعار",
+    "devices": "الأجهزة المسجلة",
+    "description": "إرسال إشعارات وإدارة الأجهزة المسجلة",
+    "stats": {
+      "totalSent": "إجمالي المرسل",
+      "totalDelivered": "إجمالي التسليم",
+      "totalClicked": "إجمالي النقرات",
+      "deliveryRate": "نسبة التسليم",
+      "clickRate": "نسبة النقر",
+      "totalDevices": "إجمالي الأجهزة",
+      "activeDevices": "الأجهزة النشطة"
+    },
+    "target": {
+      "type": "نوع الهدف",
+      "all": "كل المستخدمين",
+      "allDesc": "إرسال لجميع المستخدمين المسجلين",
+      "topic": "موضوع",
+      "topicDesc": "إرسال لموضوع محدد",
+      "users": "مستخدمين محددين",
+      "usersDesc": "اختر مستخدمين محددين",
+      "segment": "شريحة",
+      "segmentDesc": "تصفية حسب معايير"
+    },
+    "form": {
+      "title": "عنوان الإشعار",
+      "body": "محتوى الإشعار",
+      "imageUrl": "رابط الصورة",
+      "priority": "الأولوية",
+      "high": "عالية",
+      "normal": "عادية",
+      "send": "إرسال الإشعار",
+      "sending": "جاري الإرسال...",
+      "success": "تم إرسال الإشعار بنجاح",
+      "error": "فشل في إرسال الإشعار"
+    },
+    "segment": {
+      "followsGame": "يتابع لعبة",
+      "followsTeam": "يتابع فريق",
+      "followsTournament": "يتابع بطولة",
+      "platform": "المنصة",
+      "lastActiveWithin": "نشط خلال (أيام)"
+    },
+    "devicesTable": {
+      "user": "المستخدم",
+      "deviceType": "نوع الجهاز",
+      "deviceName": "اسم الجهاز",
+      "appVersion": "إصدار التطبيق",
+      "lastActive": "آخر نشاط",
+      "status": "الحالة",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "allPlatforms": "جميع المنصات",
+      "allStatus": "جميع الحالات",
+      "clearFilters": "مسح الفلاتر",
+      "noDevices": "لا توجد أجهزة",
+      "showing": "عرض",
+      "to": "إلى",
+      "of": "من",
+      "page": "صفحة"
+    }
   }
 }
