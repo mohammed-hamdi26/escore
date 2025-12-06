@@ -1,8 +1,6 @@
-import { getPlayers, getPlayersCount } from "@/app/[locale]/_Lib/palyerApi";
+import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import PlayersTable from "@/components/Player Management/PlayersTable";
 import Loading from "@/components/ui app/Loading";
-import Table from "@/components/ui app/Table";
-import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
 
 const columns = [
@@ -23,20 +21,22 @@ const columns = [
     header: "Country",
   },
 ];
+
 async function page({ searchParams }) {
   const { search, size, page } = await searchParams;
 
-  const players = await getPlayers();
-
-  // const numOfPlayers = await getPlayersCount();
+  const { data: players, pagination } = await getPlayers({
+    search,
+    size,
+    page,
+  });
 
   return (
     <Suspense fallback={<Loading />}>
       <PlayersTable
-        // numOfPlayers={numOfPlayers}
-        search={search}
-        players={players}
+        players={players || []}
         columns={columns}
+        pagination={pagination}
       />
     </Suspense>
   );

@@ -1,7 +1,7 @@
 "use client";
 import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
-import { Link, usePathname } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import TeamsFilter from "./TeamsFilter";
 import Pagination from "../ui app/Pagination";
@@ -10,16 +10,16 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import DropMenu from "../ui app/DropMenu";
 import { Award, EllipsisVertical, Link2 } from "lucide-react";
-import { getFirst10Words, getNumPages } from "@/app/[locale]/_Lib/helps";
-import { useSearchParams } from "next/navigation";
-export default function TeamsTable({ teams, columns, numOfTeams }) {
+import { getFirst10Words } from "@/app/[locale]/_Lib/helps";
+
+export default function TeamsTable({ teams, columns, pagination }) {
   const t = useTranslations("TeamsTable");
   const [isLoading, setIsLoading] = useState(false);
-  const searchParams = useSearchParams();
-  const numPages = getNumPages(numOfTeams, Number(searchParams.get("size")));
+  const numPages = pagination?.totalPages || 1;
+  const totalItems = pagination?.total || teams.length;
   return (
     <div className="space-y-8">
-      <TeamsFilter numOfSize={numOfTeams} />
+      <TeamsFilter numOfSize={totalItems} />
       <Table
         grid_cols="grid-cols-[0.5fr_0.5fr_1fr_2fr]"
         columns={[...columns]}

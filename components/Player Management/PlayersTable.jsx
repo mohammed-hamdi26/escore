@@ -3,29 +3,24 @@ import { Link } from "@/i18n/navigation";
 import Table from "../ui app/Table";
 import { Button } from "../ui/button";
 import FilterPlayers from "./FilterPlayers";
-import { Suspense, lazy, useState } from "react";
+import { useState } from "react";
 import Pagination from "../ui app/Pagination";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
-import imageIcon from "@/public/images/a-flat-vector-lettermark-logo-design-sho_M1U1HI8tTvOIgjZLmcU6eg_gSbp1v7WSyql-yuko9RTsQ-removebg-preview.png";
 import toast from "react-hot-toast";
 import { deletePlayer } from "@/app/[locale]/_Lib/actions";
 import DropMenu from "../ui app/DropMenu";
 import { Award, EllipsisVertical, Heart, Link2 } from "lucide-react";
-import { calculateAge, getNumPages } from "@/app/[locale]/_Lib/helps";
-import { useSearchParams } from "next/navigation";
+import { calculateAge } from "@/app/[locale]/_Lib/helps";
 
-function PlayersTable({ players, columns, search, numOfPlayers }) {
+function PlayersTable({ players, columns, pagination }) {
   const t = useTranslations("PlayersTable");
   const [isLoading, setIsLoading] = useState(false);
-  const searchParams = useSearchParams();
-  const numPages = getNumPages(numOfPlayers, Number(searchParams.get("size")));
-
-  console.log("players", players);
+  const numPages = pagination?.totalPages || 1;
+  const totalItems = pagination?.total || players.length;
 
   return (
     <div className="space-y-8">
-      <FilterPlayers numOfPlayers={numOfPlayers} search={search} />
+      <FilterPlayers numOfPlayers={totalItems} />
 
       <Table
         t={t}

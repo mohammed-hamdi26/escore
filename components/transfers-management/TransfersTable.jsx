@@ -1,7 +1,6 @@
 "use client";
 import { Link } from "@/i18n/navigation";
 
-import { useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
@@ -9,6 +8,8 @@ import Pagination from "../ui app/Pagination";
 import Table from "../ui app/Table";
 import { deleteTransfer } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import TransfersFilter from "./TransfersFilter";
+
 const columns = [
   {
     id: "player",
@@ -22,28 +23,21 @@ const columns = [
     id: "to",
     header: "To",
   },
-  //   {
-  //     id: "startDate",
-  //     header: "Start Date",
-  //   },
   {
     id: "fee",
     header: "fee",
   },
 ];
 
-export default function TransfersTable({ transfers }) {
+export default function TransfersTable({ transfers, pagination }) {
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("TransfersTable");
-  const searchParams = useSearchParams();
-  //   const numPages = getNumPages(
-  //     numOfTournaments,
-  //     Number(searchParams.get("size"))
-  //   );
+  const numPages = pagination?.totalPages || 1;
+  const totalItems = pagination?.total || transfers.length;
 
   return (
     <div className="space-y-8">
-      {/* <TournamentsFilter numOfSize={numOfTournaments} /> */}
+      <TransfersFilter numOfSize={totalItems} />
 
       <Table
         t={t}
@@ -56,15 +50,6 @@ export default function TransfersTable({ transfers }) {
             grid_cols="grid-cols-[0.5fr_0.5fr_0.5fr_0.5fr_2fr]"
           >
             <Table.Cell className="flex gap-2 items-center">
-              {/* {transfer?.logo && (
-                <img
-                  src={transfer?.logo.light}
-                  width={30}
-                  height={30}
-                  alt=""
-                  className="rounded-full"
-                />
-              )} */}
               {transfer?.player.nickname}
             </Table.Cell>
             <Table.Cell>{transfer?.fromTeam?.name}</Table.Cell>
@@ -88,7 +73,7 @@ export default function TransfersTable({ transfers }) {
                   try {
                     setIsLoading(true);
                     await deleteTransfer(transfer.id);
-                    toast.success("The Tournament is Deleted");
+                    toast.success("The Transfer is Deleted");
                   } catch (e) {
                     toast.error("error in Delete");
                   } finally {
@@ -102,7 +87,7 @@ export default function TransfersTable({ transfers }) {
           </Table.Row>
         ))}
       </Table>
-      {/* <Pagination numPages={numPages} numItems={tournaments.length} /> */}
+      <Pagination numPages={numPages} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { getTeams, getTeamsCount } from "@/app/[locale]/_Lib/teamsApi";
+import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import TeamsTable from "@/components/teams management/TeamsTable";
 
 const columns = [
@@ -9,12 +9,13 @@ const columns = [
 
 async function page({ searchParams }) {
   const { size, page, search } = await searchParams;
-  const [teams] = await Promise.all([
-    getTeams({ size, page, "name.contains": search || "" }),
-    // getTeamsCount(),
-  ]);
+  const { data: teams, pagination } = await getTeams({
+    size,
+    page,
+    search,
+  });
 
-  return <TeamsTable columns={columns} teams={teams} />;
+  return <TeamsTable columns={columns} teams={teams || []} pagination={pagination} />;
 }
 
 export default page;
