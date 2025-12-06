@@ -1,49 +1,57 @@
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { cookies } from "next/headers";
-import { getLocale } from "next-intl/server";
 import { NextResponse } from "next/server";
+
 const intlMiddleware = createMiddleware(routing);
 
-const protectedRoutePath = "dashboard";
-const publicRoutesPath = ["/login", "/register"];
+// Routes that require authentication
+const protectedRoutes = ["/dashboard"];
+
+// Routes that should redirect to dashboard if already logged in
+const authRoutes = ["/login", "/register"];
+
 export default async function middleware(req) {
   const pathname = req.nextUrl.pathname;
-  const isProtectedRoute = pathname.includes(protectedRoutePath);
-  const isPublicRoute = publicRoutesPath.forEach((route) => {
-    console.log(pathname.includes(route));
-    pathname.includes(route) ? true : false;
-  });
 
+  // Remove locale prefix to check the actual path
+  const pathnameWithoutLocale = pathname.replace(/^\/(en|ar)/, "") || "/";
+
+  // Check if route is protected (requires auth)
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathnameWithoutLocale.startsWith(route)
+  );
+
+  // Check if route is an auth route (login/register)
+  const isAuthRoute = authRoutes.some((route) =>
+    pathnameWithoutLocale.startsWith(route)
+  );
+
+  // Get session token
   const session = (await cookies()).get("session")?.value;
 
+  // Redirect to login if accessing protected route without session
   if (isProtectedRoute && !session) {
-    return NextResponse.redirect(new URL(`/login`, req.nextUrl));
+    const locale = pathname.match(/^\/(en|ar)/)?.[1] || "en";
+    return NextResponse.redirect(new URL(`/${locale}/login`, req.nextUrl));
   }
 
-  if (isPublicRoute && session) {
-    return NextResponse.redirect(new URL(`/dashboard`, req.nextUrl));
+  // Redirect to dashboard if accessing auth routes with valid session
+  if (isAuthRoute && session) {
+    const locale = pathname.match(/^\/(en|ar)/)?.[1] || "en";
+    return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.nextUrl));
   }
-  if (intlMiddleware) {
-    return intlMiddleware(req);
-  }
-  // return intlMiddleware(req);
+
+  // Continue with internationalization middleware
+  return intlMiddleware(req);
 }
+
 export const config = {
   matcher: [
-    // Match all pathnames except for
-    // - … if they start with `/api`, `/_next` or `/_vercel`
-    // - … the ones containing a dot (e.g. `favicon.ico`)
+    // Match all pathnames except for:
+    // - API routes
+    // - Next.js internals (_next, _vercel)
+    // - Static files (files with extensions like .png, .ico, etc.)
     "/((?!api|_next|_vercel|.*\\..*).*)",
   ],
 };
-
-/**
- * old version with a bug
- * matcher: [
-    "/",
-    "/(en|ar)/:path*",
-    // "/dashboard/:path*",
-    // "/((?!api|_next/static|_next/image|.*\\.png$).*)",
-  ],
- */
