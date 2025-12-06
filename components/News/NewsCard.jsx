@@ -109,22 +109,33 @@ function NewsCard({
               </h3>
             </div>
 
-            {/* Actions Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+              <Link href={`/dashboard/news/edit/${news.id}`}>
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-[#677185] hover:text-white"
-                  disabled={isLoading}
+                  variant="outline"
+                  size="sm"
+                  className="border-green-primary text-green-primary hover:bg-green-primary hover:text-white"
                 >
-                  {isLoading ? (
-                    <Spinner className="size-4" />
-                  ) : (
-                    <MoreVertical className="size-4" />
-                  )}
+                  <Edit className="size-4 mr-1" />
+                  {t("edit")}
                 </Button>
-              </DropdownMenuTrigger>
+              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-[#677185] hover:text-white"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Spinner className="size-4" />
+                    ) : (
+                      <MoreVertical className="size-4" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <Link href={`/dashboard/news/edit/${news.id}`}>
                   <DropdownMenuItem className="cursor-pointer">
@@ -189,7 +200,8 @@ function NewsCard({
                   {t("delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Meta Info */}

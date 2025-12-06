@@ -5,7 +5,6 @@ const withNextIntl = createNextIntlPlugin();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects(parm) {
-    //
     return [
       {
         source:
@@ -18,21 +17,22 @@ const nextConfig = {
         destination: "/:slug/dashboard",
         permanent: true,
       },
+      {
+        source: "/:locale(en|ar)/dashboard/news/edit",
+        destination: "/:locale/dashboard/news",
+        permanent: true,
+      },
     ];
   },
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "supersafely-integumentary-danilo.ngrok-free.dev",
-        // port: "8000",
-        // pathname: "/**",
+        protocol: "http",
+        hostname: "51.20.123.246",
       },
       {
         protocol: "https",
-        hostname: "supersafely-integumentary-danilo.ngrok-free.devhttps",
-        // port: "8000",
-        // pathname: "/**",
+        hostname: "51.20.123.246",
       },
       {
         protocol: "https",
