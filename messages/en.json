@@ -122,7 +122,10 @@
     "support center": "Support Center",
     "settings": "Settings",
     "change password": "Change Password",
-    "transfers management": "Transfers Management"
+    "transfers management": "Transfers Management",
+    "notifications": "Notifications",
+    "users": "Users Management",
+    "content-request": "Become Content Creator"
   },
   "buttonLinks": {
     "add new": "Add New",
@@ -1275,6 +1278,18 @@
     "authorImageRequired": "Author image is required",
     "coverImage": "Cover Image",
     "externalLink": "External Link"
+  },
+  "ForgetPassword": {
+    "title": "Forgot Password?",
+    "description": "Enter your email address and we'll send you a link to reset your password.",
+    "emailPlaceholder": "Enter your email",
+    "sendResetLink": "Send Reset Link",
+    "sending": "Sending...",
+    "backToLogin": "Back to Login",
+    "emailSent": "Reset link sent successfully!",
+    "checkEmail": "Check Your Email",
+    "emailSentDescription": "We've sent a password reset link to your email address. Please check your inbox and follow the instructions.",
+    "error": "Failed to send reset link. Please try again."
   },
   "ContentRequest": {
     "title": "Become a Content Creator",

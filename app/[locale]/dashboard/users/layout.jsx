@@ -60,11 +60,11 @@ export default function UsersLayout({ children }) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Users className="w-8 h-8 text-green-primary" />
-        <h1 className="text-2xl font-bold text-white">{t("title")}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("title")}</h1>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap gap-4 border-b border-gray-700 pb-4">
+      <div className="flex flex-wrap gap-4 border-b border-gray-200 dark:border-gray-700 pb-4">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href, item.exact);
@@ -76,7 +76,7 @@ export default function UsersLayout({ children }) {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                 active
                   ? "bg-green-primary/20 text-green-primary"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
               <Icon className="w-5 h-5" />

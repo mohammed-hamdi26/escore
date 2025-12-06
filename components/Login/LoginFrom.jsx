@@ -12,22 +12,8 @@ function LoginFrom({ formik, t }) {
     <div className="flex flex-[0.5] flex-col space-y-8 ">
       <div className="space-y-8 flex flex-col items-center justify-center ">
         <Image src={logoImage} alt="logo" width={250} height={40} />
-        {/* <Link
-          href="/register/form"
-          className="text-gray-400 hover:text-gray-400/90 hover:underline transition-all duration-300"
-        >
-          {t("Don't have an account?")}
-        </Link> */}
       </div>
       <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
-        {/* <InputApp
-          placeholder={"Your Email"}
-          name="email"
-          type="email"
-          error={formik.touched.email && formik.errors.email}
-          onChange={formik.handleChange}
-          className="max-w-[400px]"
-        /> */}
         <InputApp
           t={t}
           placeholder={t("email")}
@@ -48,12 +34,12 @@ function LoginFrom({ formik, t }) {
           onBlur={formik.handleBlur}
           className="max-w-[400px]"
         />
-        {/* <Link
-          className="text-[#C7C7C7] hover:text-[#C7C7C7]/90 text-end max-w-[400px]"
-          href="/forgot-password"
+        <Link
+          className="text-gray-500 dark:text-[#C7C7C7] hover:text-green-primary dark:hover:text-[#C7C7C7]/90 text-end max-w-[400px] text-sm transition-colors"
+          href="/forget-password"
         >
           {t("Forgot Password ?")}
-        </Link> */}
+        </Link>
         <Button
           disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
@@ -61,6 +47,16 @@ function LoginFrom({ formik, t }) {
         >
           {t("Login")}
         </Button>
+
+        {/* Register Link */}
+        <div className="flex justify-center max-w-[400px]">
+          <Link
+            href="/register/form"
+            className="text-sm text-gray-500 dark:text-gray-400 hover:text-green-primary transition-colors duration-300"
+          >
+            {t("Don't have an account?")}
+          </Link>
+        </div>
 
         {/* Privacy Policy Link */}
         <div className="flex justify-center max-w-[400px]">

@@ -262,7 +262,7 @@ function UserForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Role Selection */}
             <div className="space-y-3">
-              <Label className="text-[#677185] text-sm">{t("Role")}</Label>
+              <Label className="text-gray-600 dark:text-[#677185] text-sm">{t("Role")}</Label>
               <div className="grid grid-cols-2 gap-3">
                 {roleOptions.map((option) => {
                   const RoleIcon = option.icon;
@@ -275,11 +275,11 @@ function UserForm({
                       className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
                         isSelected
                           ? "border-green-500/50 bg-green-500/10"
-                          : "border-[#1a1f2e] bg-[#0F1017] hover:border-gray-600"
+                          : "border-gray-200 dark:border-[#1a1f2e] bg-gray-50 dark:bg-[#0F1017] hover:border-gray-300 dark:hover:border-gray-600"
                       }`}
                     >
                       <RoleIcon className={`size-5 ${option.color}`} />
-                      <span className={`text-sm font-medium ${isSelected ? "text-white" : "text-[#677185]"}`}>
+                      <span className={`text-sm font-medium ${isSelected ? "text-gray-900 dark:text-white" : "text-gray-600 dark:text-[#677185]"}`}>
                         {t(option.label)}
                       </span>
                     </button>
@@ -290,7 +290,7 @@ function UserForm({
 
             {/* Verification Status */}
             <div className="space-y-3">
-              <Label className="text-[#677185] text-sm">{t("Verification Status")}</Label>
+              <Label className="text-gray-600 dark:text-[#677185] text-sm">{t("Verification Status")}</Label>
               <div
                 className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
                   formik.values.isVerified
@@ -305,10 +305,10 @@ function UserForm({
                     }`}
                   />
                   <div>
-                    <p className="text-white font-medium">
+                    <p className="text-gray-900 dark:text-white font-medium">
                       {formik.values.isVerified ? t("Verified") : t("Unverified")}
                     </p>
-                    <p className="text-xs text-[#677185]">
+                    <p className="text-xs text-gray-500 dark:text-[#677185]">
                       {formik.values.isVerified
                         ? t("Email has been verified")
                         : t("Email not verified yet")}
@@ -344,7 +344,7 @@ function UserForm({
                 className={`rounded-xl border-2 transition-all duration-200 ${
                   isEnabled
                     ? "border-green-500/50 bg-green-500/5"
-                    : "border-[#1a1f2e] bg-[#0F1017]"
+                    : "border-gray-200 dark:border-[#1a1f2e] bg-gray-50 dark:bg-[#0F1017]"
                 }`}
               >
                 {/* Permission Header */}
@@ -354,10 +354,10 @@ function UserForm({
                       <IconComponent className={`size-5 ${item.color}`} />
                     </div>
                     <div>
-                      <Label className="text-white font-medium cursor-pointer">
+                      <Label className="text-gray-900 dark:text-white font-medium cursor-pointer">
                         {t(item.translationKey)}
                       </Label>
-                      <p className="text-xs text-[#677185]">
+                      <p className="text-xs text-gray-500 dark:text-[#677185]">
                         {isEnabled
                           ? `${selectedActions.length} ${t("actions selected")}`
                           : t("Disabled")}
@@ -374,9 +374,9 @@ function UserForm({
 
                 {/* Actions */}
                 {isEnabled && (
-                  <div className="px-4 pb-4 border-t border-[#1a1f2e] pt-3">
+                  <div className="px-4 pb-4 border-t border-gray-200 dark:border-[#1a1f2e] pt-3">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs text-[#677185] uppercase tracking-wide">
+                      <span className="text-xs text-gray-500 dark:text-[#677185] uppercase tracking-wide">
                         {t("Actions")}
                       </span>
                       <div className="flex gap-2">
@@ -387,7 +387,7 @@ function UserForm({
                         >
                           {t("All")}
                         </button>
-                        <span className="text-[#677185]">|</span>
+                        <span className="text-gray-400 dark:text-[#677185]">|</span>
                         <button
                           type="button"
                           onClick={() => handleDeselectAllActions(item.value)}
@@ -407,8 +407,8 @@ function UserForm({
                             key={action.value}
                             className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${
                               isChecked
-                                ? "bg-[#1a1f2e] border border-[#2a2f3e]"
-                                : "hover:bg-[#1a1f2e]/50"
+                                ? "bg-gray-100 dark:bg-[#1a1f2e] border border-gray-200 dark:border-[#2a2f3e]"
+                                : "hover:bg-gray-100 dark:hover:bg-[#1a1f2e]/50"
                             }`}
                           >
                             <Checkbox
@@ -419,7 +419,7 @@ function UserForm({
                               className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
                             />
                             <ActionIcon className={`size-3.5 ${action.color}`} />
-                            <span className="text-sm text-white capitalize">
+                            <span className="text-sm text-gray-900 dark:text-white capitalize">
                               {t(action.label)}
                             </span>
                           </label>

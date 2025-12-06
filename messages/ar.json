@@ -104,7 +104,10 @@
     "support center": "مركز الدعم",
     "settings": "الإعدادات",
     "change password": "تغيير كلمة المرور",
-    "transfers management": "إدارة الانتقالات"
+    "transfers management": "إدارة الانتقالات",
+    "notifications": "الإشعارات",
+    "users": "إدارة المستخدمين",
+    "content-request": "كن صانع محتوى"
   },
   "buttonLinks": {
     "add new": "إضافة جديد",
@@ -1276,6 +1279,18 @@
     "authorImageRequired": "صورة الكاتب مطلوبة",
     "coverImage": "صورة الغلاف",
     "externalLink": "رابط خارجي"
+  },
+  "ForgetPassword": {
+    "title": "نسيت كلمة المرور؟",
+    "description": "أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "sendResetLink": "إرسال رابط إعادة التعيين",
+    "sending": "جاري الإرسال...",
+    "backToLogin": "العودة لتسجيل الدخول",
+    "emailSent": "تم إرسال رابط إعادة التعيين بنجاح!",
+    "checkEmail": "تحقق من بريدك الإلكتروني",
+    "emailSentDescription": "لقد أرسلنا رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد واتباع التعليمات.",
+    "error": "فشل إرسال رابط إعادة التعيين. يرجى المحاولة مرة أخرى."
   },
   "ContentRequest": {
     "title": "كن صانع محتوى",

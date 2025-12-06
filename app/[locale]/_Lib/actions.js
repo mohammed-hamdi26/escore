@@ -882,6 +882,16 @@ export async function resetUserPassword(userId) {
   }
 }
 
+export async function forgotPassword(email) {
+  try {
+    const res = await apiClient.post("/auth/forgot-password", { email });
+    return res.data;
+  } catch (error) {
+    console.log("Failed to send reset email", error);
+    throw new Error(error.response?.data?.message || "Failed to send reset email");
+  }
+}
+
 export async function addAward(typeEdit, id, data) {
   const locale = await getLocale();
   console.log(typeEdit, id, data);

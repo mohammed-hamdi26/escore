@@ -94,7 +94,7 @@ export default async function UsersDashboardPage() {
     <div className="space-y-8">
       {/* User Statistics */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t("stats.userStats")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -103,11 +103,11 @@ export default async function UsersDashboardPage() {
             return (
               <div
                 key={index}
-                className={`${stat.color} rounded-xl p-6 border border-gray-700/50`}
+                className={`${stat.color} rounded-xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-sm dark:shadow-none`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">{stat.label}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">{stat.label}</p>
                     <p className="text-3xl font-bold mt-1">{stat.value}</p>
                   </div>
                   <div className={`${stat.iconBg} p-3 rounded-lg`}>
@@ -122,8 +122,8 @@ export default async function UsersDashboardPage() {
 
       {/* Role Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <Shield className="w-5 h-5 text-green-primary" />
             {t("stats.roleDistribution")}
           </h3>
@@ -139,11 +139,11 @@ export default async function UsersDashboardPage() {
                     <span className={`${role.color} font-medium`}>
                       {role.label}
                     </span>
-                    <span className="text-gray-400">
+                    <span className="text-gray-500 dark:text-gray-400">
                       {role.value} ({percentage}%)
                     </span>
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full ${
                         role.color.replace("text-", "bg-").replace("-400", "-500")
@@ -158,8 +158,8 @@ export default async function UsersDashboardPage() {
         </div>
 
         {/* Content Creator Requests */}
-        <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <UserCheck className="w-5 h-5 text-green-primary" />
             {t("stats.contentRequestsStats")}
           </h3>
@@ -169,18 +169,18 @@ export default async function UsersDashboardPage() {
               return (
                 <div
                   key={index}
-                  className="bg-gray-700/50 rounded-lg p-4 text-center"
+                  className="bg-gray-100 dark:bg-gray-700/50 rounded-lg p-4 text-center"
                 >
                   <Icon className={`w-8 h-8 ${stat.color} mx-auto mb-2`} />
-                  <p className="text-2xl font-bold text-white">{stat.value}</p>
-                  <p className="text-gray-400 text-sm">{stat.label}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">{stat.label}</p>
                 </div>
               );
             })}
           </div>
           {stats.contentRequests.pending > 0 && (
             <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-              <p className="text-yellow-500 text-sm">
+              <p className="text-yellow-600 dark:text-yellow-500 text-sm">
                 {t("stats.pendingRequestsNote", {
                   count: stats.contentRequests.pending,
                 })}

@@ -53,9 +53,9 @@ export default function ContentRequestsTable({ requests, meta }) {
 
   if (!requests || requests.length === 0) {
     return (
-      <div className="bg-gray-800/50 rounded-xl p-8 border border-gray-700 text-center">
+      <div className="bg-white dark:bg-gray-800/50 rounded-xl p-8 border border-gray-200 dark:border-gray-700 text-center shadow-sm dark:shadow-none">
         <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-        <p className="text-gray-400">{t("noRequests")}</p>
+        <p className="text-gray-500 dark:text-gray-400">{t("noRequests")}</p>
       </div>
     );
   }
@@ -67,7 +67,7 @@ export default function ContentRequestsTable({ requests, meta }) {
         {requests.map((request) => (
           <div
             key={request._id || request.id}
-            className="bg-gray-800/50 rounded-xl border border-gray-700 p-6"
+            className="bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm dark:shadow-none"
           >
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               {/* User Info */}
@@ -79,21 +79,21 @@ export default function ContentRequestsTable({ requests, meta }) {
                     className="w-14 h-14 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-gray-600 flex items-center justify-center">
-                    <span className="text-gray-300 text-xl font-medium">
+                  <div className="w-14 h-14 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                    <span className="text-gray-600 dark:text-gray-300 text-xl font-medium">
                       {request.email?.[0]?.toUpperCase() || "U"}
                     </span>
                   </div>
                 )}
                 <div>
-                  <h3 className="text-white font-medium text-lg">
+                  <h3 className="text-gray-900 dark:text-white font-medium text-lg">
                     {request.username || t("noUsername")}
                   </h3>
-                  <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
                     <Mail className="w-4 h-4" />
                     {request.email}
                   </div>
-                  <div className="flex items-center gap-2 text-gray-500 text-sm mt-1">
+                  <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm mt-1">
                     <Calendar className="w-4 h-4" />
                     {t("requestedAt")}: {new Date(request.contentRequestedAt).toLocaleDateString()}
                   </div>
@@ -111,15 +111,15 @@ export default function ContentRequestsTable({ requests, meta }) {
 
             {/* Actions */}
             {rejectingId === (request._id || request.id) ? (
-              <div className="mt-4 p-4 bg-gray-700/50 rounded-lg">
-                <label className="block text-sm text-gray-400 mb-2">
+              <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg">
+                <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">
                   {t("rejectReasonLabel")}
                 </label>
                 <textarea
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
                   placeholder={t("rejectReasonPlaceholder")}
-                  className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-red-500 min-h-[100px]"
+                  className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-red-500 min-h-[100px]"
                 />
                 <div className="flex gap-2 mt-3">
                   <button
@@ -134,14 +134,14 @@ export default function ContentRequestsTable({ requests, meta }) {
                       setRejectingId(null);
                       setRejectReason("");
                     }}
-                    className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-colors"
+                    className="px-4 py-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-white rounded-lg transition-colors"
                   >
                     {t("cancel")}
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="flex gap-3 mt-4 pt-4 border-t border-gray-700">
+              <div className="flex gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => handleApprove(request._id || request.id)}
                   disabled={isLoading === (request._id || request.id)}
