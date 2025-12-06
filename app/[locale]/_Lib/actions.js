@@ -1055,6 +1055,30 @@ export async function removeUserPermission(userId, entity) {
     throw new Error(e.response?.data?.message || "Failed to remove permission");
   }
 }
+
+// Content Request Functions
+export async function requestContentRole() {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post("/users/request-content-role");
+    revalidatePath(`/${locale}/dashboard`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response?.data || e);
+    throw new Error(e.response?.data?.message || "Failed to submit content request");
+  }
+}
+
+export async function getContentStatus() {
+  try {
+    const res = await apiClient.get("/users/content-status");
+    return res.data.data;
+  } catch (e) {
+    console.log(e.response?.data || e);
+    throw new Error(e.response?.data?.message || "Failed to get content status");
+  }
+}
+
 export async function editLinks(typeEdit, id, data) {
   const locale = await getLocale();
   console.log(typeEdit, id, data);

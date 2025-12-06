@@ -79,6 +79,10 @@
     "Notifications": {
       "title": "الإشعارات",
       "description": "إرسال إشعارات وإدارة الأجهزة المسجلة"
+    },
+    "Become Content Creator": {
+      "title": "كن صانع محتوى",
+      "description": "تقدم لتصبح صانع محتوى ونشر الأخبار والمقالات"
     }
   },
   "nav": {
@@ -1261,5 +1265,48 @@
     "authorImageRequired": "صورة الكاتب مطلوبة",
     "coverImage": "صورة الغلاف",
     "externalLink": "رابط خارجي"
+  },
+  "ContentRequest": {
+    "title": "كن صانع محتوى",
+    "alreadyContentCreator": "أنت صانع محتوى بالفعل!",
+    "alreadyContentCreatorDesc": "لديك صلاحيات صانع محتوى بالفعل. ابدأ في إنشاء محتوى رائع!",
+    "status": {
+      "pending": "الطلب قيد المراجعة",
+      "approved": "تمت الموافقة على الطلب",
+      "rejected": "تم رفض الطلب"
+    },
+    "requestedAt": "تاريخ الطلب",
+    "approvedAt": "تاريخ الموافقة",
+    "rejectionReason": "سبب الرفض",
+    "benefits": {
+      "title": "مزايا أن تكون صانع محتوى",
+      "createNews": {
+        "title": "إنشاء مقالات إخبارية",
+        "desc": "اكتب وانشر مقالات إخبارية عن أحداث الرياضات الإلكترونية"
+      },
+      "editContent": {
+        "title": "تعديل محتواك",
+        "desc": "قم بتحديث وإدارة مقالاتك المنشورة في أي وقت"
+      },
+      "manageArticles": {
+        "title": "إدارة مقالاتك",
+        "desc": "تحكم كامل في المحتوى المنشور الخاص بك"
+      },
+      "buildAudience": {
+        "title": "بناء جمهورك",
+        "desc": "قم بتنمية متابعيك في مجتمع الرياضات الإلكترونية"
+      }
+    },
+    "requirements": {
+      "title": "المتطلبات",
+      "verifiedEmail": "يجب أن يكون بريدك الإلكتروني مؤكداً",
+      "activeAccount": "يجب أن يكون لديك حساب نشط بسمعة جيدة",
+      "followGuidelines": "يجب الموافقة على اتباع إرشادات المحتوى لدينا"
+    },
+    "submitRequest": "إرسال الطلب",
+    "resubmitRequest": "إعادة إرسال الطلب",
+    "requestSubmitted": "تم إرسال طلبك بنجاح!",
+    "requestFailed": "فشل إرسال الطلب. يرجى المحاولة مرة أخرى.",
+    "verifyEmailFirst": "يرجى تأكيد بريدك الإلكتروني قبل إرسال الطلب."
   }
 }

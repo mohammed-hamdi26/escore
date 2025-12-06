@@ -97,6 +97,10 @@
     "Notifications": {
       "title": "Notifications",
       "description": "Send push notifications and manage registered devices"
+    },
+    "Become Content Creator": {
+      "title": "Become Content Creator",
+      "description": "Apply to become a content creator and publish news and articles"
     }
   },
   "nav": {
@@ -1260,5 +1264,48 @@
     "authorImageRequired": "Author image is required",
     "coverImage": "Cover Image",
     "externalLink": "External Link"
+  },
+  "ContentRequest": {
+    "title": "Become a Content Creator",
+    "alreadyContentCreator": "You're Already a Content Creator!",
+    "alreadyContentCreatorDesc": "You already have content creator privileges. Start creating amazing content!",
+    "status": {
+      "pending": "Request Pending",
+      "approved": "Request Approved",
+      "rejected": "Request Rejected"
+    },
+    "requestedAt": "Requested on",
+    "approvedAt": "Approved on",
+    "rejectionReason": "Reason for rejection",
+    "benefits": {
+      "title": "Benefits of Being a Content Creator",
+      "createNews": {
+        "title": "Create News Articles",
+        "desc": "Write and publish news articles about esports events"
+      },
+      "editContent": {
+        "title": "Edit Your Content",
+        "desc": "Update and manage your published articles anytime"
+      },
+      "manageArticles": {
+        "title": "Manage Your Articles",
+        "desc": "Full control over your published content"
+      },
+      "buildAudience": {
+        "title": "Build Your Audience",
+        "desc": "Grow your following in the esports community"
+      }
+    },
+    "requirements": {
+      "title": "Requirements",
+      "verifiedEmail": "Your email must be verified",
+      "activeAccount": "You must have an active account in good standing",
+      "followGuidelines": "You must agree to follow our content guidelines"
+    },
+    "submitRequest": "Submit Request",
+    "resubmitRequest": "Resubmit Request",
+    "requestSubmitted": "Your request has been submitted successfully!",
+    "requestFailed": "Failed to submit request. Please try again.",
+    "verifyEmailFirst": "Please verify your email address before submitting a request."
   }
 }

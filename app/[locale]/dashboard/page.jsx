@@ -7,7 +7,7 @@ import Player from "@/components/icons/Player";
 import SupportCenter from "@/components/icons/SuppotCenter";
 import TeamsManagement from "@/components/icons/TeamsManagement";
 import User from "@/components/icons/User";
-import { ArrowRightLeft, Bell } from "lucide-react";
+import { ArrowRightLeft, Bell, Newspaper } from "lucide-react";
 import { getLoginUser } from "../_Lib/usersApi";
 
 /**
@@ -90,6 +90,12 @@ export default async function page() {
       href: "/notifications",
       icon: <Bell className="icon-transition" width="57" height="56" />,
       isShowed: isAdmin,
+    },
+    {
+      title: "Become Content Creator",
+      href: "/content-request",
+      icon: <Newspaper className="icon-transition" width="57" height="56" />,
+      isShowed: user?.role === "user", // Only show to regular users
     },
   ];
 
