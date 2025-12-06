@@ -1,47 +1,147 @@
 import "server-only";
-// import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import crypto from "crypto";
 
-// const secretKey = process.env.SESSION_SECRET;
-// const encodedKey = new TextEncoder().encode(secretKey);
+// Encryption configuration
+const ALGORITHM = "aes-256-gcm";
+const IV_LENGTH = 16;
+const AUTH_TAG_LENGTH = 16;
+const SALT_LENGTH = 32;
 
-// export async function encrypt(payload) {
-//   return new SignJWT(payload)
-//     .setProtectedHeader({ alg: "HS256" })
-//     .setIssuedAt()
-//     .setExpirationTime("7d")
-//     .sign(encodedKey);
-// }
+// Get encryption key from environment or generate a secure default
+function getEncryptionKey() {
+  const secret = process.env.SESSION_SECRET || process.env.NEXTAUTH_SECRET;
+  if (!secret) {
+    console.warn(
+      "Warning: SESSION_SECRET not set. Using a derived key for development."
+    );
+    // For development, derive a key from a constant (not secure for production)
+    return crypto.scryptSync("escore-dev-secret-key", "salt", 32);
+  }
+  // Derive a 32-byte key from the secret using scrypt
+  return crypto.scryptSync(secret, "escore-session-salt", 32);
+}
 
-// export async function decrypt(session) {
-//   try {
-//     const { payload } = await jwtVerify(session, encodedKey, {
-//       algorithms: ["HS256"],
-//     });
-//     return payload;
-//   } catch (error) {
-//
-//   }
-// }
+/**
+ * Encrypt a token using AES-256-GCM
+ * @param {string} token - The plain text token to encrypt
+ * @returns {string} - Base64 encoded encrypted token with IV and auth tag
+ */
+function encryptToken(token) {
+  try {
+    const key = getEncryptionKey();
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
 
+    let encrypted = cipher.update(token, "utf8", "hex");
+    encrypted += cipher.final("hex");
+
+    const authTag = cipher.getAuthTag();
+
+    // Combine IV + AuthTag + Encrypted data and encode as base64
+    const combined = Buffer.concat([
+      iv,
+      authTag,
+      Buffer.from(encrypted, "hex"),
+    ]);
+
+    return combined.toString("base64");
+  } catch (error) {
+    console.error("Encryption error:", error);
+    throw new Error("Failed to encrypt session token");
+  }
+}
+
+/**
+ * Decrypt an encrypted token
+ * @param {string} encryptedToken - Base64 encoded encrypted token
+ * @returns {string|null} - Decrypted token or null if decryption fails
+ */
+function decryptToken(encryptedToken) {
+  try {
+    const key = getEncryptionKey();
+    const combined = Buffer.from(encryptedToken, "base64");
+
+    // Extract IV, auth tag, and encrypted data
+    const iv = combined.subarray(0, IV_LENGTH);
+    const authTag = combined.subarray(IV_LENGTH, IV_LENGTH + AUTH_TAG_LENGTH);
+    const encrypted = combined.subarray(IV_LENGTH + AUTH_TAG_LENGTH);
+
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+    decipher.setAuthTag(authTag);
+
+    let decrypted = decipher.update(encrypted, undefined, "utf8");
+    decrypted += decipher.final("utf8");
+
+    return decrypted;
+  } catch (error) {
+    console.error("Decryption error:", error.message);
+    return null;
+  }
+}
+
+/**
+ * Save session token securely with encryption
+ * @param {string} token - The JWT token to save
+ */
 export async function saveSession(token) {
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
   const cookieStore = await cookies();
 
   // Only use secure cookies in production with HTTPS
   const isProduction = process.env.NODE_ENV === "production";
   const isHttps = process.env.NEXT_PUBLIC_BASE_URL?.startsWith("https://");
 
-  cookieStore.set("session", token, {
-    httpOnly: true,
-    secure: isProduction && isHttps,
+  // Encrypt the token before storing
+  const encryptedToken = encryptToken(token);
+
+  cookieStore.set("session", encryptedToken, {
+    httpOnly: true, // Prevents JavaScript access (XSS protection)
+    secure: isProduction && isHttps, // HTTPS only in production
     expires: expiresAt,
-    sameSite: "lax",
+    sameSite: "lax", // CSRF protection
     path: "/",
   });
 }
 
+/**
+ * Get the decrypted session token
+ * @returns {Promise<string|null>} - Decrypted token or null
+ */
+export async function getSession() {
+  const cookieStore = await cookies();
+  const encryptedToken = cookieStore.get("session")?.value;
+
+  if (!encryptedToken) {
+    return null;
+  }
+
+  return decryptToken(encryptedToken);
+}
+
+/**
+ * Delete session cookie
+ */
 export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.delete("session");
+}
+
+/**
+ * Check if session exists and is valid
+ * @returns {Promise<boolean>}
+ */
+export async function hasValidSession() {
+  const token = await getSession();
+  return token !== null;
+}
+
+/**
+ * Refresh session expiry (extends cookie lifetime)
+ */
+export async function refreshSession() {
+  const token = await getSession();
+  if (token) {
+    await saveSession(token);
+  }
 }

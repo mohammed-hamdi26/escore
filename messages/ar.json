@@ -140,26 +140,21 @@
     "Enter Player Photo": "ادخل صورة اللاعب",
     "Yes": "نعم",
     "No": "لا",
-
     "firstNameRequired": "الاسم الأول مطلوب",
     "lastNameRequired": "اسم العائلة مطلوب",
-
     "birthDateRequired": "تاريخ الميلاد مطلوب",
     "nationalityRequired": "الجنسية مطلوبة",
     "photoRequired": "صورة اللاعب مطلوبة",
     "photoDarkRequired": "صورة اللاعب (الوضع الداكن) مطلوبة",
-
     "earningsNegative": "لا يمكن أن تكون الأرباح رقمًا سالبًا",
     "achievementsNegative": "لا يمكن أن تكون الإنجازات رقمًا سالبًا",
     "rankingNegative": "لا يمكن أن يكون التصنيف رقمًا سالبًا",
     "marketValueNegative": "لا يمكن أن تكون القيمة السوقية رقمًا سالبًا",
-
     "countryRequired": "البلد مطلوب",
     "Select country Player Belong To": "اختر البلد التي ينتمي إليه اللاعب",
     "country": "البلد",
     "Enter Team Player Belong To": "ادخل الفريق الذي ينتمي إليه اللاعب",
     "Player Team": "فريق اللاعب",
-
     "Nickname": "الاسم المستخدم",
     "Enter Player Nickname": "ادخل اسم المستخدم",
     "nicknameRequired": "اسم المستخدم مطلوب"
@@ -246,7 +241,6 @@
     "Edit": "تعديل",
     "Delete": "حذف"
   },
-
   "NewsForm": {
     "Title": "العنوان",
     "Enter Title": "أدخل العنوان",
@@ -290,22 +284,17 @@
     "Trending": "الأكثر تداولاً",
     "Players": "اللاعبون",
     "Select Players": "اختر اللاعبين",
-
     "Teams": "الفرق",
     "Select Teams": "اختر الفرق",
-
     "Games": "الألعاب",
     "Select Games": "اختر الألعاب",
-
     "Tournaments": "البطولات",
     "Select Tournaments": "اختر البطولات",
-
     "newsTypeInvalid": "يجب أن يكون نوع الخبر عامًا أو ملخص مباراة أو شائعًا",
     "statusInvalid": "يجب أن تكون الحالة منشورة أو مجدولة",
     "authorNameRequired": "اسم المؤلف مطلوب",
     "contentRequired": "المحتوى مطلوب",
     "imageRequired": "الصورة مطلوبة",
-
     "titleRequired": "العنوان مطلوب"
   },
   "TournamentForm": {
@@ -332,7 +321,6 @@
     "Upload Knockout Light Image": "رفع صورة الشكل الفاتحة",
     "Upload Knockout Dark Image": "رفع صورة الشكل المظلمة",
     "knockout image (Dark)": "صورة الشكل (المظلمة)",
-
     "Edit": "تعديل",
     "Add": "إضافة",
     "Upload Tournament Dark Logo": "رفع شعار البطولة (الوضع الداكن)",
@@ -371,7 +359,6 @@
     "Cancelled": "ملغية",
     "Completed": "منتهية",
     "Country": "البلد",
-
     "Games": "الألعاب",
     "Select Game": "اختر اللعبة"
   },
@@ -381,7 +368,6 @@
     "Desc": "الوصف",
     "Start Date": "تاريخ البدء",
     "End Date": "تاريخ الانتهاء",
-
     "Status": "الحالة",
     "Edit": "تعديل",
     "Delete": "حذف",
@@ -404,23 +390,17 @@
     "Dictionary": "قاموس",
     "Cancel": "الغاء",
     "No languages found": "لا يوجد لغات",
-
     "Edit Language": "تعديل اللغة",
-
     "DialogAddDescription": "اضافة لغة جديدة للنظام. قم بملء جميع الحقول المطلوبة.",
-
     "DialogEditDescription": "تحديث معلومات اللغة. قم بتعديل الحقول المطلوبة.",
     "DialogEditTitle": "تعديل اللغة",
-
     "Language added successfully": "تم اضافة اللغة بنجاح",
     "Language updated successfully": "تم تحديث اللغة بنجاح",
     "Language deleted successfully": "تم حذف اللغة بنجاح",
-
     "Enter local name": "أدخل الاسم المحلي",
     "Enter language name": "أدخل اسم اللغة",
     "Enter language code": "أدخل كود اللغة",
     "Local Name": "الاسم المحلي",
-
     "Local name is required": "الاسم المحلي مطلوب",
     "Name is required": "الاسم مطلوب",
     "Code is required": "الكود مطلوب"
@@ -439,46 +419,32 @@
     "Solo": "فردي",
     "Tournaments": "البطولات",
     "Write Champion Name": "اكتب اسم البطولة",
-
     "Game": "اللعبة",
     "Write Game Name": "اكتب اسم اللعبة",
-
     "Team 1": "الفريق 1",
     "Write Team Name": "اكتب اسم الفريق",
-
     "Team 2": "الفريق 2",
     "Select Team Name": "اختر اسم الفريق",
-
     "Winning Team": "الفريق الفائز",
     "Select Winning Team": "اختر الفريق الفائز",
-
     "Match Type": "نوع المباراة",
     "Select Match Type": "اختر نوع المباراة",
-
     "Match State": "حالة المباراة",
     "Select Match State": "اختر حالة المباراة",
-
     "Series Format": "تنسيق السلسلة",
     "Select Series Format": "اختر تنسيق السلسلة",
-
     "Player 1 Score": "نتيجة اللاعب 1",
     "Enter Player 1 Score": "أدخل نتيجة اللاعب 1",
-
     "Player 2 Score": "نتيجة اللاعب 2",
     "Enter Player 2 Score": "أدخل نتيجة اللاعب 2",
-
     "round": "المرحلة",
     "Enter round": "أدخل المرحلة",
     "round is required": "المرحلة مطلوبة",
-
     "location Type": "نوع المكان",
-
     "location": "المكان",
     "Enter location": "أدخل المكان",
-
     "Match Date": "تاريخ المباراة",
     "Enter Match Date": "أدخل تاريخ المباراة",
-
     "time": "الوقت",
     "Enter Match Time": "أدخل وقت المباراة",
     "Stream URL": "رابط البث",
@@ -500,7 +466,6 @@
     "VOD URL": "رابط VOD",
     "Enter VOD URL": "ادخل رابط VOD",
     "Pick a date": "اختر تاريخ",
-
     "Enter Highlight URL": "ادخل رابط الحلقة",
     "Highlight URL": "رابط الحلقة",
     "Enter End Time": "ادخل وقت النهاية",
@@ -510,7 +475,6 @@
     "Enter Venue": "ادخل المكان",
     "Venue": "المكان",
     "Venue Type": "نوع المكان",
-
     "Venue is required": "المكان مطلوب",
     "Start Time is required": "وقت البدء مطلوب",
     "End Time is required": "وقت النهاية مطلوب",
@@ -519,7 +483,6 @@
     "Team 1 is required": "الفريق 1 مطلوب",
     "Team 2 is required": "الفريق 2 مطلوب",
     "Series Format is required": "تنسيق السلسلة مطلوب",
-
     "Team Lineups": "تشكيلات الفرق",
     "Team Lineup": "تشكيلة الفريق",
     "Select All": "اختيار الكل",
@@ -562,7 +525,19 @@
   "Error": {
     "Something went wrong!": "حدث خطأ",
     "Try again": "حاول مرة اخرى",
-    "Home": "الصفحة الرئيسية"
+    "Home": "الصفحة الرئيسية",
+    "title": "حدث خطأ ما!",
+    "description": "واجهنا خطأً غير متوقع. لا تقلق، تم إبلاغ فريقنا.",
+    "errorDetails": "تفاصيل الخطأ",
+    "errorMessage": "رسالة الخطأ",
+    "errorId": "معرّف الخطأ",
+    "copy": "نسخ",
+    "copied": "تم النسخ!",
+    "tryAgain": "حاول مرة أخرى",
+    "goHome": "الذهاب للوحة التحكم",
+    "goBack": "العودة",
+    "persistentError": "إذا استمر هذا الخطأ، يرجى",
+    "contactSupport": "التواصل مع الدعم"
   },
   "toast": {
     "uploaded Photo": "تم تحميل الصورة",
@@ -603,19 +578,14 @@
     "Edit": "تعديل",
     "Update": "تحديث",
     "Cancel": "الغاء",
-
     "DialogDeleteDescription": "هذا الإجراء غير قابل للتراجع. سيتم حذف السمة نهائيًا وإزالتها من النظام.",
     "DialogDeleteTitle": "هل أنت متأكد تمامًا أنك تريد حذف هذه السمة؟",
     "DialogEditTitle": "تعديل السمة",
     "DialogEditDescription": "قم بتحديث لون السمة. عدل الحقول حسب الحاجة.",
-
     "No words found": "لم يتم العثور على كلمات",
-
     "word deleted successfully": "تم حذف الكلمة بنجاح",
-
     "Word translation updated successfully": "تم تحديث الترجمة بنجاح",
     "Word added successfully": "تمت اضافة الكلمة بنجاح",
-
     "translation is required": "الترجمة مطلوبة"
   },
   "LinksTable": {
@@ -662,19 +632,14 @@
   "Awards": {
     "title": "العنوان",
     "titlePlaceholder": "أدخل العنوان",
-
     "image": "الصورة",
     "imagePlaceholder": "رابط الصورة",
-
     "game": "اللعبة",
     "gamePlaceholder": "الألعاب",
-
     "tournament": "البطولة",
     "tournamentPlaceholder": "البطولة",
-
     "achievedDate": "تاريخ الإنجاز",
     "datePlaceholder": "التاريخ",
-
     "description": "الوصف",
     "descriptionPlaceholder": "أدخل الوصف",
     "Add new Award": "اضافة جائزة جديدة",
@@ -697,7 +662,6 @@
     "Error in Awards added": "خطأ في إضافة الجائزة",
     "Error in Awards updated": "خطأ في تحديث الجائزة"
   },
-
   "Register": {
     "Register to Go to Dashboard": "سجل الدخول للانتقال إلى لوحة التحكم",
     "First name": "الاسم الأول",
@@ -716,7 +680,6 @@
     "Invalid email address": "البريد الإلكتروني غير صالح",
     "Last name is required": "الاسم الأخير مطلوب",
     "First name is required": "الاسم الأول مطلوب",
-
     "Registration successful": "تم التسجيل بنجاح",
     "Registration failed": "فشل التسجيل",
     "The Code is Send To Your Email": "تم ارسال الكود الى بريدك الالكتروني",
@@ -724,10 +687,8 @@
     "Code must be 6 numbers": "الكود يجب أن يكون 6 أرقام",
     "Code is required": "الكود مطلوب",
     "Login": "تسجيل الدخول",
-
     "Already have an account?": "هل لديك حساب بالفعل؟"
   },
-
   "SupportCenter": {
     "Answer": "الرد",
     "Type your message": "اكتب ردك هنا...",
@@ -779,25 +740,18 @@
   "TransfersForm": {
     "player": "اللاعب",
     "selectPlayerPlaceholder": "اختر اللاعب",
-
     "game": "اللعبة",
     "selectGamePlaceholder": "اختر اللعبة",
-
     "fee": "رسوم الانتقال",
     "feePlaceholder": "ادخل رسوم الانتقال",
-
     "transfer Date": "تاريخ الانتقال",
     "selectDatePlaceholder": "اختر تاريخ الانتقال",
-
     "description": "الوصف",
     "descriptionPlaceholder": "أدخل الوصف",
-
     "from Team": "من الفريق",
     "selectFromTeamPlaceholder": "اختر الفريق المرسل",
-
     "to Team": "إلى الفريق",
     "selectToTeamPlaceholder": "اختر الفريق المستلم",
-
     "Transfer date is required": "تاريخ الانتقال مطلوب",
     "Transfer fee is required": "رسوم الانتقال مطلوبة",
     "Player is required": "اللاعب مطلوب",
@@ -983,5 +937,13 @@
       "of": "من",
       "page": "صفحة"
     }
+  },
+  "NotFound": {
+    "title": "الصفحة غير موجودة",
+    "description": "الصفحة التي تبحث عنها ربما تم إزالتها، أو تغيير اسمها، أو غير متاحة مؤقتاً.",
+    "goHome": "الذهاب للوحة التحكم",
+    "goBack": "العودة",
+    "helpText": "هل تحتاج مساعدة؟ يمكنك",
+    "contactSupport": "التواصل مع الدعم"
   }
 }

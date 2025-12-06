@@ -1,20 +1,51 @@
 import axios from "axios";
-import { cookies } from "next/headers";
+import { getSession } from "./session";
 
 const apiClient = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1`,
-
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 30000, // 30 second timeout
 });
-apiClient.interceptors.request.use(async (config) => {
-  const token = (await cookies()).get("session")?.value;
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Request interceptor to add auth token
+apiClient.interceptors.request.use(
+  async (config) => {
+    try {
+      const token = await getSession();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      console.error("Error getting session:", error.message);
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
+);
 
-  return config;
-});
+// Response interceptor for error handling
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle specific error cases
+    if (error.response) {
+      const { status } = error.response;
+
+      // Log errors in development
+      if (process.env.NODE_ENV === "development") {
+        console.error(`API Error [${status}]:`, error.response.data);
+      }
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error("Network Error: No response received");
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export default apiClient;
