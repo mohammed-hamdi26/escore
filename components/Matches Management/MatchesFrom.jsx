@@ -1,7 +1,7 @@
 "use client";
 import Champion from "@/components/icons/Champion";
 import TeamsManagement from "@/components/icons/TeamsManagement";
-import { Gamepad2, Loader, MapPin } from "lucide-react";
+import { Gamepad2, Loader, MapPin, Star, Eye, Hash } from "lucide-react";
 
 import {
   combineDateAndTime,
@@ -21,12 +21,18 @@ import * as Yup from "yup";
 import SelectDateTimeInput from "../ui app/SelectDateAndTimeInput";
 import TextAreaInput from "../ui app/TextAreaInput";
 import MatchLineupSelector from "./MatchLineupSelector";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
+
 const validateSchema = Yup.object({
   date: Yup.date().required("Match date is required"),
   time: Yup.string().required("Match time is required"),
 
   status: Yup.string()
-    .oneOf(["scheduled", "live", "completed", "postponed", "cancelled"], "Invalid status")
+    .oneOf(
+      ["scheduled", "live", "completed", "postponed", "cancelled"],
+      "Invalid status"
+    )
     .required("Status is required"),
 
   bestOf: Yup.number().nullable(),
@@ -35,15 +41,9 @@ const validateSchema = Yup.object({
     .oneOf(["ONLINE", "OFFLINE"], "Invalid venue type")
     .required("Venue type is required"),
 
-  player1Score: Yup.number()
-    .min(0, "Score cannot be negative")
-    .default(0),
+  player1Score: Yup.number().min(0, "Score cannot be negative").default(0),
 
-  player2Score: Yup.number()
-    .min(0, "Score cannot be negative")
-    .default(0),
-
-  summary: Yup.string().nullable(),
+  player2Score: Yup.number().min(0, "Score cannot be negative").default(0),
 
   venue: Yup.string().when("isOnline", {
     is: "OFFLINE",
@@ -56,15 +56,19 @@ const validateSchema = Yup.object({
 
   // Optional fields
   round: Yup.string().nullable(),
+  matchNumber: Yup.number().nullable(),
   startedAt: Yup.string().nullable(),
   endedAt: Yup.string().nullable(),
   tournament: Yup.string().nullable(),
+  isFeatured: Yup.boolean(),
+  isActive: Yup.boolean(),
 
   // Required fields
   game: Yup.string().required("Game is required"),
   team1: Yup.string().required("Team 1 is required"),
   team2: Yup.string().required("Team 2 is required"),
 });
+
 function MatchesFrom({
   teamsOptions,
   gamesOptions,
@@ -89,12 +93,12 @@ function MatchesFrom({
       isOnline: match?.isOnline === false ? "OFFLINE" : "ONLINE",
       player1Score: match?.result?.team1Score || 0,
       player2Score: match?.result?.team2Score || 0,
-      summary: match?.summary || "",
       venue: match?.venue || "",
 
       streamUrl: match?.streamUrl || "",
 
       round: match?.round || "",
+      matchNumber: match?.matchNumber || "",
       tournament: match?.tournament?.id || "",
       game: match?.game?.id || "",
 
@@ -105,9 +109,11 @@ function MatchesFrom({
       startedAt: match?.startedAt
         ? format(new Date(match.startedAt), "HH:mm")
         : "",
-      endedAt: match?.endedAt
-        ? format(new Date(match.endedAt), "HH:mm")
-        : "",
+      endedAt: match?.endedAt ? format(new Date(match.endedAt), "HH:mm") : "",
+
+      // New fields
+      isFeatured: match?.isFeatured || false,
+      isActive: match?.isActive !== false, // Default to true
 
       // Lineup fields
       team1Lineup:
@@ -177,7 +183,6 @@ function MatchesFrom({
         delete dataValues.time;
         delete dataValues.player1Score;
         delete dataValues.player2Score;
-        delete dataValues.summary; // Not in backend schema
 
         // Remove empty optional fields
         if (!dataValues.tournament) delete dataValues.tournament;
@@ -189,6 +194,13 @@ function MatchesFrom({
         // Convert bestOf to number
         if (dataValues.bestOf) {
           dataValues.bestOf = Number(dataValues.bestOf);
+        }
+
+        // Convert matchNumber to number or remove if empty
+        if (dataValues.matchNumber) {
+          dataValues.matchNumber = Number(dataValues.matchNumber);
+        } else {
+          delete dataValues.matchNumber;
         }
 
         // Remove lineup fields from main data (handle separately via API)
@@ -220,10 +232,6 @@ function MatchesFrom({
     },
   });
 
-  const matchTypeOptions = [
-    { value: "SOLO", label: t("Solo") },
-    { value: "TEAM", label: t("Team") },
-  ];
   const matchStateOptions = [
     { value: "scheduled", label: t("UPCOMING") },
     { value: "live", label: t("LIVE") },
@@ -235,6 +243,7 @@ function MatchesFrom({
     { value: 1, label: t("Best of 1") },
     { value: 3, label: t("Best of 3") },
     { value: 5, label: t("Best of 5") },
+    { value: 7, label: t("Best of 7") },
   ];
   const venueTypeOptions = [
     { value: "ONLINE", label: t("ONLINE") },
@@ -243,6 +252,7 @@ function MatchesFrom({
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
+      {/* Tournament & Game Selection */}
       <FormSection>
         <FormRow>
           <SelectInput
@@ -292,6 +302,8 @@ function MatchesFrom({
             }
           />
         </FormRow>
+
+        {/* Teams Selection */}
         <FormRow>
           <SelectInput
             formik={formik}
@@ -323,8 +335,6 @@ function MatchesFrom({
                 : ""
             }
             disabled={formik.values?.game === ""}
-            // onBlur={formik.handleBlur}
-            // onChange={formik.handleChange}
           />
           <SelectInput
             formik={formik}
@@ -356,35 +366,7 @@ function MatchesFrom({
                 : ""
             }
             disabled={formik.values?.game === ""}
-            // onBlur={formik.handleBlur}
           />
-          {/* {formik.values.status === "FINISHED" && (
-            <SelectInput
-              formik={formik}
-              label={t("Winning Team")}
-              name={"winningTeam"}
-              options={mappedArrayToSelectOptions(
-                teamsOptions.filter(
-                  (team) =>
-                    (team.id === formik.values?.team1) |
-                    (team.id === formik.values?.team2)
-                ),
-                "name",
-                "id"
-              )}
-              disabled={
-                !formik.values.team1 || !formik.values.team2
-              }
-              onChange={(value) =>
-                formik.setFieldValue("winningTeam", Number(value))
-              }
-              value={formik.values.winningTeam}
-              placeholder={"Select Winning Team"}
-              icon={
-                <Trophy className="text-[#677185]" height={35} width={35} />
-              }
-            />
-          )} */}
         </FormRow>
 
         {/* Team Lineups Section */}
@@ -433,26 +415,11 @@ function MatchesFrom({
             </FormRow>
           </div>
         )}
+      </FormSection>
 
+      {/* Match Status & Format */}
+      <FormSection>
         <FormRow>
-          {/* <SelectInput
-            formik={formik}
-            options={matchTypeOptions}
-            onChange={(value) => formik.setFieldValue("matchType", value)}
-            value={formik.values.matchType}
-            label={t("Match Type")}
-            name={"matchType"}
-            placeholder={t("Select Match Type")}
-            icon={<Champion color={"text-[#677185]"} />}
-            error={
-              formik?.errors?.matchType && formik?.touched?.matchType
-                ? formik.errors.matchType
-                : ""
-            }
-            disabled={formik.isSubmitting}
-            // onBlur={formik.handleBlur}
-          /> */}
-
           <SelectInput
             formik={formik}
             options={mappedArrayToSelectOptions(
@@ -472,7 +439,6 @@ function MatchesFrom({
                 : ""
             }
             disabled={formik.isSubmitting}
-            // onBlur={formik.handleBlur}
           />
           <SelectInput
             options={mappedArrayToSelectOptions(
@@ -490,23 +456,108 @@ function MatchesFrom({
                 ? t(formik.errors.bestOf)
                 : ""
             }
-            // onBlur={formik.handleBlur}
             disabled={formik.isSubmitting}
           />
         </FormRow>
-      </FormSection>
 
-      <FormSection>
+        {/* Round & Match Number */}
         <FormRow>
           <InputApp
-            label={
-              formik.values.matchType === "SOLO"
-                ? t("Player 1 Score")
-                : t("Team 1 Score")
+            label={t("Round")}
+            value={formik.values.round}
+            onChange={formik.handleChange}
+            name={"round"}
+            type={"text"}
+            placeholder={t("Enter Round (e.g. Quarter Finals)")}
+            className=" border-0 focus:outline-none "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            error={
+              formik?.errors?.round && formik?.touched?.round
+                ? t(formik?.errors?.round)
+                : ""
             }
+            onBlur={formik.handleBlur}
+            disabled={formik.isSubmitting}
+          />
+          <InputApp
+            label={t("Match Number")}
+            value={formik.values.matchNumber}
+            onChange={formik.handleChange}
+            name={"matchNumber"}
+            type={"number"}
+            placeholder={t("Enter Match Number")}
+            className=" border-0 focus:outline-none "
+            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+            textColor="text-[#677185]"
+            icon={<Hash className="text-[#677185]" height={20} width={20} />}
+            error={
+              formik?.errors?.matchNumber && formik?.touched?.matchNumber
+                ? t(formik?.errors?.matchNumber)
+                : ""
+            }
+            onBlur={formik.handleBlur}
+            disabled={formik.isSubmitting}
+          />
+        </FormRow>
+
+        {/* Featured & Active Toggles */}
+        <FormRow>
+          <div className="flex items-center gap-6 p-4 bg-dashboard-box dark:bg-[#0F1017] rounded-lg">
+            <div className="flex items-center gap-3">
+              <Switch
+                id="isFeatured"
+                checked={formik.values.isFeatured}
+                onCheckedChange={(checked) =>
+                  formik.setFieldValue("isFeatured", checked)
+                }
+                disabled={formik.isSubmitting}
+              />
+              <Label
+                htmlFor="isFeatured"
+                className="flex items-center gap-2 cursor-pointer text-[#677185]"
+              >
+                <Star
+                  className={`h-4 w-4 ${formik.values.isFeatured ? "text-yellow-500 fill-yellow-500" : "text-gray-400"}`}
+                />
+                {t("Featured Match")}
+              </Label>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Switch
+                id="isActive"
+                checked={formik.values.isActive}
+                onCheckedChange={(checked) =>
+                  formik.setFieldValue("isActive", checked)
+                }
+                disabled={formik.isSubmitting}
+              />
+              <Label
+                htmlFor="isActive"
+                className="flex items-center gap-2 cursor-pointer text-[#677185]"
+              >
+                <Eye
+                  className={`h-4 w-4 ${formik.values.isActive ? "text-green-500" : "text-gray-400"}`}
+                />
+                {t("Active")}
+              </Label>
+            </div>
+          </div>
+        </FormRow>
+      </FormSection>
+
+      {/* Score Section */}
+      <FormSection>
+        <h3 className="text-lg font-semibold text-[#BABDC4] mb-4">
+          {t("Match Result")}
+        </h3>
+        <FormRow>
+          <InputApp
+            label={t("Team 1 Score")}
             name={"player1Score"}
             type={"number"}
-            placeholder={"Enter Player 1 Score"}
+            placeholder={"0"}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -522,14 +573,10 @@ function MatchesFrom({
           />
 
           <InputApp
-            label={
-              formik.values.matchType === "SOLO"
-                ? t("Player 2 Score")
-                : t("Team 2 Score")
-            }
+            label={t("Team 2 Score")}
             name={"player2Score"}
             type={"number"}
-            placeholder={"Enter Player 2 Score"}
+            placeholder={"0"}
             className=" border-0 focus:outline-none "
             backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
             textColor="text-[#677185]"
@@ -544,26 +591,9 @@ function MatchesFrom({
             disabled={formik.isSubmitting}
           />
         </FormRow>
-        <InputApp
-          label={t("round")}
-          value={formik.values.round}
-          onChange={formik.handleChange}
-          name={"round"}
-          type={"text"}
-          placeholder={t("Enter round")}
-          className=" border-0 focus:outline-none "
-          backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-          textColor="text-[#677185]"
-          error={
-            formik?.errors?.round && formik?.touched?.round
-              ? t(formik?.errors?.round)
-              : ""
-          }
-          onBlur={formik.handleBlur}
-          disabled={formik.isSubmitting}
-        />
       </FormSection>
 
+      {/* Venue Section */}
       <FormSection>
         <FormRow>
           <SelectInput
@@ -611,38 +641,25 @@ function MatchesFrom({
         </FormRow>
       </FormSection>
 
+      {/* Date & Time Section */}
       <FormSection>
         <SelectDateTimeInput
           label={{ date: t("Date"), time: t("Match Time") }}
           names={{ date: "date", time: "time" }}
           errors={{
             date:
-              formik?.errors?.matchDate &&
-              formik?.touched?.matchDate &&
-              t(formik?.errors?.matchDate),
+              formik?.errors?.date &&
+              formik?.touched?.date &&
+              t(formik?.errors?.date),
             time:
-              formik?.errors?.matchTime &&
-              formik?.touched?.matchTime &&
-              t(formik?.errors?.matchTime),
+              formik?.errors?.time &&
+              formik?.touched?.time &&
+              t(formik?.errors?.time),
           }}
           formik={formik}
           placeholder={t("Pick a date")}
         />
         <FormRow>
-          {/* <DatePicker
-            placeholder={"Enter Match Date"}
-            formik={formik}
-            label={t("Match Date")}
-            name={"matchDate"}
-            icon={
-              <Date
-                height="35"
-                width="35"
-                className={"fill-[#677185] "}
-                color={"text-[#677185]"}
-              />
-            }
-          /> */}
           <InputApp
             label={t("Start Time")}
             name={"startedAt"}
@@ -658,6 +675,8 @@ function MatchesFrom({
             }
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
+            value={formik.values.startedAt}
+            disabled={formik.isSubmitting}
           />
           <InputApp
             label={t("End Time")}
@@ -674,10 +693,13 @@ function MatchesFrom({
             }
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
+            value={formik.values.endedAt}
+            disabled={formik.isSubmitting}
           />
         </FormRow>
       </FormSection>
 
+      {/* URLs Section */}
       <FormSection>
         <FormRow>
           <InputApp
@@ -717,24 +739,9 @@ function MatchesFrom({
             value={formik.values.highlightsUrl}
           />
         </FormRow>
-        <TextAreaInput
-          disabled={formik.isSubmitting}
-          className={"bg-dashboard-box  dark:bg-[#0F1017]"}
-          error={
-            (formik.errors.summary &&
-              formik.touched.summary &&
-              formik.errors.summary) ||
-            ""
-          }
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.summary}
-          label={t("Summary")}
-          name={"summary"}
-          placeholder={t("Enter Summary")}
-          formik={formik}
-        />
       </FormSection>
+
+      {/* Submit Button */}
       <div className="flex justify-end">
         <Button
           disabled={formik.isSubmitting || !formik.isValid}
@@ -748,8 +755,8 @@ function MatchesFrom({
               ? t("Adding")
               : t("Editing")
             : formType === "add"
-            ? t("Add Match")
-            : t("Edit Match")}
+              ? t("Add Match")
+              : t("Edit Match")}
         </Button>
       </div>
     </form>
