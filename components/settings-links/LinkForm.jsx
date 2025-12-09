@@ -3,7 +3,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputApp from "../ui app/InputApp";
 import FileInput from "../ui app/FileInput";
-import FormRow from "../ui app/FormRow";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import {
@@ -11,6 +10,7 @@ import {
   updateAppSocialLink,
 } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
   url: Yup.string().url("Invalid URL").required("URL is required"),
@@ -18,32 +18,50 @@ const validationSchema = Yup.object({
   lightImage: Yup.string().required("Light image URL is required"),
 });
 
-function LinkForm({ t, setOpen, link }) {
+function LinkForm({ t, setOpen, link, setLinks }) {
   const formik = useFormik({
     initialValues: {
       name: link?.name || "",
       url: link?.url || "",
-      darkImage: link?.image.dark || "",
-      lightImage: link?.image.light || "",
+      darkImage: link?.image?.dark || "",
+      lightImage: link?.image?.light || "",
     },
     validationSchema,
     onSubmit: async (values) => {
-      const linkData = link ? { id: link.id, ...values } : values;
-
-      linkData.image = {
-        light: linkData.lightImage,
-        dark: linkData.darkImage,
+      const linkData = {
+        name: values.name,
+        url: values.url,
+        image: {
+          light: values.lightImage,
+          dark: values.darkImage || values.lightImage,
+        },
       };
+
       try {
-        link
-          ? await updateAppSocialLink(linkData)
-          : await addAppSocialLink(linkData);
-        toast.success(
-          link ? t("Link updated successfully") : t("Link added successfully")
-        );
+        if (link) {
+          // Update existing link
+          const response = await updateAppSocialLink({ id: link.id, ...linkData });
+          if (setLinks) {
+            setLinks((prev) =>
+              prev.map((l) =>
+                l.id === link.id
+                  ? { ...l, ...linkData, id: link.id }
+                  : l
+              )
+            );
+          }
+          toast.success(t("Link updated successfully"));
+        } else {
+          // Add new link
+          const response = await addAppSocialLink(linkData);
+          if (setLinks && response?.data) {
+            setLinks((prev) => [...prev, response.data]);
+          }
+          toast.success(t("Link added successfully"));
+        }
         setOpen(false);
       } catch (error) {
-        toast.error(error.message);
+        toast.error(error.message || t("An error occurred"));
       }
     },
   });

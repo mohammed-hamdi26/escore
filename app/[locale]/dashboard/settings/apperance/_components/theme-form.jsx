@@ -37,9 +37,13 @@ function ThemeForm({
       };
       try {
         if (formType === "add") {
-          await addTheme(dataValues);
+          const response = await addTheme(dataValues);
           formik.resetForm();
-          setThemes((prev) => [dataValues, ...prev]);
+          if (response?.data) {
+            setThemes((prev) => [response.data, ...prev]);
+          } else {
+            setThemes((prev) => [dataValues, ...prev]);
+          }
           toast.success(sucessMessage);
           setOpen(false);
         } else if (formType === "edit") {
@@ -47,13 +51,13 @@ function ThemeForm({
           toast.success(sucessMessage);
           setThemes((prev) =>
             prev.map((theme) =>
-              theme.id === currentTheme.id ? dataValues : theme
+              theme.id === currentTheme.id ? { ...theme, ...dataValues } : theme
             )
           );
           setOpen(false);
         }
       } catch (error) {
-        toast.error(error.message || "An error occurred");
+        toast.error(error.message || t("An error occurred"));
         setOpen(false);
       }
     },
@@ -76,11 +80,11 @@ function ThemeForm({
       </ColorPicker>
       {formType === "add" && (
         <SelectInput
-          placeholder="Theme type"
+          placeholder={t("ThemeType")}
           options={mappedArrayToSelectOptions(
             [
-              { value: "dark", label: "Dark" },
-              { value: "light", label: "Light" },
+              { value: "dark", label: t("Dark") },
+              { value: "light", label: t("Light") },
             ],
             "label",
             "value"
