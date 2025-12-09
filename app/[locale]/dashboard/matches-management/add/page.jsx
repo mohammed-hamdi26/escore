@@ -5,7 +5,7 @@ import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import MatchesFrom from "@/components/Matches Management/MatchesFrom";
 
 async function page() {
-  const [teamsOptions, gamesOptions, { data: tournamentsOptions }] =
+  const [{ data: teamsOptions }, gamesOptions, { data: tournamentsOptions }] =
     await Promise.all([getTeams(), getGames(), getTournaments()]);
 
   return (
