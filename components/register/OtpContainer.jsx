@@ -14,7 +14,7 @@ function OtpContainer() {
             {t("Verify code")}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 font-semibold mt-2">
-            {t("An authentication code has been sent to your email.")}
+            {t("authCodeSent")}
           </p>
         </div>
         <OtpInput t={t} />

@@ -49,7 +49,7 @@ function OtpInput({ t }) {
     validationSchema,
     onSubmit: async (values) => {
       if (!email) {
-        toast.error(t("Email not found. Please register again."));
+        toast.error(t("emailNotFound"));
         router.push("/register/form");
         return;
       }
@@ -89,7 +89,8 @@ function OtpInput({ t }) {
     <form onSubmit={formik.handleSubmit} className="space-y-3 w-full">
       {email && (
         <p className="text-sm text-center text-gray-600 dark:text-gray-400 mb-4">
-          {t("Code sent to")}: <span className="font-medium text-green-primary">{email}</span>
+          {t("Code sent to")}:{" "}
+          <span className="font-medium text-green-primary">{email}</span>
         </p>
       )}
       <InputOTP
@@ -123,8 +124,10 @@ function OtpInput({ t }) {
           disabled={isResending}
           className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-green-primary transition-colors disabled:opacity-50"
         >
-          <RefreshCw className={`w-4 h-4 ${isResending ? "animate-spin" : ""}`} />
-          {isResending ? t("Resending...") : t("Resend Code")}
+          <RefreshCw
+            className={`w-4 h-4 ${isResending ? "animate-spin" : ""}`}
+          />
+          {isResending ? t("resending") : t("Resend Code")}
         </button>
       </div>
 
@@ -133,7 +136,7 @@ function OtpInput({ t }) {
         disabled={!formik.isValid || formik.isSubmitting}
         className="w-full bg-green-primary hover:bg-green-primary/70 text-white cursor-pointer font-bold rounded-[10px] text-lg py-5.5 mt-4 disabled:bg-gray-600 disabled:cursor-not-allowed"
       >
-        {formik.isSubmitting ? t("Verifying...") : t("Verify")}
+        {formik.isSubmitting ? t("verifying") : t("Verify")}
       </Button>
     </form>
   );

@@ -62,7 +62,9 @@ function TransfersForm({
       fee: transfer?.fee || "",
       currency: transfer?.currency || "USD",
       contractLength: transfer?.contractLength || "",
-      transferDate: transfer?.transferDate ? transfer.transferDate.split("T")[0] : "",
+      transferDate: transfer?.transferDate
+        ? transfer.transferDate.split("T")[0]
+        : "",
       source: transfer?.source || "",
       notes: transfer?.notes || "",
       isFeatured: transfer?.isFeatured || false,
@@ -74,7 +76,9 @@ function TransfersForm({
         const dataValues = {
           ...values,
           fee: values.fee ? Number(values.fee) : undefined,
-          contractLength: values.contractLength ? Number(values.contractLength) : undefined,
+          contractLength: values.contractLength
+            ? Number(values.contractLength)
+            : undefined,
           fromTeam: values.fromTeam || undefined,
           toTeam: values.toTeam || undefined,
           game: values.game || undefined,
@@ -111,12 +115,20 @@ function TransfersForm({
   // Auto-set fromTeam when player is selected
   const handlePlayerChange = (playerId) => {
     formik.setFieldValue("player", playerId);
-    const player = playersOptions.find((p) => p.id === playerId || p._id === playerId);
+    const player = playersOptions.find(
+      (p) => p.id === playerId || p._id === playerId
+    );
     if (player?.team) {
-      formik.setFieldValue("fromTeam", player.team.id || player.team._id || player.team);
+      formik.setFieldValue(
+        "fromTeam",
+        player.team.id || player.team._id || player.team
+      );
     }
     if (player?.game) {
-      formik.setFieldValue("game", player.game.id || player.game._id || player.game);
+      formik.setFieldValue(
+        "game",
+        player.game.id || player.game._id || player.game
+      );
     }
   };
 
@@ -130,7 +142,11 @@ function TransfersForm({
             label={t("Player")}
             formik={formik}
             placeholder={t("Select Player")}
-            options={mappedArrayToSelectOptions(playersOptions, "nickname", "id")}
+            options={mappedArrayToSelectOptions(
+              playersOptions,
+              "nickname",
+              "id"
+            )}
             error={formik.touched.player && formik.errors.player}
             onChange={handlePlayerChange}
             required
@@ -182,7 +198,9 @@ function TransfersForm({
           />
         </FormRow>
         {formik.errors["at-least-one-team"] && (
-          <p className="text-red-500 text-sm mt-2">{t("At least one team (From or To) is required")}</p>
+          <p className="text-red-500 text-sm mt-2">
+            {t("At least one team (From or To) is required")}
+          </p>
         )}
       </FormSection>
 
@@ -218,7 +236,9 @@ function TransfersForm({
             formik={formik}
             placeholder={t("Enter Contract Length")}
             type="number"
-            error={formik.touched.contractLength && formik.errors.contractLength}
+            error={
+              formik.touched.contractLength && formik.errors.contractLength
+            }
             className="border-0 focus:outline-none"
             backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
             textColor="text-[#677185]"
@@ -250,7 +270,7 @@ function TransfersForm({
             name="source"
             label={t("Source")}
             formik={formik}
-            placeholder={t("Enter Source (e.g., Official announcement)")}
+            placeholder={t("enterSource")}
             className="border-0 focus:outline-none"
             backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
             textColor="text-[#677185]"
@@ -266,7 +286,7 @@ function TransfersForm({
           </Label>
           <Textarea
             name="notes"
-            placeholder={t("Enter additional notes...")}
+            placeholder={t("enterNotes")}
             value={formik.values.notes}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -278,10 +298,15 @@ function TransfersForm({
           <Switch
             id="isFeatured"
             checked={formik.values.isFeatured}
-            onCheckedChange={(checked) => formik.setFieldValue("isFeatured", checked)}
+            onCheckedChange={(checked) =>
+              formik.setFieldValue("isFeatured", checked)
+            }
             disabled={formik.isSubmitting}
           />
-          <Label htmlFor="isFeatured" className="text-sm text-gray-700 dark:text-gray-300">
+          <Label
+            htmlFor="isFeatured"
+            className="text-sm text-gray-700 dark:text-gray-300"
+          >
             {t("Featured Transfer")}
           </Label>
         </div>

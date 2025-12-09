@@ -189,7 +189,9 @@ export default function TicketDetailsModal({ ticketId, onClose }) {
               <SelectContent>
                 <SelectItem value="open">{t("Open")}</SelectItem>
                 <SelectItem value="in_progress">{t("In Progress")}</SelectItem>
-                <SelectItem value="waiting_reply">{t("Waiting Reply")}</SelectItem>
+                <SelectItem value="waiting_reply">
+                  {t("Waiting Reply")}
+                </SelectItem>
                 <SelectItem value="resolved">{t("Resolved")}</SelectItem>
                 <SelectItem value="closed">{t("Closed")}</SelectItem>
               </SelectContent>
@@ -292,7 +294,7 @@ export default function TicketDetailsModal({ ticketId, onClose }) {
               <Input
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
-                placeholder={t("Type your reply...")}
+                placeholder={t("typeReply")}
                 disabled={submitting}
                 className="flex-1 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
               />

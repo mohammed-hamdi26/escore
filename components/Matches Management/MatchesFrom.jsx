@@ -145,8 +145,8 @@ function MatchesFrom({
               team1Score > team2Score
                 ? dataValues.team1
                 : team1Score < team2Score
-                  ? dataValues.team2
-                  : undefined,
+                ? dataValues.team2
+                : undefined,
           },
           // isOnline is already a boolean from the toggle
           scheduledDate: format(
@@ -471,7 +471,7 @@ function MatchesFrom({
           onChange={formik.handleChange}
           name={"round"}
           type={"text"}
-          placeholder={t("Enter Round (e.g. Quarter Finals)")}
+          placeholder={t("enterRound")}
           className=" border-0 focus:outline-none "
           backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
           textColor="text-[#677185]"
@@ -501,7 +501,11 @@ function MatchesFrom({
                 className="flex items-center gap-2 cursor-pointer text-[#677185]"
               >
                 <Star
-                  className={`h-4 w-4 ${formik.values.isFeatured ? "text-yellow-500 fill-yellow-500" : "text-gray-400"}`}
+                  className={`h-4 w-4 ${
+                    formik.values.isFeatured
+                      ? "text-yellow-500 fill-yellow-500"
+                      : "text-gray-400"
+                  }`}
                 />
                 {t("Featured Match")}
               </Label>
@@ -521,7 +525,9 @@ function MatchesFrom({
                 className="flex items-center gap-2 cursor-pointer text-[#677185]"
               >
                 <Eye
-                  className={`h-4 w-4 ${formik.values.isActive ? "text-green-500" : "text-gray-400"}`}
+                  className={`h-4 w-4 ${
+                    formik.values.isActive ? "text-green-500" : "text-gray-400"
+                  }`}
                 />
                 {t("Active")}
               </Label>
@@ -594,7 +600,9 @@ function MatchesFrom({
                 className="flex items-center gap-2 cursor-pointer text-[#677185]"
               >
                 <Wifi
-                  className={`h-4 w-4 ${formik.values.isOnline ? "text-green-500" : "text-gray-400"}`}
+                  className={`h-4 w-4 ${
+                    formik.values.isOnline ? "text-green-500" : "text-gray-400"
+                  }`}
                 />
                 {formik.values.isOnline ? t("Online") : t("Offline")}
               </Label>
@@ -736,8 +744,8 @@ function MatchesFrom({
               ? t("Adding")
               : t("Editing")
             : formType === "add"
-              ? t("Add Match")
-              : t("Edit Match")}
+            ? t("Add Match")
+            : t("Edit Match")}
         </Button>
       </div>
     </form>

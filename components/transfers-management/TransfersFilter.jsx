@@ -20,7 +20,9 @@ export default function TransfersFilter({ games = [] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("search") || ""
+  );
 
   const updateFilter = (key, value) => {
     const params = new URLSearchParams(searchParams);
@@ -38,9 +40,7 @@ export default function TransfersFilter({ games = [] }) {
     setSearchTerm("");
   };
 
-  const hasFilters =
-    searchParams.get("game") ||
-    searchParams.get("search");
+  const hasFilters = searchParams.get("game") || searchParams.get("search");
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm">
@@ -60,7 +60,7 @@ export default function TransfersFilter({ games = [] }) {
               params.delete("page");
               router.push(`${pathname}?${params.toString()}`);
             }}
-            placeholder={t("Search transfers...")}
+            placeholder={t("searchTransfers")}
             className="w-full"
             flexGrow="flex-0"
           />
