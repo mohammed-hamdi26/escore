@@ -80,8 +80,11 @@ export default function TransfersTable({ transfers, pagination, games = [] }) {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {transfer.player?.photo && (
-                          <Image
-                            src={transfer.player.photo.light || transfer.player.photo}
+                          <img
+                            src={
+                              transfer.player.photo.light ||
+                              transfer.player.photo
+                            }
                             alt={transfer.player.nickname || "Player"}
                             width={36}
                             height={36}
@@ -108,8 +111,11 @@ export default function TransfersTable({ transfers, pagination, games = [] }) {
                         {/* From Team */}
                         <div className="flex items-center gap-1">
                           {transfer.fromTeam?.logo && (
-                            <Image
-                              src={transfer.fromTeam.logo.light || transfer.fromTeam.logo}
+                            <img
+                              src={
+                                transfer.fromTeam.logo.light ||
+                                transfer.fromTeam.logo
+                              }
                               alt={transfer.fromTeam.name}
                               width={24}
                               height={24}
@@ -117,7 +123,7 @@ export default function TransfersTable({ transfers, pagination, games = [] }) {
                             />
                           )}
                           {transfer.fromTeam?.logo?.dark && (
-                            <Image
+                            <img
                               src={transfer.fromTeam.logo.dark}
                               alt={transfer.fromTeam.name}
                               width={24}
@@ -135,8 +141,11 @@ export default function TransfersTable({ transfers, pagination, games = [] }) {
                         {/* To Team */}
                         <div className="flex items-center gap-1">
                           {transfer.toTeam?.logo && (
-                            <Image
-                              src={transfer.toTeam.logo.light || transfer.toTeam.logo}
+                            <img
+                              src={
+                                transfer.toTeam.logo.light ||
+                                transfer.toTeam.logo
+                              }
                               alt={transfer.toTeam.name}
                               width={24}
                               height={24}
@@ -144,7 +153,7 @@ export default function TransfersTable({ transfers, pagination, games = [] }) {
                             />
                           )}
                           {transfer.toTeam?.logo?.dark && (
-                            <Image
+                            <img
                               src={transfer.toTeam.logo.dark}
                               alt={transfer.toTeam.name}
                               width={24}
@@ -170,7 +179,10 @@ export default function TransfersTable({ transfers, pagination, games = [] }) {
                     <td className="px-4 py-3">
                       <div className="text-sm text-gray-600 dark:text-gray-400">
                         {transfer.transferDate
-                          ? format(new Date(transfer.transferDate), "yyyy-MM-dd")
+                          ? format(
+                              new Date(transfer.transferDate),
+                              "yyyy-MM-dd"
+                            )
                           : "-"}
                       </div>
                     </td>
@@ -181,29 +193,39 @@ export default function TransfersTable({ transfers, pagination, games = [] }) {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setSelectedTransferId(transfer.id || transfer._id)}
-                          className="flex items-center gap-1"
+                          onClick={() =>
+                            setSelectedTransferId(transfer.id || transfer._id)
+                          }
+                          className="flex items-center text-black dark:text-white gap-1"
                         >
                           <Eye className="w-4 h-4" />
                           <span className="hidden md:inline">{t("View")}</span>
                         </Button>
                         <Link
-                          href={`/dashboard/transfers-management/edit/${transfer.id || transfer._id}`}
+                          href={`/dashboard/transfers-management/edit/${
+                            transfer.id || transfer._id
+                          }`}
                         >
                           <Button
                             size="sm"
                             variant="outline"
-                            className="flex items-center gap-1"
+                            className="flex items-center text-black dark:text-white gap-1"
                           >
                             <Edit className="w-4 h-4" />
-                            <span className="hidden md:inline">{t("Edit")}</span>
+                            <span className="hidden md:inline">
+                              {t("Edit")}
+                            </span>
                           </Button>
                         </Link>
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => handleDelete(transfer.id || transfer._id)}
-                          disabled={deletingId === (transfer.id || transfer._id)}
+                          onClick={() =>
+                            handleDelete(transfer.id || transfer._id)
+                          }
+                          disabled={
+                            deletingId === (transfer.id || transfer._id)
+                          }
                           className="flex items-center gap-1"
                         >
                           <Trash2 className="w-4 h-4" />

@@ -315,6 +315,7 @@ function TransfersForm({
       {/* Submit Button */}
       <div className="flex justify-end gap-4">
         <Button
+          className={"text-black dark:text-white"}
           type="button"
           variant="outline"
           onClick={() => router.back()}

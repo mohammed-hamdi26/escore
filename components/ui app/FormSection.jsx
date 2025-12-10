@@ -5,7 +5,11 @@ function FormSection({ children, title, icon, badge }) {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             {icon && <span className="text-green-primary">{icon}</span>}
-            {title && <h3 className="text-lg font-semibold text-white">{title}</h3>}
+            {title && (
+              <h3 className="text-lg font-semibold text-[#677185] dark:text-white">
+                {title}
+              </h3>
+            )}
           </div>
           {badge && badge}
         </div>

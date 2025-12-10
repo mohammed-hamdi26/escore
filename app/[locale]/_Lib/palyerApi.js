@@ -17,7 +17,10 @@ export async function getPlayers(searchParams = {}) {
 
     return {
       data: res.data?.data,
-      pagination: res.data?.pagination || { totalPages: 1, total: res.data?.data?.length || 0 }
+      pagination: res.data?.pagination || {
+        totalPages: 1,
+        total: res.data?.data?.length || 0,
+      },
     };
   } catch (e) {
     throw new Error("Failed to get players");
@@ -25,10 +28,12 @@ export async function getPlayers(searchParams = {}) {
 }
 
 export async function getPlayer(id) {
+  console.log(id);
   try {
     const res = await apiClient.get(`/players/${id}`);
     return res.data.data;
   } catch (e) {
+    // console.log(e.response);
     throw new Error("Failed to get players");
   }
 }

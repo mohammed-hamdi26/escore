@@ -27,11 +27,7 @@ import {
 import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
 
-function PlayerCard({
-  player,
-  onDelete,
-  t,
-}) {
+function PlayerCard({ player, onDelete, t }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null);
 
@@ -45,7 +41,10 @@ function PlayerCard({
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     return age;
@@ -71,9 +70,9 @@ function PlayerCard({
     <div className="bg-dashboard-box dark:bg-[#0F1017] rounded-xl overflow-hidden hover:ring-1 hover:ring-green-primary/30 transition-all">
       <div className="flex flex-col md:flex-row">
         {/* Player Image */}
-        <div className="relative w-full md:w-48 h-48 md:h-auto flex-shrink-0">
+        <div className="relative w-full md:w-48 h-48 md:h-auto shrink-0">
           {playerImage ? (
-            <Image
+            <img
               src={playerImage}
               alt={player.nickname}
               fill
@@ -89,7 +88,7 @@ function PlayerCard({
             <div className="absolute bottom-2 left-2">
               <div className="bg-black/70 rounded-lg p-1.5 flex items-center gap-1.5">
                 {teamImage ? (
-                  <Image
+                  <img
                     src={teamImage}
                     alt={player.team.name}
                     width={20}
@@ -115,13 +114,19 @@ function PlayerCard({
               {/* Game & Country */}
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 {player.game && (
-                  <Badge variant="outline" className="text-xs border-[#677185] text-[#677185]">
+                  <Badge
+                    variant="outline"
+                    className="text-xs border-[#677185] text-[#677185]"
+                  >
                     <Gamepad2 className="size-3 mr-1" />
                     {player.game.name}
                   </Badge>
                 )}
                 {player.country && (
-                  <Badge variant="outline" className="text-xs border-[#677185] text-[#677185]">
+                  <Badge
+                    variant="outline"
+                    className="text-xs border-[#677185] text-[#677185]"
+                  >
                     <Globe className="size-3 mr-1" />
                     {player.country.name || player.country.code}
                   </Badge>
@@ -129,7 +134,7 @@ function PlayerCard({
               </div>
 
               {/* Nickname */}
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-black dark:text-white">
                 {player.nickname}
               </h3>
 
@@ -158,7 +163,7 @@ function PlayerCard({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-[#677185] hover:text-white"
+                    className="text-[#677185] dark:hover:text-white"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -169,19 +174,25 @@ function PlayerCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <Link href={`/dashboard/player-management/awards/${player.id}`}>
+                  <Link
+                    href={`/dashboard/player-management/awards/${player.id}`}
+                  >
                     <DropdownMenuItem className="cursor-pointer">
                       <Award className="size-4 mr-2" />
                       {t("awards")}
                     </DropdownMenuItem>
                   </Link>
-                  <Link href={`/dashboard/player-management/links/${player.id}`}>
+                  <Link
+                    href={`/dashboard/player-management/links/${player.id}`}
+                  >
                     <DropdownMenuItem className="cursor-pointer">
                       <LinkIcon className="size-4 mr-2" />
                       {t("links")}
                     </DropdownMenuItem>
                   </Link>
-                  <Link href={`/dashboard/player-management/favorites-characters/${player.id}`}>
+                  <Link
+                    href={`/dashboard/player-management/favorites-characters/${player.id}`}
+                  >
                     <DropdownMenuItem className="cursor-pointer">
                       <Star className="size-4 mr-2" />
                       {t("favoritesCharacters")}
@@ -192,7 +203,9 @@ function PlayerCard({
 
                   <DropdownMenuItem
                     className="cursor-pointer text-red-400 focus:text-red-400"
-                    onClick={() => handleAction(() => onDelete(player.id), "delete")}
+                    onClick={() =>
+                      handleAction(() => onDelete(player.id), "delete")
+                    }
                     disabled={loadingAction === "delete"}
                   >
                     <Trash2 className="size-4 mr-2" />
@@ -209,7 +222,9 @@ function PlayerCard({
             {age && (
               <div className="flex items-center gap-1">
                 <Calendar className="size-3" />
-                <span>{age} {t("yearsOld")}</span>
+                <span>
+                  {age} {t("yearsOld")}
+                </span>
               </div>
             )}
 

@@ -9,13 +9,9 @@ async function page({ searchParams }) {
     size,
     page,
   });
+  console.log(players);
 
-  return (
-    <PlayerListRedesign
-      players={players || []}
-      pagination={pagination}
-    />
-  );
+  return <PlayerListRedesign players={players || []} pagination={pagination} />;
 }
 
 export default page;

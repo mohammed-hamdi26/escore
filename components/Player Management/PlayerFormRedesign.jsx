@@ -41,15 +41,9 @@ const validationSchema = yup.object({
     .string()
     .required("nicknameRequired")
     .max(50, "nicknameTooLong"),
-  dateOfBirth: yup
-    .string()
-    .required("birthDateRequired"),
-  country: yup
-    .string()
-    .required("countryRequired"),
-  photoLight: yup
-    .string()
-    .required("photoRequired"),
+  dateOfBirth: yup.string().required("birthDateRequired"),
+  country: yup.string().required("countryRequired"),
+  photoLight: yup.string().required("photoRequired"),
 
   // Optional fields
   photoDark: yup.string(),
@@ -62,10 +56,7 @@ function PlayerFormRedesign({
   submit,
   player,
   countries = [],
-  OptionsData: {
-    teamsOptions = [],
-    gamesOptions = [],
-  } = {},
+  OptionsData: { teamsOptions = [], gamesOptions = [] } = {},
 }) {
   const t = useTranslations("playerForm");
   const router = useRouter();
@@ -101,14 +92,18 @@ function PlayerFormRedesign({
             light: values.photoLight,
             dark: values.photoDark || values.photoLight,
           },
-          slug: `${values.firstName}-${values.lastName}`.replace(/\s+/g, "-").toLowerCase(),
+          slug: `${values.firstName}-${values.lastName}`
+            .replace(/\s+/g, "-")
+            .toLowerCase(),
           game: values.mainGame || undefined,
           team: values.team || undefined,
-          country: selectedCountry ? {
-            name: selectedCountry.label,
-            code: selectedCountry.value,
-            flag: selectedCountry.value,
-          } : undefined,
+          country: selectedCountry
+            ? {
+                name: selectedCountry.label,
+                code: selectedCountry.value,
+                flag: selectedCountry.value,
+              }
+            : undefined,
         };
 
         await submit(dataValues);
@@ -117,9 +112,7 @@ function PlayerFormRedesign({
           formik.resetForm();
         }
 
-        toast.success(
-          formType === "add" ? t("addSuccess") : t("editSuccess")
-        );
+        toast.success(formType === "add" ? t("addSuccess") : t("editSuccess"));
       } catch (error) {
         if (!error.toString().includes("NEXT_REDIRECT")) {
           toast.error(error.message || t("error"));
@@ -134,7 +127,7 @@ function PlayerFormRedesign({
 
   // Count validation errors
   const touchedErrorCount = Object.keys(formik.errors).filter(
-    key => formik.touched[key]
+    (key) => formik.touched[key]
   ).length;
 
   return (
@@ -147,13 +140,13 @@ function PlayerFormRedesign({
             variant="ghost"
             size="icon"
             onClick={() => router.back()}
-            className="text-[#677185] hover:text-white"
+            className="text-[#677185] dark:hover:text-white"
           >
-            <ArrowLeft className="size-5" />
+            <ArrowLeft className="rtl:rotate-180 size-5" />
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-white">
+              <h1 className="text-xl font-bold text-[#677185] dark:text-white">
                 {formType === "add" ? t("addPlayer") : t("editPlayer")}
               </h1>
             </div>
@@ -189,7 +182,11 @@ function PlayerFormRedesign({
         <FormSection
           title={t("basicInfo")}
           icon={<User className="size-5" />}
-          badge={<span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">{t("required")}</span>}
+          badge={
+            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+              {t("required")}
+            </span>
+          }
         >
           <FormRow>
             <InputApp
@@ -203,7 +200,11 @@ function PlayerFormRedesign({
               backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
               textColor="text-[#677185]"
               icon={<User className="size-5 text-[#677185]" />}
-              error={formik.touched.firstName && formik.errors.firstName && t(formik.errors.firstName)}
+              error={
+                formik.touched.firstName &&
+                formik.errors.firstName &&
+                t(formik.errors.firstName)
+              }
               required
             />
             <InputApp
@@ -217,7 +218,11 @@ function PlayerFormRedesign({
               backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
               textColor="text-[#677185]"
               icon={<User className="size-5 text-[#677185]" />}
-              error={formik.touched.lastName && formik.errors.lastName && t(formik.errors.lastName)}
+              error={
+                formik.touched.lastName &&
+                formik.errors.lastName &&
+                t(formik.errors.lastName)
+              }
               required
             />
           </FormRow>
@@ -234,7 +239,11 @@ function PlayerFormRedesign({
               backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
               textColor="text-[#677185]"
               icon={<User className="size-5 text-[#677185]" />}
-              error={formik.touched.nickname && formik.errors.nickname && t(formik.errors.nickname)}
+              error={
+                formik.touched.nickname &&
+                formik.errors.nickname &&
+                t(formik.errors.nickname)
+              }
               required
             />
           </FormRow>
@@ -244,7 +253,11 @@ function PlayerFormRedesign({
         <FormSection
           title={t("personalDetails")}
           icon={<Calendar className="size-5" />}
-          badge={<span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">{t("required")}</span>}
+          badge={
+            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+              {t("required")}
+            </span>
+          }
         >
           <FormRow>
             <DatePicker
@@ -254,7 +267,11 @@ function PlayerFormRedesign({
               placeholder={t("birthDatePlaceholder")}
               icon={<Calendar className="size-5 text-[#677185]" />}
               disabledDate={{ after: new Date() }}
-              error={formik.touched.dateOfBirth && formik.errors.dateOfBirth && t(formik.errors.dateOfBirth)}
+              error={
+                formik.touched.dateOfBirth &&
+                formik.errors.dateOfBirth &&
+                t(formik.errors.dateOfBirth)
+              }
             />
             <SelectInput
               name="country"
@@ -264,7 +281,11 @@ function PlayerFormRedesign({
               placeholder={t("countryPlaceholder")}
               onChange={(value) => formik.setFieldValue("country", value)}
               icon={<Globe className="size-5 text-[#677185]" />}
-              error={formik.touched.country && formik.errors.country && t(formik.errors.country)}
+              error={
+                formik.touched.country &&
+                formik.errors.country &&
+                t(formik.errors.country)
+              }
             />
           </FormRow>
         </FormSection>
@@ -273,7 +294,11 @@ function PlayerFormRedesign({
         <FormSection
           title={t("profilePhotos")}
           icon={<ImageIcon className="size-5" />}
-          badge={<span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">{t("required")}</span>}
+          badge={
+            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+              {t("required")}
+            </span>
+          }
         >
           <FormRow>
             <FileInput
@@ -282,7 +307,11 @@ function PlayerFormRedesign({
               label={t("photoLight")}
               placeholder={t("photoLightPlaceholder")}
               required
-              error={formik.touched.photoLight && formik.errors.photoLight && t(formik.errors.photoLight)}
+              error={
+                formik.touched.photoLight &&
+                formik.errors.photoLight &&
+                t(formik.errors.photoLight)
+              }
             />
             <FileInput
               formik={formik}
@@ -297,7 +326,11 @@ function PlayerFormRedesign({
         <FormSection
           title={t("teamAndGame")}
           icon={<Users className="size-5" />}
-          badge={<span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">{t("optional")}</span>}
+          badge={
+            <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+              {t("optional")}
+            </span>
+          }
         >
           <FormRow>
             <SelectInput
@@ -318,7 +351,10 @@ function PlayerFormRedesign({
               formik={formik}
               label={t("mainGame")}
               options={mappedArrayToSelectOptions(
-                teamsOptions.find((team) => team.id === formik.values.team)?.games || gamesOptions || [],
+                teamsOptions.find((team) => team.id === formik.values.team)
+                  ?.games ||
+                  gamesOptions ||
+                  [],
                 "name",
                 "id"
               )}
@@ -330,7 +366,7 @@ function PlayerFormRedesign({
         </FormSection>
 
         {/* Submit Button */}
-        <div className="flex justify-between items-center gap-4 pt-4 sticky bottom-0 bg-gradient-to-t from-[#0a0c10] via-[#0a0c10] to-transparent py-6">
+        <div className="flex justify-between items-center gap-4 pt-4 sticky bottom-0 bg-linear-to-t from-white to-transparent dark:from-[#0a0c10] dark:via-[#0a0c10] dark:to-transparent py-6">
           <div className="text-sm text-[#677185]">
             <span className="text-red-500">*</span> {t("requiredFields")}
           </div>
@@ -341,7 +377,7 @@ function PlayerFormRedesign({
               onClick={() => router.back()}
               className="border-[#677185] text-[#677185] hover:text-white hover:border-white"
             >
-              <ArrowLeft className="size-4 mr-2" />
+              <ArrowLeft className="rtl:rotate-180 size-4 mr-2" />
               {t("cancel")}
             </Button>
             <Button

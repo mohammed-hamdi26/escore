@@ -6,18 +6,10 @@ import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import PlayerFormRedesign from "@/components/Player Management/PlayerFormRedesign";
 
 async function page({ params }) {
-  const id = await params.id;
-  const [
-    countries,
-    player,
-    { data: teamsOptions },
-    gamesOptions,
-  ] = await Promise.all([
-    getCountries(),
-    getPlayer(id),
-    getTeams(),
-    getGames(),
-  ]);
+  const { id } = await params;
+  const [countries, player, { data: teamsOptions }, gamesOptions] =
+    await Promise.all([getCountries(), getPlayer(id), getTeams(), getGames()]);
+  console.log(player);
 
   return (
     <PlayerFormRedesign

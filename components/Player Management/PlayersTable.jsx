@@ -17,7 +17,7 @@ function PlayersTable({ players, columns, pagination }) {
   const [isLoading, setIsLoading] = useState(false);
   const numPages = pagination?.totalPages || 1;
   const totalItems = pagination?.total || players.length;
-
+  // return null;
   return (
     <div className="space-y-8">
       <FilterPlayers numOfPlayers={totalItems} />
@@ -35,17 +35,17 @@ function PlayersTable({ players, columns, pagination }) {
             key={player.id}
           >
             <Table.Cell className="flex items-center gap-2">
-              {(player?.photo?.light || player?.photo?.dark) && (
+              {/* {(player?.photo?.light || player?.photo?.dark) && (
                 <img
                   src={`${player?.photo?.light || player?.photo?.dark}`}
                   className="rounded-full overflow-hidden size-10"
                   alt=""
                 />
-              )}{" "}
+              )}{" "} */}
               {player.nickname}
             </Table.Cell>
             <Table.Cell>
-              {(player?.team?.logo?.light || player?.team?.logo?.dark) && (
+              {/* {(player?.team?.logo?.light || player?.team?.logo?.dark) && (
                 <img
                   className="rounded-full overflow-hidden size-10"
                   src={`${
@@ -53,7 +53,7 @@ function PlayersTable({ players, columns, pagination }) {
                   }`}
                   alt=""
                 />
-              )}
+              )} */}
             </Table.Cell>
             <Table.Cell>{calculateAge(player.dateOfBirth)}</Table.Cell>
             <Table.Cell>{player.country.name}</Table.Cell>

@@ -72,7 +72,7 @@ export default function TransfersFilter({ games = [] }) {
             value={searchParams.get("game") || "all"}
             onValueChange={(value) => updateFilter("game", value)}
           >
-            <SelectTrigger className="w-[150px] bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+            <SelectTrigger className="w-[150px] text-black dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
               <SelectValue placeholder={t("Game")} />
             </SelectTrigger>
             <SelectContent>

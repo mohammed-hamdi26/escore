@@ -687,6 +687,7 @@
       "approved": "Approved",
       "rejected": "Rejected"
     },
+    "contentRequestsNav": "Content Requests",
     "stats": {
       "userStats": "User Statistics",
       "totalUsers": "Total Users",
@@ -961,7 +962,8 @@
     "Resend Code": "Resend Code",
     "verifying": "Verifying...",
     "Verify": "Verify",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "Password is required": "Password is required"
   },
   "SupportCenter": {
     "Answer": "Answer",

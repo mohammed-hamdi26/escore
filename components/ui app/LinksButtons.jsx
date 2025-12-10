@@ -18,9 +18,13 @@ function LinksButtons() {
   return (
     <div className="flex gap-4  mb-8">
       <Link
-        disabled={pathname.includes("edit")}
-        href={pathname.slice(0, pathname.lastIndexOf("add")) + "edit"}
-        className="disabled:cursor-not-allowed"
+        aria-disabled={pathname.includes("edit") ? "true" : "false"}
+        href={
+          pathname.includes("edit")
+            ? pathname
+            : pathname.slice(0, pathname.lastIndexOf("add")) + "edit"
+        }
+        className={`${pathname.includes("edit") ? "cursor-not-allowed" : ""}`}
       >
         <Button
           disabled={pathname.includes("edit")}
@@ -33,10 +37,16 @@ function LinksButtons() {
           {t("edit")}
         </Button>
       </Link>
+
       <Link
+        aria-disabled={pathname.includes("add") ? "true" : "false"}
         disabled={pathname.includes("add")}
-        href={pathname.slice(0, pathname.lastIndexOf("edit")) + "add"}
-        className="disabled:cursor-not-allowed"
+        href={
+          pathname.includes("add")
+            ? pathname
+            : pathname.slice(0, pathname.lastIndexOf("edit")) + "add"
+        }
+        className={`${pathname.includes("add") ? "cursor-not-allowed" : ""}`}
       >
         <Button
           disabled={pathname.includes("add")}

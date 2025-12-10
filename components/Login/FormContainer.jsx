@@ -9,7 +9,9 @@ import { useTranslations } from "next-intl";
 import { Link, redirect } from "@/i18n/navigation";
 const validationSchema = Yup.object({
   // : Yup.string().required("username is required"),
-  email: Yup.string().email(" ").required("Email is Required"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is Required"),
   password: Yup.string().required("password is required"),
   // role: Yup.string().required("Required"),
 });

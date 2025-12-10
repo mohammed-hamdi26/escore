@@ -1,13 +1,7 @@
 "use client";
 
 import { Link, usePathname } from "@/i18n/navigation";
-import {
-  Users,
-  BarChart3,
-  UserPlus,
-  Shield,
-  UserCheck,
-} from "lucide-react";
+import { Users, BarChart3, UserPlus, Shield, UserCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const navItems = [
@@ -32,7 +26,7 @@ const navItems = [
   {
     href: "/dashboard/users/content-requests",
     icon: UserCheck,
-    labelKey: "contentRequests",
+    labelKey: "contentRequestsNav",
     exact: false,
   },
 ];
@@ -49,7 +43,8 @@ export default function UsersLayout({ children }) {
   };
 
   // Don't show tabs on edit pages
-  const isEditPage = pathname.includes("/edit") || pathname.includes("/following");
+  const isEditPage =
+    pathname.includes("/edit") || pathname.includes("/following");
 
   if (isEditPage) {
     return <>{children}</>;
@@ -60,7 +55,9 @@ export default function UsersLayout({ children }) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Users className="w-8 h-8 text-green-primary" />
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("title")}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          {t("title")}
+        </h1>
       </div>
 
       {/* Navigation Tabs */}

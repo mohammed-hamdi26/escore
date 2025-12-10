@@ -816,7 +816,8 @@
     "Resend Code": "إعادة إرسال الرمز",
     "verifying": "جاري التحقق...",
     "Verify": "تأكيد",
-    "privacyPolicy": "سياسة الخصوصية"
+    "privacyPolicy": "سياسة الخصوصية",
+    "Password is required": "كلمة المرور مطلوبة"
   },
   "SupportCenter": {
     "Answer": "الرد",
@@ -1151,6 +1152,7 @@
       "approved": "مقبول",
       "rejected": "مرفوض"
     },
+    "contentRequestsNav": "طلبات المحتوى",
     "stats": {
       "userStats": "إحصائيات المستخدمين",
       "totalUsers": "إجمالي المستخدمين",

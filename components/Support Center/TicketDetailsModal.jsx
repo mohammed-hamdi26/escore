@@ -183,7 +183,7 @@ export default function TicketDetailsModal({ ticketId, onClose }) {
               onValueChange={handleStatusChange}
               disabled={updating}
             >
-              <SelectTrigger className="w-[140px] bg-white dark:bg-gray-700">
+              <SelectTrigger className="w-[140px] text-black dark:text-white bg-white dark:bg-gray-700">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -202,7 +202,7 @@ export default function TicketDetailsModal({ ticketId, onClose }) {
               onValueChange={handlePriorityChange}
               disabled={updating}
             >
-              <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700">
+              <SelectTrigger className="w-[120px] text-black dark:text-white bg-white dark:bg-gray-700">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -219,7 +219,7 @@ export default function TicketDetailsModal({ ticketId, onClose }) {
                 variant="outline"
                 onClick={handleReopenTicket}
                 disabled={updating}
-                className="flex items-center gap-1"
+                className="flex text-black dark:text-white  items-center gap-1"
               >
                 <RefreshCw className="w-4 h-4" />
                 {t("Reopen")}
@@ -230,7 +230,7 @@ export default function TicketDetailsModal({ ticketId, onClose }) {
                 variant="outline"
                 onClick={handleCloseTicket}
                 disabled={updating}
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 text-black dark:text-white"
               >
                 <X className="w-4 h-4" />
                 {t("Close")}
@@ -296,7 +296,7 @@ export default function TicketDetailsModal({ ticketId, onClose }) {
                 onChange={(e) => setReplyMessage(e.target.value)}
                 placeholder={t("typeReply")}
                 disabled={submitting}
-                className="flex-1 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
+                className="flex-1 text-[#6b7280] bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
               />
               <Button
                 type="submit"

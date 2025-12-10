@@ -106,7 +106,7 @@ export default function SupportTicketsTable({ tickets, pagination }) {
                           size="sm"
                           variant="outline"
                           onClick={() => setSelectedTicketId(ticket.id)}
-                          className="flex items-center gap-1"
+                          className="flex text-black dark:text-white items-center gap-1"
                         >
                           <Eye className="w-4 h-4" />
                           <span className="hidden md:inline">{t("View")}</span>

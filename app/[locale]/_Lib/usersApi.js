@@ -53,6 +53,7 @@ export async function getUsers(searchParams = {}) {
  * @param {string} id - User ID
  */
 export async function getUser(id) {
+  console.log(id);
   try {
     const res = await apiClient.get(`/admin/users/${id}`);
     return res.data.data;
@@ -69,10 +70,15 @@ export async function getUser(id) {
  */
 export async function getContentRequests(page = 1, limit = 20) {
   try {
-    const res = await apiClient.get(`/admin/content-requests?page=${page}&limit=${limit}`);
+    const res = await apiClient.get(
+      `/admin/content-requests?page=${page}&limit=${limit}`
+    );
     return { data: res.data.data, meta: res.data.meta };
   } catch (e) {
-    console.error("Failed to get content requests:", e.response?.data || e.message);
+    console.error(
+      "Failed to get content requests:",
+      e.response?.data || e.message
+    );
     throw new Error("Failed to get content requests");
   }
 }

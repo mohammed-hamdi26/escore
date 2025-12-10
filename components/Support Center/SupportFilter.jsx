@@ -98,7 +98,7 @@ export default function SupportFilter() {
           value={searchParams.get("status") || "all"}
           onValueChange={(value) => updateFilter("status", value)}
         >
-          <SelectTrigger className="w-[150px] bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+          <SelectTrigger className="w-[150px] text-black dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
             <SelectValue placeholder={t("Status")} />
           </SelectTrigger>
           <SelectContent>
@@ -116,7 +116,7 @@ export default function SupportFilter() {
           value={searchParams.get("category") || "all"}
           onValueChange={(value) => updateFilter("category", value)}
         >
-          <SelectTrigger className="w-[160px] bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+          <SelectTrigger className="w-[160px] text-black dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
             <SelectValue placeholder={t("Category")} />
           </SelectTrigger>
           <SelectContent>
@@ -134,7 +134,7 @@ export default function SupportFilter() {
           value={searchParams.get("priority") || "all"}
           onValueChange={(value) => updateFilter("priority", value)}
         >
-          <SelectTrigger className="w-[140px] bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+          <SelectTrigger className="w-[140px] text-black dark:text-white bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
             <SelectValue placeholder={t("Priority")} />
           </SelectTrigger>
           <SelectContent>

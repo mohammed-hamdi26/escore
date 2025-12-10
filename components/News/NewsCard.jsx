@@ -38,7 +38,8 @@ function NewsCard({
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null);
 
-  const isPublished = news.publishedAt && new Date(news.publishedAt) <= new Date();
+  const isPublished =
+    news.publishedAt && new Date(news.publishedAt) <= new Date();
   const coverImage = news.coverImage?.light || news.coverImage?.dark;
 
   const handleAction = async (action, actionName) => {
@@ -61,11 +62,11 @@ function NewsCard({
         {/* Cover Image */}
         <div className="relative w-full md:w-48 h-40 md:h-auto flex-shrink-0">
           {coverImage ? (
-            <Image
+            <img
               src={coverImage}
               alt={news.title}
               fill
-              className="object-cover"
+              className="object-cover h-full"
             />
           ) : (
             <div className="w-full h-full bg-[#1a1f2e] flex items-center justify-center">
@@ -75,7 +76,7 @@ function NewsCard({
           {/* Featured Badge */}
           {news.isFeatured && (
             <div className="absolute top-2 left-2">
-              <Badge className="bg-yellow-600 text-white text-xs">
+              <Badge className="bg-yellow-500 dark:bg-yellow-600 text-white text-xs">
                 <Star className="size-3 mr-1" />
                 {t("featured")}
               </Badge>
@@ -91,7 +92,10 @@ function NewsCard({
               {/* Game & Status */}
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 {news.game && (
-                  <Badge variant="outline" className="text-xs border-[#677185] text-[#677185]">
+                  <Badge
+                    variant="outline"
+                    className="text-xs border-[#677185] text-[#677185]"
+                  >
                     {news.game.name}
                   </Badge>
                 )}
@@ -103,7 +107,7 @@ function NewsCard({
               </div>
 
               {/* Title */}
-              <h3 className="text-lg font-semibold text-white line-clamp-2">
+              <h3 className="text-lg font-bold text-[#677185]  dark:text-white line-clamp-2">
                 {news.title}
               </h3>
             </div>
@@ -135,64 +139,75 @@ function NewsCard({
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {news.urlExternal && (
-                  <>
+                <DropdownMenuContent align="end" className="w-48">
+                  {news.urlExternal && (
+                    <>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => window.open(news.urlExternal, "_blank")}
+                      >
+                        <ExternalLink className="size-4 mr-2" />
+                        {t("viewSource")}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+
+                  {isPublished ? (
                     <DropdownMenuItem
                       className="cursor-pointer"
-                      onClick={() => window.open(news.urlExternal, "_blank")}
+                      onClick={() =>
+                        handleAction(() => onUnpublish(news.id), "unpublish")
+                      }
+                      disabled={loadingAction === "unpublish"}
                     >
-                      <ExternalLink className="size-4 mr-2" />
-                      {t("viewSource")}
+                      <EyeOff className="size-4 mr-2" />
+                      {t("unpublish")}
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
+                  ) : (
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() =>
+                        handleAction(() => onPublish(news.id), "publish")
+                      }
+                      disabled={loadingAction === "publish"}
+                    >
+                      <Send className="size-4 mr-2" />
+                      {t("publish")}
+                    </DropdownMenuItem>
+                  )}
 
-                {isPublished ? (
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => handleAction(() => onUnpublish(news.id), "unpublish")}
-                    disabled={loadingAction === "unpublish"}
+                    onClick={() =>
+                      handleAction(
+                        () => onToggleFeatured(news.id),
+                        "toggleFeatured"
+                      )
+                    }
+                    disabled={loadingAction === "toggleFeatured"}
                   >
-                    <EyeOff className="size-4 mr-2" />
-                    {t("unpublish")}
+                    <Star
+                      className={`size-4 mr-2 ${
+                        news.isFeatured ? "fill-yellow-500 text-yellow-500" : ""
+                      }`}
+                    />
+                    {news.isFeatured ? t("removeFeatured") : t("makeFeatured")}
                   </DropdownMenuItem>
-                ) : (
+
+                  <DropdownMenuSeparator />
+
                   <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => handleAction(() => onPublish(news.id), "publish")}
-                    disabled={loadingAction === "publish"}
+                    className="cursor-pointer text-red-400 focus:text-red-400"
+                    onClick={() =>
+                      handleAction(() => onDelete(news.id), "delete")
+                    }
+                    disabled={loadingAction === "delete"}
                   >
-                    <Send className="size-4 mr-2" />
-                    {t("publish")}
+                    <Trash2 className="size-4 mr-2" />
+                    {t("delete")}
                   </DropdownMenuItem>
-                )}
-
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => handleAction(() => onToggleFeatured(news.id), "toggleFeatured")}
-                  disabled={loadingAction === "toggleFeatured"}
-                >
-                  <Star
-                    className={`size-4 mr-2 ${
-                      news.isFeatured ? "fill-yellow-500 text-yellow-500" : ""
-                    }`}
-                  />
-                  {news.isFeatured ? t("removeFeatured") : t("makeFeatured")}
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem
-                  className="cursor-pointer text-red-400 focus:text-red-400"
-                  onClick={() => handleAction(() => onDelete(news.id), "delete")}
-                  disabled={loadingAction === "delete"}
-                >
-                  <Trash2 className="size-4 mr-2" />
-                  {t("delete")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
+                </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>

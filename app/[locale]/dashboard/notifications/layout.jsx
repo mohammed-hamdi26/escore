@@ -57,7 +57,7 @@ export default function NotificationsLayout({ children }) {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                 active
                   ? "bg-green-primary/20 text-green-primary"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
               <Icon className="w-5 h-5" />

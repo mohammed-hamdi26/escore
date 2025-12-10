@@ -14,11 +14,7 @@ import {
 } from "@/app/[locale]/_Lib/newsApi";
 import { deleteNew } from "@/app/[locale]/_Lib/actions";
 
-function NewsListRedesign({
-  news,
-  pagination,
-  locale = "en",
-}) {
+function NewsListRedesign({ news, pagination, locale = "en" }) {
   const t = useTranslations("news");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -67,7 +63,9 @@ function NewsListRedesign({
             disabled={isPending}
             className="border-[#677185] text-[#677185] hover:text-white"
           >
-            <RefreshCw className={`size-4 ${isPending ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`size-4 ${isPending ? "animate-spin" : ""}`}
+            />
           </Button>
           <Button
             className="bg-green-primary hover:bg-green-primary/80 text-white"
@@ -84,7 +82,7 @@ function NewsListRedesign({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#677185]" />
         <Input
           placeholder={t("searchPlaceholder")}
-          className="pl-10 bg-dashboard-box dark:bg-[#0F1017] border-0 text-white placeholder:text-[#677185]"
+          className="pl-10 bg-dashboard-box dark:bg-[#0F1017] border-0 text-[#677185] dark:text-white placeholder:text-[#677185]"
         />
       </div>
 
