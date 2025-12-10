@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import {
   AlertTriangle,
   RefreshCw,
@@ -15,6 +15,7 @@ import {
 
 export default function Error({ error, reset }) {
   const t = useTranslations("Error");
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -23,7 +24,23 @@ export default function Error({ error, reset }) {
     if (process.env.NODE_ENV === "development") {
       console.error("Error caught by error boundary:", error);
     }
-  }, [error]);
+
+    // Check if it's an auth error (401/403) and redirect to login
+    const errorMessage = error?.message?.toLowerCase() || "";
+    const isAuthError =
+      error?.isAuthError ||
+      errorMessage.includes("401") ||
+      errorMessage.includes("403") ||
+      errorMessage.includes("unauthorized") ||
+      errorMessage.includes("forbidden") ||
+      errorMessage.includes("authentication") ||
+      errorMessage.includes("not authenticated");
+
+    if (isAuthError) {
+      // Clear any stale session data and redirect to login
+      router.push("/login");
+    }
+  }, [error, router]);
 
   const errorMessage = error?.message || "An unexpected error occurred";
   const errorDigest = error?.digest || "Unknown";
