@@ -828,6 +828,17 @@
     "Add your first theme to get started": "Add your first theme to get started",
     "Dark": "Dark",
     "Light": "Light",
+    "Dark mode theme": "For dark mode",
+    "Light mode theme": "For light mode",
+    "Color Picker": "Color Picker",
+    "Manual Input": "Manual Input",
+    "Enter a valid hex color code (e.g., #3B82F6)": "Enter a valid hex color code (e.g., #3B82F6)",
+    "Invalid hex color": "Invalid hex color",
+    "Color is required": "Color is required",
+    "Theme type is required": "Theme type is required",
+    "Manage app color themes": "Manage app color themes",
+    "Adding...": "Adding...",
+    "Updating...": "Updating...",
     "Update": "Update",
     "Submit": "Submit"
   },
@@ -1059,7 +1070,10 @@
     "Cancel": "Cancel",
     "Link updated successfully": "Link updated successfully",
     "Link added successfully": "Link added successfully",
-    "An error occurred": "An error occurred"
+    "An error occurred": "An error occurred",
+    "Manage your social media links": "Manage your social media links",
+    "Updating...": "Updating...",
+    "Adding...": "Adding..."
   },
   "ChangePassword": {
     "Current Password": "Current Password",

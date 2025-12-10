@@ -23,25 +23,21 @@ jest.mock("@/app/[locale]/_Lib/actions", () => ({
   updateAppSocialLink: jest.fn().mockResolvedValue({}),
 }));
 
-// Mock InputApp
-jest.mock("@/components/ui app/InputApp", () => ({
-  __esModule: true,
-  default: ({ label, name, error, ...props }) => (
-    <div>
-      <label htmlFor={name}>{label}</label>
-      <input id={name} name={name} data-testid={`input-${name}`} {...props} />
-      {error && <span data-testid={`error-${name}`}>{error}</span>}
-    </div>
-  ),
-}));
-
 // Mock FileInput
 jest.mock("@/components/ui app/FileInput", () => ({
   __esModule: true,
-  default: ({ label, name, error, ...props }) => (
+  default: ({ label, name, error, formik, placeholder, ...props }) => (
     <div>
       <label htmlFor={name}>{label}</label>
-      <input id={name} name={name} data-testid={`file-${name}`} {...props} />
+      <input
+        id={name}
+        name={name}
+        data-testid={`file-${name}`}
+        placeholder={placeholder}
+        value={props.value || ""}
+        onChange={props.onChange}
+        onBlur={props.onBlur}
+      />
       {error && <span data-testid={`error-${name}`}>{error}</span>}
     </div>
   ),
@@ -67,6 +63,11 @@ jest.mock("@/components/ui/spinner", () => ({
   Spinner: () => <div data-testid="spinner">Loading...</div>,
 }));
 
+// Mock lucide-react icons
+jest.mock("lucide-react", () => ({
+  Loader2: ({ className }) => <div data-testid="loader-icon" className={className}>Loading...</div>,
+}));
+
 describe("LinkForm", () => {
   const mockT = (key) => {
     const translations = {
@@ -84,12 +85,14 @@ describe("LinkForm", () => {
       "Link added successfully": "Link added successfully",
       "Link updated successfully": "Link updated successfully",
       "An error occurred": "An error occurred",
+      "Adding...": "Adding...",
+      "Updating...": "Updating...",
     };
     return translations[key] || key;
   };
 
   const mockSetOpen = jest.fn();
-  const mockSetLinks = jest.fn();
+  const mockOnSuccess = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -100,12 +103,12 @@ describe("LinkForm", () => {
       <LinkForm
         t={mockT}
         setOpen={mockSetOpen}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
-    expect(screen.getByTestId("input-name")).toBeInTheDocument();
-    expect(screen.getByTestId("input-url")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Link Name")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("https://example.com")).toBeInTheDocument();
     expect(screen.getByTestId("file-lightImage")).toBeInTheDocument();
     expect(screen.getByTestId("file-darkImage")).toBeInTheDocument();
   });
@@ -115,7 +118,7 @@ describe("LinkForm", () => {
       <LinkForm
         t={mockT}
         setOpen={mockSetOpen}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
@@ -135,7 +138,7 @@ describe("LinkForm", () => {
         t={mockT}
         setOpen={mockSetOpen}
         link={existingLink}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
@@ -155,12 +158,12 @@ describe("LinkForm", () => {
         t={mockT}
         setOpen={mockSetOpen}
         link={existingLink}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
-    expect(screen.getByTestId("input-name")).toHaveValue("Facebook");
-    expect(screen.getByTestId("input-url")).toHaveValue("https://facebook.com");
+    expect(screen.getByPlaceholderText("Link Name")).toHaveValue("Facebook");
+    expect(screen.getByPlaceholderText("https://example.com")).toHaveValue("https://facebook.com");
   });
 
   it("handles null image gracefully", () => {
@@ -176,11 +179,11 @@ describe("LinkForm", () => {
         t={mockT}
         setOpen={mockSetOpen}
         link={linkWithNullImage}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
-    expect(screen.getByTestId("input-name")).toHaveValue("Test");
+    expect(screen.getByPlaceholderText("Link Name")).toHaveValue("Test");
   });
 
   it("handles undefined image dark gracefully", () => {
@@ -196,11 +199,11 @@ describe("LinkForm", () => {
         t={mockT}
         setOpen={mockSetOpen}
         link={linkWithPartialImage}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
-    expect(screen.getByTestId("input-name")).toHaveValue("Test");
+    expect(screen.getByPlaceholderText("Link Name")).toHaveValue("Test");
   });
 
   it("submits form and calls addAppSocialLink for new link", async () => {
@@ -211,12 +214,12 @@ describe("LinkForm", () => {
       <LinkForm
         t={mockT}
         setOpen={mockSetOpen}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
-    fireEvent.change(screen.getByTestId("input-name"), { target: { value: "New Link" } });
-    fireEvent.change(screen.getByTestId("input-url"), { target: { value: "https://newlink.com" } });
+    fireEvent.change(screen.getByPlaceholderText("Link Name"), { target: { value: "New Link" } });
+    fireEvent.change(screen.getByPlaceholderText("https://example.com"), { target: { value: "https://newlink.com" } });
     fireEvent.change(screen.getByTestId("file-lightImage"), { target: { value: "/light.png" } });
 
     const submitButton = screen.getByTestId("submit-button");
@@ -251,11 +254,11 @@ describe("LinkForm", () => {
         t={mockT}
         setOpen={mockSetOpen}
         link={existingLink}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
-    fireEvent.change(screen.getByTestId("input-name"), { target: { value: "Updated Link" } });
+    fireEvent.change(screen.getByPlaceholderText("Link Name"), { target: { value: "Updated Link" } });
 
     const submitButton = screen.getByTestId("submit-button");
     fireEvent.click(submitButton);
@@ -279,12 +282,12 @@ describe("LinkForm", () => {
       <LinkForm
         t={mockT}
         setOpen={mockSetOpen}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
-    fireEvent.change(screen.getByTestId("input-name"), { target: { value: "New Link" } });
-    fireEvent.change(screen.getByTestId("input-url"), { target: { value: "https://newlink.com" } });
+    fireEvent.change(screen.getByPlaceholderText("Link Name"), { target: { value: "New Link" } });
+    fireEvent.change(screen.getByPlaceholderText("https://example.com"), { target: { value: "https://newlink.com" } });
     fireEvent.change(screen.getByTestId("file-lightImage"), { target: { value: "/light.png" } });
 
     const submitButton = screen.getByTestId("submit-button");
@@ -295,30 +298,28 @@ describe("LinkForm", () => {
     });
   });
 
-  it("updates links state after successful add", async () => {
-    const { addAppSocialLink } = require("@/app/[locale]/_Lib/actions");
-
+  it("calls onSuccess callback after successful add", async () => {
     render(
       <LinkForm
         t={mockT}
         setOpen={mockSetOpen}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
-    fireEvent.change(screen.getByTestId("input-name"), { target: { value: "New Link" } });
-    fireEvent.change(screen.getByTestId("input-url"), { target: { value: "https://newlink.com" } });
+    fireEvent.change(screen.getByPlaceholderText("Link Name"), { target: { value: "New Link" } });
+    fireEvent.change(screen.getByPlaceholderText("https://example.com"), { target: { value: "https://newlink.com" } });
     fireEvent.change(screen.getByTestId("file-lightImage"), { target: { value: "/light.png" } });
 
     const submitButton = screen.getByTestId("submit-button");
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockSetLinks).toHaveBeenCalled();
+      expect(mockOnSuccess).toHaveBeenCalled();
     });
   });
 
-  it("updates links state after successful update", async () => {
+  it("calls onSuccess callback after successful update", async () => {
     const existingLink = {
       id: "1",
       name: "Existing",
@@ -331,17 +332,17 @@ describe("LinkForm", () => {
         t={mockT}
         setOpen={mockSetOpen}
         link={existingLink}
-        setLinks={mockSetLinks}
+        onSuccess={mockOnSuccess}
       />
     );
 
-    fireEvent.change(screen.getByTestId("input-name"), { target: { value: "Updated" } });
+    fireEvent.change(screen.getByPlaceholderText("Link Name"), { target: { value: "Updated" } });
 
     const submitButton = screen.getByTestId("submit-button");
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockSetLinks).toHaveBeenCalled();
+      expect(mockOnSuccess).toHaveBeenCalled();
     });
   });
 });

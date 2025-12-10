@@ -1,13 +1,26 @@
 "use client";
-import Table from "@/components/ui app/Table";
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-
-import DialogLinks from "./DialogLinks";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import {
+  Link2,
+  Plus,
+  RefreshCw,
+  Edit,
+  Trash2,
+  ExternalLink,
+  MoreVertical,
+  Globe
+} from "lucide-react";
 import { Button } from "../ui/button";
-import { useState } from "react";
-import { deleteAppSocialLink } from "@/app/[locale]/_Lib/actions";
-import toast from "react-hot-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,167 +30,240 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { deleteAppSocialLink } from "@/app/[locale]/_Lib/actions";
+import toast from "react-hot-toast";
 import { useTheme } from "next-themes";
-import { Link2, Trash2 } from "lucide-react";
+import DialogLinks from "./DialogLinks";
+import { Spinner } from "../ui/spinner";
 
-function LinksContainer({ links: initialLinks }) {
-  const t = useTranslations("LinksApp");
-  const [links, setLinks] = useState(initialLinks || []);
-  const [deletingId, setDeletingId] = useState(null);
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+function LinkCard({ link, onDelete, onEdit, t, isDark }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const getImageUrl = (link) => {
+  const getImageUrl = () => {
     if (!link?.image) return null;
     const imageUrl = isDark ? (link.image.dark || link.image.light) : link.image.light;
     if (!imageUrl) return null;
-    // If it's already a full URL, return as-is
     if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
       return imageUrl;
     }
-    // Otherwise, prepend the base URL
     return `${process.env.NEXT_PUBLIC_BASE_URL}${imageUrl}`;
   };
 
-  const handleDelete = async (linkId) => {
+  const imageUrl = getImageUrl();
+
+  const handleDelete = async () => {
+    setIsLoading(true);
     try {
-      setDeletingId(linkId);
-      await deleteAppSocialLink(linkId);
-      setLinks((prev) => prev.filter((l) => l.id !== linkId));
+      await deleteAppSocialLink(link.id);
+      onDelete(link.id);
       toast.success(t("The Link is Deleted"));
     } catch (e) {
       toast.error(t("error in Delete"));
     } finally {
-      setDeletingId(null);
+      setIsLoading(false);
+      setShowDeleteDialog(false);
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-          {t("Social Links")}
-        </h2>
-        <DialogLinks
-          trigger={
-            <Button
-              className="text-white text-center w-fit min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80 transition-colors duration-300"
+    <>
+      <div className="bg-dashboard-box dark:bg-[#0F1017] rounded-xl overflow-hidden hover:ring-1 hover:ring-green-primary/30 transition-all">
+        <div className="flex items-center p-4 gap-4">
+          {/* Icon/Image */}
+          <div className="w-14 h-14 rounded-xl overflow-hidden bg-[#1a1f2e] flex items-center justify-center flex-shrink-0">
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                width={56}
+                height={56}
+                alt={link.name || "Social link"}
+                className="object-contain w-full h-full p-2"
+              />
+            ) : (
+              <Globe className="w-6 h-6 text-[#677185]" />
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-semibold text-white truncate">
+              {link.name}
+            </h3>
+            <a
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-[#677185] hover:text-green-primary truncate block max-w-md transition-colors"
             >
-              {t("Add New Link")}
+              {link.url}
+            </a>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <a
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg text-[#677185] hover:text-white hover:bg-white/5 transition-colors"
+            >
+              <ExternalLink className="w-4 h-4" />
+            </a>
+
+            <DialogLinks
+              t={t}
+              link={link}
+              trigger={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-green-primary text-green-primary hover:bg-green-primary hover:text-white"
+                >
+                  <Edit className="w-4 h-4 mr-1" />
+                  {t("Edit")}
+                </Button>
+              }
+              dialogTitle={t("Edit Link")}
+              onSuccess={(updatedLink) => onEdit(link.id, updatedLink)}
+            />
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-[#677185] hover:text-red-400 hover:bg-red-400/10"
+              onClick={() => setShowDeleteDialog(true)}
+              disabled={isLoading}
+            >
+              {isLoading ? <Spinner className="w-4 h-4" /> : <Trash2 className="w-4 h-4" />}
             </Button>
-          }
-          dialogTitle={t("Add New Link")}
-          t={t}
-          setLinks={setLinks}
-        />
+          </div>
+        </div>
       </div>
 
-      {!links || links.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-gray-400">
-          <Link2 className="w-16 h-16 mb-4 opacity-50" />
-          <p className="text-lg font-medium">{t("No links found")}</p>
-          <p className="text-sm mt-1">{t("Add your first social link to get started")}</p>
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("Delete Link")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("Are you sure you want to delete this link? This action cannot be undone.")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoading}>{t("Cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={handleDelete}
+              disabled={isLoading}
+            >
+              {isLoading ? <Spinner className="w-4 h-4 mr-2" /> : null}
+              {t("Delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+
+function LinksContainer({ links: initialLinks }) {
+  const t = useTranslations("LinksApp");
+  const router = useRouter();
+  const [links, setLinks] = useState(initialLinks || []);
+  const [isPending, startTransition] = useTransition();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  const handleRefresh = () => {
+    startTransition(() => {
+      router.refresh();
+    });
+  };
+
+  const handleDelete = (linkId) => {
+    setLinks((prev) => prev.filter((l) => l.id !== linkId));
+  };
+
+  const handleEdit = (linkId, updatedData) => {
+    setLinks((prev) =>
+      prev.map((l) => (l.id === linkId ? { ...l, ...updatedData } : l))
+    );
+  };
+
+  const handleAdd = (newLink) => {
+    setLinks((prev) => [...prev, newLink]);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">{t("Social Links")}</h1>
+          <p className="text-[#677185] mt-1">{t("Manage your social media links")}</p>
         </div>
-      ) : (
-        <Table
-          t={t}
-          grid_cols="grid-cols-[1fr_1.5fr_auto]"
-          columns={[
-            { id: "name", header: "name" },
-            { id: "link", header: "Link" },
-          ]}
-        >
-          {links.map((link) => {
-            const imageUrl = getImageUrl(link);
-            return (
-              <Table.Row key={link.id} grid_cols="grid-cols-[1fr_1.5fr_auto]">
-                <Table.Cell className="flex gap-3 items-center">
-                  {imageUrl ? (
-                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-                      <Image
-                        src={imageUrl}
-                        width={40}
-                        height={40}
-                        alt={link.name || "Social link"}
-                        className="object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-                      <Link2 className="w-5 h-5 text-gray-400" />
-                    </div>
-                  )}
-                  <span className="font-medium text-gray-800 dark:text-white">
-                    {link.name}
-                  </span>
-                </Table.Cell>
-                <Table.Cell>
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 dark:text-blue-400 hover:underline truncate block max-w-[300px]"
-                  >
-                    {link.url}
-                  </a>
-                </Table.Cell>
-                <Table.Cell className="flex gap-2 items-center justify-end">
-                  <DialogLinks
-                    t={t}
-                    link={link}
-                    trigger={
-                      <Button className="text-white bg-green-primary rounded-full min-w-[80px] cursor-pointer hover:bg-green-primary/80">
-                        {t("Edit")}
-                      </Button>
-                    }
-                    dialogTitle={t("Edit Link")}
-                    setLinks={setLinks}
-                  />
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        disabled={deletingId === link.id}
-                        variant="destructive"
-                        className="rounded-full min-w-[80px] cursor-pointer"
-                      >
-                        {deletingId === link.id ? (
-                          <span className="animate-spin">...</span>
-                        ) : (
-                          <>
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            {t("Delete")}
-                          </>
-                        )}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          {t("Delete Link")}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t("Are you sure you want to delete this link? This action cannot be undone.")}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{t("Cancel")}</AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-red-600 hover:bg-red-700"
-                          onClick={() => handleDelete(link.id)}
-                        >
-                          {t("Delete")}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </Table.Cell>
-              </Table.Row>
-            );
-          })}
-        </Table>
-      )}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleRefresh}
+            disabled={isPending}
+            className="border-[#677185] text-[#677185] hover:text-white"
+          >
+            <RefreshCw className={`w-4 h-4 ${isPending ? "animate-spin" : ""}`} />
+          </Button>
+          <DialogLinks
+            t={t}
+            trigger={
+              <Button className="bg-green-primary hover:bg-green-primary/80 text-white">
+                <Plus className="w-4 h-4 mr-2" />
+                {t("Add New Link")}
+              </Button>
+            }
+            dialogTitle={t("Add New Link")}
+            onSuccess={handleAdd}
+          />
+        </div>
+      </div>
+
+      {/* Links List */}
+      <div className="space-y-4">
+        {!links || links.length === 0 ? (
+          <div className="bg-dashboard-box dark:bg-[#0F1017] rounded-xl p-12 text-center">
+            <div className="w-16 h-16 rounded-full bg-[#1a1f2e] flex items-center justify-center mx-auto mb-4">
+              <Link2 className="w-8 h-8 text-[#677185]" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              {t("No links found")}
+            </h3>
+            <p className="text-[#677185] mb-6">{t("Add your first social link to get started")}</p>
+            <DialogLinks
+              t={t}
+              trigger={
+                <Button className="bg-green-primary hover:bg-green-primary/80 text-white">
+                  <Plus className="w-4 h-4 mr-2" />
+                  {t("Add New Link")}
+                </Button>
+              }
+              dialogTitle={t("Add New Link")}
+              onSuccess={handleAdd}
+            />
+          </div>
+        ) : (
+          links.map((link) => (
+            <LinkCard
+              key={link.id}
+              link={link}
+              onDelete={handleDelete}
+              onEdit={handleEdit}
+              t={t}
+              isDark={isDark}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 }

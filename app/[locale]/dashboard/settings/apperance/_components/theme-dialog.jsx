@@ -9,10 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import ThemeForm from "./theme-form";
+
 function ThemeDialog({
   trigger,
   formType = "add",
-  setThemes,
+  onSuccess,
   currentTheme,
   t,
 }) {
@@ -22,13 +23,14 @@ function ThemeDialog({
     formType === "add" ? t("Add New theme") : t("DialogEditTitle");
   const dialogDescription =
     formType === "add" ? t("DialogAddDescription") : t("DialogEditDescription");
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-dashboard-box dark:bg-[#0F1017] border-gray-800">
         <DialogHeader>
-          <DialogTitle>{dialogTitle}</DialogTitle>
-          <DialogDescription>{dialogDescription}</DialogDescription>
+          <DialogTitle className="text-white">{dialogTitle}</DialogTitle>
+          <DialogDescription className="text-[#677185]">{dialogDescription}</DialogDescription>
         </DialogHeader>
         <ThemeForm
           t={t}
@@ -38,7 +40,7 @@ function ThemeDialog({
               : t("Theme updated successfully")
           }
           formType={formType}
-          setThemes={setThemes}
+          onSuccess={onSuccess}
           setOpen={setOpen}
           currentTheme={currentTheme}
         />

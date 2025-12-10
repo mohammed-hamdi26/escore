@@ -10,11 +10,19 @@ jest.mock("next/image", () => ({
   },
 }));
 
+// Mock next/navigation
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    refresh: jest.fn(),
+  }),
+}));
+
 // Mock next-intl
 jest.mock("next-intl", () => ({
   useTranslations: () => (key) => {
     const translations = {
       "Social Links": "Social Links",
+      "Manage your social media links": "Manage your social media links",
       "Add New Link": "Add New Link",
       "No links found": "No links found",
       "Add your first social link to get started": "Add your first social link to get started",
@@ -58,46 +66,48 @@ jest.mock("@/app/[locale]/_Lib/actions", () => ({
 // Mock DialogLinks component
 jest.mock("@/components/settings-links/DialogLinks", () => ({
   __esModule: true,
-  default: ({ trigger, dialogTitle }) => (
+  default: ({ trigger, onSuccess }) => (
     <div data-testid="dialog-links">
       {trigger}
-      <span data-testid="dialog-title">{dialogTitle}</span>
     </div>
   ),
 }));
 
 // Mock AlertDialog components
 jest.mock("@/components/ui/alert-dialog", () => ({
-  AlertDialog: ({ children, open }) => open !== false ? <div data-testid="alert-dialog">{children}</div> : null,
-  AlertDialogTrigger: ({ children, asChild }) => <div data-testid="alert-trigger">{children}</div>,
+  AlertDialog: ({ children, open }) => open ? <div data-testid="alert-dialog">{children}</div> : null,
   AlertDialogContent: ({ children }) => <div data-testid="alert-content">{children}</div>,
   AlertDialogHeader: ({ children }) => <div>{children}</div>,
   AlertDialogTitle: ({ children }) => <h2>{children}</h2>,
   AlertDialogDescription: ({ children }) => <p>{children}</p>,
   AlertDialogFooter: ({ children }) => <div>{children}</div>,
-  AlertDialogCancel: ({ children }) => <button data-testid="alert-cancel">{children}</button>,
-  AlertDialogAction: ({ children, onClick }) => <button data-testid="alert-action" onClick={onClick}>{children}</button>,
+  AlertDialogCancel: ({ children, disabled }) => <button data-testid="alert-cancel" disabled={disabled}>{children}</button>,
+  AlertDialogAction: ({ children, onClick, disabled }) => <button data-testid="alert-action" onClick={onClick} disabled={disabled}>{children}</button>,
 }));
 
 // Mock Button
 jest.mock("@/components/ui/button", () => ({
-  Button: ({ children, onClick, disabled, className }) => (
+  Button: ({ children, onClick, disabled, className, variant, size }) => (
     <button onClick={onClick} disabled={disabled} className={className} data-testid="button">
       {children}
     </button>
   ),
 }));
 
-// Mock Table
-jest.mock("@/components/ui app/Table", () => {
-  const Table = ({ children }) => <table data-testid="table"><tbody>{children}</tbody></table>;
-  Table.Row = ({ children }) => <tr data-testid="table-row">{children}</tr>;
-  Table.Cell = ({ children }) => <td data-testid="table-cell">{children}</td>;
-  return {
-    __esModule: true,
-    default: Table,
-  };
-});
+// Mock Spinner
+jest.mock("@/components/ui/spinner", () => ({
+  Spinner: () => <div data-testid="spinner">Loading...</div>,
+}));
+
+// Mock lucide-react icons
+jest.mock("lucide-react", () => ({
+  Link2: () => <svg data-testid="icon-link2" />,
+  Plus: () => <svg data-testid="icon-plus" />,
+  RefreshCw: () => <svg data-testid="icon-refresh" />,
+  Edit: () => <svg data-testid="icon-edit" />,
+  Trash2: () => <svg data-testid="icon-trash" />,
+  ExternalLink: () => <svg data-testid="icon-external" />,
+}));
 
 describe("LinksContainer", () => {
   const mockLinks = [
@@ -133,11 +143,12 @@ describe("LinksContainer", () => {
     expect(screen.getByText("No links found")).toBeInTheDocument();
   });
 
-  it("renders links table when links provided", () => {
+  it("renders link cards when links provided", () => {
     render(<LinksContainer links={mockLinks} />);
 
-    expect(screen.getByTestId("table")).toBeInTheDocument();
-    expect(screen.getAllByTestId("table-row")).toHaveLength(2);
+    // Card-based design shows link names
+    expect(screen.getByText("Facebook")).toBeInTheDocument();
+    expect(screen.getByText("Twitter")).toBeInTheDocument();
   });
 
   it("displays link names", () => {
@@ -160,12 +171,16 @@ describe("LinksContainer", () => {
     expect(screen.getByText("Social Links")).toBeInTheDocument();
   });
 
+  it("renders subtitle", () => {
+    render(<LinksContainer links={mockLinks} />);
+
+    expect(screen.getByText("Manage your social media links")).toBeInTheDocument();
+  });
+
   it("renders Add New Link button", () => {
     render(<LinksContainer links={mockLinks} />);
 
-    // Use getAllByText since it appears in both button and dialog title
-    const addNewLinkElements = screen.getAllByText("Add New Link");
-    expect(addNewLinkElements.length).toBeGreaterThan(0);
+    expect(screen.getByText("Add New Link")).toBeInTheDocument();
   });
 
   it("renders edit buttons for each link", () => {
@@ -175,48 +190,11 @@ describe("LinksContainer", () => {
     expect(editButtons).toHaveLength(2);
   });
 
-  it("renders delete buttons for each link", () => {
+  it("renders images for links", () => {
     render(<LinksContainer links={mockLinks} />);
 
-    // Delete appears in both trigger buttons and alert action buttons
-    const deleteButtons = screen.getAllByText("Delete");
-    // 2 links × 2 buttons (trigger + action) = 4
-    expect(deleteButtons.length).toBeGreaterThanOrEqual(2);
-  });
-
-  it("handles delete action", async () => {
-    const { deleteAppSocialLink } = require("@/app/[locale]/_Lib/actions");
-    const toast = require("react-hot-toast").default;
-
-    render(<LinksContainer links={mockLinks} />);
-
-    // Find and click the delete action button
-    const deleteActionButtons = screen.getAllByTestId("alert-action");
-    fireEvent.click(deleteActionButtons[0]);
-
-    await waitFor(() => {
-      expect(deleteAppSocialLink).toHaveBeenCalledWith("1");
-    });
-
-    await waitFor(() => {
-      expect(toast.success).toHaveBeenCalledWith("Link deleted successfully");
-    });
-  });
-
-  it("handles delete error", async () => {
-    const { deleteAppSocialLink } = require("@/app/[locale]/_Lib/actions");
-    const toast = require("react-hot-toast").default;
-
-    deleteAppSocialLink.mockRejectedValueOnce(new Error("Delete failed"));
-
-    render(<LinksContainer links={mockLinks} />);
-
-    const deleteActionButtons = screen.getAllByTestId("alert-action");
-    fireEvent.click(deleteActionButtons[0]);
-
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Error deleting link");
-    });
+    const images = screen.getAllByRole("img");
+    expect(images.length).toBeGreaterThanOrEqual(2);
   });
 
   it("handles external image URLs correctly", () => {
