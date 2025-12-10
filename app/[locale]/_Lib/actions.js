@@ -61,6 +61,17 @@ export async function logout() {
   redirect("/login");
 }
 
+// Force clear session without redirect (for error handling)
+export async function forceLogout() {
+  try {
+    await deleteSession();
+    return { success: true };
+  } catch (e) {
+    console.error("Force logout error:", e);
+    return { success: false };
+  }
+}
+
 // player actions
 export async function addPlayer(playerData) {
   try {
