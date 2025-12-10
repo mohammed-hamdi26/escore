@@ -7,17 +7,20 @@ import { PermissionsProvider } from "@/contexts/PermissionsContext";
 
 export default async function DashboardLayout({ children }) {
   let user = null;
+  let shouldRedirect = false;
 
   try {
     user = await getLoginUser();
   } catch (error) {
-    // If user fetch fails, clear session and redirect to login
-    const cookieStore = await cookies();
-    cookieStore.delete("session");
-    redirect("/login");
+    // If user fetch fails, mark for redirect
+    // Don't call redirect inside try-catch as it throws internally
+    shouldRedirect = true;
   }
 
-  if (!user) {
+  // Clear session and redirect outside try-catch
+  if (shouldRedirect || !user) {
+    const cookieStore = await cookies();
+    cookieStore.delete("session");
     redirect("/login");
   }
 
