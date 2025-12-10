@@ -2,23 +2,24 @@ import SideNavBar from "@/components/dashboard/SideNavBar";
 import TopNav from "@/components/dashboard/TopNav";
 import { getLoginUser } from "../_Lib/usersApi";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { PermissionsProvider } from "@/contexts/PermissionsContext";
 
 export default async function DashboardLayout({ children }) {
   let user = null;
+  let shouldRedirect = false;
 
   try {
     user = await getLoginUser();
   } catch (error) {
-    // If user fetch fails, clear session and redirect to login
-    const cookieStore = await cookies();
-    cookieStore.delete("session");
-    redirect("/login");
+    // If user fetch fails, mark for redirect
+    // Don't call redirect inside try-catch as it throws internally
+    shouldRedirect = true;
   }
 
-  if (!user) {
-    redirect("/login");
+  // Redirect to force-logout route which will clear the session cookie
+  // Can't delete cookies in Server Components, so use a route handler
+  if (shouldRedirect || !user) {
+    redirect("/api/auth/force-logout");
   }
 
   return (

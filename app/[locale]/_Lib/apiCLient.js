@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getSession } from "./session";
+import { getSession, deleteSession } from "./session";
 
 const apiClient = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1`,
@@ -30,10 +30,22 @@ apiClient.interceptors.request.use(
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     // Handle specific error cases
     if (error.response) {
       const { status } = error.response;
+
+      // Handle 401 (Unauthorized) and 403 (Forbidden) - clear session
+      if (status === 401 || status === 403) {
+        try {
+          await deleteSession();
+          console.log("Session cleared due to authentication error");
+        } catch (sessionError) {
+          console.error("Failed to clear session:", sessionError.message);
+        }
+        // Add a flag to the error for easier handling
+        error.isAuthError = true;
+      }
 
       // Log errors in development
       if (process.env.NODE_ENV === "development") {

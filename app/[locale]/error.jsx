@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import {
   AlertTriangle,
   RefreshCw,
@@ -11,19 +11,62 @@ import {
   ArrowLeft,
   Copy,
   CheckCircle,
+  LogOut,
 } from "lucide-react";
+import { forceLogout } from "./_Lib/actions";
 
 export default function Error({ error, reset }) {
   const t = useTranslations("Error");
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [isAuthError, setIsAuthError] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   useEffect(() => {
     // Log error to console in development
     if (process.env.NODE_ENV === "development") {
       console.error("Error caught by error boundary:", error);
     }
+
+    // Check if it's an auth error (401/403)
+    const errorMsg = error?.message?.toLowerCase() || "";
+    const errorDigest = error?.digest?.toLowerCase() || "";
+    const combinedError = errorMsg + " " + errorDigest;
+
+    const authError =
+      error?.isAuthError ||
+      combinedError.includes("401") ||
+      combinedError.includes("403") ||
+      combinedError.includes("unauthorized") ||
+      combinedError.includes("forbidden") ||
+      combinedError.includes("authentication") ||
+      combinedError.includes("not authenticated") ||
+      combinedError.includes("jwt") ||
+      combinedError.includes("token");
+
+    setIsAuthError(authError);
+
+    // Auto-clear session and redirect for auth errors
+    if (authError) {
+      handleForceLogout();
+    }
   }, [error]);
+
+  const handleForceLogout = async () => {
+    setIsClearing(true);
+    try {
+      await forceLogout();
+      // Small delay to ensure cookie is cleared
+      setTimeout(() => {
+        router.push("/login");
+        router.refresh();
+      }, 100);
+    } catch (e) {
+      console.error("Failed to clear session:", e);
+      setIsClearing(false);
+    }
+  };
 
   const errorMessage = error?.message || "An unexpected error occurred";
   const errorDigest = error?.digest || "Unknown";
@@ -34,6 +77,18 @@ export default function Error({ error, reset }) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  // Show loading state while clearing session
+  if (isClearing) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-primary mx-auto mb-4"></div>
+          <p className="text-gray-400">Redirecting to login...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 py-8">
@@ -52,13 +107,28 @@ export default function Error({ error, reset }) {
 
           {/* Title */}
           <h1 className="text-2xl md:text-3xl font-bold text-white text-center mb-3">
-            {t("title")}
+            {isAuthError ? "Session Expired" : t("title")}
           </h1>
 
           {/* Description */}
           <p className="text-gray-400 text-center mb-6 max-w-md mx-auto">
-            {t("description")}
+            {isAuthError
+              ? "Your session has expired or is invalid. Please log in again."
+              : t("description")}
           </p>
+
+          {/* Auth Error - Show Login Button */}
+          {isAuthError && (
+            <div className="mb-6">
+              <button
+                onClick={handleForceLogout}
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-green-primary hover:bg-green-600 text-white font-semibold rounded-lg transition-all duration-200"
+              >
+                <LogOut className="w-5 h-5" />
+                Go to Login
+              </button>
+            </div>
+          )}
 
           {/* Error Details Toggle */}
           <div className="mb-6">
@@ -120,47 +190,53 @@ export default function Error({ error, reset }) {
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={reset}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-green-primary hover:bg-green-600 text-white font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-green-primary/25"
-            >
-              <RefreshCw className="w-5 h-5" />
-              {t("tryAgain")}
-            </button>
+          {/* Action Buttons - Only show for non-auth errors */}
+          {!isAuthError && (
+            <>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={reset}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-green-primary hover:bg-green-600 text-white font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-green-primary/25"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                  {t("tryAgain")}
+                </button>
 
-            <Link
-              href="/dashboard"
-              className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02]"
-            >
-              <Home className="w-5 h-5" />
-              {t("goHome")}
-            </Link>
-          </div>
+                <Link
+                  href="/dashboard"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02]"
+                >
+                  <Home className="w-5 h-5" />
+                  {t("goHome")}
+                </Link>
+              </div>
 
-          {/* Go Back Button */}
-          <button
-            onClick={() => window.history.back()}
-            className="w-full mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 text-gray-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {t("goBack")}
-          </button>
+              {/* Go Back Button */}
+              <button
+                onClick={() => window.history.back()}
+                className="w-full mt-3 inline-flex items-center justify-center gap-2 px-5 py-3 text-gray-400 hover:text-white transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                {t("goBack")}
+              </button>
+            </>
+          )}
         </div>
 
         {/* Help Section */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-500 text-sm">
-            {t("persistentError")}{" "}
-            <Link
-              href="/dashboard/support-center"
-              className="text-green-primary hover:underline"
-            >
-              {t("contactSupport")}
-            </Link>
-          </p>
-        </div>
+        {!isAuthError && (
+          <div className="mt-6 text-center">
+            <p className="text-gray-500 text-sm">
+              {t("persistentError")}{" "}
+              <Link
+                href="/dashboard/support-center"
+                className="text-green-primary hover:underline"
+              >
+                {t("contactSupport")}
+              </Link>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

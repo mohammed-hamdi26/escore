@@ -24,10 +24,10 @@ function ThemeDeleteDialog({ theme_id, onDelete, t }) {
       setIsLoading(true);
       await deleteTheme(theme_id);
       onDelete(theme_id);
-      toast.success("theme deleted successfully ");
+      toast.success(t("Theme deleted successfully"));
       setOpen(false);
     } catch (error) {
-      toast.error(error.message || "Failed to delete word");
+      toast.error(error.message || t("Failed to delete theme"));
     } finally {
       setIsLoading(false);
     }
