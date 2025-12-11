@@ -44,9 +44,10 @@ function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete }) {
       const { width, height } = e.currentTarget;
       // Set initial crop to center of image
       const cropWidth = Math.min(width * 0.8, 300);
-      const cropHeight = selectedRatio === "free"
-        ? Math.min(height * 0.8, 300)
-        : cropWidth / (ASPECT_RATIOS[selectedRatio] || 1);
+      const cropHeight =
+        selectedRatio === "free"
+          ? Math.min(height * 0.8, 300)
+          : cropWidth / (ASPECT_RATIOS[selectedRatio] || 1);
 
       const x = (width - cropWidth) / 2;
       const y = (height - cropHeight) / 2;
@@ -187,7 +188,11 @@ function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete }) {
                   variant={selectedRatio === ratio ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleRatioChange(ratio)}
-                  className="min-w-[60px]"
+                  className={`min-w-[60px]  ${
+                    selectedRatio === ratio
+                      ? "text-white"
+                      : "text-black dark:text-white"
+                  }`}
                 >
                   {ratio === "free" ? t("free") : ratio}
                 </Button>
@@ -219,18 +224,23 @@ function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete }) {
           </div>
         </div>
 
-        <DialogFooter className="flex gap-2 sm:gap-0">
+        <DialogFooter className="flex gap-0  sm:gap-2 ">
           <Button
             type="button"
             variant="ghost"
             onClick={handleReset}
-            className="gap-2"
+            className="gap-2 bg-[#C7C7C7] hover:bg-[#C7C7C7]/80 text-black dark:text-white"
           >
             <RotateCcw className="size-4" />
             {t("reset")}
           </Button>
           <div className="flex-1" />
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button
+            type="button"
+            className={"text-black dark:text-white"}
+            variant="outline"
+            onClick={onClose}
+          >
             {t("cancel")}
           </Button>
           <Button

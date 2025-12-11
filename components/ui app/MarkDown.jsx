@@ -40,6 +40,8 @@ function MarkDown({ formik, name, label, placeholder, error }) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
+  console.log(content);
+
   // Mount state for hydration
   useEffect(() => {
     setMounted(true);
@@ -53,18 +55,21 @@ function MarkDown({ formik, name, label, placeholder, error }) {
   }, [formik?.values[name]]);
 
   // Add to history for undo/redo
-  const addToHistory = useCallback((newContent) => {
-    setHistory(prev => {
-      const newHistory = prev.slice(0, historyIndex + 1);
-      newHistory.push(newContent);
-      // Keep only last 50 states
-      if (newHistory.length > 50) {
-        newHistory.shift();
-      }
-      return newHistory;
-    });
-    setHistoryIndex(prev => Math.min(prev + 1, 49));
-  }, [historyIndex]);
+  const addToHistory = useCallback(
+    (newContent) => {
+      setHistory((prev) => {
+        const newHistory = prev.slice(0, historyIndex + 1);
+        newHistory.push(newContent);
+        // Keep only last 50 states
+        if (newHistory.length > 50) {
+          newHistory.shift();
+        }
+        return newHistory;
+      });
+      setHistoryIndex((prev) => Math.min(prev + 1, 49));
+    },
+    [historyIndex]
+  );
 
   // Undo function
   const handleUndo = useCallback(() => {
@@ -89,42 +94,48 @@ function MarkDown({ formik, name, label, placeholder, error }) {
   }, [historyIndex, history, formik, name]);
 
   // Handle paste (including images)
-  const handlePaste = useCallback(async (e) => {
-    const clipboardData = e.clipboardData;
+  const handlePaste = useCallback(
+    async (e) => {
+      const clipboardData = e.clipboardData;
 
-    // Check for images
-    const items = clipboardData.items;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf("image") !== -1) {
-        e.preventDefault();
-        const file = items[i].getAsFile();
-        if (file) {
-          // Convert image to base64 for preview (in production, upload to server)
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const base64 = event.target.result;
-            const textarea = textareaRef.current;
-            const start = textarea.selectionStart;
-            const imageMarkdown = `![pasted-image](${base64})`;
-            const newContent = content.substring(0, start) + imageMarkdown + content.substring(start);
-            setContent(newContent);
-            formik.setFieldValue(name, newContent);
-            addToHistory(newContent);
-          };
-          reader.readAsDataURL(file);
+      // Check for images
+      const items = clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          e.preventDefault();
+          const file = items[i].getAsFile();
+          if (file) {
+            // Convert image to base64 for preview (in production, upload to server)
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              const base64 = event.target.result;
+              const textarea = textareaRef.current;
+              const start = textarea.selectionStart;
+              const imageMarkdown = `![pasted-image](${base64})`;
+              const newContent =
+                content.substring(0, start) +
+                imageMarkdown +
+                content.substring(start);
+              setContent(newContent);
+              formik.setFieldValue(name, newContent);
+              addToHistory(newContent);
+            };
+            reader.readAsDataURL(file);
+          }
+          return;
         }
-        return;
       }
-    }
 
-    // Handle text paste normally but add to history
-    setTimeout(() => {
-      const newContent = textareaRef.current?.value || "";
-      if (newContent !== content) {
-        addToHistory(newContent);
-      }
-    }, 0);
-  }, [content, formik, name, addToHistory]);
+      // Handle text paste normally but add to history
+      setTimeout(() => {
+        const newContent = textareaRef.current?.value || "";
+        if (newContent !== content) {
+          addToHistory(newContent);
+        }
+      }, 0);
+    },
+    [content, formik, name, addToHistory]
+  );
 
   const insertMarkdown = (before, after = "", placeholder = "") => {
     const textarea = textareaRef.current;
@@ -160,9 +171,7 @@ function MarkDown({ formik, name, label, placeholder, error }) {
     const lineStart = textBeforeCursor.lastIndexOf("\n") + 1;
 
     const newText =
-      content.substring(0, lineStart) +
-      prefix +
-      content.substring(lineStart);
+      content.substring(0, lineStart) + prefix + content.substring(lineStart);
 
     formik.setFieldValue(name, newText);
     setContent(newText);
@@ -183,7 +192,10 @@ function MarkDown({ formik, name, label, placeholder, error }) {
     }
 
     // Redo: Ctrl+Shift+Z or Ctrl+Y
-    if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) {
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      (e.key === "y" || (e.key === "z" && e.shiftKey))
+    ) {
       e.preventDefault();
       handleRedo();
       return;
@@ -408,21 +420,29 @@ function MarkDown({ formik, name, label, placeholder, error }) {
     // Code blocks
     html = html.replace(
       /```(\w*)\n([\s\S]*?)```/g,
-      `<pre class="${isDark ? 'bg-gray-900 text-gray-100' : 'bg-gray-800 text-gray-100'} p-4 rounded-lg overflow-x-auto my-4"><code>$2</code></pre>`
+      `<pre class="${
+        isDark ? "bg-gray-900 text-gray-100" : "bg-gray-800 text-gray-100"
+      } p-4 rounded-lg overflow-x-auto my-4"><code>$2</code></pre>`
     );
 
     // Headings
     html = html.replace(
       /^### (.*$)/gim,
-      `<h3 class="text-lg font-bold mt-4 mb-2 ${isDark ? 'text-gray-100' : 'text-gray-800'}">$1</h3>`
+      `<h3 class="text-lg font-bold mt-4 mb-2 ${
+        isDark ? "text-gray-100" : "text-gray-800"
+      }">$1</h3>`
     );
     html = html.replace(
       /^## (.*$)/gim,
-      `<h2 class="text-xl font-bold mt-4 mb-2 ${isDark ? 'text-gray-100' : 'text-gray-800'}">$1</h2>`
+      `<h2 class="text-xl font-bold mt-4 mb-2 ${
+        isDark ? "text-gray-100" : "text-gray-800"
+      }">$1</h2>`
     );
     html = html.replace(
       /^# (.*$)/gim,
-      `<h1 class="text-2xl font-bold mt-4 mb-2 ${isDark ? 'text-gray-100' : 'text-gray-800'}">$1</h1>`
+      `<h1 class="text-2xl font-bold mt-4 mb-2 ${
+        isDark ? "text-gray-100" : "text-gray-800"
+      }">$1</h1>`
     );
 
     // Bold and Italic
@@ -438,19 +458,27 @@ function MarkDown({ formik, name, label, placeholder, error }) {
     );
     html = html.replace(
       /\[([^\]]+)\]\(([^)]+)\)/g,
-      `<a href="$2" class="${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'} underline" target="_blank" rel="noopener noreferrer">$1</a>`
+      `<a href="$2" class="${
+        isDark
+          ? "text-blue-400 hover:text-blue-300"
+          : "text-blue-600 hover:text-blue-800"
+      } underline" target="_blank" rel="noopener noreferrer">$1</a>`
     );
 
     // Inline code
     html = html.replace(
       /`([^`]+)`/g,
-      `<code class="${isDark ? 'bg-gray-700 text-red-400' : 'bg-gray-200 text-red-600'} px-1.5 py-0.5 rounded text-sm">$1</code>`
+      `<code class="${
+        isDark ? "bg-gray-700 text-red-400" : "bg-gray-200 text-red-600"
+      } px-1.5 py-0.5 rounded text-sm">$1</code>`
     );
 
     // Blockquotes
     html = html.replace(
       /^> (.+)$/gim,
-      `<blockquote class="border-l-4 border-green-500 pl-4 py-2 my-2 ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-gray-50 text-gray-700'} italic">$1</blockquote>`
+      `<blockquote class="border-l-4 border-green-500 pl-4 py-2 my-2 ${
+        isDark ? "bg-gray-800 text-gray-300" : "bg-gray-50 text-gray-700"
+      } italic">$1</blockquote>`
     );
 
     // Lists - Unordered
@@ -468,7 +496,7 @@ function MarkDown({ formik, name, label, placeholder, error }) {
     // Horizontal rule
     html = html.replace(
       /^---$/gim,
-      `<hr class="my-4 ${isDark ? 'border-gray-600' : 'border-gray-300'}" />`
+      `<hr class="my-4 ${isDark ? "border-gray-600" : "border-gray-300"}" />`
     );
 
     // Line breaks
@@ -504,13 +532,26 @@ function MarkDown({ formik, name, label, placeholder, error }) {
       )}
       <div
         dir={locale === "ar" ? "rtl" : "ltr"}
-        className={`${containerClasses} flex flex-col ${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} border rounded-lg overflow-hidden shadow-sm`}
+        className={`${containerClasses} flex flex-col ${
+          isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
+        } border rounded-lg overflow-hidden shadow-sm`}
       >
         {/* Toolbar */}
-        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'} border-b p-2 flex items-center gap-1 flex-wrap`}>
+        <div
+          className={`${
+            isDark
+              ? "bg-gray-800 border-gray-700"
+              : "bg-gray-50 border-gray-200"
+          } border-b p-2 flex items-center gap-1 flex-wrap`}
+        >
           {toolbarButtons.map((btn, idx) =>
             btn.type === "divider" ? (
-              <div key={idx} className={`h-6 w-px ${isDark ? 'bg-gray-600' : 'bg-gray-300'} mx-1`} />
+              <div
+                key={idx}
+                className={`h-6 w-px ${
+                  isDark ? "bg-gray-600" : "bg-gray-300"
+                } mx-1`}
+              />
             ) : (
               <button
                 type="button"
@@ -520,10 +561,10 @@ function MarkDown({ formik, name, label, placeholder, error }) {
                 disabled={btn.disabled}
                 className={`p-2 rounded transition-colors ${
                   btn.disabled
-                    ? 'opacity-40 cursor-not-allowed'
+                    ? "opacity-40 cursor-not-allowed"
                     : isDark
-                      ? 'hover:bg-gray-700 text-gray-300 hover:text-white'
-                      : 'hover:bg-gray-200 text-gray-600 hover:text-gray-900'
+                    ? "hover:bg-gray-700 text-gray-300 hover:text-white"
+                    : "hover:bg-gray-200 text-gray-600 hover:text-gray-900"
                 }`}
               >
                 <btn.icon size={18} />
@@ -534,7 +575,11 @@ function MarkDown({ formik, name, label, placeholder, error }) {
           <div className="flex-1" />
 
           {/* View Mode Toggle */}
-          <div className={`flex items-center ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg p-0.5`}>
+          <div
+            className={`flex items-center ${
+              isDark ? "bg-gray-700" : "bg-gray-200"
+            } rounded-lg p-0.5`}
+          >
             <button
               type="button"
               onClick={() => setViewMode("edit")}
@@ -544,8 +589,8 @@ function MarkDown({ formik, name, label, placeholder, error }) {
                     ? "bg-gray-600 shadow-sm text-white"
                     : "bg-white shadow-sm text-gray-900"
                   : isDark
-                    ? "text-gray-400 hover:text-gray-200"
-                    : "text-gray-500 hover:text-gray-700"
+                  ? "text-gray-400 hover:text-gray-200"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
               title="Edit only"
             >
@@ -560,8 +605,8 @@ function MarkDown({ formik, name, label, placeholder, error }) {
                     ? "bg-gray-600 shadow-sm text-white"
                     : "bg-white shadow-sm text-gray-900"
                   : isDark
-                    ? "text-gray-400 hover:text-gray-200"
-                    : "text-gray-500 hover:text-gray-700"
+                  ? "text-gray-400 hover:text-gray-200"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
               title="Split view"
             >
@@ -576,8 +621,8 @@ function MarkDown({ formik, name, label, placeholder, error }) {
                     ? "bg-gray-600 shadow-sm text-white"
                     : "bg-white shadow-sm text-gray-900"
                   : isDark
-                    ? "text-gray-400 hover:text-gray-200"
-                    : "text-gray-500 hover:text-gray-700"
+                  ? "text-gray-400 hover:text-gray-200"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
               title="Preview only"
             >
@@ -590,8 +635,8 @@ function MarkDown({ formik, name, label, placeholder, error }) {
             onClick={() => setIsFullscreen(!isFullscreen)}
             className={`p-2 rounded transition-colors ml-2 ${
               isDark
-                ? 'hover:bg-gray-700 text-gray-300 hover:text-white'
-                : 'hover:bg-gray-200 text-gray-600 hover:text-gray-900'
+                ? "hover:bg-gray-700 text-gray-300 hover:text-white"
+                : "hover:bg-gray-200 text-gray-600 hover:text-gray-900"
             }`}
             title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
           >
@@ -600,12 +645,25 @@ function MarkDown({ formik, name, label, placeholder, error }) {
         </div>
 
         {/* Editor Area */}
-        <div className="flex-1 flex overflow-hidden" style={{ minHeight: isFullscreen ? "calc(100vh - 120px)" : "350px" }}>
+        <div
+          className="flex-1 flex overflow-hidden"
+          style={{ minHeight: isFullscreen ? "calc(100vh - 120px)" : "350px" }}
+        >
           {/* Edit Panel */}
           {(viewMode === "edit" || viewMode === "split") && (
-            <div className={`flex flex-col ${viewMode === "split" ? "w-1/2" : "w-full"}`}>
+            <div
+              className={`flex flex-col ${
+                viewMode === "split" ? "w-1/2" : "w-full"
+              }`}
+            >
               {viewMode === "split" && (
-                <div className={`${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'} px-4 py-2 text-sm font-medium flex items-center gap-2`}>
+                <div
+                  className={`${
+                    isDark
+                      ? "bg-gray-800 text-gray-400"
+                      : "bg-gray-100 text-gray-600"
+                  } px-4 py-2 text-sm font-medium flex items-center gap-2`}
+                >
                   <Edit3 size={14} />
                   <span>{tMarkDown("Markdown")}</span>
                 </div>
@@ -619,11 +677,13 @@ function MarkDown({ formik, name, label, placeholder, error }) {
                 }}
                 onKeyDown={handleKeyDown}
                 onPaste={handlePaste}
-                placeholder={placeholder || "Write your content here using Markdown..."}
+                placeholder={
+                  placeholder || "Write your content here using Markdown..."
+                }
                 className={`flex-1 p-4 font-mono text-sm resize-none focus:outline-none ${
                   isDark
-                    ? 'bg-gray-900 text-gray-100 placeholder:text-gray-500'
-                    : 'bg-white text-gray-800 placeholder:text-gray-400'
+                    ? "bg-gray-900 text-gray-100 placeholder:text-gray-500"
+                    : "bg-white text-gray-800 placeholder:text-gray-400"
                 }`}
                 style={{ minHeight: "300px" }}
               />
@@ -632,14 +692,24 @@ function MarkDown({ formik, name, label, placeholder, error }) {
 
           {/* Divider */}
           {viewMode === "split" && (
-            <div className={`w-px ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`} />
+            <div className={`w-px ${isDark ? "bg-gray-700" : "bg-gray-200"}`} />
           )}
 
           {/* Preview Panel */}
           {(viewMode === "preview" || viewMode === "split") && (
-            <div className={`flex flex-col ${viewMode === "split" ? "w-1/2" : "w-full"}`}>
+            <div
+              className={`flex flex-col ${
+                viewMode === "split" ? "w-1/2" : "w-full"
+              }`}
+            >
               {viewMode === "split" && (
-                <div className={`${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'} px-4 py-2 text-sm font-medium flex items-center gap-2`}>
+                <div
+                  className={`${
+                    isDark
+                      ? "bg-gray-800 text-gray-400"
+                      : "bg-gray-100 text-gray-600"
+                  } px-4 py-2 text-sm font-medium flex items-center gap-2`}
+                >
                   <Eye size={14} />
                   <span>{tMarkDown("Preview")}</span>
                 </div>
@@ -647,8 +717,8 @@ function MarkDown({ formik, name, label, placeholder, error }) {
               <div
                 className={`flex-1 p-4 overflow-auto prose prose-sm max-w-none ${
                   isDark
-                    ? 'bg-gray-800 prose-invert'
-                    : 'bg-gray-50'
+                    ? "bg-gray-800  prose-invert"
+                    : "bg-gray-50  text-gray-800"
                 }`}
                 dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
               />
@@ -657,7 +727,13 @@ function MarkDown({ formik, name, label, placeholder, error }) {
         </div>
 
         {/* Footer */}
-        <div className={`${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-500'} border-t px-4 py-2 text-xs flex justify-between items-center`}>
+        <div
+          className={`${
+            isDark
+              ? "bg-gray-800 border-gray-700 text-gray-400"
+              : "bg-gray-50 border-gray-200 text-gray-500"
+          } border-t px-4 py-2 text-xs flex justify-between items-center`}
+        >
           <div className="flex items-center gap-4">
             <span>
               {content.length} {tMarkDown("characters")}
@@ -667,7 +743,11 @@ function MarkDown({ formik, name, label, placeholder, error }) {
               {tMarkDown("words")}
             </span>
           </div>
-          <div className={`flex items-center gap-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+          <div
+            className={`flex items-center gap-2 ${
+              isDark ? "text-gray-500" : "text-gray-400"
+            }`}
+          >
             <span>Ctrl+Z Undo</span>
             <span>|</span>
             <span>Ctrl+Y Redo</span>

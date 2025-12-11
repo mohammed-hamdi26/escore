@@ -11,7 +11,7 @@ import { Shield } from "lucide-react";
 
 function RegisterFrom({ formik, t }) {
   return (
-    <div className="flex flex-[0.5] flex-col space-y-8">
+    <div className="flex  flex-1 lg:flex-[0.7] max-w-[600px] flex-col space-y-8">
       <div className="space-y-8 flex flex-col items-center justify-center">
         <Image src={logoImage} alt="logo" width={250} height={40} />
       </div>
@@ -24,7 +24,7 @@ function RegisterFrom({ formik, t }) {
           error={formik.touched.firstName && formik.errors.firstName}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className="max-w-[400px]"
+          className=""
         />
         <InputApp
           t={t}
@@ -34,7 +34,7 @@ function RegisterFrom({ formik, t }) {
           error={formik.touched.lastName && formik.errors.lastName}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className="max-w-[400px]"
+          className=""
         />
         <InputApp
           t={t}
@@ -44,7 +44,7 @@ function RegisterFrom({ formik, t }) {
           error={formik.touched.email && formik.errors.email}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className="max-w-[400px]"
+          className=""
         />
         <InputApp
           t={t}
@@ -54,18 +54,18 @@ function RegisterFrom({ formik, t }) {
           error={formik.touched.password && formik.errors.password}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className="max-w-[400px]"
+          className=""
         />
         <Button
           disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
-          className="max-w-[400px] font-bold text-lg text-white bg-green-primary cursor-pointer hover:bg-green-primary/80 rounded-[10px] p-6 disabled:bg-gray-600 disabled:cursor-not-allowed"
+          className=" font-bold text-lg text-white bg-green-primary cursor-pointer hover:bg-green-primary/80 rounded-[10px] p-6 disabled:bg-gray-600 disabled:cursor-not-allowed"
         >
           {formik.isSubmitting ? <Spinner /> : t("Register")}
         </Button>
 
         {/* Login Link */}
-        <div className="flex justify-center max-w-[400px]">
+        <div className="flex justify-center ">
           <Link
             href="/login"
             className="text-sm text-gray-500 dark:text-gray-400 hover:text-green-primary transition-colors duration-300"
@@ -75,7 +75,7 @@ function RegisterFrom({ formik, t }) {
         </div>
 
         {/* Privacy Policy Link */}
-        <div className="flex justify-center max-w-[400px]">
+        <div className="flex justify-center ">
           <Link
             href="/privacy-policy"
             className="flex items-center gap-2 text-sm text-gray-400 hover:text-green-primary transition-colors duration-300"

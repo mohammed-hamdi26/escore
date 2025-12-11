@@ -836,7 +836,8 @@
     "verifying": "جاري التحقق...",
     "Verify": "تأكيد",
     "privacyPolicy": "سياسة الخصوصية",
-    "Password is required": "كلمة المرور مطلوبة"
+    "Password is required": "كلمة المرور مطلوبة",
+    "Password must be at least 8 characters": "كلمة المرور يجب ان تكون على الاقل 8 حروف"
   },
   "SupportCenter": {
     "Answer": "الرد",
