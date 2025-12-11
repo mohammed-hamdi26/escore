@@ -36,31 +36,18 @@ import { Switch } from "../ui/switch";
 // Validation schema - Required: title, content, coverImageLight, authorName, authorPicture
 const validationSchema = yup.object({
   // Required fields
-  title: yup
-    .string()
-    .required("titleRequired")
-    .max(300, "titleTooLong"),
-  content: yup
-    .string()
-    .required("contentRequired")
-    .min(10, "contentTooShort"),
-  coverImageLight: yup
-    .string()
-    .required("coverImageRequired"),
+  title: yup.string().required("titleRequired").max(300, "titleTooLong"),
+  content: yup.string().required("contentRequired").min(10, "contentTooShort"),
+  coverImageLight: yup.string().required("coverImageRequired"),
   authorName: yup
     .string()
     .required("authorNameRequired")
     .max(100, "authorNameTooLong"),
-  authorPicture: yup
-    .string()
-    .required("authorImageRequired"),
+  authorPicture: yup.string().required("authorImageRequired"),
 
   // Optional fields
   coverImageDark: yup.string(),
-  urlExternal: yup
-    .string()
-    .url("invalidUrl")
-    .nullable(),
+  urlExternal: yup.string().url("invalidUrl").nullable(),
   game: yup.string().nullable(),
   tournament: yup.string().nullable(),
   team: yup.string().nullable(),
@@ -69,7 +56,6 @@ const validationSchema = yup.object({
   publishedAt: yup.date().nullable(),
   isFeatured: yup.boolean(),
 });
-
 
 function NewsFormRedesign({
   formType = "add",
@@ -128,7 +114,9 @@ function NewsFormRedesign({
           team: values.team || undefined,
           player: values.player || undefined,
           match: values.match || undefined,
-          publishedAt: values.publishedAt ? values.publishedAt.toISOString() : undefined,
+          publishedAt: values.publishedAt
+            ? values.publishedAt.toISOString()
+            : undefined,
           isFeatured: values.isFeatured,
         };
 
@@ -138,9 +126,7 @@ function NewsFormRedesign({
           formik.resetForm();
         }
 
-        toast.success(
-          formType === "add" ? t("addSuccess") : t("editSuccess")
-        );
+        toast.success(formType === "add" ? t("addSuccess") : t("editSuccess"));
       } catch (error) {
         if (!error.toString().includes("NEXT_REDIRECT")) {
           toast.error(error.message || t("error"));
@@ -156,61 +142,12 @@ function NewsFormRedesign({
   // Count validation errors
   const errorCount = Object.keys(formik.errors).length;
   const touchedErrorCount = Object.keys(formik.errors).filter(
-    key => formik.touched[key]
+    (key) => formik.touched[key]
   ).length;
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between bg-dashboard-box dark:bg-[#0F1017] rounded-xl p-4">
-        <div className="flex items-center gap-4">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => router.back()}
-            className="text-[#677185] hover:text-white"
-          >
-            <ArrowLeft className="size-5" />
-          </Button>
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-white">
-                {formType === "add" ? t("addNews") : t("editNews")}
-              </h1>
-              {/* Featured Switch in Header */}
-              <div className="flex items-center gap-2 px-3 py-1 bg-[#1a1f2e] rounded-lg">
-                <Switch
-                  id="isFeaturedHeader"
-                  checked={formik.values.isFeatured}
-                  onCheckedChange={(checked) => formik.setFieldValue("isFeatured", checked)}
-                />
-                <Label htmlFor="isFeaturedHeader" className="flex items-center gap-1 cursor-pointer text-sm">
-                  <Star className={`size-4 ${formik.values.isFeatured ? "fill-yellow-500 text-yellow-500" : "text-[#677185]"}`} />
-                  <span className={formik.values.isFeatured ? "text-yellow-500" : "text-[#677185]"}>
-                    {t("featured")}
-                  </span>
-                </Label>
-              </div>
-            </div>
-            {newData && (
-              <p className="text-sm text-[#677185] mt-1">
-                {t("editing")}: {newData.title?.substring(0, 50)}...
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Validation Status */}
-        {touchedErrorCount > 0 && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <AlertCircle className="size-4 text-red-500" />
-            <span className="text-sm text-red-400">
-              {touchedErrorCount} {t("validationErrors")}
-            </span>
-          </div>
-        )}
-      </div>
 
       {/* Required Fields Notice */}
       <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex items-center gap-2">
@@ -225,7 +162,11 @@ function NewsFormRedesign({
         <FormSection
           title={t("basicInfo")}
           icon={<FileText className="size-5" />}
-          badge={<span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">{t("required")}</span>}
+          badge={
+            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+              {t("required")}
+            </span>
+          }
         >
           <FormRow>
             <InputApp
@@ -238,7 +179,11 @@ function NewsFormRedesign({
               className="border-0 focus:outline-none"
               backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
               textColor="text-[#677185]"
-              error={formik.touched.title && formik.errors.title && t(formik.errors.title)}
+              error={
+                formik.touched.title &&
+                formik.errors.title &&
+                t(formik.errors.title)
+              }
               required
             />
           </FormRow>
@@ -249,7 +194,11 @@ function NewsFormRedesign({
               formik={formik}
               label={t("content")}
               placeholder={t("contentPlaceholder")}
-              error={formik.touched.content && formik.errors.content && t(formik.errors.content)}
+              error={
+                formik.touched.content &&
+                formik.errors.content &&
+                t(formik.errors.content)
+              }
             />
           </FormRow>
         </FormSection>
@@ -258,7 +207,11 @@ function NewsFormRedesign({
         <FormSection
           title={t("coverImage")}
           icon={<ImageIcon className="size-5" />}
-          badge={<span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">{t("required")}</span>}
+          badge={
+            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+              {t("required")}
+            </span>
+          }
         >
           <FormRow>
             <FileInput
@@ -267,7 +220,11 @@ function NewsFormRedesign({
               label={t("coverImageLight")}
               placeholder={t("coverImagePlaceholder")}
               required
-              error={formik.touched.coverImageLight && formik.errors.coverImageLight && t(formik.errors.coverImageLight)}
+              error={
+                formik.touched.coverImageLight &&
+                formik.errors.coverImageLight &&
+                t(formik.errors.coverImageLight)
+              }
             />
             <FileInput
               formik={formik}
@@ -282,7 +239,11 @@ function NewsFormRedesign({
         <FormSection
           title={t("authorInfo")}
           icon={<User className="size-5" />}
-          badge={<span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">{t("required")}</span>}
+          badge={
+            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+              {t("required")}
+            </span>
+          }
         >
           <FormRow>
             <InputApp
@@ -296,7 +257,11 @@ function NewsFormRedesign({
               backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
               textColor="text-[#677185]"
               icon={<User className="size-5 text-[#677185]" />}
-              error={formik.touched.authorName && formik.errors.authorName && t(formik.errors.authorName)}
+              error={
+                formik.touched.authorName &&
+                formik.errors.authorName &&
+                t(formik.errors.authorName)
+              }
               required
             />
             <FileInput
@@ -305,7 +270,11 @@ function NewsFormRedesign({
               label={t("authorPicture")}
               placeholder={t("authorPicturePlaceholder")}
               required
-              error={formik.touched.authorPicture && formik.errors.authorPicture && t(formik.errors.authorPicture)}
+              error={
+                formik.touched.authorPicture &&
+                formik.errors.authorPicture &&
+                t(formik.errors.authorPicture)
+              }
             />
           </FormRow>
         </FormSection>
@@ -314,7 +283,11 @@ function NewsFormRedesign({
         <FormSection
           title={t("externalLink")}
           icon={<Link className="size-5" />}
-          badge={<span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">{t("optional")}</span>}
+          badge={
+            <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+              {t("optional")}
+            </span>
+          }
         >
           <FormRow>
             <InputApp
@@ -328,7 +301,11 @@ function NewsFormRedesign({
               backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
               textColor="text-[#677185]"
               icon={<Link className="size-5 text-[#677185]" />}
-              error={formik.touched.urlExternal && formik.errors.urlExternal && t(formik.errors.urlExternal)}
+              error={
+                formik.touched.urlExternal &&
+                formik.errors.urlExternal &&
+                t(formik.errors.urlExternal)
+              }
             />
           </FormRow>
         </FormSection>
@@ -337,7 +314,11 @@ function NewsFormRedesign({
         <FormSection
           title={t("relatedEntities")}
           icon={<Gamepad2 className="size-5" />}
-          badge={<span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">{t("optional")}</span>}
+          badge={
+            <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+              {t("optional")}
+            </span>
+          }
         >
           <FormRow>
             <SelectInput
@@ -353,7 +334,11 @@ function NewsFormRedesign({
               name="tournament"
               formik={formik}
               label={t("tournament")}
-              options={mappedArrayToSelectOptions(tournamentsOptions, "name", "id")}
+              options={mappedArrayToSelectOptions(
+                tournamentsOptions,
+                "name",
+                "id"
+              )}
               placeholder={t("selectTournament")}
               onChange={(value) => formik.setFieldValue("tournament", value)}
               icon={<Trophy className="size-5 text-[#677185]" />}
@@ -374,7 +359,11 @@ function NewsFormRedesign({
               name="player"
               formik={formik}
               label={t("player")}
-              options={mappedArrayToSelectOptions(playersOptions, "nickname", "id")}
+              options={mappedArrayToSelectOptions(
+                playersOptions,
+                "nickname",
+                "id"
+              )}
               placeholder={t("selectPlayer")}
               onChange={(value) => formik.setFieldValue("player", value)}
               icon={<User className="size-5 text-[#677185]" />}
@@ -388,7 +377,9 @@ function NewsFormRedesign({
               label={t("match")}
               options={mappedArrayToSelectOptions(
                 matchesOptions.map((m) => ({
-                  name: `${m.team1?.name || "TBD"} vs ${m.team2?.name || "TBD"}`,
+                  name: `${m.team1?.name || "TBD"} vs ${
+                    m.team2?.name || "TBD"
+                  }`,
                   id: m.id,
                 })),
                 "name",
@@ -405,7 +396,11 @@ function NewsFormRedesign({
         <FormSection
           title={t("publishing")}
           icon={<Calendar className="size-5" />}
-          badge={<span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">{t("optional")}</span>}
+          badge={
+            <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+              {t("optional")}
+            </span>
+          }
         >
           <FormRow>
             <DatePicker
@@ -416,13 +411,11 @@ function NewsFormRedesign({
               icon={<Calendar className="size-5 text-[#677185]" />}
             />
           </FormRow>
-          <p className="text-xs text-[#677185] mt-2">
-            {t("publishDateHint")}
-          </p>
+          <p className="text-xs text-[#677185] mt-2">{t("publishDateHint")}</p>
         </FormSection>
 
         {/* Submit Button */}
-        <div className="flex justify-between items-center gap-4 pt-4 sticky bottom-0 bg-gradient-to-t from-[#0a0c10] via-[#0a0c10] to-transparent py-6">
+        <div className="flex justify-between items-center gap-4 pt-4 sticky bottom-0 bg-linear-to-t from-white to-transparent dark:from-[#0a0c10] dark:via-[#0a0c10] dark:to-transparent py-6">
           <div className="text-sm text-[#677185]">
             <span className="text-red-500">*</span> {t("requiredFields")}
           </div>

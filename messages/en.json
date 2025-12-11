@@ -982,7 +982,8 @@
     "verifying": "Verifying...",
     "Verify": "Verify",
     "privacyPolicy": "Privacy Policy",
-    "Password is required": "Password is required"
+    "Password is required": "Password is required",
+    "Password must be at least 8 characters": "Password must be at least 8 characters"
   },
   "SupportCenter": {
     "Answer": "Answer",

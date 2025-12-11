@@ -9,7 +9,7 @@ import { Shield } from "lucide-react";
 
 function LoginFrom({ formik, t }) {
   return (
-    <div className="flex flex-[0.5] flex-col space-y-8 ">
+    <div className="lex  flex-1 lg:flex-[0.7] max-w-[600px] flex-col space-y-8 ">
       <div className="space-y-8 flex flex-col items-center justify-center ">
         <Image src={logoImage} alt="logo" width={250} height={40} />
       </div>

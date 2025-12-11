@@ -485,9 +485,9 @@ function MatchesFrom({
         />
 
         {/* Featured & Active Toggles */}
-        <FormRow>
-          <div className="flex items-center gap-6 p-4 bg-dashboard-box dark:bg-[#0F1017] rounded-lg">
-            <div className="flex items-center gap-3">
+        {/* <FormRow> */}
+        {/* <div className="flex items-center gap-6 p-4 bg-dashboard-box dark:bg-[#0F1017] rounded-lg"> */}
+        {/* <div className="flex items-center gap-3">
               <Switch
                 id="isFeatured"
                 checked={formik.values.isFeatured}
@@ -509,9 +509,9 @@ function MatchesFrom({
                 />
                 {t("Featured Match")}
               </Label>
-            </div>
+            </div> */}
 
-            <div className="flex items-center gap-3">
+        {/* <div className="flex items-center gap-3">
               <Switch
                 id="isActive"
                 checked={formik.values.isActive}
@@ -531,9 +531,9 @@ function MatchesFrom({
                 />
                 {t("Active")}
               </Label>
-            </div>
-          </div>
-        </FormRow>
+            </div> */}
+        {/* </div> */}
+        {/* </FormRow> */}
       </FormSection>
 
       {/* Score Section */}

@@ -46,7 +46,7 @@ function FilterMatches() {
             className={
               currentStatus === option.value
                 ? "bg-green-primary text-white hover:bg-green-primary/80"
-                : "hover:bg-green-primary/10"
+                : "hover:bg-green-primary/10 text-black dark:text-white cursor-pointer"
             }
           >
             {option.label}
