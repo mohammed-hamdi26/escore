@@ -25,7 +25,7 @@ export async function getMatches(searchParams = {}) {
     // Return both data and pagination
     return {
       data: res.data.data,
-      pagination: res.data.pagination,
+      pagination: res.data.meta,
     };
   } catch (e) {
     throw new Error("Error in get Matches");

@@ -147,7 +147,9 @@ export default function UsersListTable({ users, meta }) {
 
                 {/* Email */}
                 <td className="px-4 py-3">
-                  <span className="text-gray-700 dark:text-gray-300">{user.email}</span>
+                  <span className="text-gray-700 dark:text-gray-300">
+                    {user.email}
+                  </span>
                 </td>
 
                 {/* Role */}
@@ -208,7 +210,10 @@ export default function UsersListTable({ users, meta }) {
 
                     <button
                       onClick={() => handleResetPassword(user.id, user.email)}
-                      disabled={isLoading === `reset-${user.id}` || user.role === "admin"}
+                      disabled={
+                        isLoading === `reset-${user.id}` ||
+                        user.role === "admin"
+                      }
                       className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-yellow-400/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title={t("resetPassword")}
                     >
@@ -235,8 +240,8 @@ export default function UsersListTable({ users, meta }) {
       <div className="flex justify-between items-center">
         <p className="text-gray-500 dark:text-gray-400 text-sm">
           {t("showing", {
-            from: (meta.currentPage - 1) * meta.limit + 1,
-            to: Math.min(meta.currentPage * meta.limit, meta.total),
+            from: (meta.page - 1) * meta.limit + 1,
+            to: Math.min(meta.page * meta.limit, meta.total),
             total: meta.total,
           })}
         </p>
@@ -261,12 +266,18 @@ export default function UsersListTable({ users, meta }) {
 
             <div className="space-y-4">
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">{t("email")}</p>
-                <p className="text-gray-900 dark:text-white font-medium">{resetResult.email}</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">
+                  {t("email")}
+                </p>
+                <p className="text-gray-900 dark:text-white font-medium">
+                  {resetResult.email}
+                </p>
               </div>
 
               <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/30 rounded-xl p-4">
-                <p className="text-yellow-700 dark:text-yellow-400 text-sm mb-1">{t("newPassword")}</p>
+                <p className="text-yellow-700 dark:text-yellow-400 text-sm mb-1">
+                  {t("newPassword")}
+                </p>
                 <div className="flex items-center justify-between gap-2">
                   <code className="text-lg font-mono font-bold text-yellow-800 dark:text-yellow-300">
                     {resetResult.newPassword}

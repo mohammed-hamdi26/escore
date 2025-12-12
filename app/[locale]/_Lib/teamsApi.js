@@ -18,7 +18,10 @@ export async function getTeams(searchParams = {}) {
 
     return {
       data: res.data?.data,
-      pagination: res.data?.pagination || { totalPages: 1, total: res.data?.data?.length || 0 }
+      pagination: res.data?.meta || {
+        totalPages: 1,
+        total: res.data?.data?.length || 0,
+      },
     };
   } catch (e) {
     console.log(e.response);

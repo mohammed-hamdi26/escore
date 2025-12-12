@@ -16,9 +16,14 @@ export async function getTournaments(searchParams = {}) {
 
     const res = await apiClient.get(url);
 
+    console.log(res);
+
     return {
       data: res.data?.data,
-      pagination: res.data?.pagination || { totalPages: 1, total: res.data?.data?.length || 0 }
+      pagination: res.data?.pagination || {
+        totalPages: 1,
+        total: res.data?.data?.length || 0,
+      },
     };
   } catch (e) {
     throw new Error("Error in Get tournaments");

@@ -47,3 +47,20 @@ export function calculateAge(birthdate) {
   }
   return age;
 }
+
+export function getFlagEmoji(countryCode) {
+  // Check if the country code is exactly two letters long
+  if (countryCode.length !== 2) {
+    return "🏳️"; // Return a white flag as a default for invalid codes
+  }
+
+  // Convert the country code to uppercase as required by regional indicator symbols
+  const upperCaseCode = countryCode.toUpperCase();
+
+  // Map each character to its regional indicator symbol code point and create a string
+  const codePoints = upperCaseCode
+    .split("")
+    .map((char) => 127397 + char.charCodeAt());
+
+  return String.fromCodePoint(...codePoints);
+}
