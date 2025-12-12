@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 
 import { cn } from "@/lib/utils";
+import { getFlagEmoji } from "@/app/[locale]/_Lib/helps";
 
 const SelectInputCombox = ({
   options,
@@ -65,7 +66,11 @@ const SelectInputCombox = ({
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
-                  value={option.value}
+                  value={
+                    name === "country"
+                      ? option.value.split(" ")[1]
+                      : option.value
+                  }
                   onSelect={(currentValue) => {
                     // console.log(option.value);
                     setValue(option.value === value ? "" : option.value);
@@ -78,6 +83,7 @@ const SelectInputCombox = ({
                     setOpen(false);
                   }}
                 >
+                  {/* {option?.name?.split(" ")[1]} */}
                   {option.name}
                   <CheckIcon
                     className={cn(

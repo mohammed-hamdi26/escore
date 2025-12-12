@@ -21,7 +21,8 @@ export async function getTransfers(searchParams = {}) {
     if (searchParams.toTeam) params.set("toTeam", searchParams.toTeam);
     if (searchParams.dateFrom) params.set("dateFrom", searchParams.dateFrom);
     if (searchParams.dateTo) params.set("dateTo", searchParams.dateTo);
-    if (searchParams.isActive !== undefined) params.set("isActive", searchParams.isActive);
+    if (searchParams.isActive !== undefined)
+      params.set("isActive", searchParams.isActive);
 
     const queryString = params.toString();
     const url = queryString ? `/transfers?${queryString}` : "/transfers";
@@ -30,7 +31,10 @@ export async function getTransfers(searchParams = {}) {
 
     return {
       data: res.data?.data || [],
-      pagination: res.data?.pagination || { totalPages: 1, total: res.data?.data?.length || 0 }
+      pagination: res.data?.meta || {
+        totalPages: 1,
+        total: res.data?.data?.length || 0,
+      },
     };
   } catch (e) {
     console.error("Failed to get transfers:", e.response?.data || e.message);
@@ -59,7 +63,10 @@ export async function getRecentTransfers(limit = 10) {
     const res = await apiClient.get(`/transfers/recent?limit=${limit}`);
     return res.data?.data || [];
   } catch (e) {
-    console.error("Failed to get recent transfers:", e.response?.data || e.message);
+    console.error(
+      "Failed to get recent transfers:",
+      e.response?.data || e.message
+    );
     return [];
   }
 }
@@ -72,7 +79,10 @@ export async function getTransfersByPlayer(playerId) {
     const res = await apiClient.get(`/transfers/player/${playerId}`);
     return res.data?.data || [];
   } catch (e) {
-    console.error("Failed to get player transfers:", e.response?.data || e.message);
+    console.error(
+      "Failed to get player transfers:",
+      e.response?.data || e.message
+    );
     return [];
   }
 }
@@ -85,7 +95,10 @@ export async function getTransfersByTeam(teamId) {
     const res = await apiClient.get(`/transfers/team/${teamId}`);
     return res.data?.data || [];
   } catch (e) {
-    console.error("Failed to get team transfers:", e.response?.data || e.message);
+    console.error(
+      "Failed to get team transfers:",
+      e.response?.data || e.message
+    );
     return [];
   }
 }
@@ -100,7 +113,10 @@ export async function getTransferStats() {
       total: res.data?.pagination?.total || 0,
     };
   } catch (e) {
-    console.error("Failed to get transfer stats:", e.response?.data || e.message);
+    console.error(
+      "Failed to get transfer stats:",
+      e.response?.data || e.message
+    );
     return null;
   }
 }

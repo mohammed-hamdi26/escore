@@ -79,7 +79,7 @@ function PlayerFormRedesign({
     onSubmit: async (values) => {
       try {
         const selectedCountry = countries.find(
-          (c) => c.value === values.country
+          (c) => c.label === values.country
         );
 
         const dataValues = {

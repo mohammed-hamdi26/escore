@@ -17,7 +17,7 @@ export async function getPlayers(searchParams = {}) {
 
     return {
       data: res.data?.data,
-      pagination: res.data?.pagination || {
+      pagination: res.data?.meta || {
         totalPages: 1,
         total: res.data?.data?.length || 0,
       },

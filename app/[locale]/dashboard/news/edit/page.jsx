@@ -13,14 +13,10 @@ async function page({ searchParams }) {
   });
 
   const news = newsResponse.data || [];
-  const pagination = newsResponse.pagination || null;
+  const pagination = newsResponse.meta || null;
 
   return (
-    <NewsListRedesign
-      news={news}
-      pagination={pagination}
-      locale={locale}
-    />
+    <NewsListRedesign news={news} pagination={pagination} locale={locale} />
   );
 }
 

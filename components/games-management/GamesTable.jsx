@@ -34,7 +34,7 @@ function GamesTable({ games, columns, numOfGames }) {
           <Table.Row key={game.id} grid_cols="grid-cols-[1fr_0.5fr_2fr]">
             <Table.Cell className="flex items-center gap-2">
               {game?.logo && (
-                <imgش
+                <img
                   src={`${game.logo.light}`}
                   className="rounded-full"
                   width={40}

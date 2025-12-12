@@ -10,14 +10,14 @@ import PlayerCard from "./PlayerCard";
 import Pagination from "../ui app/Pagination";
 import { deletePlayer } from "@/app/[locale]/_Lib/actions";
 
-function PlayerListRedesign({
-  players,
-  pagination,
-}) {
+function PlayerListRedesign({ players, pagination }) {
   const t = useTranslations("playerList");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+
+  console.log("pagination", pagination);
+  console.table(players);
 
   const handleRefresh = () => {
     startTransition(() => {
@@ -60,7 +60,9 @@ function PlayerListRedesign({
             disabled={isPending}
             className="border-[#677185] text-[#677185] hover:text-white"
           >
-            <RefreshCw className={`size-4 ${isPending ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`size-4 ${isPending ? "animate-spin" : ""}`}
+            />
           </Button>
           <Button
             className="bg-green-primary hover:bg-green-primary/80 text-white"
@@ -114,9 +116,7 @@ function PlayerListRedesign({
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="flex justify-center">
-          <Pagination numPages={pagination.totalPages} />
-        </div>
+        <Pagination numPages={pagination.totalPages} />
       )}
     </div>
   );

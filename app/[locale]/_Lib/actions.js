@@ -40,7 +40,9 @@ export async function register(userData) {
     console.log("Register error:", e.response?.data);
     return {
       success: false,
-      error: e.response?.data?.message || "Registration failed. Email may already exist."
+      error:
+        e.response?.data?.message ||
+        "Registration failed. Email may already exist.",
     };
   }
 }
@@ -52,7 +54,7 @@ export async function verifyAccount(email, otp) {
     console.log("Verify error:", e.response?.data);
     return {
       success: false,
-      error: e.response?.data?.message || "Invalid or expired code"
+      error: e.response?.data?.message || "Invalid or expired code",
     };
   }
 }
@@ -76,7 +78,8 @@ export async function forceLogout() {
 export async function addPlayer(playerData) {
   try {
     const res = await apiClient.post("/players", playerData);
-    // return res.data;
+    console.log("add player", res);
+    // return res.data.data;
   } catch (e) {
     console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in adding player");
@@ -387,7 +390,9 @@ export async function toggleMatchFeatured(id) {
     return res.data;
   } catch (e) {
     console.log("Error toggling featured:", e.response?.data);
-    throw new Error(e.response?.data?.message || "Error toggling featured status");
+    throw new Error(
+      e.response?.data?.message || "Error toggling featured status"
+    );
   }
 }
 
@@ -723,12 +728,17 @@ export async function deleteTheme(theme_id) {
 export async function addTicketReply(id, message) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.post(`/support/tickets/${id}/reply`, { message });
+    const res = await apiClient.post(`/support/tickets/${id}/reply`, {
+      message,
+    });
     revalidatePath(`/${locale}/dashboard/support-center`);
     return { success: true, data: res.data?.data };
   } catch (error) {
     console.log("Failed to add reply:", error.response?.data);
-    return { success: false, error: error.response?.data?.message || "Failed to add reply" };
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to add reply",
+    };
   }
 }
 
@@ -741,7 +751,10 @@ export async function updateTicket(id, data) {
     return { success: true, data: res.data?.data };
   } catch (error) {
     console.log("Failed to update ticket:", error.response?.data);
-    return { success: false, error: error.response?.data?.message || "Failed to update ticket" };
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to update ticket",
+    };
   }
 }
 
@@ -754,7 +767,10 @@ export async function closeTicket(id) {
     return { success: true, data: res.data?.data };
   } catch (error) {
     console.log("Failed to close ticket:", error.response?.data);
-    return { success: false, error: error.response?.data?.message || "Failed to close ticket" };
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to close ticket",
+    };
   }
 }
 
@@ -767,7 +783,10 @@ export async function reopenTicket(id) {
     return { success: true, data: res.data?.data };
   } catch (error) {
     console.log("Failed to reopen ticket:", error.response?.data);
-    return { success: false, error: error.response?.data?.message || "Failed to reopen ticket" };
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to reopen ticket",
+    };
   }
 }
 
@@ -780,7 +799,10 @@ export async function deleteSupportTicket(id) {
     return { success: true };
   } catch (error) {
     console.log("Failed to delete ticket:", error.response?.data);
-    return { success: false, error: error.response?.data?.message || "Failed to delete ticket" };
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to delete ticket",
+    };
   }
 }
 
@@ -791,7 +813,10 @@ export async function getTicketByIdAction(id) {
     return { success: true, data: res.data?.data };
   } catch (error) {
     console.log("Failed to get ticket:", error.response?.data);
-    return { success: false, error: error.response?.data?.message || "Failed to get ticket" };
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to get ticket",
+    };
   }
 }
 
@@ -868,7 +893,10 @@ export async function addTransfer(data) {
     return { success: true, data: res.data.data };
   } catch (error) {
     console.error("Failed to add transfer:", error.response?.data || error);
-    return { success: false, error: error.response?.data?.message || "Failed to add transfer" };
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to add transfer",
+    };
   }
 }
 
@@ -881,7 +909,10 @@ export async function editTransfer(data) {
     return { success: true, data: res.data.data };
   } catch (error) {
     console.error("Failed to edit transfer:", error.response?.data || error);
-    return { success: false, error: error.response?.data?.message || "Failed to edit transfer" };
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to edit transfer",
+    };
   }
 }
 
@@ -893,7 +924,10 @@ export async function deleteTransfer(id) {
     return { success: true };
   } catch (error) {
     console.error("Failed to delete transfer:", error.response?.data || error);
-    return { success: false, error: error.response?.data?.message || "Failed to delete transfer" };
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to delete transfer",
+    };
   }
 }
 
@@ -903,7 +937,10 @@ export async function getTransferByIdAction(id) {
     return { success: true, data: res.data.data };
   } catch (error) {
     console.error("Failed to get transfer:", error.response?.data || error);
-    return { success: false, error: error.response?.data?.message || "Failed to get transfer" };
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to get transfer",
+    };
   }
 }
 
@@ -926,7 +963,8 @@ export async function editUser(data) {
     // Update user basic info (role, isVerified)
     const userUpdateData = {};
     if (data.role) userUpdateData.role = data.role;
-    if (data.isVerified !== undefined) userUpdateData.isVerified = data.isVerified;
+    if (data.isVerified !== undefined)
+      userUpdateData.isVerified = data.isVerified;
 
     if (Object.keys(userUpdateData).length > 0) {
       await apiClient.patch(`/admin/users/${data.id}`, userUpdateData);
@@ -967,7 +1005,9 @@ export async function resetUserPassword(userId) {
     return res.data.data;
   } catch (error) {
     console.log("Failed to reset password", error);
-    throw new Error(error.response?.data?.message || "Failed to reset password");
+    throw new Error(
+      error.response?.data?.message || "Failed to reset password"
+    );
   }
 }
 
@@ -979,20 +1019,24 @@ export async function forgotPassword(email) {
     console.log("Failed to send reset email", error);
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to send reset email"
+      error: error.response?.data?.message || "Failed to send reset email",
     };
   }
 }
 
 export async function resetPassword(email, otp, newPassword) {
   try {
-    const res = await apiClient.post("/auth/reset-password", { email, otp, newPassword });
+    const res = await apiClient.post("/auth/reset-password", {
+      email,
+      otp,
+      newPassword,
+    });
     return { success: true, data: res.data };
   } catch (error) {
     console.log("Failed to reset password", error);
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to reset password"
+      error: error.response?.data?.message || "Failed to reset password",
     };
   }
 }
@@ -1005,7 +1049,7 @@ export async function resendOTP(email, type) {
     console.log("Failed to resend OTP", error);
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to resend OTP"
+      error: error.response?.data?.message || "Failed to resend OTP",
     };
   }
 }
@@ -1136,7 +1180,9 @@ export async function sendNotificationAction(data) {
 export async function approveContentRequest(userId) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.post(`/admin/content-requests/${userId}/approve`);
+    const res = await apiClient.post(
+      `/admin/content-requests/${userId}/approve`
+    );
     revalidatePath(`/${locale}/dashboard/users/content-requests`);
     revalidatePath(`/${locale}/dashboard/users`);
     return res.data;
@@ -1149,7 +1195,10 @@ export async function approveContentRequest(userId) {
 export async function rejectContentRequest(userId, reason) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.post(`/admin/content-requests/${userId}/reject`, { reason });
+    const res = await apiClient.post(
+      `/admin/content-requests/${userId}/reject`,
+      { reason }
+    );
     revalidatePath(`/${locale}/dashboard/users/content-requests`);
     revalidatePath(`/${locale}/dashboard/users`);
     return res.data;
@@ -1163,7 +1212,9 @@ export async function rejectContentRequest(userId, reason) {
 export async function setUserPermissions(userId, permissions) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.put(`/admin/users/${userId}/permissions`, { permissions });
+    const res = await apiClient.put(`/admin/users/${userId}/permissions`, {
+      permissions,
+    });
     revalidatePath(`/${locale}/dashboard/users/${userId}/edit`);
     return res.data;
   } catch (e) {
@@ -1175,7 +1226,10 @@ export async function setUserPermissions(userId, permissions) {
 export async function addUserPermission(userId, permission) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.patch(`/admin/users/${userId}/permissions`, permission);
+    const res = await apiClient.patch(
+      `/admin/users/${userId}/permissions`,
+      permission
+    );
     revalidatePath(`/${locale}/dashboard/users/${userId}/edit`);
     return res.data;
   } catch (e) {
@@ -1187,7 +1241,9 @@ export async function addUserPermission(userId, permission) {
 export async function removeUserPermission(userId, entity) {
   const locale = await getLocale();
   try {
-    const res = await apiClient.delete(`/admin/users/${userId}/permissions/${entity}`);
+    const res = await apiClient.delete(
+      `/admin/users/${userId}/permissions/${entity}`
+    );
     revalidatePath(`/${locale}/dashboard/users/${userId}/edit`);
     return res.data;
   } catch (e) {
@@ -1205,7 +1261,9 @@ export async function requestContentRole() {
     return res.data;
   } catch (e) {
     console.log(e.response?.data || e);
-    throw new Error(e.response?.data?.message || "Failed to submit content request");
+    throw new Error(
+      e.response?.data?.message || "Failed to submit content request"
+    );
   }
 }
 
@@ -1215,7 +1273,9 @@ export async function getContentStatus() {
     return res.data.data;
   } catch (e) {
     console.log(e.response?.data || e);
-    throw new Error(e.response?.data?.message || "Failed to get content status");
+    throw new Error(
+      e.response?.data?.message || "Failed to get content status"
+    );
   }
 }
 

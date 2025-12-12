@@ -120,9 +120,10 @@ export default function TournamentsForm({
     onSubmit: async (values) => {
       try {
         let dataValues = tournament ? { id: tournament.id, ...values } : values;
-        const selectedCountry = countries.find(
-          (c) => c.value === dataValues.country
-        );
+        console.log("", dataValues.country);
+        const selectedCountry = countries.find((c) => {
+          return c.label === dataValues.country;
+        });
 
         dataValues.country = {
           name: selectedCountry?.label,
@@ -158,7 +159,6 @@ export default function TournamentsForm({
   });
 
   //
-  console.log("formik errors", formik.errors);
   console.log("formik errors", formik.values);
 
   const statusOptions = [
@@ -167,7 +167,7 @@ export default function TournamentsForm({
     { value: "completed", label: t("Completed") },
     { value: "cancelled", label: t("Cancelled") },
   ];
-  console.log("formik errors", formik.values);
+  // console.log("formik errors", formik.values);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8 ">
       <FormSection>
@@ -251,7 +251,7 @@ export default function TournamentsForm({
             name={"country"}
             label={t("Country")}
             formik={formik}
-            options={mappedArrayToSelectOptions(countries, "label", "value")}
+            options={mappedArrayToSelectOptions(countries, "label", "label")}
             onChange={(value) => {
               formik.setFieldValue("country", value);
             }}

@@ -13,6 +13,7 @@ import { forceLogout } from "../_Lib/actions";
 export default function DashboardError({ error, reset }) {
   const router = useRouter();
   const [isClearing, setIsClearing] = useState(true);
+  console.log(error);
 
   useEffect(() => {
     // Log error in development
@@ -30,7 +31,7 @@ export default function DashboardError({ error, reset }) {
     try {
       await forceLogout();
       // Wait a moment for the cookie to be cleared
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       router.push("/login");
       router.refresh();
     } catch (e) {
@@ -46,7 +47,9 @@ export default function DashboardError({ error, reset }) {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-primary mx-auto mb-4"></div>
-          <p className="text-gray-400 text-lg">Session expired, redirecting to login...</p>
+          <p className="text-gray-400 text-lg">
+            Session expired, redirecting to login...
+          </p>
         </div>
       </div>
     );
@@ -73,7 +76,8 @@ export default function DashboardError({ error, reset }) {
 
           {/* Description */}
           <p className="text-gray-400 mb-6">
-            Your session has expired or is invalid. Please log in again to continue.
+            Your session has expired or is invalid. Please log in again to
+            continue.
           </p>
 
           {/* Login Button */}
