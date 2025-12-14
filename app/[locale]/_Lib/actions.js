@@ -15,6 +15,7 @@ export async function login(userData) {
 
     await saveSession(res?.data?.data?.tokens?.accessToken);
   } catch (e) {
+    console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in login");
   }
   redirect("/dashboard");
