@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getSession, deleteSession } from "./session";
 
-const eapiClient = axios.create({
+const apiClient = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1`,
   headers: {
     "Content-Type": "application/json",
