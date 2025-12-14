@@ -79,9 +79,9 @@ function FileInput({
   }
 
   function handleCropComplete(croppedBlob) {
-    // Convert blob to File object
-    const croppedFile = new File([croppedBlob], "cropped-image.jpg", {
-      type: "image/jpeg",
+    // Convert blob to File object - keep as PNG to preserve transparency
+    const croppedFile = new File([croppedBlob], "cropped-image.png", {
+      type: "image/png",
     });
     setFiles(croppedFile);
     setShowCropper(false);
