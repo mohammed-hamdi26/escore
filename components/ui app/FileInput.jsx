@@ -149,10 +149,7 @@ function FileInput({
                 try {
                   // File size already validated, but double-check
                   if (file.size > MAX_FILE_SIZE) {
-                    formik.setFieldError(
-                      name,
-                      tCropper("fileTooLarge")
-                    );
+                    formik.setFieldError(name, tCropper("fileTooLarge"));
                     formik.setFieldTouched(name, true, false);
                     toast.error(tCropper("fileTooLarge"));
                     return;
@@ -242,7 +239,7 @@ function UploadFile({ name, handleAddFile, icon, ...props }) {
 
 function PreviewImage({ file }) {
   return (
-    <div className="relative size-10 overflow-hidden rounded-full">
+    <div className="relative size-10 ">
       <Image
         fill
         alt="file"
