@@ -31,16 +31,15 @@ export default async function RootLayout({ children, params }) {
   }
   // ${geistSans.variable} ${geistMono.variable}
   return (
-    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
       <body
         className={` antialiased  dark:bg-background transition-colors duration-300 text-white`}
       >
         <ThemeProvider
           attribute="class"
-          // defaultTheme="light"
-
-          // enableSystem
-          // disableTransitionOnChange
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
         >
           <NextIntlClientProvider locale={locale} messages={messages}>
             <Toaster position="top-center" />

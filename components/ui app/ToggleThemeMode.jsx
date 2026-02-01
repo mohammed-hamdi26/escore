@@ -1,21 +1,34 @@
 "use client";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 
 function ToggleThemeMode() {
   const { setTheme, theme } = useTheme();
-  const [mode, setMode] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
-  useLayoutEffect(() => {
-    if (typeof window !== "undefined") {
-      // );
-    }
+  // Prevent hydration mismatch by only rendering theme-dependent UI after mount
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
   const classNameToggleItem =
     "  dark:text-white   flex justify-center items-center size-10 rounded-full cursor-pointer    ";
+
+  // Return placeholder during SSR to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="flex  rtl:mr-auto items-center gap-4">
+        <Button className={"bg-transparent text-[#677185] " + classNameToggleItem}>
+          <Sun />
+        </Button>
+        <Button className={"bg-transparent text-[#677185] " + classNameToggleItem}>
+          <Moon />
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex  rtl:mr-auto items-center gap-4">
