@@ -1,56 +1,82 @@
 function Table({ t, columns, children, grid_cols, showHeader = true }) {
   return (
-    <>
-      <table className="w-full h-[10px] overflow-hidden">
+    <div className="glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5">
+      <table className="w-full">
         {showHeader && (
           <TableHeader>
-            <TableRow
-              className={`px-16 grid gap-8 ${grid_cols} bg-[#F5F6F8] dark:bg-[#384E9733] rounded-full`}
-            >
+            <tr className={`grid gap-6 px-6 ${grid_cols}`}>
               {columns.map((column) => (
-                <TableHeaderRow
-                  className="py-4 text-sm text-start text-[#677185] dark:text-white"
-                  key={column.id}
-                >
+                <TableHeaderCell key={column.id}>
                   {t ? t(column.header) : column.header}
-                </TableHeaderRow>
+                </TableHeaderCell>
               ))}
-            </TableRow>
+            </tr>
           </TableHeader>
         )}
-        <TableBody>{children && children}</TableBody>
+        <TableBody>{children}</TableBody>
       </table>
       {!children && (
-        <p className="text-center py-4 text-2xl font-bold text-black dark:text-white ">
-          No data
-        </p>
+        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+          <svg
+            className="size-12 mb-3 opacity-50"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+            />
+          </svg>
+          <p className="text-lg font-medium">No data available</p>
+        </div>
       )}
-    </>
+    </div>
   );
 }
 
-function TableHeader({ children, ...props }) {
-  return <thead {...props}>{children}</thead>;
+function TableHeader({ children }) {
+  return (
+    <thead className="bg-muted/50 dark:bg-white/5 border-b border-border">
+      {children}
+    </thead>
+  );
 }
-function TableHeaderRow({ children, ...props }) {
-  return <th {...props}>{children}</th>;
+
+function TableHeaderCell({ children }) {
+  return (
+    <th className="py-4 text-start text-sm font-medium text-muted-foreground">
+      {children}
+    </th>
+  );
 }
-function TableRow({ children, grid_cols, ...props }) {
+
+function TableRow({ children, grid_cols, className = "", ...props }) {
   return (
     <tr
-      className={`px-16 py-4 grid items-center gap-8 ${grid_cols} text-[#677185] dark:text-white  border-b border-[#313A5F] `}
+      className={`grid items-center gap-6 px-6 py-4 ${grid_cols} border-b border-border last:border-b-0 transition-colors hover:bg-muted/30 dark:hover:bg-white/5 ${className}`}
       {...props}
     >
       {children}
     </tr>
   );
 }
-function TableBody({ children, ...props }) {
-  return <tbody {...props}>{children}</tbody>;
+
+function TableBody({ children }) {
+  return <tbody className="divide-y divide-border">{children}</tbody>;
 }
-function TableCell({ children, grid_cols, ...props }) {
-  return <td {...props}>{children}</td>;
+
+function TableCell({ children, className = "", ...props }) {
+  return (
+    <td className={`text-sm text-foreground ${className}`} {...props}>
+      {children}
+    </td>
+  );
 }
+
 Table.Row = TableRow;
 Table.Cell = TableCell;
+
 export default Table;
