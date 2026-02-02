@@ -10,6 +10,7 @@ import { useState } from "react";
 import { deleteTournament } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Pencil,
   Trash2,
@@ -20,6 +21,12 @@ import {
   Calendar,
   Star,
   Users,
+  MoreHorizontal,
+  Eye,
+  Copy,
+  ExternalLink,
+  StarOff,
+  Loader2,
 } from "lucide-react";
 
 // Status badge colors
@@ -244,27 +251,12 @@ function TournamentsTable({ tournaments, pagination, games }) {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 justify-end">
-                  <Link href={`/dashboard/tournaments-management/edit/${tournament.id}`}>
-                    <Button
-                      size="sm"
-                      className="h-8 px-3 bg-green-primary hover:bg-green-primary/90 text-white rounded-lg"
-                    >
-                      <Pencil className="size-3.5 mr-1.5 rtl:mr-0 rtl:ml-1.5" />
-                      {t("edit") || "Edit"}
-                    </Button>
-                  </Link>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={loadingId === tournament.id}
-                    onClick={() => handleDelete(tournament.id, tournament.name)}
-                    className="h-8 px-3 text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded-lg disabled:opacity-50"
-                  >
-                    <Trash2 className="size-3.5 mr-1.5 rtl:mr-0 rtl:ml-1.5" />
-                    {loadingId === tournament.id ? "..." : t("delete") || "Delete"}
-                  </Button>
-                </div>
+                <ActionsDropdown
+                  tournament={tournament}
+                  loadingId={loadingId}
+                  onDelete={handleDelete}
+                  t={t}
+                />
               </div>
             ))
           )}
@@ -273,6 +265,128 @@ function TournamentsTable({ tournaments, pagination, games }) {
 
       {/* Pagination */}
       {numPages > 1 && <Pagination numPages={numPages} />}
+    </div>
+  );
+}
+
+// Actions Dropdown Component
+function ActionsDropdown({ tournament, loadingId, onDelete, t }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+
+  const isLoading = loadingId === tournament.id;
+
+  const handleEdit = () => {
+    setIsOpen(false);
+    router.push(`/dashboard/tournaments-management/edit/${tournament.id}`);
+  };
+
+  const handleView = () => {
+    setIsOpen(false);
+    // Open tournament page in new tab
+    window.open(`/tournaments/${tournament.slug}`, "_blank");
+  };
+
+  const handleDuplicate = () => {
+    setIsOpen(false);
+    // Navigate to add page with tournament data as query params
+    toast.success(t("duplicateInfo") || "Feature coming soon");
+  };
+
+  const handleToggleFeatured = () => {
+    setIsOpen(false);
+    toast.success(t("featureToggleInfo") || "Feature coming soon");
+  };
+
+  const handleDelete = () => {
+    setIsOpen(false);
+    onDelete(tournament.id, tournament.name);
+  };
+
+  return (
+    <div className="flex items-center gap-2 justify-end">
+      {/* Quick Edit Button */}
+      <Link href={`/dashboard/tournaments-management/edit/${tournament.id}`}>
+        <Button
+          size="sm"
+          className="h-8 px-3 bg-green-primary hover:bg-green-primary/90 text-white rounded-lg"
+        >
+          <Pencil className="size-3.5 mr-1.5 rtl:mr-0 rtl:ml-1.5" />
+          {t("edit") || "Edit"}
+        </Button>
+      </Link>
+
+      {/* More Actions Dropdown */}
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8 w-8 p-0 rounded-lg hover:bg-muted dark:hover:bg-[#252a3d]"
+          >
+            <MoreHorizontal className="size-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-48 p-1.5 bg-background dark:bg-[#12141c] border-border"
+          align="end"
+        >
+          <div className="space-y-0.5">
+            {/* View */}
+            <button
+              onClick={handleView}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted dark:hover:bg-[#1a1d2e] transition-colors text-left rtl:text-right"
+            >
+              <Eye className="size-4 text-muted-foreground" />
+              {t("viewTournament") || "View Tournament"}
+            </button>
+
+            {/* Duplicate */}
+            <button
+              onClick={handleDuplicate}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted dark:hover:bg-[#1a1d2e] transition-colors text-left rtl:text-right"
+            >
+              <Copy className="size-4 text-muted-foreground" />
+              {t("duplicate") || "Duplicate"}
+            </button>
+
+            {/* Toggle Featured */}
+            <button
+              onClick={handleToggleFeatured}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted dark:hover:bg-[#1a1d2e] transition-colors text-left rtl:text-right"
+            >
+              {tournament.isFeatured ? (
+                <>
+                  <StarOff className="size-4 text-muted-foreground" />
+                  {t("removeFeatured") || "Remove Featured"}
+                </>
+              ) : (
+                <>
+                  <Star className="size-4 text-yellow-500" />
+                  {t("makeFeatured") || "Make Featured"}
+                </>
+              )}
+            </button>
+
+            {/* Divider */}
+            <div className="h-px bg-border my-1" />
+
+            {/* Delete */}
+            <button
+              onClick={handleDelete}
+              disabled={isLoading}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-500/10 transition-colors text-left rtl:text-right disabled:opacity-50"
+            >
+              {isLoading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Trash2 className="size-4" />
+              )}
+              {isLoading ? t("deleting") || "Deleting..." : t("delete") || "Delete"}
+            </button>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
