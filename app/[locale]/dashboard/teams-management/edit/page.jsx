@@ -1,21 +1,6 @@
-import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
-import TeamsTable from "@/components/teams management/TeamsTable";
+import { redirect } from "next/navigation";
 
-const columns = [
-  { id: "name", header: "Name" },
-  { id: "country", header: "Country" },
-  { id: "description", header: "Description" },
-];
-
-async function page({ searchParams }) {
-  const { size, page, search } = await searchParams;
-  const { data: teams, pagination } = await getTeams({
-    size,
-    page,
-    search,
-  });
-
-  return <TeamsTable columns={columns} teams={teams || []} pagination={pagination} />;
+// Redirect to the main teams list page
+export default function page() {
+  redirect("/dashboard/teams-management");
 }
-
-export default page;

@@ -2,20 +2,32 @@ import { addMatch } from "@/app/[locale]/_Lib/actions";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
-import MatchesFrom from "@/components/Matches Management/MatchesFrom";
+import MatchFormRedesign from "@/components/Matches Management/MatchFormRedesign";
+import BackPage from "@/components/ui app/BackPage";
+import { getTranslations } from "next-intl/server";
 
-async function page() {
+export default async function AddMatchPage() {
+  const t = await getTranslations("MatchForm");
+
   const [{ data: teamsOptions }, gamesOptions, { data: tournamentsOptions }] =
-    await Promise.all([getTeams(), getGames(), getTournaments()]);
-  console.log("tournamentsOptions", tournamentsOptions);
+    await Promise.all([
+      getTeams({ size: 500 }),
+      getGames({ limit: 100 }),
+      getTournaments({ size: 500 }),
+    ]);
+
   return (
-    <MatchesFrom
-      submit={addMatch}
-      gamesOptions={gamesOptions}
-      teamsOptions={teamsOptions}
-      tournamentsOptions={tournamentsOptions}
-    />
+    <div className="space-y-6">
+      <BackPage title={t("addMatch") || "Add Match"} />
+      <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+        <MatchFormRedesign
+          submit={addMatch}
+          gamesOptions={gamesOptions}
+          teamsOptions={teamsOptions}
+          tournamentsOptions={tournamentsOptions}
+          formType="add"
+        />
+      </div>
+    </div>
   );
 }
-
-export default page;

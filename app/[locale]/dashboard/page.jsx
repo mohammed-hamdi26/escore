@@ -37,7 +37,7 @@ export default async function page() {
     },
     {
       title: "Matches Management",
-      href: "/matches-management/edit",
+      href: "/matches-management",
       icon: <MatchesManagement width="57" height="56" />,
       isShowed: hasPermission(user, "Match"),
     },
@@ -49,7 +49,7 @@ export default async function page() {
     },
     {
       title: "Teams Management",
-      href: "/teams-management/edit",
+      href: "/teams-management",
       icon: <TeamsManagement width="57" height="56" />,
       isShowed: hasPermission(user, "Team"),
     },

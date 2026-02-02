@@ -1,11 +1,14 @@
-import LinksButtons from "@/components/ui app/LinksButtons";
+import TeamsHeader from "@/components/teams management/TeamsHeader";
 
 function layout({ children }) {
   return (
-    <>
-      <LinksButtons />
+    <div className="space-y-6">
+      {/* Page Header - conditionally rendered based on route */}
+      <TeamsHeader />
+
+      {/* Content */}
       {children}
-    </>
+    </div>
   );
 }
 

@@ -70,11 +70,11 @@ function MatchLineupSelector({
   if (!teamId) return null;
 
   return (
-    <div className="rounded-lg border border-[#2a2f3e] bg-[#1a1f2e]/30 flex-1 p-4">
+    <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#1a1f2e]/30 flex-1 p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-[#232838] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 dark:bg-[#232838] flex items-center justify-center">
             {teamLogo ? (
               <Image
                 src={teamLogo}
@@ -88,8 +88,8 @@ function MatchLineupSelector({
             )}
           </div>
           <div>
-            <h4 className="font-semibold">{teamName || t("Team Lineup")}</h4>
-            <p className="text-sm text-[#677185]">
+            <h4 className="font-semibold text-gray-900 dark:text-white">{teamName || t("Team Lineup")}</h4>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {selectedPlayers.length} {t("selected")}
             </p>
           </div>
@@ -102,7 +102,7 @@ function MatchLineupSelector({
             size="sm"
             onClick={handleSelectAll}
             disabled={loading || players.length === 0}
-            className="text-xs"
+            className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           >
             {t("Select All")}
           </Button>
@@ -112,7 +112,7 @@ function MatchLineupSelector({
             size="sm"
             onClick={handleClearAll}
             disabled={loading || selectedPlayers.length === 0}
-            className="text-xs"
+            className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           >
             {t("Clear All")}
           </Button>
@@ -122,15 +122,15 @@ function MatchLineupSelector({
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-[#677185]" />
-          <span className="ml-2 text-[#677185]">{t("Loading players")}</span>
+          <Loader2 className="w-6 h-6 animate-spin text-gray-400 dark:text-gray-500" />
+          <span className="ml-2 text-gray-500 dark:text-gray-400">{t("Loading players")}</span>
         </div>
       ) : error ? (
-        <div className="text-center py-8 text-red-400">
+        <div className="text-center py-8 text-red-500 dark:text-red-400">
           {t("Failed to load players")}
         </div>
       ) : players.length === 0 ? (
-        <div className="text-center py-8 text-[#677185]">
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
           <User className="w-10 h-10 mx-auto mb-2 opacity-50" />
           <p>{t("No players available")}</p>
         </div>
@@ -147,7 +147,7 @@ function MatchLineupSelector({
                 className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
                   isSelected
                     ? "bg-green-primary/20 border border-green-primary/50"
-                    : "bg-[#232838] hover:bg-[#2a3142]"
+                    : "bg-white dark:bg-[#232838] hover:bg-gray-100 dark:hover:bg-[#2a3142] border border-gray-200 dark:border-transparent"
                 }`}
               >
                 <Checkbox
@@ -156,7 +156,7 @@ function MatchLineupSelector({
                   className="data-[state=checked]:bg-green-primary data-[state=checked]:border-green-primary"
                 />
 
-                <div className="w-8 h-8 rounded-full overflow-hidden bg-[#1a1f2e] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-[#1a1f2e] flex items-center justify-center">
                   {photoUrl ? (
                     <Image
                       src={photoUrl}
@@ -171,16 +171,16 @@ function MatchLineupSelector({
                 </div>
 
                 <div className="flex-1">
-                  <p className="font-medium text-sm">{player.nickname}</p>
+                  <p className="font-medium text-sm text-gray-900 dark:text-white">{player.nickname}</p>
                   {(player.firstName || player.lastName) && (
-                    <p className="text-xs text-[#677185]">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {player.firstName} {player.lastName}
                     </p>
                   )}
                 </div>
 
                 {/* {player.role && (
-                  <span className="px-2 py-1 rounded-full bg-[#1a1f2e] text-xs text-[#677185]">
+                  <span className="px-2 py-1 rounded-full bg-gray-100 dark:bg-[#1a1f2e] text-xs text-gray-500 dark:text-gray-400">
                     {player.role}
                   </span>
                 )} */}

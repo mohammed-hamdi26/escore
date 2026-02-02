@@ -17,7 +17,8 @@ function LinksButtons() {
     pathname.includes("lineups") ||
     pathname.includes("/add") ||
     pathname.includes("/edit/") ||
-    pathname.includes("/view/")
+    pathname.includes("/view/") ||
+    pathname.endsWith("/matches-management")
   )
     return null;
 

@@ -396,6 +396,21 @@ export async function endMatch(id, result) {
   }
 }
 
+// Update match result (for live score updates)
+export async function updateMatchResult(id, result) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.patch(`/matches/${id}/result`, result);
+    revalidatePath(`/${locale}/dashboard/matches-management`);
+    revalidatePath(`/${locale}/dashboard/matches-management/view/${id}`);
+    return res.data;
+  } catch (e) {
+    console.log("Error updating match result:", e.response?.data);
+    throw new Error(e.response?.data?.message || "Error updating match result");
+  }
+}
+
 // Update match status
 export async function updateMatchStatus(id, status) {
   const locale = await getLocale();
