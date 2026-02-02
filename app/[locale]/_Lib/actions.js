@@ -196,6 +196,22 @@ export async function deleteTeam(id) {
   }
 }
 
+export async function removePlayerFromTeam(playerId, teamId) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.patch(`/players/${playerId}`, {
+      team: null,
+      isFreeAgent: true,
+    });
+    revalidatePath(`/${locale}/dashboard/teams-management/lineups/${teamId}`);
+    return res.data;
+  } catch (e) {
+    console.log(e.response?.data?.errors || e.response?.data || e.response || e);
+    throw new Error("Failed to remove player from team");
+  }
+}
+
 // News Actions
 export async function addNews(newsData) {
   const locale = await getLocale();

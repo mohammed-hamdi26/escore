@@ -521,8 +521,9 @@ function RoleSelectField({
       </label>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
               error ? "ring-2 ring-red-500 border-red-500" : ""
             }`}
@@ -539,17 +540,19 @@ function RoleSelectField({
             </div>
             <div className="flex items-center gap-1">
               {value && (
-                <button
-                  type="button"
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={handleClear}
-                  className="p-1 hover:bg-muted dark:hover:bg-[#252a3d] rounded-lg transition-colors"
+                  onKeyDown={(e) => e.key === 'Enter' && handleClear(e)}
+                  className="p-1 hover:bg-muted dark:hover:bg-[#252a3d] rounded-lg transition-colors cursor-pointer"
                 >
                   <X className="size-4 text-muted-foreground" />
-                </button>
+                </span>
               )}
               <ChevronDown className="size-4 text-muted-foreground" />
             </div>
-          </button>
+          </div>
         </PopoverTrigger>
         <PopoverContent
           className="w-[var(--radix-popover-trigger-width)] p-2 bg-background border border-border rounded-xl shadow-lg"
@@ -715,8 +718,9 @@ function GameSelectField({
       </label>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
               error ? "ring-2 ring-red-500 border-red-500" : ""
             }`}
@@ -766,7 +770,7 @@ function GameSelectField({
                 }`}
               />
             </div>
-          </button>
+          </div>
         </PopoverTrigger>
         <PopoverContent
           className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border"
@@ -891,8 +895,9 @@ function TeamSelectField({
       </label>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
               error ? "ring-2 ring-red-500 border-red-500" : ""
             }`}
@@ -949,7 +954,7 @@ function TeamSelectField({
                 }`}
               />
             </div>
-          </button>
+          </div>
         </PopoverTrigger>
         <PopoverContent
           className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border"
@@ -1094,8 +1099,9 @@ function TournamentMultiSelectField({
       </label>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             className={`w-full min-h-12 px-4 py-2 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
               error ? "ring-2 ring-red-500 border-red-500" : ""
             }`}
@@ -1153,7 +1159,7 @@ function TournamentMultiSelectField({
                 }`}
               />
             </div>
-          </button>
+          </div>
         </PopoverTrigger>
         <PopoverContent
           className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border"
@@ -1296,8 +1302,9 @@ function CountrySelectField({
       </label>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
               error ? "ring-2 ring-red-500 border-red-500" : ""
             }`}
@@ -1351,7 +1358,7 @@ function CountrySelectField({
                 }`}
               />
             </div>
-          </button>
+          </div>
         </PopoverTrigger>
         <PopoverContent
           className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border"
@@ -1530,8 +1537,9 @@ function DatePickerField({ label, name, formik, placeholder, maxDate }) {
       </label>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
               error ? "ring-2 ring-red-500 border-red-500" : ""
             }`}
@@ -1566,7 +1574,7 @@ function DatePickerField({ label, name, formik, placeholder, maxDate }) {
                 <X className="size-4 text-muted-foreground group-hover:text-red-500" />
               </span>
             )}
-          </button>
+          </div>
         </PopoverTrigger>
         <PopoverContent
           className="w-auto p-0 bg-background dark:bg-[#12141c] border-border"

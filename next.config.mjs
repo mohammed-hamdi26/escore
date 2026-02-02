@@ -38,6 +38,18 @@ const nextConfig = {
         protocol: "https",
         hostname: "www.esports.net",
       },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
+      {
+        protocol: "https",
+        hostname: "flagcdn.com",
+      },
+      {
+        protocol: "https",
+        hostname: "randomuser.me",
+      },
       // {
       //   protocol: "https",
       //   hostname: "digitalhub.fifa.com",

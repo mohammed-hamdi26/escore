@@ -1,29 +1,48 @@
 import { updateTeam } from "@/app/[locale]/_Lib/actions";
 import { getCountries } from "@/app/[locale]/_Lib/countriesApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
-import { getNews } from "@/app/[locale]/_Lib/newsApi";
-import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import { getTeam } from "@/app/[locale]/_Lib/teamsApi";
-import TeamForm from "@/components/teams management/TeamForm";
+import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
+import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
+import TeamFormRedesign from "@/components/teams management/TeamFormRedesign";
 
 export default async function page({ params }) {
   const { id } = await params;
 
-  const [countries, newsOptions, playersOptions, gamesOptions, team] =
-    await Promise.all([
-      getCountries(),
-      getNews(),
-      getPlayers(),
-      getGames(),
-      getTeam(id),
-    ]);
+  const [countries, gamesOptions, team, tournamentsResult, playersResult] = await Promise.all([
+    getCountries(),
+    getGames(),
+    getTeam(id),
+    getTournaments({ size: 200 }),
+    getPlayers({ size: 200 }),
+  ]);
+
+  // Map tournaments and players to options format
+  const tournamentsOptions = tournamentsResult?.data?.map(t => ({
+    id: t.id || t._id,
+    _id: t.id || t._id,
+    name: t.name,
+    slug: t.slug,
+    logo: t.logo,
+    status: t.status,
+  })) || [];
+
+  const playersOptions = playersResult?.data?.map(p => ({
+    id: p.id || p._id,
+    _id: p.id || p._id,
+    nickname: p.nickname,
+    firstName: p.firstName,
+    lastName: p.lastName,
+    photo: p.photo,
+    country: p.country,
+  })) || [];
+
   return (
-    <TeamForm
+    <TeamFormRedesign
       submit={updateTeam}
       countries={countries.countries}
       team={team}
-      OptionsData={{ newsOptions, playersOptions, gamesOptions }}
-      successMessage="Team updated"
+      OptionsData={{ gamesOptions, tournamentsOptions, playersOptions }}
       formType="edit"
     />
   );
