@@ -295,7 +295,7 @@ export default function TournamentsForm({
           {formik.isSubmitting ? (
             <>
               <Loader2 className="size-4 mr-2 animate-spin" />
-              {formType === "add" ? t("Adding...") : t("Saving...")}
+              {formType === "add" ? t("AddingProgress") : t("SavingProgress")}
             </>
           ) : (
             <>
