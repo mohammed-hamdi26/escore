@@ -2,7 +2,7 @@ import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import TournamentsTable from "@/components/Tournaments Management/TournamentsTable";
 
-async function TournamentsEditPage({ searchParams }) {
+async function TournamentsPage({ searchParams }) {
   const { size, page, search, game, status, tier, isFeatured, sortBy, sortOrder } = await searchParams;
 
   // Fetch tournaments and games in parallel
@@ -32,4 +32,4 @@ async function TournamentsEditPage({ searchParams }) {
   );
 }
 
-export default TournamentsEditPage;
+export default TournamentsPage;

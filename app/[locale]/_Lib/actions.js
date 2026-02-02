@@ -266,7 +266,7 @@ export async function addTournament(tournamentData) {
     console.log(e.response.data.errors);
     throw new Error("Error in adding tournament");
   }
-  redirect("/dashboard/tournaments-management/edit");
+  redirect("/dashboard/tournaments-management");
 }
 
 export async function editTournament(tournamentData) {

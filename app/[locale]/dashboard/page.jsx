@@ -25,7 +25,7 @@ export default async function page() {
   const links = [
     {
       title: "Tournaments Management",
-      href: "/tournaments-management/edit",
+      href: "/tournaments-management",
       icon: (
         <Champion
           width="57"

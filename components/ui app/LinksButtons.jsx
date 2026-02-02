@@ -9,19 +9,18 @@ function LinksButtons() {
   const pathname = usePathname();
   const t = useTranslations("buttonLinks");
 
+  // Hide on specific pages
   if (
     pathname.includes("links") ||
     pathname.includes("favorites-characters") ||
     pathname.includes("awards") ||
-    pathname.includes("lineups")
+    pathname.includes("lineups") ||
+    pathname.includes("/add")
   )
     return null;
 
-  // Only show Add button on edit pages
-  if (!pathname.includes("edit")) return null;
-
   return (
-    <Link href={pathname.replace("edit", "add")}>
+    <Link href={`${pathname}/add`}>
       <Button className="h-10 px-5 rounded-xl font-medium bg-green-primary hover:bg-green-primary/90 text-white transition-all">
         <Plus className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
         {t("add new")}
