@@ -43,7 +43,7 @@ export default async function page() {
     },
     {
       title: "Players",
-      href: "/player-management/edit",
+      href: "/player-management",
       icon: <Player width="57" height="56" />,
       isShowed: hasPermission(user, "Player"),
     },

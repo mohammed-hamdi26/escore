@@ -1,5 +1,6 @@
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import {
+  getPlayer,
   getPlayers,
   getPlayersFavoriteCharacters,
 } from "@/app/[locale]/_Lib/palyerApi";
@@ -7,7 +8,8 @@ import FavoriteCharacterPageContainer from "@/components/favorite characters/Fav
 
 async function page({ params }) {
   const { id } = await params;
-  const [players, games, characters] = await Promise.all([
+  const [player, players, games, characters] = await Promise.all([
+    getPlayer(id),
     getPlayers(),
     getGames(),
     getPlayersFavoriteCharacters(id),
@@ -19,6 +21,7 @@ async function page({ params }) {
       id={id}
       players={players}
       characters={characters}
+      playerName={player?.nickname || player?.firstName}
     />
   );
 }

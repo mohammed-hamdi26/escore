@@ -85,8 +85,8 @@ describe("LinkForm", () => {
       "Link added successfully": "Link added successfully",
       "Link updated successfully": "Link updated successfully",
       "An error occurred": "An error occurred",
-      "Adding...": "Adding...",
-      "Updating...": "Updating...",
+      "Adding": "Adding...",
+      "Updating": "Updating...",
     };
     return translations[key] || key;
   };

@@ -7,6 +7,7 @@ import { deleteSession, saveSession } from "./session";
 import { redirect } from "next/navigation";
 import { getPlayersLinks } from "./palyerApi";
 import { getAwardsTeam, getTeamsLinks } from "./teamsApi";
+import { getTournamentLinks } from "./tournamentsApi";
 
 // login
 export async function login(userData) {
@@ -85,7 +86,7 @@ export async function addPlayer(playerData) {
     console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in adding player");
   }
-  redirect("/dashboard/player-management/edit");
+  redirect("/dashboard/player-management");
 }
 export async function editPlayer(playerData) {
   const locale = await getLocale();
@@ -119,7 +120,7 @@ export async function deletePlayer(id) {
 
   try {
     const res = await apiClient.delete(`/players/${id}`);
-    revalidatePath(`${locale}/dashboard/player-management/edit`);
+    revalidatePath(`${locale}/dashboard/player-management`);
     return res.data;
   } catch (e) {
     throw new Error("error in Delete");
@@ -294,6 +295,18 @@ export async function deleteTournament(id) {
     return res.data;
   } catch (e) {
     throw new Error("error in Delete tournament");
+  }
+}
+
+export async function toggleTournamentFeatured(id) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.patch(`/tournaments/${id}/toggle-featured`);
+    revalidatePath(`/${locale}/dashboard/tournaments-management`);
+    return res.data;
+  } catch (e) {
+    throw new Error("Error toggling tournament featured status");
   }
 }
 
@@ -1285,10 +1298,14 @@ export async function editLinks(typeEdit, id, data) {
   console.log(typeEdit, id, data);
 
   try {
-    let socialLinks =
-      typeEdit === "players"
-        ? await getPlayersLinks(id)
-        : await getTeamsLinks(id);
+    let socialLinks;
+    if (typeEdit === "players") {
+      socialLinks = await getPlayersLinks(id);
+    } else if (typeEdit === "teams") {
+      socialLinks = await getTeamsLinks(id);
+    } else if (typeEdit === "tournaments") {
+      socialLinks = await getTournamentLinks(id);
+    }
 
     console.log(socialLinks);
     const isLinkExist = socialLinks.find((link) => link.id === data.id);
@@ -1299,15 +1316,20 @@ export async function editLinks(typeEdit, id, data) {
     const res = await apiClient.put(`/${typeEdit}/${id}`, {
       socialLinks: [...socialLinks, data],
     });
-    revalidatePath(
-      `${locale}/dashboard/${
-        typeEdit === "players" ? "player-management" : "teams-management"
-      }/links/${id}`
-    );
+
+    let revalidatePathStr;
+    if (typeEdit === "players") {
+      revalidatePathStr = `${locale}/dashboard/player-management/links/${id}`;
+    } else if (typeEdit === "teams") {
+      revalidatePathStr = `${locale}/dashboard/teams-management/links/${id}`;
+    } else if (typeEdit === "tournaments") {
+      revalidatePathStr = `${locale}/dashboard/tournaments-management/links/${id}`;
+    }
+    revalidatePath(revalidatePathStr);
     return res.data;
   } catch (e) {
     console.log(e.response.data.errors || e.response.data || e.response || e);
-    throw new Error("Error in updating player");
+    throw new Error("Error in updating link");
   }
 }
 
@@ -1315,10 +1337,14 @@ export async function deleteLink(typeEdit, id, linkId) {
   const locale = await getLocale();
 
   try {
-    let socialLinks =
-      typeEdit === "players"
-        ? await getPlayersLinks(id)
-        : await getTeamsLinks(id);
+    let socialLinks;
+    if (typeEdit === "players") {
+      socialLinks = await getPlayersLinks(id);
+    } else if (typeEdit === "teams") {
+      socialLinks = await getTeamsLinks(id);
+    } else if (typeEdit === "tournaments") {
+      socialLinks = await getTournamentLinks(id);
+    }
 
     console.log(socialLinks);
 
@@ -1330,16 +1356,21 @@ export async function deleteLink(typeEdit, id, linkId) {
     const res = await apiClient.put(`/${typeEdit}/${id}`, {
       socialLinks: socialLinks,
     });
-    revalidatePath(
-      `${locale}/dashboard/${
-        typeEdit === "players" ? "player-management" : "teams-management"
-      }/links/${id}`
-    );
+
+    let revalidatePathStr;
+    if (typeEdit === "players") {
+      revalidatePathStr = `${locale}/dashboard/player-management/links/${id}`;
+    } else if (typeEdit === "teams") {
+      revalidatePathStr = `${locale}/dashboard/teams-management/links/${id}`;
+    } else if (typeEdit === "tournaments") {
+      revalidatePathStr = `${locale}/dashboard/tournaments-management/links/${id}`;
+    }
+    revalidatePath(revalidatePathStr);
     return res.data;
   } catch (e) {
     console.log(
       e?.response?.data?.errors || e?.response?.data || e?.response || e
     );
-    throw new Error("Error in updating player");
+    throw new Error("Error in deleting link");
   }
 }

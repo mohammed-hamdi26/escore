@@ -10,6 +10,16 @@ export async function getPlayers(searchParams = {}) {
     // Add search param
     if (searchParams.search) params.set("search", searchParams.search);
 
+    // Add filter params
+    if (searchParams.game) params.set("game", searchParams.game);
+    if (searchParams.team) params.set("team", searchParams.team);
+    if (searchParams.country) params.set("country", searchParams.country);
+    if (searchParams.isFreeAgent) params.set("isFreeAgent", searchParams.isFreeAgent);
+
+    // Add sorting params
+    if (searchParams.sortBy) params.set("sortBy", searchParams.sortBy);
+    if (searchParams.sortOrder) params.set("sortOrder", searchParams.sortOrder);
+
     const queryString = params.toString();
     const url = queryString ? `/players?${queryString}` : "/players";
 

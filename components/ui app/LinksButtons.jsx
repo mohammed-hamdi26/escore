@@ -15,7 +15,9 @@ function LinksButtons() {
     pathname.includes("favorites-characters") ||
     pathname.includes("awards") ||
     pathname.includes("lineups") ||
-    pathname.includes("/add")
+    pathname.includes("/add") ||
+    pathname.includes("/edit/") ||
+    pathname.includes("/view/")
   )
     return null;
 

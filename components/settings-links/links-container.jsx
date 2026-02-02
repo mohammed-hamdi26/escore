@@ -148,7 +148,7 @@ function LinkCard({ link, onDelete, onEdit, t, isDark }) {
           <AlertDialogHeader>
             <AlertDialogTitle>{t("Delete Link")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("Are you sure you want to delete this link? This action cannot be undone.")}
+              {t("Are you sure you want to delete this link")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

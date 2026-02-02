@@ -81,3 +81,13 @@ export async function getUpcomingTournaments() {
     return [];
   }
 }
+
+export async function getTournamentLinks(id) {
+  try {
+    const res = await apiClient.get(`/tournaments/${id}`);
+    return res.data?.data?.socialLinks || [];
+  } catch (e) {
+    console.error("Error fetching tournament links:", e);
+    return [];
+  }
+}

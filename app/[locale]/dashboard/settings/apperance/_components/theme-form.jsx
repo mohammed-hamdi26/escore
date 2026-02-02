@@ -198,7 +198,7 @@ function ThemeForm({
                   onBlur={formik.handleBlur}
                   className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white font-mono placeholder-gray-500 focus:outline-none focus:border-green-primary transition-colors"
                 />
-                <p className="text-xs text-gray-500 mt-2">{t("Enter a valid hex color code (e.g., #3B82F6)")}</p>
+                <p className="text-xs text-gray-500 mt-2">{t("Enter a valid hex color code (eg #3B82F6)")}</p>
               </div>
               <div
                 className="w-14 h-14 rounded-xl border-2 border-gray-600 flex-shrink-0"
@@ -222,7 +222,7 @@ function ThemeForm({
           {formik.isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              {formType === "add" ? t("Adding...") : t("Updating...")}
+              {formType === "add" ? t("Adding") : t("Updating")}
             </>
           ) : formType === "add" ? (
             t("Submit")

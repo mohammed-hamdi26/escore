@@ -29,7 +29,7 @@ jest.mock("next-intl", () => ({
       "Edit": "Edit",
       "Delete": "Delete",
       "Delete Link": "Delete Link",
-      "Are you sure you want to delete this link? This action cannot be undone.": "Are you sure you want to delete this link?",
+      "Are you sure you want to delete this link": "Are you sure you want to delete this link?",
       "Cancel": "Cancel",
       "The Link is Deleted": "Link deleted successfully",
       "error in Delete": "Error deleting link",

@@ -132,7 +132,7 @@ function LinkForm({ t, setOpen, link, onSuccess }) {
           {formik.isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              {link ? t("Updating...") : t("Adding...")}
+              {link ? t("Updating") : t("Adding")}
             </>
           ) : link ? (
             t("Update Link")

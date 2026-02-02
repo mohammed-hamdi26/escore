@@ -1,111 +1,247 @@
 "use client";
-import { Link } from "@/i18n/navigation";
-import Pagination from "../ui app/Pagination";
-import Table from "../ui app/Table";
-import { Button } from "../ui/button";
-import { format } from "date-fns";
-
 import { useState } from "react";
-import { deleteLink, deleteTournament } from "@/app/[locale]/_Lib/actions";
-import toast from "react-hot-toast";
 import { useLocale, useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { getNumPages } from "@/app/[locale]/_Lib/helps";
-import Image from "next/image";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Switch } from "../ui/switch";
+import { deleteLink, editLinks } from "@/app/[locale]/_Lib/actions";
+import toast from "react-hot-toast";
 import LinksForm from "./LinksForm";
-import EditDialog from "./EditDialog";
-
-const columns = [
-  {
-    id: "name",
-    header: "name",
-  },
-  {
-    id: "url",
-    header: "URL",
-  },
-];
+import {
+  Edit,
+  ExternalLink,
+  Link2,
+  MoreVertical,
+  Trash2,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Spinner } from "../ui/spinner";
 
 function LinksTable({ links, numOfLinks, idUser, linksType = "players" }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const t = useTranslations("LinksTable");
-  const searchParams = useSearchParams();
-  const numPages = getNumPages(numOfLinks, Number(searchParams.get("size")));
+  const t = useTranslations("Links");
   const locale = useLocale();
-  console.log("links", links);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingId, setLoadingId] = useState(null);
+  const [togglingId, setTogglingId] = useState(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editLink, setEditLink] = useState(null);
+
+  const handleDelete = async (linkId) => {
+    if (!confirm(t("confirmDelete") || "Are you sure you want to delete this link?")) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setLoadingId(linkId);
+      await deleteLink(linksType, idUser, linkId);
+      toast.success(t("Link deleted successfully") || "Link deleted successfully");
+    } catch (e) {
+      toast.error(t("Error deleting link") || "Error deleting link");
+    } finally {
+      setIsLoading(false);
+      setLoadingId(null);
+    }
+  };
+
+  const handleEdit = (link) => {
+    setEditLink(link);
+    setEditOpen(true);
+  };
+
+  const handleToggleActive = async (link) => {
+    try {
+      setTogglingId(link.id);
+      const linkData = {
+        id: link.id,
+        name: link.name,
+        url: link.url,
+        image: link.image,
+        isActive: !link.isActive,
+      };
+      await editLinks(linksType, idUser, linkData);
+      toast.success(
+        link.isActive
+          ? t("Link hidden successfully") || "Link hidden"
+          : t("Link shown successfully") || "Link visible"
+      );
+    } catch (e) {
+      toast.error(t("Error updating link") || "Error updating link");
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  if (!links || links.length === 0) {
+    return (
+      <div className="bg-dashboard-box dark:bg-[#0F1017] rounded-xl p-12 text-center">
+        <Link2 className="size-16 mx-auto mb-4 text-[#677185]" />
+        <h3 className="text-xl font-semibold text-foreground mb-2">
+          {t("noLinks") || "No Links"}
+        </h3>
+        <p className="text-muted-foreground">
+          {t("noLinksDescription") || "Add social links to display them here."}
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8">
-      {/* <LinksFilter numOfSize={numOfLinks} /> */}
+    <>
+      {/* Links Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {links.map((link) => {
+          const linkImage = link.image?.light || link.image?.dark;
+          const isActive = link.isActive !== false; // Default to true if not set
 
-      <Table
-        t={t}
-        grid_cols="grid-cols-[0.7fr_0.7fr_2fr]"
-        columns={columns}
-        // data={tournaments}
-      >
-        {links.map((link) => (
-          <Table.Row key={link.id} grid_cols="grid-cols-[0.7fr_0.7fr_2fr]">
-            <Table.Cell className="flex gap-4 items-center text-lg">
-              {link?.image?.light && (
-                <img
-                  src={`${link?.image?.light}`}
-                  alt=""
-                  className="rounded-full size-10"
-                />
-              )}
-              {link?.name}
-            </Table.Cell>
-            <Table.Cell>
-              <a className="text-[#3A469D] hover:underline" href={link?.url}>
-                {link?.url}
-              </a>
-            </Table.Cell>
+          return (
+            <div
+              key={link.id}
+              className={`group bg-dashboard-box dark:bg-[#0F1017] rounded-xl overflow-hidden transition-all ${
+                isActive
+                  ? "hover:ring-1 hover:ring-blue-500/30"
+                  : "opacity-60 hover:opacity-80"
+              }`}
+            >
+              {/* Link Header */}
+              <div className="flex items-center justify-between p-4 border-b border-white/5">
+                <div className="flex items-center gap-3 min-w-0">
+                  {linkImage ? (
+                    <img
+                      src={linkImage}
+                      alt={link.name}
+                      className="size-10 rounded-lg object-contain bg-white/5 p-1"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <div className="size-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                      <Link2 className="size-5 text-blue-500" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-foreground truncate">
+                      {link.name}
+                    </h3>
+                    <div className="flex items-center gap-1.5">
+                      {isActive ? (
+                        <Eye className="size-3 text-green-500" />
+                      ) : (
+                        <EyeOff className="size-3 text-muted-foreground" />
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        {isActive
+                          ? t("visible") || "Visible"
+                          : t("hidden") || "Hidden"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-            <Table.Cell className="flex gap-4 justify-end">
-              <EditDialog
-                link={link}
-                idUser={idUser}
-                t={t}
-                trigger={
-                  <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
-                    {t("Edit")}
-                  </Button>
-                }
-                contentDialog={
-                  <LinksForm
-                    linksType={linksType}
-                    id={idUser}
-                    link={link}
-                    idUser={idUser}
-                    t={t}
+                {/* Actions Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-[#677185] hover:text-white size-8"
+                      disabled={isLoading && loadingId === link.id}
+                    >
+                      {isLoading && loadingId === link.id ? (
+                        <Spinner className="size-4" />
+                      ) : (
+                        <MoreVertical className="size-4" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => handleEdit(link)}
+                    >
+                      <Edit className="size-4 mr-2" />
+                      {t("Edit")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => window.open(link.url, "_blank")}
+                    >
+                      <ExternalLink className="size-4 mr-2" />
+                      {t("openLink") || "Open Link"}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="cursor-pointer text-red-400 focus:text-red-400"
+                      onClick={() => handleDelete(link.id)}
+                      disabled={isLoading}
+                    >
+                      <Trash2 className="size-4 mr-2" />
+                      {t("Delete")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* Link URL */}
+              <div className="p-4 space-y-3">
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-400 hover:text-blue-300 hover:underline truncate block"
+                >
+                  {link.url}
+                </a>
+
+                {/* Visibility Toggle */}
+                <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                  <span className="text-xs text-muted-foreground">
+                    {t("showInApp") || "Show in app"}
+                  </span>
+                  <Switch
+                    checked={isActive}
+                    onCheckedChange={() => handleToggleActive(link)}
+                    disabled={togglingId === link.id}
+                    className="data-[state=checked]:bg-green-500"
                   />
-                }
-              />
-              <Button
-                disabled={isLoading}
-                className={
-                  "text-white bg-[#3A469D] rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
-                }
-                onClick={async () => {
-                  try {
-                    setIsLoading(true);
-                    await deleteLink(linksType, idUser, link.id);
-                    toast.success(t("The Link is Deleted"));
-                  } catch (e) {
-                    toast.error(t("error in Delete"));
-                  } finally {
-                    setIsLoading(false);
-                  }
-                }}
-              >
-                {t("Delete")}
-              </Button>
-            </Table.Cell>
-          </Table.Row>
-        ))}
-      </Table>
-      <Pagination numPages={numPages} numItems={links.length} />
-    </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent
+          dir={locale === "en" ? "ltr" : "rtl"}
+          className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto"
+        >
+          <DialogTitle className="flex items-center gap-2">
+            <Edit className="size-5 text-green-primary" />
+            {t("Edit Link") || "Edit Link"}
+          </DialogTitle>
+          {editLink && (
+            <LinksForm
+              link={editLink}
+              id={idUser}
+              setOpen={setEditOpen}
+              linksType={linksType}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
+
 export default LinksTable;

@@ -17,6 +17,8 @@ function ImageUpload({
   aspectRatio = "square", // square, landscape, portrait
   enableCrop = true,
   showUrlInput = false,
+  compact = false, // Smaller version for compact layouts
+  hint,
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -193,24 +195,26 @@ function ImageUpload({
             />
 
             {isUploading ? (
-              <div className="flex flex-col items-center gap-3 text-muted-foreground">
-                <Loader2 className="size-10 animate-spin text-green-primary" />
-                <span className="text-sm">{t?.("uploading") || "Uploading..."}</span>
+              <div className={`flex flex-col items-center gap-2 text-muted-foreground ${compact ? "p-2" : ""}`}>
+                <Loader2 className={`${compact ? "size-6" : "size-10"} animate-spin text-green-primary`} />
+                <span className={`${compact ? "text-xs" : "text-sm"}`}>{t?.("uploading") || "Uploading..."}</span>
               </div>
             ) : (
-              <div className="flex flex-col items-center gap-3 text-muted-foreground p-4">
-                <div className="size-14 rounded-full bg-green-primary/10 flex items-center justify-center">
-                  <ImageIcon className="size-7 text-green-primary" />
+              <div className={`flex flex-col items-center text-muted-foreground ${compact ? "gap-1 p-2" : "gap-3 p-4"}`}>
+                <div className={`${compact ? "size-8" : "size-14"} rounded-full bg-green-primary/10 flex items-center justify-center`}>
+                  <ImageIcon className={`${compact ? "size-4" : "size-7"} text-green-primary`} />
                 </div>
                 <div className="text-center">
-                  <p className="text-sm font-medium text-foreground">
-                    {t?.("dropHere") || "Drop image here"}
+                  <p className={`${compact ? "text-xs" : "text-sm"} font-medium text-foreground`}>
+                    {compact ? (t?.("clickUpload") || "Click to upload") : (t?.("dropHere") || "Drop image here")}
                   </p>
-                  <p className="text-xs mt-1">
-                    {t?.("orClick") || "or click to browse"}
-                  </p>
+                  {!compact && (
+                    <p className="text-xs mt-1">
+                      {t?.("orClick") || "or click to browse"}
+                    </p>
+                  )}
                 </div>
-                <p className="text-xs">
+                <p className={`${compact ? "text-[10px]" : "text-xs"}`}>
                   {t?.("maxSize") || "PNG, JPG up to 5MB"}
                 </p>
               </div>

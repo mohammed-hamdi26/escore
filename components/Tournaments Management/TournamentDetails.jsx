@@ -376,6 +376,23 @@ function TournamentDetails({ tournament }) {
             </div>
           )}
 
+          {/* Social Links Management */}
+          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+              <LinkIcon className="size-5 text-green-primary" />
+              {t("socialLinks") || "Social Links"}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {t("manageSocialLinks") || "Manage social media links for this tournament"}
+            </p>
+            <Link href={`/dashboard/tournaments-management/links/${tournament.id || tournament._id}`}>
+              <Button variant="outline" className="w-full gap-2 border-green-primary/30 text-green-primary hover:bg-green-primary/10">
+                <LinkIcon className="size-4" />
+                {t("manageLinks") || "Manage Links"}
+              </Button>
+            </Link>
+          </div>
+
           {/* Stats */}
           <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
