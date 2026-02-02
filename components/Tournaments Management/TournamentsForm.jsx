@@ -114,8 +114,23 @@ export default function TournamentsForm({
           dark: dataValues.knockoutImageDark || dataValues.knockoutImageLight,
         };
 
+        // Convert dates to ISO datetime format for backend
+        if (dataValues.startDate) {
+          dataValues.startDate = new Date(dataValues.startDate).toISOString();
+        }
+        if (dataValues.endDate) {
+          dataValues.endDate = new Date(dataValues.endDate).toISOString();
+        }
+
         dataValues.slug = dataValues?.name.replace(/\s+/g, "-").toLowerCase();
         dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value || g);
+
+        // Clean up temporary fields
+        delete dataValues.logoLight;
+        delete dataValues.logoDark;
+        delete dataValues.knockoutImageLight;
+        delete dataValues.knockoutImageDark;
+        delete dataValues.gamesData;
 
         await submit(dataValues);
         formType === "add" && formik.resetForm();
