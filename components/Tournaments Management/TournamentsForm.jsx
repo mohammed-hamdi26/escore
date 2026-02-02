@@ -27,6 +27,13 @@ import {
   ChevronDown,
   Globe,
   Check,
+  Clock,
+  Play,
+  CheckCircle2,
+  XCircle,
+  Award,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -124,16 +131,16 @@ export default function TournamentsForm({
   });
 
   const statusOptions = [
-    { value: "upcoming", label: t("Upcoming") },
-    { value: "ongoing", label: t("Ongoing") },
-    { value: "completed", label: t("Completed") },
-    { value: "cancelled", label: t("Cancelled") },
+    { value: "upcoming", label: t("Upcoming"), icon: Clock, color: "text-blue-500", bg: "bg-blue-500/10" },
+    { value: "ongoing", label: t("Ongoing"), icon: Play, color: "text-green-500", bg: "bg-green-500/10" },
+    { value: "completed", label: t("Completed"), icon: CheckCircle2, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { value: "cancelled", label: t("Cancelled"), icon: XCircle, color: "text-red-500", bg: "bg-red-500/10" },
   ];
 
   const tierOptions = [
-    { value: "S", label: "S-Tier" },
-    { value: "A", label: "A-Tier" },
-    { value: "B", label: "B-Tier" },
+    { value: "S", label: "S-Tier", color: "text-yellow-500", bg: "bg-gradient-to-r from-yellow-500/20 to-orange-500/20", badge: "bg-gradient-to-r from-yellow-400 to-orange-500" },
+    { value: "A", label: "A-Tier", color: "text-purple-500", bg: "bg-purple-500/10", badge: "bg-purple-500" },
+    { value: "B", label: "B-Tier", color: "text-blue-500", bg: "bg-blue-500/10", badge: "bg-blue-500" },
   ];
 
   return (
@@ -162,11 +169,12 @@ export default function TournamentsForm({
             placeholder={t("Enter Location")}
             formik={formik}
           />
-          <SelectField
+          <StatusSelectField
             label={t("Status")}
             name="status"
             options={statusOptions}
             formik={formik}
+            placeholder={t("Select Status")}
           />
           <CountrySelectField
             label={t("Country")}
@@ -179,11 +187,12 @@ export default function TournamentsForm({
         </FormRow>
 
         <FormRow cols={3}>
-          <SelectField
+          <TierSelectField
             label={t("Tier")}
             name="tier"
             options={tierOptions}
             formik={formik}
+            placeholder={t("Select Tier")}
           />
           <PrizePoolField
             label={t("Prize Pool")}
@@ -359,6 +368,165 @@ function SelectField({ label, name, options, formik, placeholder }) {
   );
 }
 
+// Status Select Field with Icons and Colors
+function StatusSelectField({ label, name, options, formik, placeholder }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  const handleSelect = (option) => {
+    formik.setFieldValue(name, option.value);
+    formik.setFieldTouched(name, true);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
+              error ? "ring-2 ring-red-500 border-red-500" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {selectedOption ? (
+                <>
+                  <div className={`size-8 rounded-lg ${selectedOption.bg} flex items-center justify-center`}>
+                    <selectedOption.icon className={`size-4 ${selectedOption.color}`} />
+                  </div>
+                  <span className={`font-medium ${selectedOption.color}`}>{selectedOption.label}</span>
+                </>
+              ) : (
+                <>
+                  <div className="size-8 rounded-lg bg-muted dark:bg-[#252a3d] flex items-center justify-center">
+                    <Clock className="size-4 text-muted-foreground" />
+                  </div>
+                  <span className="text-muted-foreground">{placeholder}</span>
+                </>
+              )}
+            </div>
+            <ChevronDown className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-2 bg-background dark:bg-[#12141c] border-border"
+          align="start"
+        >
+          {options.map((option) => {
+            const isSelected = value === option.value;
+            const IconComponent = option.icon;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => handleSelect(option)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                  isSelected
+                    ? `${option.bg} ${option.color}`
+                    : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
+                }`}
+              >
+                <div className={`size-8 rounded-lg ${option.bg} flex items-center justify-center`}>
+                  <IconComponent className={`size-4 ${option.color}`} />
+                </div>
+                <span className={`flex-1 text-sm font-medium ${isSelected ? option.color : "text-foreground"}`}>
+                  {option.label}
+                </span>
+                {isSelected && <Check className={`size-4 ${option.color}`} />}
+              </button>
+            );
+          })}
+        </PopoverContent>
+      </Popover>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// Tier Select Field with Premium Styling
+function TierSelectField({ label, name, options, formik, placeholder }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  const handleSelect = (option) => {
+    formik.setFieldValue(name, option.value);
+    formik.setFieldTouched(name, true);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
+              error ? "ring-2 ring-red-500 border-red-500" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {selectedOption ? (
+                <>
+                  <div className={`size-8 rounded-lg ${selectedOption.badge} flex items-center justify-center`}>
+                    <Award className="size-4 text-white" />
+                  </div>
+                  <span className={`font-bold ${selectedOption.color}`}>{selectedOption.label}</span>
+                </>
+              ) : (
+                <>
+                  <div className="size-8 rounded-lg bg-muted dark:bg-[#252a3d] flex items-center justify-center">
+                    <Award className="size-4 text-muted-foreground" />
+                  </div>
+                  <span className="text-muted-foreground">{placeholder}</span>
+                </>
+              )}
+            </div>
+            <ChevronDown className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-2 bg-background dark:bg-[#12141c] border-border"
+          align="start"
+        >
+          {options.map((option) => {
+            const isSelected = value === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => handleSelect(option)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                  isSelected
+                    ? `${option.bg} border border-current/20`
+                    : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
+                }`}
+              >
+                <div className={`size-8 rounded-lg ${option.badge} flex items-center justify-center`}>
+                  <Award className="size-4 text-white" />
+                </div>
+                <span className={`flex-1 text-sm font-bold ${isSelected ? option.color : "text-foreground"}`}>
+                  {option.label}
+                </span>
+                {isSelected && <Check className={`size-4 ${option.color}`} />}
+              </button>
+            );
+          })}
+        </PopoverContent>
+      </Popover>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
 // Multi-Select Field for Games
 function MultiSelectField({ label, name, options, formik }) {
   const selectedIds = formik.values[name]?.map((g) => g.id || g.value || g) || [];
@@ -408,14 +576,24 @@ function MultiSelectField({ label, name, options, formik }) {
   );
 }
 
-// Enhanced Date Picker Field with Calendar Popup
+// Enhanced Date Picker Field with Year/Month Navigation
 function DatePickerField({ label, name, formik, placeholder, minDate }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [viewDate, setViewDate] = useState(new Date());
   const error = formik.touched[name] && formik.errors[name];
   const value = formik.values[name];
 
   const selectedDate = value ? new Date(value) : undefined;
   const minDateObj = minDate ? new Date(minDate) : undefined;
+
+  // Generate years from 1990 to current year + 10
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1990 + 11 }, (_, i) => 1990 + i);
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
   const formatDisplayDate = (dateStr) => {
     if (!dateStr) return "";
@@ -441,6 +619,30 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
     e.stopPropagation();
     formik.setFieldValue(name, "");
     formik.setFieldTouched(name, true);
+  };
+
+  const handleMonthChange = (monthIndex) => {
+    const newDate = new Date(viewDate);
+    newDate.setMonth(monthIndex);
+    setViewDate(newDate);
+  };
+
+  const handleYearChange = (year) => {
+    const newDate = new Date(viewDate);
+    newDate.setFullYear(year);
+    setViewDate(newDate);
+  };
+
+  const goToPreviousMonth = () => {
+    const newDate = new Date(viewDate);
+    newDate.setMonth(newDate.getMonth() - 1);
+    setViewDate(newDate);
+  };
+
+  const goToNextMonth = () => {
+    const newDate = new Date(viewDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    setViewDate(newDate);
   };
 
   return (
@@ -476,13 +678,65 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0 bg-background dark:bg-[#12141c] border-border" align="start">
+          {/* Year/Month Navigation */}
+          <div className="p-3 border-b border-border">
+            <div className="flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={goToPreviousMonth}
+                className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
+              >
+                <ChevronLeft className="size-4 text-foreground" />
+              </button>
+
+              <div className="flex items-center gap-2">
+                {/* Month Select */}
+                <select
+                  value={viewDate.getMonth()}
+                  onChange={(e) => handleMonthChange(parseInt(e.target.value))}
+                  className="h-8 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                >
+                  {months.map((month, index) => (
+                    <option key={month} value={index}>{month}</option>
+                  ))}
+                </select>
+
+                {/* Year Select */}
+                <select
+                  value={viewDate.getFullYear()}
+                  onChange={(e) => handleYearChange(parseInt(e.target.value))}
+                  className="h-8 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                >
+                  {years.map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="button"
+                onClick={goToNextMonth}
+                className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
+              >
+                <ChevronRight className="size-4 text-foreground" />
+              </button>
+            </div>
+          </div>
+
+          {/* Calendar */}
           <CalendarComponent
             mode="single"
             selected={selectedDate}
             onSelect={handleSelect}
+            month={viewDate}
+            onMonthChange={setViewDate}
             disabled={(date) => minDateObj && date < minDateObj}
             initialFocus
             className="rounded-xl"
+            classNames={{
+              nav: "hidden",
+              caption: "hidden",
+            }}
           />
         </PopoverContent>
       </Popover>
