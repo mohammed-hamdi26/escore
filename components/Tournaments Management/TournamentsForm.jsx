@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { Button } from "../ui/button";
@@ -8,17 +9,20 @@ import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import FormSection from "../ui app/FormSection";
 import FormRow from "../ui app/FormRow";
 import ImageUpload from "../ui app/ImageUpload";
+import { Calendar as CalendarComponent } from "../ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Trophy,
   Calendar,
   MapPin,
-  DollarSign,
+  Coins,
   Gamepad2,
   Image as ImageIcon,
   Save,
   Loader2,
   Star,
   CalendarDays,
+  X,
 } from "lucide-react";
 
 const validateSchema = yup.object({
@@ -175,11 +179,10 @@ export default function TournamentsForm({
             options={tierOptions}
             formik={formik}
           />
-          <CurrencyField
+          <PrizePoolField
             label={t("Prize Pool")}
             name="prizePool"
             formik={formik}
-            currency="USD"
           />
           <FeaturedToggle
             label={t("Featured")}
@@ -399,10 +402,14 @@ function MultiSelectField({ label, name, options, formik }) {
   );
 }
 
-// Enhanced Date Picker Field
+// Enhanced Date Picker Field with Calendar Popup
 function DatePickerField({ label, name, formik, placeholder, minDate }) {
+  const [isOpen, setIsOpen] = useState(false);
   const error = formik.touched[name] && formik.errors[name];
   const value = formik.values[name];
+
+  const selectedDate = value ? new Date(value) : undefined;
+  const minDateObj = minDate ? new Date(minDate) : undefined;
 
   const formatDisplayDate = (dateStr) => {
     if (!dateStr) return "";
@@ -415,43 +422,75 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
     });
   };
 
+  const handleSelect = (date) => {
+    if (date) {
+      const formattedDate = date.toISOString().split("T")[0];
+      formik.setFieldValue(name, formattedDate);
+      formik.setFieldTouched(name, true);
+    }
+    setIsOpen(false);
+  };
+
+  const handleClear = (e) => {
+    e.stopPropagation();
+    formik.setFieldValue(name, "");
+    formik.setFieldTouched(name, true);
+  };
+
   return (
     <div className="flex-1 space-y-2">
       <label className="text-sm font-medium text-muted-foreground">{label}</label>
-      <div className="relative group">
-        <div className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-          <CalendarDays className="size-5 text-green-primary" />
-        </div>
-        <input
-          type="date"
-          name={name}
-          value={value}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          min={minDate}
-          className={`w-full h-12 pl-11 pr-4 rtl:pl-4 rtl:pr-11 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] ${
-            error ? "ring-2 ring-red-500 border-red-500" : ""
-          } ${!value ? "text-muted-foreground" : ""}`}
-        />
-        {value && (
-          <div className="absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <span className="text-xs text-muted-foreground bg-green-primary/10 px-2 py-1 rounded-md">
-              {formatDisplayDate(value).split(",")[0]}
-            </span>
-          </div>
-        )}
-      </div>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
+              error ? "ring-2 ring-red-500 border-red-500" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="size-9 rounded-lg bg-green-primary/10 flex items-center justify-center">
+                <CalendarDays className="size-5 text-green-primary" />
+              </div>
+              {value ? (
+                <span className="text-foreground font-medium">{formatDisplayDate(value)}</span>
+              ) : (
+                <span className="text-muted-foreground">{placeholder}</span>
+              )}
+            </div>
+            {value && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="size-7 rounded-lg bg-muted hover:bg-red-500/20 flex items-center justify-center transition-colors group"
+              >
+                <X className="size-4 text-muted-foreground group-hover:text-red-500" />
+              </button>
+            )}
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 bg-background dark:bg-[#12141c] border-border" align="start">
+          <CalendarComponent
+            mode="single"
+            selected={selectedDate}
+            onSelect={handleSelect}
+            disabled={(date) => minDateObj && date < minDateObj}
+            initialFocus
+            className="rounded-xl"
+          />
+        </PopoverContent>
+      </Popover>
       {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }
 
-// Currency Input Field with formatting
-function CurrencyField({ label, name, formik, currency = "USD" }) {
+// Prize Pool Input Field with formatting (no currency type)
+function PrizePoolField({ label, name, formik }) {
   const error = formik.touched[name] && formik.errors[name];
   const value = formik.values[name];
 
-  const formatCurrency = (num) => {
+  const formatNumber = (num) => {
     if (!num && num !== 0) return "";
     return new Intl.NumberFormat("en-US").format(num);
   };
@@ -461,38 +500,24 @@ function CurrencyField({ label, name, formik, currency = "USD" }) {
     formik.setFieldValue(name, rawValue ? parseInt(rawValue, 10) : "");
   };
 
-  const currencySymbols = {
-    USD: "$",
-    EUR: "€",
-    GBP: "£",
-    SAR: "﷼",
-  };
-
   return (
     <div className="flex-1 space-y-2">
       <label className="text-sm font-medium text-muted-foreground">{label}</label>
       <div className="relative">
-        <div className="absolute left-0 rtl:left-auto rtl:right-0 top-0 h-full flex items-center justify-center w-12 bg-green-primary/10 rounded-l-xl rtl:rounded-l-none rtl:rounded-r-xl border-r border-green-primary/20 rtl:border-r-0 rtl:border-l">
-          <span className="text-green-primary font-semibold text-lg">
-            {currencySymbols[currency] || "$"}
-          </span>
+        <div className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2">
+          <Coins className="size-5 text-green-primary" />
         </div>
         <input
           type="text"
           name={name}
-          value={formatCurrency(value)}
+          value={formatNumber(value)}
           onChange={handleChange}
           onBlur={formik.handleBlur}
           placeholder="0"
-          className={`w-full h-12 pl-14 pr-4 rtl:pl-4 rtl:pr-14 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 transition-all ${
+          className={`w-full h-12 pl-11 pr-4 rtl:pl-4 rtl:pr-11 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 transition-all ${
             error ? "ring-2 ring-red-500 border-red-500" : ""
           }`}
         />
-        {value > 0 && (
-          <div className="absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <span className="text-xs text-muted-foreground">{currency}</span>
-          </div>
-        )}
       </div>
       {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
