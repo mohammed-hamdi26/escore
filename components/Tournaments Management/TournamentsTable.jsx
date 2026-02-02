@@ -1,13 +1,13 @@
 "use client";
 
-import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import Pagination from "../ui app/Pagination";
 import { Button } from "../ui/button";
 import { format } from "date-fns";
 import TournamentsFilter from "./TournamentsFilter";
 import { useState } from "react";
-import { deleteTournament } from "@/app/[locale]/_Lib/actions";
+import { deleteTournament, toggleTournamentFeatured } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -23,8 +23,6 @@ import {
   Users,
   MoreHorizontal,
   Eye,
-  Copy,
-  ExternalLink,
   StarOff,
   Loader2,
 } from "lucide-react";
@@ -168,7 +166,8 @@ function TournamentsTable({ tournaments, pagination, games }) {
             tournaments.map((tournament) => (
               <div
                 key={tournament.id}
-                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors"
+                onClick={() => router.push(`/dashboard/tournaments-management/view/${tournament.id}`)}
+                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors cursor-pointer"
               >
                 {/* Tournament Name & Logo */}
                 <div className="flex items-center gap-3 min-w-0">
@@ -272,6 +271,7 @@ function TournamentsTable({ tournaments, pagination, games }) {
 // Actions Dropdown Component
 function ActionsDropdown({ tournament, loadingId, onDelete, t }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [togglingFeatured, setTogglingFeatured] = useState(false);
   const router = useRouter();
 
   const isLoading = loadingId === tournament.id;
@@ -283,19 +283,20 @@ function ActionsDropdown({ tournament, loadingId, onDelete, t }) {
 
   const handleView = () => {
     setIsOpen(false);
-    // Open tournament page in new tab
-    window.open(`/tournaments/${tournament.slug}`, "_blank");
+    router.push(`/dashboard/tournaments-management/view/${tournament.id}`);
   };
 
-  const handleDuplicate = () => {
-    setIsOpen(false);
-    // Navigate to add page with tournament data as query params
-    toast.success(t("duplicateInfo") || "Feature coming soon");
-  };
-
-  const handleToggleFeatured = () => {
-    setIsOpen(false);
-    toast.success(t("featureToggleInfo") || "Feature coming soon");
+  const handleToggleFeatured = async () => {
+    try {
+      setTogglingFeatured(true);
+      await toggleTournamentFeatured(tournament.id);
+      toast.success(t("toggleFeaturedSuccess") || "Featured status updated");
+      setIsOpen(false);
+    } catch (e) {
+      toast.error(t("toggleFeaturedError") || "Failed to update featured status");
+    } finally {
+      setTogglingFeatured(false);
+    }
   };
 
   const handleDelete = () => {
@@ -304,18 +305,7 @@ function ActionsDropdown({ tournament, loadingId, onDelete, t }) {
   };
 
   return (
-    <div className="flex items-center gap-2 justify-end">
-      {/* Quick Edit Button */}
-      <Link href={`/dashboard/tournaments-management/edit/${tournament.id}`}>
-        <Button
-          size="sm"
-          className="h-8 px-3 bg-green-primary hover:bg-green-primary/90 text-white rounded-lg"
-        >
-          <Pencil className="size-3.5 mr-1.5 rtl:mr-0 rtl:ml-1.5" />
-          {t("edit") || "Edit"}
-        </Button>
-      </Link>
-
+    <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
       {/* More Actions Dropdown */}
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
@@ -324,7 +314,7 @@ function ActionsDropdown({ tournament, loadingId, onDelete, t }) {
             variant="ghost"
             className="h-8 w-8 p-0 rounded-lg hover:bg-muted dark:hover:bg-[#252a3d]"
           >
-            <MoreHorizontal className="size-4" />
+            <MoreHorizontal className="size-4 text-foreground" />
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -332,30 +322,36 @@ function ActionsDropdown({ tournament, loadingId, onDelete, t }) {
           align="end"
         >
           <div className="space-y-0.5">
-            {/* View */}
+            {/* View Details */}
             <button
               onClick={handleView}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted dark:hover:bg-[#1a1d2e] transition-colors text-left rtl:text-right"
             >
               <Eye className="size-4 text-muted-foreground" />
-              {t("viewTournament") || "View Tournament"}
+              {t("viewDetails") || "View Details"}
             </button>
 
-            {/* Duplicate */}
+            {/* Edit */}
             <button
-              onClick={handleDuplicate}
+              onClick={handleEdit}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted dark:hover:bg-[#1a1d2e] transition-colors text-left rtl:text-right"
             >
-              <Copy className="size-4 text-muted-foreground" />
-              {t("duplicate") || "Duplicate"}
+              <Pencil className="size-4 text-muted-foreground" />
+              {t("edit") || "Edit"}
             </button>
 
             {/* Toggle Featured */}
             <button
               onClick={handleToggleFeatured}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted dark:hover:bg-[#1a1d2e] transition-colors text-left rtl:text-right"
+              disabled={togglingFeatured}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted dark:hover:bg-[#1a1d2e] transition-colors text-left rtl:text-right disabled:opacity-50"
             >
-              {tournament.isFeatured ? (
+              {togglingFeatured ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  {t("updating") || "Updating..."}
+                </>
+              ) : tournament.isFeatured ? (
                 <>
                   <StarOff className="size-4 text-muted-foreground" />
                   {t("removeFeatured") || "Remove Featured"}

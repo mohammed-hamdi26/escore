@@ -2,18 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { AlertTriangle, LogOut } from "lucide-react";
+import { AlertTriangle, LogOut, RefreshCw } from "lucide-react";
 import { forceLogout } from "../_Lib/actions";
 
 /**
  * Dashboard-specific error handler
- * Any error in dashboard routes will clear the session and redirect to login
- * This handles the case where the user's session is invalid (e.g., after DB reset)
+ * Only clears session and redirects for actual auth errors (401/403)
+ * Other errors show a retry option
  */
 export default function DashboardError({ error, reset }) {
   const router = useRouter();
-  const [isClearing, setIsClearing] = useState(true);
-  console.log(error);
+  const [isClearing, setIsClearing] = useState(false);
+
+  // Check if this is an auth error (401/403)
+  const isAuthError = error?.message?.includes("401") ||
+                      error?.message?.includes("403") ||
+                      error?.message?.includes("Unauthorized") ||
+                      error?.message?.includes("No token") ||
+                      error?.message?.includes("Invalid token") ||
+                      error?.message?.includes("jwt") ||
+                      error?.digest?.includes("NEXT_REDIRECT");
 
   useEffect(() => {
     // Log error in development
@@ -21,10 +29,11 @@ export default function DashboardError({ error, reset }) {
       console.error("Dashboard error:", error);
     }
 
-    // Always clear session and redirect for any dashboard error
-    // This handles auth errors that are hidden in production
-    handleClearAndRedirect();
-  }, [error]);
+    // Only redirect for actual auth errors
+    if (isAuthError) {
+      handleClearAndRedirect();
+    }
+  }, [error, isAuthError]);
 
   const handleClearAndRedirect = async () => {
     setIsClearing(true);
@@ -41,7 +50,7 @@ export default function DashboardError({ error, reset }) {
     }
   };
 
-  // Show loading state while clearing session
+  // Show loading state while clearing session (only for auth errors)
   if (isClearing) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 py-8">
@@ -55,6 +64,54 @@ export default function DashboardError({ error, reset }) {
     );
   }
 
+  // For non-auth errors, show retry option
+  if (!isAuthError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 py-8">
+        <div className="max-w-md w-full">
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 p-8 shadow-2xl text-center">
+            {/* Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl"></div>
+                <div className="relative bg-red-500/10 p-5 rounded-full border border-red-500/30">
+                  <AlertTriangle className="w-12 h-12 text-red-500" />
+                </div>
+              </div>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-2xl font-bold text-white mb-3">
+              Something went wrong
+            </h1>
+
+            {/* Description */}
+            <p className="text-gray-400 mb-6">
+              An error occurred while loading this page. Please try again.
+            </p>
+
+            {/* Error details in dev mode */}
+            {process.env.NODE_ENV === "development" && error?.message && (
+              <p className="text-red-400 text-sm mb-4 p-2 bg-red-500/10 rounded">
+                {error.message}
+              </p>
+            )}
+
+            {/* Retry Button */}
+            <button
+              onClick={() => reset()}
+              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-green-primary hover:bg-green-600 text-white font-semibold rounded-lg transition-all duration-200"
+            >
+              <RefreshCw className="w-5 h-5" />
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // For auth errors, show login redirect
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4 py-8">
       <div className="max-w-md w-full">

@@ -34,12 +34,37 @@ import {
   Award,
   ChevronLeft,
   ChevronRight,
+  Link as LinkIcon,
+  Tv,
+  FileText,
+  Wifi,
+  WifiOff,
+  Power,
 } from "lucide-react";
 import Image from "next/image";
 
+// Currency options
+const CURRENCY_OPTIONS = [
+  { value: "USD", label: "USD - US Dollar", symbol: "$" },
+  { value: "EUR", label: "EUR - Euro", symbol: "€" },
+  { value: "GBP", label: "GBP - British Pound", symbol: "£" },
+  { value: "SAR", label: "SAR - Saudi Riyal", symbol: "﷼" },
+  { value: "AED", label: "AED - UAE Dirham", symbol: "د.إ" },
+  { value: "EGP", label: "EGP - Egyptian Pound", symbol: "ج.م" },
+  { value: "KWD", label: "KWD - Kuwaiti Dinar", symbol: "د.ك" },
+  { value: "QAR", label: "QAR - Qatari Riyal", symbol: "﷼" },
+  { value: "BHD", label: "BHD - Bahraini Dinar", symbol: "د.ب" },
+  { value: "OMR", label: "OMR - Omani Rial", symbol: "ر.ع" },
+  { value: "JPY", label: "JPY - Japanese Yen", symbol: "¥" },
+  { value: "CNY", label: "CNY - Chinese Yuan", symbol: "¥" },
+  { value: "KRW", label: "KRW - Korean Won", symbol: "₩" },
+  { value: "TRY", label: "TRY - Turkish Lira", symbol: "₺" },
+];
+
 const validateSchema = yup.object({
   name: yup.string().required("Tournament name is required"),
-  organizer: yup.string().required("Organizer is required"),
+  organizer: yup.string(),
+  description: yup.string(),
   startDate: yup
     .date()
     .typeError("Invalid start date")
@@ -48,20 +73,17 @@ const validateSchema = yup.object({
     .date()
     .typeError("Invalid end date")
     .required("End date is required"),
-  location: yup.string().required("Location is required"),
+  location: yup.string(),
   prizePool: yup
     .number()
     .min(0, "Prize pool must be positive")
-    .required("Prize pool is required"),
-  status: yup
-    .string()
-    .oneOf(["upcoming", "ongoing", "completed", "cancelled"], "Invalid status")
-    .required("Status is required"),
-  logoLight: yup.string().required("Logo is required"),
+    .nullable(),
+  currency: yup.string(),
   gamesData: yup
     .array()
     .test("games", "At least one game is required", (value) => value && value.length > 0),
-  knockoutImageLight: yup.string().required("Bracket image is required"),
+  streamUrl: yup.string().url("Must be a valid URL").nullable(),
+  websiteUrl: yup.string().url("Must be a valid URL").nullable(),
 });
 
 export default function TournamentsForm({
@@ -77,10 +99,12 @@ export default function TournamentsForm({
     initialValues: {
       name: tournament?.name || "",
       organizer: tournament?.organizer || "",
+      description: tournament?.description || "",
       startDate: tournament?.startDate ? new Date(tournament.startDate).toISOString().split("T")[0] : "",
       endDate: tournament?.endDate ? new Date(tournament.endDate).toISOString().split("T")[0] : "",
       location: tournament?.location || "",
       prizePool: tournament?.prizePool || "",
+      currency: tournament?.currency || "USD",
       status: tournament?.status || "upcoming",
       logoLight: tournament?.logo?.light || "",
       logoDark: tournament?.logo?.dark || "",
@@ -88,7 +112,13 @@ export default function TournamentsForm({
       gamesData: tournament?.games || [],
       knockoutImageLight: tournament?.bracketImage?.light || "",
       knockoutImageDark: tournament?.bracketImage?.dark || "",
-      tier: tournament?.tier || "B",
+      tier: tournament?.tier || "",
+      format: tournament?.format || "",
+      rules: tournament?.rules || "",
+      streamUrl: tournament?.streamUrl || "",
+      websiteUrl: tournament?.websiteUrl || "",
+      isOnline: tournament?.isOnline || false,
+      isActive: tournament?.isActive !== undefined ? tournament.isActive : true,
       isFeatured: tournament?.isFeatured || false,
     },
     validationSchema: validateSchema,
@@ -105,14 +135,21 @@ export default function TournamentsForm({
             }
           : null;
 
-        dataValues.logo = {
-          light: dataValues.logoLight,
-          dark: dataValues.logoDark || dataValues.logoLight,
-        };
-        dataValues.bracketImage = {
-          light: dataValues.knockoutImageLight,
-          dark: dataValues.knockoutImageDark || dataValues.knockoutImageLight,
-        };
+        // Build logo object
+        dataValues.logo = dataValues.logoLight
+          ? {
+              light: dataValues.logoLight,
+              dark: dataValues.logoDark || dataValues.logoLight,
+            }
+          : null;
+
+        // Build bracketImage object
+        dataValues.bracketImage = dataValues.knockoutImageLight
+          ? {
+              light: dataValues.knockoutImageLight,
+              dark: dataValues.knockoutImageDark || dataValues.knockoutImageLight,
+            }
+          : null;
 
         // Convert dates to ISO datetime format for backend
         if (dataValues.startDate) {
@@ -123,7 +160,22 @@ export default function TournamentsForm({
         }
 
         dataValues.slug = dataValues?.name.replace(/\s+/g, "-").toLowerCase();
-        dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value || g);
+        dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value || g._id || g);
+
+        // Convert empty strings to null for optional number fields
+        if (dataValues.prizePool === "" || dataValues.prizePool === null) {
+          dataValues.prizePool = null;
+        }
+
+        // Convert empty strings to null for optional fields
+        if (!dataValues.streamUrl) dataValues.streamUrl = null;
+        if (!dataValues.websiteUrl) dataValues.websiteUrl = null;
+        if (!dataValues.format) dataValues.format = null;
+        if (!dataValues.rules) dataValues.rules = null;
+        if (!dataValues.description) dataValues.description = null;
+        if (!dataValues.location) dataValues.location = null;
+        if (!dataValues.organizer) dataValues.organizer = null;
+        if (!dataValues.tier) dataValues.tier = null;
 
         // Clean up temporary fields
         delete dataValues.logoLight;
@@ -168,6 +220,7 @@ export default function TournamentsForm({
             name="name"
             placeholder={t("Enter Name of Tournament")}
             formik={formik}
+            required
           />
           <InputField
             label={t("Organizer")}
@@ -177,13 +230,16 @@ export default function TournamentsForm({
           />
         </FormRow>
 
-        <FormRow cols={3}>
-          <InputField
-            label={t("location")}
-            name="location"
-            placeholder={t("Enter Location")}
-            formik={formik}
-          />
+        {/* Description */}
+        <TextAreaField
+          label={t("Description")}
+          name="description"
+          placeholder={t("Enter tournament description")}
+          formik={formik}
+          rows={3}
+        />
+
+        <FormRow cols={2}>
           <StatusSelectField
             label={t("Status")}
             name="status"
@@ -209,10 +265,40 @@ export default function TournamentsForm({
             formik={formik}
             placeholder={t("Select Tier")}
           />
-          <PrizePoolField
+          <PrizePoolWithCurrencyField
             label={t("Prize Pool")}
             name="prizePool"
+            currencyName="currency"
             formik={formik}
+            currencyOptions={CURRENCY_OPTIONS}
+          />
+          <InputField
+            label={t("Format")}
+            name="format"
+            placeholder="e.g. Double Elimination"
+            formik={formik}
+          />
+        </FormRow>
+
+        <FormRow cols={3}>
+          <BooleanToggle
+            label={t("Online Tournament")}
+            name="isOnline"
+            formik={formik}
+            iconOn={<Wifi className="size-4" />}
+            iconOff={<WifiOff className="size-4" />}
+            labelOn={t("Online")}
+            labelOff={t("Offline")}
+          />
+          <BooleanToggle
+            label={t("Active")}
+            name="isActive"
+            formik={formik}
+            iconOn={<Power className="size-4" />}
+            iconOff={<Power className="size-4" />}
+            labelOn={t("Active")}
+            labelOff={t("Inactive")}
+            colorOn="green"
           />
           <FeaturedToggle
             label={t("Featured")}
@@ -220,9 +306,20 @@ export default function TournamentsForm({
             formik={formik}
           />
         </FormRow>
+
+        {/* Location - only show when offline */}
+        {!formik.values.isOnline && (
+          <InputField
+            label={t("location")}
+            name="location"
+            placeholder={t("Enter Location")}
+            formik={formik}
+            icon={<MapPin className="size-5 text-muted-foreground" />}
+          />
+        )}
       </FormSection>
 
-      {/* Date & Time */}
+      {/* Schedule */}
       <FormSection title={t("Schedule")} icon={<Calendar className="size-5" />}>
         <FormRow cols={2}>
           <DatePickerField
@@ -248,6 +345,37 @@ export default function TournamentsForm({
           name="gamesData"
           options={gameOptions}
           formik={formik}
+        />
+      </FormSection>
+
+      {/* Links */}
+      <FormSection title={t("Links")} icon={<LinkIcon className="size-5" />}>
+        <FormRow cols={2}>
+          <InputField
+            label={t("Stream URL")}
+            name="streamUrl"
+            placeholder="https://twitch.tv/..."
+            formik={formik}
+            icon={<Tv className="size-5 text-purple-500" />}
+          />
+          <InputField
+            label={t("Website URL")}
+            name="websiteUrl"
+            placeholder="https://..."
+            formik={formik}
+            icon={<Globe className="size-5 text-blue-500" />}
+          />
+        </FormRow>
+      </FormSection>
+
+      {/* Rules */}
+      <FormSection title={t("Rules")} icon={<FileText className="size-5" />}>
+        <TextAreaField
+          label={t("Tournament Rules")}
+          name="rules"
+          placeholder={t("Enter tournament rules and regulations")}
+          formik={formik}
+          rows={6}
         />
       </FormSection>
 
@@ -325,12 +453,15 @@ export default function TournamentsForm({
 }
 
 // Reusable Input Field Component
-function InputField({ label, name, type = "text", placeholder, formik, icon, ...props }) {
+function InputField({ label, name, type = "text", placeholder, formik, icon, required, ...props }) {
   const error = formik.touched[name] && formik.errors[name];
 
   return (
     <div className="flex-1 space-y-2">
-      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <label className="text-sm font-medium text-muted-foreground">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
       <div className="relative">
         {icon && (
           <div className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2">
@@ -682,13 +813,15 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
               )}
             </div>
             {value && (
-              <button
-                type="button"
+              <span
+                role="button"
+                tabIndex={0}
                 onClick={handleClear}
-                className="size-7 rounded-lg bg-muted hover:bg-red-500/20 flex items-center justify-center transition-colors group"
+                onKeyDown={(e) => e.key === "Enter" && handleClear(e)}
+                className="size-7 rounded-lg bg-muted hover:bg-red-500/20 flex items-center justify-center transition-colors group cursor-pointer"
               >
                 <X className="size-4 text-muted-foreground group-hover:text-red-500" />
-              </button>
+              </span>
             )}
           </button>
         </PopoverTrigger>
@@ -760,10 +893,14 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
   );
 }
 
-// Prize Pool Input Field with formatting (no currency type)
-function PrizePoolField({ label, name, formik }) {
+// Prize Pool Input Field with Currency Selector
+function PrizePoolWithCurrencyField({ label, name, currencyName, formik, currencyOptions }) {
+  const [isOpen, setIsOpen] = useState(false);
   const error = formik.touched[name] && formik.errors[name];
   const value = formik.values[name];
+  const currency = formik.values[currencyName] || "USD";
+
+  const selectedCurrency = currencyOptions.find((c) => c.value === currency) || currencyOptions[0];
 
   const formatNumber = (num) => {
     if (!num && num !== 0) return "";
@@ -775,24 +912,63 @@ function PrizePoolField({ label, name, formik }) {
     formik.setFieldValue(name, rawValue ? parseInt(rawValue, 10) : "");
   };
 
+  const handleCurrencySelect = (curr) => {
+    formik.setFieldValue(currencyName, curr.value);
+    setIsOpen(false);
+  };
+
   return (
     <div className="flex-1 space-y-2">
       <label className="text-sm font-medium text-muted-foreground">{label}</label>
-      <div className="relative">
-        <div className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2">
-          <Coins className="size-5 text-green-primary" />
+      <div className="flex gap-2">
+        {/* Currency Selector */}
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className="h-12 px-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center gap-2"
+            >
+              <span className="text-green-primary font-bold">{selectedCurrency.symbol}</span>
+              <span className="text-foreground">{selectedCurrency.value}</span>
+              <ChevronDown className={`size-3 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-56 p-2 bg-background dark:bg-[#12141c] border-border" align="start">
+            <div className="max-h-64 overflow-y-auto space-y-0.5">
+              {currencyOptions.map((curr) => (
+                <button
+                  key={curr.value}
+                  type="button"
+                  onClick={() => handleCurrencySelect(curr)}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left rtl:text-right transition-colors ${
+                    currency === curr.value
+                      ? "bg-green-primary/10 text-green-primary"
+                      : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
+                  }`}
+                >
+                  <span className="font-bold text-lg w-6">{curr.symbol}</span>
+                  <span className="text-sm font-medium flex-1">{curr.label}</span>
+                  {currency === curr.value && <Check className="size-4" />}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Amount Input */}
+        <div className="relative flex-1">
+          <input
+            type="text"
+            name={name}
+            value={formatNumber(value)}
+            onChange={handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="0"
+            className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 transition-all ${
+              error ? "ring-2 ring-red-500 border-red-500" : ""
+            }`}
+          />
         </div>
-        <input
-          type="text"
-          name={name}
-          value={formatNumber(value)}
-          onChange={handleChange}
-          onBlur={formik.handleBlur}
-          placeholder="0"
-          className={`w-full h-12 pl-11 pr-4 rtl:pl-4 rtl:pr-11 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 transition-all ${
-            error ? "ring-2 ring-red-500 border-red-500" : ""
-          }`}
-        />
       </div>
       {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
@@ -926,13 +1102,15 @@ function CountrySelectField({ label, name, countries, formik, placeholder, searc
             </div>
             <div className="flex items-center gap-1">
               {selectedCountry && (
-                <button
-                  type="button"
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={handleClear}
-                  className="size-7 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors group"
+                  onKeyDown={(e) => e.key === "Enter" && handleClear(e)}
+                  className="size-7 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors group cursor-pointer"
                 >
                   <X className="size-4 text-muted-foreground group-hover:text-red-500" />
-                </button>
+                </span>
               )}
               <ChevronDown className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </div>
@@ -1006,6 +1184,132 @@ function CountrySelectField({ label, name, countries, formik, placeholder, searc
         </PopoverContent>
       </Popover>
       {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// TextArea Field Component
+function TextAreaField({ label, name, placeholder, formik, rows = 4 }) {
+  const error = formik.touched[name] && formik.errors[name];
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <textarea
+        name={name}
+        value={formik.values[name]}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        placeholder={placeholder}
+        rows={rows}
+        className={`w-full px-4 py-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all resize-none ${
+          error ? "ring-2 ring-red-500" : ""
+        }`}
+      />
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// Number Field Component
+function NumberField({ label, name, placeholder, formik, icon }) {
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+
+  const handleChange = (e) => {
+    const rawValue = e.target.value.replace(/[^0-9]/g, "");
+    formik.setFieldValue(name, rawValue ? parseInt(rawValue, 10) : "");
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <div className="relative">
+        {icon && (
+          <div className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2">
+            {icon}
+          </div>
+        )}
+        <input
+          type="text"
+          name={name}
+          value={value || ""}
+          onChange={handleChange}
+          onBlur={formik.handleBlur}
+          placeholder={placeholder}
+          className={`w-full h-12 ${icon ? "pl-11 pr-4 rtl:pl-4 rtl:pr-11" : "px-4"} rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 transition-all ${
+            error ? "ring-2 ring-red-500 border-red-500" : ""
+          }`}
+        />
+      </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// Boolean Toggle Component
+function BooleanToggle({ label, name, formik, iconOn, iconOff, labelOn, labelOff, colorOn = "blue" }) {
+  const isChecked = formik.values[name];
+
+  const colorClasses = {
+    green: {
+      bg: "bg-green-500/20 border-green-500/50",
+      text: "text-green-500",
+      toggle: "bg-green-500",
+    },
+    blue: {
+      bg: "bg-blue-500/20 border-blue-500/50",
+      text: "text-blue-500",
+      toggle: "bg-blue-500",
+    },
+  };
+
+  const colors = colorClasses[colorOn] || colorClasses.blue;
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <button
+        type="button"
+        onClick={() => formik.setFieldValue(name, !isChecked)}
+        className={`w-full h-12 px-4 rounded-xl border transition-all flex items-center justify-between ${
+          isChecked
+            ? `${colors.bg}`
+            : "bg-muted/50 dark:bg-[#1a1d2e] border-transparent hover:bg-muted dark:hover:bg-[#252a3d]"
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={`size-8 rounded-lg flex items-center justify-center transition-all ${
+              isChecked
+                ? colors.toggle
+                : "bg-muted dark:bg-[#252a3d]"
+            }`}
+          >
+            <span className={isChecked ? "text-white" : "text-muted-foreground"}>
+              {isChecked ? iconOn : iconOff}
+            </span>
+          </div>
+          <span
+            className={`text-sm font-medium ${
+              isChecked ? colors.text : "text-foreground"
+            }`}
+          >
+            {isChecked ? labelOn : labelOff}
+          </span>
+        </div>
+        <div
+          className={`w-11 h-6 rounded-full relative transition-colors ${
+            isChecked ? colors.toggle : "bg-muted dark:bg-[#252a3d]"
+          }`}
+        >
+          <div
+            className={`absolute top-[2px] size-5 rounded-full bg-white shadow-md transition-all ${
+              isChecked ? "left-[22px] rtl:left-[2px]" : "left-[2px] rtl:left-[22px]"
+            }`}
+          />
+        </div>
+      </button>
     </div>
   );
 }
