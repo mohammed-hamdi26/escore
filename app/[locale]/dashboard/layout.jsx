@@ -11,24 +11,23 @@ export default async function DashboardLayout({ children }) {
   try {
     user = await getLoginUser();
   } catch (error) {
-    // If user fetch fails, mark for redirect
-    // Don't call redirect inside try-catch as it throws internally
     shouldRedirect = true;
   }
 
-  // Redirect to force-logout route which will clear the session cookie
-  // Can't delete cookies in Server Components, so use a route handler
   if (shouldRedirect || !user) {
     redirect("/api/auth/force-logout");
   }
 
   return (
     <PermissionsProvider user={user}>
-      <div className="p-4 md:p-8 lg:p-16 pt-4 md:pt-8 min-h-dvh">
+      <div className="min-h-dvh">
+        {/* Fixed Header */}
         <TopNav user={user} />
-        <div className="flex gap-5 h-full">
+
+        {/* Main Content Area */}
+        <div className="flex gap-5 px-4 md:px-6 lg:px-8 pb-6">
           <SideNavBar user={user} />
-          <div className="flex-1">{children}</div>
+          <main className="flex-1 min-w-0">{children}</main>
         </div>
       </div>
     </PermissionsProvider>
