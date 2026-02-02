@@ -17,6 +17,8 @@ import {
   Image as ImageIcon,
   Save,
   Loader2,
+  Star,
+  CalendarDays,
 } from "lucide-react";
 
 const validateSchema = yup.object({
@@ -173,44 +175,35 @@ export default function TournamentsForm({
             options={tierOptions}
             formik={formik}
           />
-          <InputField
+          <CurrencyField
             label={t("Prize Pool")}
             name="prizePool"
-            type="number"
-            placeholder="0"
             formik={formik}
-            icon={<DollarSign className="size-4 text-muted-foreground" />}
+            currency="USD"
           />
-          <div className="flex items-center gap-3 pt-6">
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formik.values.isFeatured}
-                onChange={(e) => formik.setFieldValue("isFeatured", e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:bg-green-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
-            </label>
-            <span className="text-sm text-foreground">{t("Featured Tournament")}</span>
-          </div>
+          <FeaturedToggle
+            label={t("Featured")}
+            name="isFeatured"
+            formik={formik}
+          />
         </FormRow>
       </FormSection>
 
       {/* Date & Time */}
       <FormSection title={t("Schedule")} icon={<Calendar className="size-5" />}>
         <FormRow cols={2}>
-          <InputField
+          <DatePickerField
             label={t("Start Date")}
             name="startDate"
-            type="date"
             formik={formik}
+            placeholder={t("Select start date")}
           />
-          <InputField
+          <DatePickerField
             label={t("End Date")}
             name="endDate"
-            type="date"
             formik={formik}
-            min={formik.values.startDate}
+            placeholder={t("Select end date")}
+            minDate={formik.values.startDate}
           />
         </FormRow>
       </FormSection>
@@ -402,6 +395,160 @@ function MultiSelectField({ label, name, options, formik }) {
         })}
       </div>
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+    </div>
+  );
+}
+
+// Enhanced Date Picker Field
+function DatePickerField({ label, name, formik, placeholder, minDate }) {
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+
+  const formatDisplayDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <div className="relative group">
+        <div className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+          <CalendarDays className="size-5 text-green-primary" />
+        </div>
+        <input
+          type="date"
+          name={name}
+          value={value}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          min={minDate}
+          className={`w-full h-12 pl-11 pr-4 rtl:pl-4 rtl:pr-11 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] ${
+            error ? "ring-2 ring-red-500 border-red-500" : ""
+          } ${!value ? "text-muted-foreground" : ""}`}
+        />
+        {value && (
+          <div className="absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <span className="text-xs text-muted-foreground bg-green-primary/10 px-2 py-1 rounded-md">
+              {formatDisplayDate(value).split(",")[0]}
+            </span>
+          </div>
+        )}
+      </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// Currency Input Field with formatting
+function CurrencyField({ label, name, formik, currency = "USD" }) {
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+
+  const formatCurrency = (num) => {
+    if (!num && num !== 0) return "";
+    return new Intl.NumberFormat("en-US").format(num);
+  };
+
+  const handleChange = (e) => {
+    const rawValue = e.target.value.replace(/[^0-9]/g, "");
+    formik.setFieldValue(name, rawValue ? parseInt(rawValue, 10) : "");
+  };
+
+  const currencySymbols = {
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
+    SAR: "﷼",
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <div className="relative">
+        <div className="absolute left-0 rtl:left-auto rtl:right-0 top-0 h-full flex items-center justify-center w-12 bg-green-primary/10 rounded-l-xl rtl:rounded-l-none rtl:rounded-r-xl border-r border-green-primary/20 rtl:border-r-0 rtl:border-l">
+          <span className="text-green-primary font-semibold text-lg">
+            {currencySymbols[currency] || "$"}
+          </span>
+        </div>
+        <input
+          type="text"
+          name={name}
+          value={formatCurrency(value)}
+          onChange={handleChange}
+          onBlur={formik.handleBlur}
+          placeholder="0"
+          className={`w-full h-12 pl-14 pr-4 rtl:pl-4 rtl:pr-14 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 transition-all ${
+            error ? "ring-2 ring-red-500 border-red-500" : ""
+          }`}
+        />
+        {value > 0 && (
+          <div className="absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <span className="text-xs text-muted-foreground">{currency}</span>
+          </div>
+        )}
+      </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// Featured Toggle Component
+function FeaturedToggle({ label, name, formik }) {
+  const isChecked = formik.values[name];
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <button
+        type="button"
+        onClick={() => formik.setFieldValue(name, !isChecked)}
+        className={`w-full h-12 px-4 rounded-xl border transition-all flex items-center justify-between ${
+          isChecked
+            ? "bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/50"
+            : "bg-muted/50 dark:bg-[#1a1d2e] border-transparent hover:bg-muted dark:hover:bg-[#252a3d]"
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={`size-8 rounded-lg flex items-center justify-center transition-all ${
+              isChecked
+                ? "bg-gradient-to-br from-yellow-400 to-orange-500"
+                : "bg-muted dark:bg-[#252a3d]"
+            }`}
+          >
+            <Star
+              className={`size-4 transition-all ${
+                isChecked ? "text-white fill-white" : "text-muted-foreground"
+              }`}
+            />
+          </div>
+          <span
+            className={`text-sm font-medium ${
+              isChecked ? "text-yellow-500" : "text-foreground"
+            }`}
+          >
+            {isChecked ? "Featured" : "Not Featured"}
+          </span>
+        </div>
+        <div
+          className={`w-11 h-6 rounded-full relative transition-colors ${
+            isChecked ? "bg-gradient-to-r from-yellow-400 to-orange-500" : "bg-muted dark:bg-[#252a3d]"
+          }`}
+        >
+          <div
+            className={`absolute top-[2px] size-5 rounded-full bg-white shadow-md transition-all ${
+              isChecked ? "left-[22px] rtl:left-[2px]" : "left-[2px] rtl:left-[22px]"
+            }`}
+          />
+        </div>
+      </button>
     </div>
   );
 }
