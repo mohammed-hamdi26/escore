@@ -39,20 +39,20 @@ function NavItems({ t }) {
       </ul>
 
       {/* Divider */}
-      <div className="nav-divider" />
+      <div className="mx-4 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent" />
 
       {/* Logout Button */}
       <div
-        className="group relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer nav-item-hover"
+        className="group relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-500/10"
         onClick={() => logout()}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => e.key === "Enter" && logout()}
       >
-        <span className="flex items-center justify-center size-9 rounded-lg bg-muted/50 transition-all duration-200 group-hover:bg-red-500/20">
-          <LogOut className="size-[18px] text-muted-foreground transition-colors duration-200 group-hover:text-red-500 rtl:rotate-180" />
+        <span className="flex items-center justify-center size-9 rounded-lg bg-gray-100 dark:bg-white/5 transition-all duration-200 group-hover:bg-red-100 dark:group-hover:bg-red-500/20">
+          <LogOut className="size-[18px] text-gray-500 dark:text-gray-400 transition-colors duration-200 group-hover:text-red-500 rtl:rotate-180" />
         </span>
-        <span className="text-sm font-medium text-muted-foreground transition-colors duration-200 group-hover:text-red-500">
+        <span className="text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200 group-hover:text-red-500">
           {t("Logout")}
         </span>
       </div>

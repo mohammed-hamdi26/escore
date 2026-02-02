@@ -14,10 +14,10 @@ function ToggleThemeMode() {
   // Return placeholder during SSR to avoid hydration mismatch
   if (!mounted) {
     return (
-      <div className="theme-toggle-pill w-[76px] h-9">
+      <div className="flex items-center bg-gray-100 dark:bg-white/5 rounded-xl p-1 w-[76px] h-9">
         <div className="flex items-center justify-around w-full h-full">
-          <Sun className="size-4 text-muted-foreground" />
-          <Moon className="size-4 text-muted-foreground" />
+          <Sun className="size-4 text-gray-500 dark:text-gray-400" />
+          <Moon className="size-4 text-gray-500 dark:text-gray-400" />
         </div>
       </div>
     );
@@ -26,10 +26,10 @@ function ToggleThemeMode() {
   const isLight = theme === "light";
 
   return (
-    <div className="theme-toggle-pill w-[76px] h-9 cursor-pointer">
+    <div className="relative flex items-center bg-gray-100 dark:bg-white/5 rounded-xl p-1 w-[76px] h-9">
       {/* Sliding indicator */}
       <div
-        className={`theme-toggle-indicator w-[34px] ${
+        className={`absolute w-[34px] h-7 rounded-lg bg-green-primary shadow-md transition-all duration-300 ease-out ${
           isLight ? "left-1" : "left-[38px]"
         }`}
       />
@@ -37,8 +37,8 @@ function ToggleThemeMode() {
       {/* Icons */}
       <button
         onClick={() => setTheme("light")}
-        className={`relative z-10 flex items-center justify-center w-[34px] h-7 rounded-full transition-colors duration-200 ${
-          isLight ? "text-white" : "text-muted-foreground hover:text-foreground"
+        className={`relative z-10 flex items-center justify-center w-[34px] h-7 rounded-lg transition-colors duration-200 ${
+          isLight ? "text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
         }`}
         aria-label="Light mode"
       >
@@ -47,8 +47,8 @@ function ToggleThemeMode() {
 
       <button
         onClick={() => setTheme("dark")}
-        className={`relative z-10 flex items-center justify-center w-[34px] h-7 rounded-full transition-colors duration-200 ${
-          !isLight ? "text-white" : "text-muted-foreground hover:text-foreground"
+        className={`relative z-10 flex items-center justify-center w-[34px] h-7 rounded-lg transition-colors duration-200 ${
+          !isLight ? "text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
         }`}
         aria-label="Dark mode"
       >

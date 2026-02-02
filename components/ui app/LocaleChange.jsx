@@ -16,7 +16,7 @@ function LocaleChange() {
     <Link
       href={pathname}
       locale={locale === "en" ? "ar" : "en"}
-      className="relative w-10 h-7 rounded-md overflow-hidden ring-1 ring-border hover:ring-green-primary/50 transition-all duration-200 hover:scale-105"
+      className="relative w-10 h-7 rounded-lg overflow-hidden ring-1 ring-gray-200 dark:ring-white/10 hover:ring-green-primary/50 transition-all duration-200 hover:scale-105 shadow-sm"
       title={altText}
     >
       <Image
