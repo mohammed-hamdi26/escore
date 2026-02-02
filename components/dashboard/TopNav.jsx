@@ -1,6 +1,6 @@
 "use client";
 import { Link } from "@/i18n/navigation";
-import { Menu, Bell, Search } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useTranslations } from "next-intl";
 import BackPage from "../ui app/BackPage";
 import LocaleChange from "../ui app/LocaleChange";
@@ -68,19 +68,6 @@ function TopNav({ user }) {
 
         {/* Right section: Controls */}
         <div className="flex items-center gap-2 md:gap-3">
-          {/* Notification Bell */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative size-9 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all"
-          >
-            <Bell className="size-[18px]" />
-            {/* Notification dot */}
-            <span className="absolute top-1.5 right-1.5 size-2 bg-green-primary rounded-full ring-2 ring-white dark:ring-[#0a0c10]" />
-          </Button>
-
-          <div className="h-6 w-px bg-gray-200 dark:bg-white/10 hidden md:block" />
-
           <ToggleThemeMode />
           <LocaleChange />
         </div>

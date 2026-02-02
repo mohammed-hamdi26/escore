@@ -14,10 +14,10 @@ function ToggleThemeMode() {
   // Return placeholder during SSR to avoid hydration mismatch
   if (!mounted) {
     return (
-      <div className="flex items-center bg-gray-100 dark:bg-white/5 rounded-xl p-1 w-[76px] h-9">
-        <div className="flex items-center justify-around w-full h-full">
-          <Sun className="size-4 text-gray-500 dark:text-gray-400" />
-          <Moon className="size-4 text-gray-500 dark:text-gray-400" />
+      <div className="relative flex items-center p-1 rounded-full bg-gray-100 dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/10 w-[72px] h-9">
+        <div className="flex items-center justify-around w-full">
+          <Sun className="size-4 text-gray-400" />
+          <Moon className="size-4 text-gray-400" />
         </div>
       </div>
     );
@@ -26,33 +26,38 @@ function ToggleThemeMode() {
   const isLight = theme === "light";
 
   return (
-    <div className="relative flex items-center bg-gray-100 dark:bg-white/5 rounded-xl p-1 w-[76px] h-9">
+    <div className="relative flex items-center p-1 rounded-full bg-gray-100 dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/10 w-[72px] h-9 shadow-inner dark:shadow-none">
       {/* Sliding indicator */}
       <div
-        className={`absolute w-[34px] h-7 rounded-lg bg-green-primary shadow-md transition-all duration-300 ease-out ${
-          isLight ? "left-1" : "left-[38px]"
+        className={`absolute w-[30px] h-[28px] rounded-full bg-white dark:bg-green-primary shadow-md transition-all duration-300 ease-out ${
+          isLight ? "left-[3px]" : "left-[37px]"
         }`}
       />
 
-      {/* Icons */}
+      {/* Light mode button */}
       <button
         onClick={() => setTheme("light")}
-        className={`relative z-10 flex items-center justify-center w-[34px] h-7 rounded-lg transition-colors duration-200 ${
-          isLight ? "text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
+        className={`relative z-10 flex items-center justify-center w-[30px] h-[28px] rounded-full transition-all duration-200 ${
+          isLight
+            ? "text-amber-500"
+            : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         }`}
         aria-label="Light mode"
       >
-        <Sun className="size-4" />
+        <Sun className={`size-[16px] transition-transform duration-300 ${isLight ? "rotate-0" : "rotate-90"}`} />
       </button>
 
+      {/* Dark mode button */}
       <button
         onClick={() => setTheme("dark")}
-        className={`relative z-10 flex items-center justify-center w-[34px] h-7 rounded-lg transition-colors duration-200 ${
-          !isLight ? "text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
+        className={`relative z-10 flex items-center justify-center w-[30px] h-[28px] rounded-full transition-all duration-200 ${
+          !isLight
+            ? "text-white"
+            : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         }`}
         aria-label="Dark mode"
       >
-        <Moon className="size-4" />
+        <Moon className={`size-[16px] transition-transform duration-300 ${!isLight ? "rotate-0" : "-rotate-90"}`} />
       </button>
     </div>
   );
