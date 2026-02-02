@@ -34,6 +34,9 @@
     "login": "Login"
   },
   "Dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Manage your esports platform",
+    "modules": "modules available",
     "Matches Management": {
       "title": "Matches Management",
       "description": "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links"
