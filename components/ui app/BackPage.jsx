@@ -1,33 +1,30 @@
 "use client";
-import { ArrowBigLeft, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "../ui/button";
-// import { useRouter } from "next/navigation";
-
-import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 function BackPage() {
-  const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("topNav");
 
   function GetTitlePage(pathname) {
     const arr = pathname.split("/");
-
+    if (arr.length < 3) return "";
     return arr[2].split("-").join(" ");
   }
+
   if (pathname === "/" || pathname === "/dashboard") return null;
+
   return (
     <div className="flex items-center gap-3">
-      {/* <Link href={pathname.split("/").slice(0, 3).join("/")}> */}
-      <Link href={"/dashboard"}>
-        <Button className="bg-green-primary/10 dark:bg-[linear-gradient(180deg,rgba(58,70,157,0.1)_0%,rgba(40,149,70,0.1)_100%)] cursor-pointer size-9 rounded-full flex justify-center items-center backdrop-blur-2xl ">
-          <ArrowLeft className="text-green-primary dark:text-white rtl:rotate-180" />
+      <Link href="/dashboard">
+        <Button className="bg-green-primary/10 hover:bg-green-primary/20 dark:bg-green-primary/15 dark:hover:bg-green-primary/25 cursor-pointer size-9 rounded-full flex justify-center items-center transition-all duration-200 hover:scale-105 group">
+          <ArrowLeft className="size-4 text-green-primary dark:text-green-primary group-hover:text-green-primary rtl:rotate-180 transition-colors" />
         </Button>
       </Link>
-      {/* </Link> */}
 
-      <p className="capitalize text-lg font-normal hidden md:block text-green-primary dark:text-white">
+      <p className="capitalize text-sm md:text-base font-medium hidden md:block text-foreground">
         {t(GetTitlePage(pathname))}
       </p>
     </div>

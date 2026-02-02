@@ -154,3 +154,111 @@ td {
   border-bottom: 0.5px solid #313a5f !important;
   padding: 18px 60px;
 } */
+
+/* ============================================
+   Gaming/Esports UI Utilities
+   ============================================ */
+
+/* Glass effect - works in both modes */
+.glass {
+  @apply backdrop-blur-md;
+  background: rgba(255, 255, 255, 0.9);
+}
+.dark .glass {
+  background: rgba(10, 11, 16, 0.85);
+}
+
+/* Subtle glow effects - dark mode only */
+.glow-green {
+  box-shadow: none;
+}
+.dark .glow-green {
+  box-shadow: 0 0 15px rgba(40, 149, 70, 0.4);
+}
+
+.glow-green-subtle {
+  box-shadow: none;
+}
+.dark .glow-green-subtle {
+  box-shadow: 0 0 10px rgba(40, 149, 70, 0.25);
+}
+
+/* Active nav indicator */
+.nav-active-indicator {
+  @apply absolute top-1/2 -translate-y-1/2 w-[3px] h-8 rounded-full bg-green-primary;
+}
+.dark .nav-active-indicator {
+  box-shadow: 0 0 8px rgba(40, 149, 70, 0.6);
+}
+.ltr .nav-active-indicator {
+  @apply left-0;
+}
+.rtl .nav-active-indicator {
+  @apply right-0;
+}
+
+/* Sidebar accent line */
+.sidebar-accent-line {
+  @apply absolute top-0 bottom-0 w-[2px] bg-green-primary;
+}
+.dark .sidebar-accent-line {
+  box-shadow: 0 0 12px rgba(40, 149, 70, 0.5);
+}
+.ltr .sidebar-accent-line {
+  @apply left-0;
+}
+.rtl .sidebar-accent-line {
+  @apply right-0;
+}
+
+/* Avatar glow ring */
+.avatar-ring {
+  @apply ring-2 ring-green-primary/50;
+}
+.dark .avatar-ring {
+  @apply ring-green-primary;
+  box-shadow: 0 0 12px rgba(40, 149, 70, 0.4);
+}
+
+/* Nav item hover/active backgrounds */
+.nav-item-hover {
+  @apply transition-all duration-200;
+}
+.nav-item-hover:hover {
+  @apply bg-black/5;
+}
+.dark .nav-item-hover:hover {
+  @apply bg-white/5;
+}
+
+.nav-item-active {
+  @apply bg-green-primary/10;
+}
+.dark .nav-item-active {
+  @apply bg-green-primary/15;
+}
+
+/* Theme toggle pill */
+.theme-toggle-pill {
+  @apply relative flex items-center p-1 rounded-full transition-colors duration-200;
+  background: rgba(0, 0, 0, 0.1);
+}
+.dark .theme-toggle-pill {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-toggle-indicator {
+  @apply absolute top-1 bottom-1 rounded-full bg-green-primary transition-all duration-200 ease-out;
+}
+.dark .theme-toggle-indicator {
+  box-shadow: 0 0 10px rgba(40, 149, 70, 0.5);
+}
+
+/* Divider line */
+.nav-divider {
+  @apply h-px mx-4 my-3;
+  background: linear-gradient(90deg, transparent, rgba(135, 144, 171, 0.3), transparent);
+}
+.dark .nav-divider {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}

@@ -2,10 +2,8 @@
 
 import NavItem from "./NavItem";
 import SettingsIcon from "./SettingsIcon";
-import { Button } from "../ui/button";
 import { logout } from "@/app/[locale]/_Lib/actions";
 import { LogOut } from "lucide-react";
-import { cloneElement } from "react";
 import PasswordIcon from "../icons/PasswordIcon";
 import { usePathname } from "@/i18n/navigation";
 
@@ -16,54 +14,49 @@ const pages = [
     href: "/dashboard/settings",
   },
   {
-    icon: <PasswordIcon width="17" height="17" />,
+    icon: <PasswordIcon width="18" height="18" />,
     title: "Change Password",
     href: "/dashboard/change-password",
   },
 ];
+
 function NavItems({ t }) {
   const pathname = usePathname();
-  return (
-    <ul className=" mx-auto space-y-6">
-      {pages.map((page) => (
-        <NavItem
-          isActive={pathname === page.href}
-          key={page.title}
-          icon={page.icon}
-          label={t(page.title)}
-          href={page.href}
-        />
-      ))}
-      {/* <NavItem
-        onClick={() => logout()}
-        className={
-          "bg-destructive hover:bg-destructive/90 cursor-pointer text-white "
-        }
-      >
 
-        <LogOut className="rtl:rotate-180" />
-      </NavItem> */}
+  return (
+    <div className="space-y-2">
+      {/* Main Navigation */}
+      <ul className="space-y-1">
+        {pages.map((page) => (
+          <NavItem
+            isActive={pathname === page.href}
+            key={page.title}
+            icon={page.icon}
+            label={t(page.title)}
+            href={page.href}
+          />
+        ))}
+      </ul>
+
+      {/* Divider */}
+      <div className="nav-divider" />
+
+      {/* Logout Button */}
       <div
-        className="group flex items-center gap-2  rounded-full cursor-pointer"
+        className="group relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer nav-item-hover"
         onClick={() => logout()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && logout()}
       >
-        <span
-          className={`px-2.5 py-2.5 rounded-lg  bg-[#262C3D33] group-hover:bg-green-primary transition-colors duration-500`}
-        >
-          {cloneElement(
-            <LogOut width={17} height={17} className="rtl:rotate-180" />,
-            {
-              className: ` text-[#667085] group-hover:text-white transition-colors duration-500`,
-            }
-          )}
-        </span>{" "}
-        <p
-          className={`text-lg font-semibold text-[#667085] dark:group-hover:text-white transition-colors duration-500 `}
-        >
+        <span className="flex items-center justify-center size-9 rounded-lg bg-muted/50 transition-all duration-200 group-hover:bg-red-500/20">
+          <LogOut className="size-[18px] text-muted-foreground transition-colors duration-200 group-hover:text-red-500 rtl:rotate-180" />
+        </span>
+        <span className="text-sm font-medium text-muted-foreground transition-colors duration-200 group-hover:text-red-500">
           {t("Logout")}
-        </p>
+        </span>
       </div>
-    </ul>
+    </div>
   );
 }
 

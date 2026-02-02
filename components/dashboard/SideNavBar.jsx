@@ -1,45 +1,29 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { Sidebar, SidebarHeader, SidebarProvider } from "../ui/sidebar";
-
 import HeaderSideNavBar from "./HeaderSideNavBar";
 import NavItems from "./NavItems";
 
-// function SideNavBar() {
-//   return (
-//     <SidebarProvider>
-//       <Sidebar
-//         className={
-//           "bg-linear-to-b from-[#00000005] to-[#24397b14]  relative outline-0 py-16"
-//         }
-//       >
-//         <SidebarHeader>
-//           <div className=" mx-auto  flex ">
-//             <div className="size-11 overflow-hidden rounded-full relative">
-//               <Image alt="avatar" src={avatar} fill className="object-cover" />{" "}
-//             </div>
-//             <div className="text-white">
-//               <h3>ahmed</h3>
-//               <p>admin</p>
-//             </div>
-//           </div>
-//         </SidebarHeader>
-//       </Sidebar>
-//     </SidebarProvider>
-//   );
-// }
-
 function SideNavBar({ user }) {
   const t = useTranslations("nav");
+
   return (
-    <div className="hidden lg:block  w-[290px] ">
-      <nav
-        className={
-          "  bg-dashboard-box  dark:bg-linear-to-b dark:from-[#00000005] dark:to-[#24397b14] flex flex-col justify-center   py-16 w-[270px]  rounded-2xl min-h-[calc(100vh-155px)]  "
-        }
-      >
-        <HeaderSideNavBar user={user} t={t} />
-        <NavItems user={user} t={t} />
+    <div className="hidden lg:block w-[290px] flex-shrink-0">
+      <nav className="relative glass rounded-2xl min-h-[calc(100vh-140px)] py-8 overflow-hidden border border-transparent dark:border-white/5">
+        {/* Accent line on left (LTR) or right (RTL) */}
+        <div className="sidebar-accent-line" />
+
+        {/* User Profile Section */}
+        <div className="px-6 mb-6">
+          <HeaderSideNavBar user={user} t={t} />
+        </div>
+
+        {/* Divider */}
+        <div className="nav-divider" />
+
+        {/* Navigation Items */}
+        <div className="px-4 mt-4">
+          <NavItems user={user} t={t} />
+        </div>
       </nav>
     </div>
   );

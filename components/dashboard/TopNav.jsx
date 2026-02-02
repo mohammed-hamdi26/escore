@@ -1,7 +1,6 @@
 "use client";
-import { logout } from "@/app/[locale]/_Lib/actions";
 import { Link } from "@/i18n/navigation";
-import { LogOut, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useTranslations } from "next-intl";
 import BackPage from "../ui app/BackPage";
 import LocaleChange from "../ui app/LocaleChange";
@@ -22,41 +21,61 @@ function TopNav({ user }) {
   const t = useTranslations("nav");
 
   return (
-    <div className="flex items-center justify-between md:gap-[190px] mb-4 md:mb-8">
-      {/* Mobile Menu */}
-      <div className="lg:hidden">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-white">
-              <Menu className="size-6" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[280px] bg-dashboard-box dark:bg-[#0F1017] border-0">
-            <SheetHeader>
-              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-            </SheetHeader>
-            <div className="flex flex-col gap-8 mt-4">
-              <Link href="/dashboard" className="mx-auto">
-                <EscoreLogo width={80} height={40} />
-              </Link>
-              {user && <HeaderSideNavBar user={user} t={t} />}
-              <NavItems t={t} />
-            </div>
-          </SheetContent>
-        </Sheet>
-      </div>
+    <header className="sticky top-0 z-50 mb-4 md:mb-6 -mx-4 md:-mx-8 lg:-mx-16 px-4 md:px-8 lg:px-16">
+      {/* Glass background */}
+      <div className="glass rounded-b-2xl border-b border-green-primary/20 dark:border-green-primary/30">
+        <div className="flex items-center justify-between py-3 md:py-4">
+          {/* Left section: Logo + Mobile Menu */}
+          <div className="flex items-center gap-3">
+            {/* Logo - always visible */}
+            <Link href="/dashboard" className="flex-shrink-0">
+              <EscoreLogo width={80} height={40} className="md:w-[100px] md:h-[50px]" />
+            </Link>
 
-      <Link className="hidden md:block" href="/dashboard">
-        <EscoreLogo width={100} height={50} />
-      </Link>
-      <div className="flex items-center justify-between flex-1">
-        <BackPage />
-        <div className={`flex ltr:ml-auto rtl:mr-auto items-center gap-4 md:gap-6`}>
-          <ToggleThemeMode />
-          <LocaleChange />
+            {/* Mobile Menu Button */}
+            <div className="lg:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-foreground hover:bg-green-primary/10 hover:text-green-primary transition-colors"
+                  >
+                    <Menu className="size-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent
+                  side="left"
+                  className="w-[280px] glass border-0 border-r border-green-primary/20"
+                >
+                  <SheetHeader>
+                    <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                  </SheetHeader>
+                  <div className="flex flex-col gap-6 mt-6">
+                    <Link href="/dashboard" className="mx-auto">
+                      <EscoreLogo width={80} height={40} />
+                    </Link>
+                    {user && <HeaderSideNavBar user={user} t={t} />}
+                    <NavItems t={t} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+
+          {/* Center section: Back button + Page title */}
+          <div className="flex-1 flex justify-center px-4">
+            <BackPage />
+          </div>
+
+          {/* Right section: Controls */}
+          <div className="flex items-center gap-2 md:gap-4">
+            <ToggleThemeMode />
+            <LocaleChange />
+          </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 
