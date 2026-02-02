@@ -23,7 +23,12 @@ import {
   Star,
   CalendarDays,
   X,
+  Search,
+  ChevronDown,
+  Globe,
+  Check,
 } from "lucide-react";
+import Image from "next/image";
 
 const validateSchema = yup.object({
   name: yup.string().required("Tournament name is required"),
@@ -163,12 +168,13 @@ export default function TournamentsForm({
             options={statusOptions}
             formik={formik}
           />
-          <SelectField
+          <CountrySelectField
             label={t("Country")}
             name="country"
-            options={countries}
+            countries={countries}
             formik={formik}
             placeholder={t("Select Country")}
+            searchPlaceholder={t("Search countries")}
           />
         </FormRow>
 
@@ -574,6 +580,163 @@ function FeaturedToggle({ label, name, formik }) {
           />
         </div>
       </button>
+    </div>
+  );
+}
+
+// Country Select Field with Search and Flags
+function CountrySelectField({ label, name, countries, formik, placeholder, searchPlaceholder }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+
+  // Find selected country
+  const selectedCountry = countries.find((c) => c.label === value);
+
+  // Filter countries based on search
+  const filteredCountries = countries.filter((country) =>
+    country.label.toLowerCase().includes(search.toLowerCase()) ||
+    country.value.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleSelect = (country) => {
+    formik.setFieldValue(name, country.label);
+    formik.setFieldTouched(name, true);
+    setIsOpen(false);
+    setSearch("");
+  };
+
+  const handleClear = (e) => {
+    e.stopPropagation();
+    formik.setFieldValue(name, "");
+    formik.setFieldTouched(name, true);
+  };
+
+  const getFlagUrl = (code) => `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
+              error ? "ring-2 ring-red-500 border-red-500" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {selectedCountry ? (
+                <>
+                  <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 ring-1 ring-white/10">
+                    <Image
+                      src={getFlagUrl(selectedCountry.value)}
+                      alt={selectedCountry.label}
+                      width={32}
+                      height={24}
+                      className="w-full h-full object-cover"
+                      unoptimized
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-foreground font-medium truncate">{selectedCountry.label}</span>
+                    <span className="text-xs text-muted-foreground bg-muted dark:bg-[#252a3d] px-2 py-0.5 rounded">
+                      {selectedCountry.value}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="size-8 rounded-lg bg-muted dark:bg-[#252a3d] flex items-center justify-center flex-shrink-0">
+                    <Globe className="size-4 text-muted-foreground" />
+                  </div>
+                  <span className="text-muted-foreground">{placeholder}</span>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {selectedCountry && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="size-7 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors group"
+                >
+                  <X className="size-4 text-muted-foreground group-hover:text-red-500" />
+                </button>
+              )}
+              <ChevronDown className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </div>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border"
+          align="start"
+        >
+          {/* Search Input */}
+          <div className="p-3 border-b border-border">
+            <div className="relative">
+              <Search className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={searchPlaceholder || "Search..."}
+                className="w-full h-10 pl-10 pr-4 rtl:pl-4 rtl:pr-10 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50"
+                autoFocus
+              />
+            </div>
+          </div>
+
+          {/* Countries List */}
+          <div className="max-h-64 overflow-y-auto p-2">
+            {filteredCountries.length === 0 ? (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                No countries found
+              </div>
+            ) : (
+              filteredCountries.map((country) => {
+                const isSelected = value === country.label;
+                return (
+                  <button
+                    key={country.value}
+                    type="button"
+                    onClick={() => handleSelect(country)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                      isSelected
+                        ? "bg-green-primary/10 text-green-primary"
+                        : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
+                    }`}
+                  >
+                    <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 ring-1 ring-white/10">
+                      <Image
+                        src={getFlagUrl(country.value)}
+                        alt={country.label}
+                        width={32}
+                        height={24}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-sm font-medium ${isSelected ? "text-green-primary" : "text-foreground"}`}>
+                        {country.label}
+                      </span>
+                    </div>
+                    <span className="text-xs text-muted-foreground bg-muted dark:bg-[#252a3d] px-2 py-0.5 rounded">
+                      {country.value}
+                    </span>
+                    {isSelected && (
+                      <Check className="size-4 text-green-primary flex-shrink-0" />
+                    )}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }
