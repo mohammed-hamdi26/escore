@@ -178,12 +178,11 @@ function PlayerFormRedesign({
             hint={t("nicknameHint")}
           />
           {/* Role */}
-          <InputField
+          <RoleSelectField
             label={t("role")}
             name="role"
             placeholder={t("rolePlaceholder")}
             formik={formik}
-            icon={<Briefcase className="size-5 text-muted-foreground" />}
             hint={t("roleHint")}
           />
         </FormRow>
@@ -431,6 +430,199 @@ function InputField({
           }`}
         />
       </div>
+      {hint && !error && (
+        <p className="text-xs text-muted-foreground">{hint}</p>
+      )}
+      {error && <p className="text-xs text-red-500">{t(error)}</p>}
+    </div>
+  );
+}
+
+// Predefined esports roles
+const ESPORTS_ROLES = [
+  // MOBA Roles
+  { value: "Mid Laner", category: "MOBA" },
+  { value: "Jungler", category: "MOBA" },
+  { value: "Top Laner", category: "MOBA" },
+  { value: "ADC", category: "MOBA" },
+  { value: "Support", category: "MOBA" },
+  { value: "Gold Laner", category: "MOBA" },
+  { value: "EXP Laner", category: "MOBA" },
+  { value: "Roamer", category: "MOBA" },
+  // FPS Roles
+  { value: "Entry Fragger", category: "FPS" },
+  { value: "AWPer", category: "FPS" },
+  { value: "IGL", category: "FPS" },
+  { value: "Lurker", category: "FPS" },
+  { value: "Rifler", category: "FPS" },
+  { value: "Controller", category: "FPS" },
+  { value: "Duelist", category: "FPS" },
+  { value: "Initiator", category: "FPS" },
+  { value: "Sentinel", category: "FPS" },
+  // General Roles
+  { value: "Captain", category: "General" },
+  { value: "Coach", category: "General" },
+  { value: "Analyst", category: "General" },
+  { value: "Substitute", category: "General" },
+  { value: "Flex", category: "General" },
+];
+
+// Role Select Field Component
+function RoleSelectField({
+  label,
+  name,
+  formik,
+  placeholder,
+  hint,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+  const t = useTranslations("playerForm");
+
+  const filteredRoles = ESPORTS_ROLES.filter(
+    (role) => role.value.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Group roles by category
+  const groupedRoles = filteredRoles.reduce((acc, role) => {
+    if (!acc[role.category]) acc[role.category] = [];
+    acc[role.category].push(role);
+    return acc;
+  }, {});
+
+  const handleSelect = (role) => {
+    formik.setFieldValue(name, role);
+    formik.setFieldTouched(name, true);
+    setIsOpen(false);
+    setSearch("");
+  };
+
+  const handleCustomInput = () => {
+    if (search.trim()) {
+      formik.setFieldValue(name, search.trim());
+      formik.setFieldTouched(name, true);
+      setIsOpen(false);
+      setSearch("");
+    }
+  };
+
+  const handleClear = (e) => {
+    e.stopPropagation();
+    formik.setFieldValue(name, "");
+    formik.setFieldTouched(name, true);
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">
+        {label}
+      </label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
+              error ? "ring-2 ring-red-500 border-red-500" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="size-8 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
+                <Briefcase className="size-4 text-purple-500" />
+              </div>
+              {value ? (
+                <span className="text-foreground font-medium truncate">{value}</span>
+              ) : (
+                <span className="text-muted-foreground">{placeholder}</span>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {value && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="p-1 hover:bg-muted dark:hover:bg-[#252a3d] rounded-lg transition-colors"
+                >
+                  <X className="size-4 text-muted-foreground" />
+                </button>
+              )}
+              <ChevronDown className="size-4 text-muted-foreground" />
+            </div>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-2 bg-background border border-border rounded-xl shadow-lg"
+          align="start"
+        >
+          <div className="relative mb-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search or type custom role..."
+              className="w-full h-10 pl-9 pr-3 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleCustomInput();
+                }
+              }}
+            />
+          </div>
+          <div className="max-h-64 overflow-y-auto space-y-2">
+            {/* Custom input option */}
+            {search.trim() && !ESPORTS_ROLES.some(r => r.value.toLowerCase() === search.toLowerCase()) && (
+              <button
+                type="button"
+                onClick={handleCustomInput}
+                className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted dark:hover:bg-[#252a3d] transition-colors text-left"
+              >
+                <div className="size-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                  <Plus className="size-4 text-green-500" />
+                </div>
+                <span className="text-foreground">Use "{search}"</span>
+              </button>
+            )}
+            {/* Grouped roles */}
+            {Object.entries(groupedRoles).map(([category, roles]) => (
+              <div key={category}>
+                <div className="text-xs font-semibold text-muted-foreground px-2 py-1 uppercase tracking-wider">
+                  {category}
+                </div>
+                {roles.map((role) => (
+                  <button
+                    key={role.value}
+                    type="button"
+                    onClick={() => handleSelect(role.value)}
+                    className={`w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted dark:hover:bg-[#252a3d] transition-colors text-left ${
+                      value === role.value ? "bg-green-primary/10" : ""
+                    }`}
+                  >
+                    <div className={`size-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      category === "MOBA" ? "bg-blue-500/10" :
+                      category === "FPS" ? "bg-red-500/10" : "bg-gray-500/10"
+                    }`}>
+                      <Briefcase className={`size-4 ${
+                        category === "MOBA" ? "text-blue-500" :
+                        category === "FPS" ? "text-red-500" : "text-gray-500"
+                      }`} />
+                    </div>
+                    <span className="text-foreground">{role.value}</span>
+                    {value === role.value && (
+                      <Check className="size-4 text-green-primary ml-auto" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            ))}
+            {filteredRoles.length === 0 && !search.trim() && (
+              <p className="text-center text-muted-foreground py-4">No roles found</p>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
       {hint && !error && (
         <p className="text-xs text-muted-foreground">{hint}</p>
       )}

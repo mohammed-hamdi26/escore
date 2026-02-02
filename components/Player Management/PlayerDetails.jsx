@@ -247,6 +247,42 @@ function PlayerDetails({ player }) {
             </div>
           )}
 
+          {/* Tournaments */}
+          {player.tournaments && player.tournaments.length > 0 && (
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Trophy className="size-5 text-green-primary" />
+                {t("tournaments") || "Tournaments"} ({player.tournaments.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {player.tournaments.map((tournament, index) => (
+                  <div key={tournament.id || tournament._id || index} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e]">
+                    {tournament.logo?.light ? (
+                      <img src={tournament.logo.light} alt={tournament.name} className="size-10 rounded-lg object-cover" />
+                    ) : (
+                      <div className="size-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                        <Trophy className="size-5 text-green-500" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground truncate">{tournament.name}</p>
+                      {tournament.status && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          tournament.status === 'completed' ? 'bg-green-500/10 text-green-500' :
+                          tournament.status === 'ongoing' ? 'bg-blue-500/10 text-blue-500' :
+                          tournament.status === 'upcoming' ? 'bg-yellow-500/10 text-yellow-500' :
+                          'bg-gray-500/10 text-gray-500'
+                        }`}>
+                          {tournament.status}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Social Links */}
           {player.socialLinks && player.socialLinks.length > 0 && (
             <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
