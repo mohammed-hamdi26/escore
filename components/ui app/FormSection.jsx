@@ -1,12 +1,16 @@
-function FormSection({ children, title, icon, badge }) {
+function FormSection({ children, title, icon, badge, className = "" }) {
   return (
-    <div className="bg-dashboard-box dark:bg-[#10131D] px-8 md:px-16 py-10 space-y-8 rounded-2xl">
+    <div className={`glass rounded-2xl border border-transparent dark:border-white/5 p-6 md:p-8 space-y-6 ${className}`}>
       {(title || icon || badge) && (
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between pb-4 border-b border-border">
           <div className="flex items-center gap-3">
-            {icon && <span className="text-green-primary">{icon}</span>}
+            {icon && (
+              <div className="size-10 rounded-xl bg-green-primary/10 flex items-center justify-center">
+                <span className="text-green-primary">{icon}</span>
+              </div>
+            )}
             {title && (
-              <h3 className="text-lg font-semibold text-[#677185] dark:text-white">
+              <h3 className="text-lg font-semibold text-foreground">
                 {title}
               </h3>
             )}

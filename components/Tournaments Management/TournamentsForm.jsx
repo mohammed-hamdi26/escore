@@ -1,89 +1,49 @@
 "use client";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import InputApp from "../ui app/InputApp";
+import { Button } from "../ui/button";
+import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
+import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import FormSection from "../ui app/FormSection";
 import FormRow from "../ui app/FormRow";
-import { Button } from "../ui/button";
-import TextAreaInput from "../ui app/TextAreaInput";
-import DatePicker from "../ui app/DatePicker";
-import Date from "../icons/Date";
-import SelectInput from "../ui app/SelectInput";
-import FileInput from "../ui app/FileInput";
-import ImageIcon from "../icons/ImageIcon";
-import toast from "react-hot-toast";
-import { useTranslations } from "use-intl";
-import MarkDown from "../ui app/MarkDown";
-import { min } from "date-fns";
-import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
-import ComboboxInput from "../ui app/ComboBoxInput";
+import ImageUpload from "../ui app/ImageUpload";
+import {
+  Trophy,
+  Calendar,
+  MapPin,
+  DollarSign,
+  Gamepad2,
+  Image as ImageIcon,
+  Save,
+  Loader2,
+} from "lucide-react";
 
 const validateSchema = yup.object({
   name: yup.string().required("Tournament name is required"),
-
   organizer: yup.string().required("Organizer is required"),
-
   startDate: yup
     .date()
     .typeError("Invalid start date")
     .required("Start date is required"),
-
   endDate: yup
     .date()
     .typeError("Invalid end date")
-    // .min(yup.ref("startDate"), "End date cannot be before start date")
     .required("End date is required"),
-
-  location: yup.string().required("location is required"),
-
+  location: yup.string().required("Location is required"),
   prizePool: yup
     .number()
     .min(0, "Prize pool must be positive")
     .required("Prize pool is required"),
-
   status: yup
     .string()
     .oneOf(["upcoming", "ongoing", "completed", "cancelled"], "Invalid status")
     .required("Status is required"),
-
-  logoLight: yup
-    .string()
-    // .url("Invalid logo URL")
-    .required("Logo is required"),
-
+  logoLight: yup.string().required("Logo is required"),
   gamesData: yup
     .array()
-    .test("games", "Games is required", (value) => value.length > 0),
-  // logoDark: yup
-  //   .string()
-  //   // .url("Invalid dark logo URL")
-  //   .required("Dark logo is required"),
-
-  knockoutImageLight: yup
-    .string()
-    // .url("Invalid knockout image URL")
-    .required("Knockout image is required"),
-  // knockoutImageDark: yup
-  //   .string()
-  //   // .url("Invalid dark knockout image URL")
-  //   .required("Dark knockout image is required"),
-
-  // winningPoints: yup
-  //   .number()
-  //   .min(0, "Winning points must be 0 or more")
-  //   .required("Winning points are required"),
-
-  // losingPoints: yup
-  //   .number()
-  //   .min(0, "Losing points must be 0 or more")
-  //   .required("Losing points are required"),
-
-  // drawPoints: yup
-  //   .number()
-  //   .min(0, "Draw points must be 0 or more")
-  //   .required("Draw points are required"),
-
-  // description: yup.string().required("Description is required"),
+    .test("games", "At least one game is required", (value) => value && value.length > 0),
+  knockoutImageLight: yup.string().required("Bracket image is required"),
 });
 
 export default function TournamentsForm({
@@ -99,51 +59,45 @@ export default function TournamentsForm({
     initialValues: {
       name: tournament?.name || "",
       organizer: tournament?.organizer || "",
-      startDate: tournament?.startDate || "",
-      endDate: tournament?.endDate || "",
+      startDate: tournament?.startDate ? new Date(tournament.startDate).toISOString().split("T")[0] : "",
+      endDate: tournament?.endDate ? new Date(tournament.endDate).toISOString().split("T")[0] : "",
       location: tournament?.location || "",
       prizePool: tournament?.prizePool || "",
       status: tournament?.status || "upcoming",
-      logoLight: tournament?.logo.light || "",
-      country: tournament?.country?.code || "",
+      logoLight: tournament?.logo?.light || "",
+      logoDark: tournament?.logo?.dark || "",
+      country: tournament?.country?.name || "",
       gamesData: tournament?.games || [],
-
-      logoDark: tournament?.logo.dark || "",
-      // winningPoints: tournament?.winningPoints || "",
-      // losingPoints: tournament?.losingPoints || "",
-      // drawPoints: tournament?.drawPoints || "",
-      // description: tournament?.description || "",
       knockoutImageLight: tournament?.bracketImage?.light || "",
       knockoutImageDark: tournament?.bracketImage?.dark || "",
+      tier: tournament?.tier || "B",
+      isFeatured: tournament?.isFeatured || false,
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
       try {
         let dataValues = tournament ? { id: tournament.id, ...values } : values;
-        console.log("", dataValues.country);
-        const selectedCountry = countries.find((c) => {
-          return c.label === dataValues.country;
-        });
 
-        dataValues.country = {
-          name: selectedCountry?.label,
-          code: selectedCountry?.value,
-          flag: selectedCountry?.value,
-        };
+        const selectedCountry = countries.find((c) => c.label === dataValues.country);
+        dataValues.country = selectedCountry
+          ? {
+              name: selectedCountry.label,
+              code: selectedCountry.value,
+              flag: `https://flagcdn.com/w80/${selectedCountry.value.toLowerCase()}.png`,
+            }
+          : null;
 
         dataValues.logo = {
           light: dataValues.logoLight,
-          dark: dataValues.logoDark,
+          dark: dataValues.logoDark || dataValues.logoLight,
         };
         dataValues.bracketImage = {
           light: dataValues.knockoutImageLight,
-          dark: dataValues.knockoutImageDark,
+          dark: dataValues.knockoutImageDark || dataValues.knockoutImageLight,
         };
 
         dataValues.slug = dataValues?.name.replace(/\s+/g, "-").toLowerCase();
-        dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value);
-
-        console.log("dataValues", dataValues);
+        dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value || g);
 
         await submit(dataValues);
         formType === "add" && formik.resetForm();
@@ -158,355 +112,296 @@ export default function TournamentsForm({
     },
   });
 
-  //
-  console.log("formik errors", formik.values);
-
   const statusOptions = [
     { value: "upcoming", label: t("Upcoming") },
     { value: "ongoing", label: t("Ongoing") },
     { value: "completed", label: t("Completed") },
     { value: "cancelled", label: t("Cancelled") },
   ];
-  // console.log("formik errors", formik.values);
+
+  const tierOptions = [
+    { value: "S", label: "S-Tier" },
+    { value: "A", label: "A-Tier" },
+    { value: "B", label: "B-Tier" },
+  ];
+
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-8 ">
-      <FormSection>
-        <FormRow>
-          <InputApp
-            t={t}
+    <form onSubmit={formik.handleSubmit} className="space-y-6">
+      {/* Basic Information */}
+      <FormSection title={t("Basic Information")} icon={<Trophy className="size-5" />}>
+        <FormRow cols={2}>
+          <InputField
             label={t("Name")}
-            name={"name"}
-            type={"text"}
+            name="name"
             placeholder={t("Enter Name of Tournament")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            error={
-              formik?.errors?.name && formik?.touched?.name
-                ? formik?.errors?.name
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            value={formik.values.name}
+            formik={formik}
           />
-          <InputApp
-            t={t}
+          <InputField
             label={t("Organizer")}
-            name={"organizer"}
-            type={"text"}
+            name="organizer"
             placeholder={t("Enter Name of Organizer")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            error={
-              formik?.errors?.organizer && formik?.touched?.organizer
-                ? formik?.errors?.organizer
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            value={formik.values.organizer}
+            formik={formik}
           />
         </FormRow>
-        <FormRow>
-          <InputApp
-            t={t}
+
+        <FormRow cols={3}>
+          <InputField
             label={t("location")}
-            name={"location"}
-            type={"text"}
-            placeholder={t("Enter Name of location")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            error={
-              formik?.errors?.location && formik?.touched?.location
-                ? formik?.errors?.location
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            value={formik.values.location}
-          />
-          <SelectInput
+            name="location"
+            placeholder={t("Enter Location")}
             formik={formik}
-            options={mappedArrayToSelectOptions(
-              statusOptions,
-              "label",
-              "value"
-            )}
-            onChange={(value) => formik.setFieldValue("status", value)}
-            value={formik.values.status}
+          />
+          <SelectField
             label={t("Status")}
-            name={"status"}
-            placeholder={t("Select Status")}
-            error={
-              formik?.errors?.status && formik?.touched?.status
-                ? formik?.errors?.status
-                : ""
-            }
-            onBlur={() => formik.setFieldTouched("status", true)}
+            name="status"
+            options={statusOptions}
+            formik={formik}
           />
-          <SelectInput
-            name={"country"}
+          <SelectField
             label={t("Country")}
+            name="country"
+            options={countries}
             formik={formik}
-            options={mappedArrayToSelectOptions(countries, "label", "label")}
-            onChange={(value) => {
-              formik.setFieldValue("country", value);
-            }}
-            value={formik.values.country}
+            placeholder={t("Select Country")}
           />
         </FormRow>
 
-        {/* <MarkDown
-          label={t("Description")}
-          formik={formik}
-          name={"description"}
-          placeholder={t("Enter Description")}
-        /> */}
-        {/* <TextAreaInput
-          name="description"
-          onChange={formik.handleChange}
-          value={formik.values.description}
-          label={t("Description")}
-          placeholder={t("Enter Description")}
-          className="border-0 focus:outline-none"
-          error={formik.touched.description && formik.errors.description}
-          onBlur={formik.handleBlur}
-          t={t}
-        /> */}
-      </FormSection>
-
-      <FormSection>
-        <FormRow>
-          <DatePicker
-            disabled={formik.isSubmitting}
-            disabledDate={{}}
-            t={t}
-            placeholder={t("Enter Start Date")}
+        <FormRow cols={3}>
+          <SelectField
+            label={t("Tier")}
+            name="tier"
+            options={tierOptions}
             formik={formik}
-            label={t("Start Date")}
-            name={"startDate"}
-            icon={
-              <Date
-                height="35"
-                width="35"
-                className={"fill-[#677185] "}
-                color={"text-[#677185]"}
-              />
-            }
           />
-          <DatePicker
-            disabled={
-              (formik.values.startDate ? false : true) || formik.isSubmitting
-            }
-            disabledDate={{ before: formik?.values?.startDate }}
-            t={t}
-            placeholder={t("Enter End Date")}
-            formik={formik}
-            label={t("End Date")}
-            name={"endDate"}
-            icon={
-              <Date
-                height="35"
-                width="35"
-                className={"fill-[#677185] "}
-                color={"text-[#677185]"}
-              />
-            }
-          />
-        </FormRow>
-      </FormSection>
-
-      <FormSection>
-        <FormRow>
-          <ComboboxInput
-            formik={formik}
-            label={t("Games")}
-            name={"gamesData"}
-            options={mappedArrayToSelectOptions(gameOptions, "name", "id")}
-            placeholder={t("Select Game")}
-            initialData={mappedArrayToSelectOptions(
-              formik.values.gamesData,
-              "name",
-              "id"
-            )}
-          />
-          <InputApp
+          <InputField
             label={t("Prize Pool")}
-            name={"prizePool"}
-            type={"number"}
-            placeholder={t("Enter Prize Pool")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            error={
-              formik?.errors?.prizePool && formik?.touched?.prizePool
-                ? formik?.errors?.prizePool
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            value={formik.values.prizePool}
-            t={t}
+            name="prizePool"
+            type="number"
+            placeholder="0"
+            formik={formik}
+            icon={<DollarSign className="size-4 text-muted-foreground" />}
           />
-          {/* <InputApp
-            label={t("Winning Points")}
-            name={"winningPoints"}
-            type={"number"}
-            placeholder={t("Enter Winning Points")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            error={
-              formik?.errors?.winningPoints && formik?.touched?.winningPoints
-                ? formik?.errors?.winningPoints
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            value={formik.values.winningPoints}
-            t={t}
-          />
-        </FormRow>
-        <FormRow>
-          <InputApp
-            label={t("Losing Points")}
-            name={"losingPoints"}
-            type={"number"}
-            placeholder={t("Enter Losing Points")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            error={
-              formik?.errors?.losingPoints && formik?.touched?.losingPoints
-                ? formik?.errors?.losingPoints
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            value={formik.values.losingPoints}
-            t={t}
-          />
-          <InputApp
-            label={t("Draw Points")}
-            name={"drawPoints"}
-            type={"number"}
-            placeholder={t("Enter Draw Points")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            error={
-              formik?.errors?.drawPoints && formik?.touched?.drawPoints
-                ? formik?.errors?.drawPoints
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            value={formik.values.drawPoints}
-            t={t}
-          /> */}
+          <div className="flex items-center gap-3 pt-6">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formik.values.isFeatured}
+                onChange={(e) => formik.setFieldValue("isFeatured", e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:bg-green-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+            </label>
+            <span className="text-sm text-foreground">{t("Featured Tournament")}</span>
+          </div>
         </FormRow>
       </FormSection>
 
-      <FormSection>
-        <FormRow>
-          <FileInput
-            t={t}
+      {/* Date & Time */}
+      <FormSection title={t("Schedule")} icon={<Calendar className="size-5" />}>
+        <FormRow cols={2}>
+          <InputField
+            label={t("Start Date")}
+            name="startDate"
+            type="date"
             formik={formik}
-            label={t("Logo")}
-            name={"logoLight"}
-            placeholder={t("Upload Tournament Logo")}
-            icon={
-              <ImageIcon
-                className={"fill-[#677185]"}
-                color={"text-[#677185]"}
-              />
-            }
-            error={
-              formik.touched.logoLight &&
-              formik.errors.logoLight &&
-              t(formik.errors.logoLight)
-            }
           />
-          <FileInput
-            t={t}
+          <InputField
+            label={t("End Date")}
+            name="endDate"
+            type="date"
             formik={formik}
-            label={t("Logo (Dark)")}
-            name={"logoDark"}
-            placeholder={t("Upload Tournament Dark Logo")}
-            icon={
-              <ImageIcon
-                className={"fill-[#677185]"}
-                color={"text-[#677185]"}
-              />
-            }
-            error={
-              formik.touched.logoDark &&
-              formik.errors.logoDark &&
-              t(formik.errors.logoDark)
-            }
-          />
-        </FormRow>
-        <FormRow>
-          <FileInput
-            t={t}
-            formik={formik}
-            label={t("knockout image")}
-            name={"knockoutImageLight"}
-            placeholder={t("Upload Knockout Light Image")}
-            icon={
-              <ImageIcon
-                className={"fill-[#677185]"}
-                color={"text-[#677185]"}
-              />
-            }
-            error={
-              formik.touched.knockoutImageLight &&
-              formik.errors.knockoutImageLight &&
-              t(formik.errors.knockoutImageLight)
-            }
-          />
-
-          <FileInput
-            t={t}
-            formik={formik}
-            label={t("knockout image (Dark)")}
-            name={"knockoutImageDark"}
-            placeholder={t("Upload Knockout Dark Image")}
-            icon={
-              <ImageIcon
-                className={"fill-[#677185]"}
-                color={"text-[#677185]"}
-              />
-            }
-            error={
-              formik.touched.knockoutImageDark &&
-              formik.errors.knockoutImageDark &&
-              t(formik.errors.knockoutImageDark)
-            }
+            min={formik.values.startDate}
           />
         </FormRow>
       </FormSection>
 
-      <div className="flex justify-end">
+      {/* Games */}
+      <FormSection title={t("Games")} icon={<Gamepad2 className="size-5" />}>
+        <MultiSelectField
+          label={t("Select Games")}
+          name="gamesData"
+          options={gameOptions}
+          formik={formik}
+        />
+      </FormSection>
+
+      {/* Images */}
+      <FormSection title={t("Images")} icon={<ImageIcon className="size-5" />}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-foreground">{t("Tournament Logo")}</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <ImageUpload
+                label={t("Light Mode")}
+                name="logoLight"
+                formik={formik}
+                aspectRatio="square"
+              />
+              <ImageUpload
+                label={t("Dark Mode")}
+                name="logoDark"
+                formik={formik}
+                aspectRatio="square"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-foreground">{t("Bracket Image")}</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <ImageUpload
+                label={t("Light Mode")}
+                name="knockoutImageLight"
+                formik={formik}
+                aspectRatio="landscape"
+              />
+              <ImageUpload
+                label={t("Dark Mode")}
+                name="knockoutImageDark"
+                formik={formik}
+                aspectRatio="landscape"
+              />
+            </div>
+          </div>
+        </div>
+      </FormSection>
+
+      {/* Submit Button */}
+      <div className="flex justify-end gap-4">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => formik.resetForm()}
+          className="h-11 px-6 rounded-xl"
+        >
+          {t("Reset")}
+        </Button>
         <Button
           disabled={!formik.isValid || formik.isSubmitting}
           type="submit"
-          className={
-            "text-white text-center min-w-[100px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
-          }
+          className="h-11 px-8 rounded-xl bg-green-primary hover:bg-green-primary/90 text-white font-medium disabled:opacity-50"
         >
-          {formik.isSubmitting
-            ? formType === "add"
-              ? "Adding..."
-              : "Editing..."
-            : formType === "add"
-            ? t("Add")
-            : t("Edit")}
+          {formik.isSubmitting ? (
+            <>
+              <Loader2 className="size-4 mr-2 animate-spin" />
+              {formType === "add" ? t("Adding...") : t("Saving...")}
+            </>
+          ) : (
+            <>
+              <Save className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+              {formType === "add" ? t("Add Tournament") : t("Save Changes")}
+            </>
+          )}
         </Button>
       </div>
     </form>
+  );
+}
+
+// Reusable Input Field Component
+function InputField({ label, name, type = "text", placeholder, formik, icon, ...props }) {
+  const error = formik.touched[name] && formik.errors[name];
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <div className="relative">
+        {icon && (
+          <div className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2">
+            {icon}
+          </div>
+        )}
+        <input
+          type={type}
+          name={name}
+          value={formik.values[name]}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          placeholder={placeholder}
+          className={`w-full h-11 px-4 ${icon ? "pl-10 rtl:pl-4 rtl:pr-10" : ""} rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all ${
+            error ? "ring-2 ring-red-500" : ""
+          }`}
+          {...props}
+        />
+      </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// Reusable Select Field Component
+function SelectField({ label, name, options, formik, placeholder }) {
+  const error = formik.touched[name] && formik.errors[name];
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <select
+        name={name}
+        value={formik.values[name]}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        className={`w-full h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all ${
+          error ? "ring-2 ring-red-500" : ""
+        }`}
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options.map((opt) => (
+          <option key={opt.value || opt.label} value={opt.value || opt.label}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// Multi-Select Field for Games
+function MultiSelectField({ label, name, options, formik }) {
+  const selectedIds = formik.values[name]?.map((g) => g.id || g.value || g) || [];
+  const error = formik.touched[name] && formik.errors[name];
+
+  const toggleGame = (game) => {
+    const gameId = game.id || game.value;
+    const isSelected = selectedIds.includes(gameId);
+
+    if (isSelected) {
+      formik.setFieldValue(
+        name,
+        formik.values[name].filter((g) => (g.id || g.value || g) !== gameId)
+      );
+    } else {
+      formik.setFieldValue(name, [...formik.values[name], { id: gameId, name: game.name || game.label }]);
+    }
+    formik.setFieldTouched(name, true);
+  };
+
+  return (
+    <div className="space-y-3">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <div className="flex flex-wrap gap-2">
+        {options.map((game) => {
+          const gameId = game.id || game.value;
+          const isSelected = selectedIds.includes(gameId);
+
+          return (
+            <button
+              key={gameId}
+              type="button"
+              onClick={() => toggleGame(game)}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                isSelected
+                  ? "bg-green-primary text-white"
+                  : "bg-muted/50 dark:bg-[#1a1d2e] text-foreground hover:bg-muted dark:hover:bg-[#252a3d]"
+              }`}
+            >
+              {game.name || game.label}
+            </button>
+          );
+        })}
+      </div>
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+    </div>
   );
 }
