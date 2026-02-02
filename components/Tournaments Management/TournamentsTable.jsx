@@ -106,7 +106,7 @@ function TournamentsTable({ tournaments, pagination, games }) {
       {/* Table */}
       <div className="glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5">
         {/* Table Header */}
-        <div className="bg-muted/50 dark:bg-white/5 border-b border-border">
+        <div className="bg-muted/50 dark:bg-[#1a1d2e] border-b border-border">
           <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4">
             <button
               onClick={() => handleSort("name")}
@@ -161,7 +161,7 @@ function TournamentsTable({ tournaments, pagination, games }) {
             tournaments.map((tournament) => (
               <div
                 key={tournament.id}
-                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-white/5 transition-colors"
+                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors"
               >
                 {/* Tournament Name & Logo */}
                 <div className="flex items-center gap-3 min-w-0">

@@ -91,7 +91,7 @@ function TournamentsFilter({ games = [] }) {
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder={t("searchPlaceholder") || "Search tournaments..."}
-            className="w-full h-10 pl-10 rtl:pl-4 rtl:pr-10 pr-4 rounded-xl bg-muted/50 dark:bg-white/5 border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
+            className="w-full h-10 pl-10 rtl:pl-4 rtl:pr-10 pr-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
           />
           {searchTerm && (
             <button
@@ -107,7 +107,7 @@ function TournamentsFilter({ games = [] }) {
         <Button
           variant="outline"
           onClick={() => setShowFilters(!showFilters)}
-          className={`h-10 px-4 rounded-xl border-0 bg-muted/50 dark:bg-white/5 hover:bg-muted dark:hover:bg-white/10 transition-all ${
+          className={`h-10 px-4 rounded-xl border-0 bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] transition-all ${
             activeFiltersCount > 0 ? "text-green-primary" : "text-foreground"
           }`}
         >
@@ -146,7 +146,7 @@ function TournamentsFilter({ games = [] }) {
               <select
                 value={currentGame}
                 onChange={(e) => updateParams("game", e.target.value)}
-                className="w-full h-10 px-3 rounded-lg bg-muted/50 dark:bg-white/5 border-0 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                className="w-full h-10 px-3 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
               >
                 <option value="">{t("allGames") || "All Games"}</option>
                 {games.map((game) => (
@@ -165,7 +165,7 @@ function TournamentsFilter({ games = [] }) {
               <select
                 value={currentStatus}
                 onChange={(e) => updateParams("status", e.target.value)}
-                className="w-full h-10 px-3 rounded-lg bg-muted/50 dark:bg-white/5 border-0 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                className="w-full h-10 px-3 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
               >
                 {STATUS_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -183,7 +183,7 @@ function TournamentsFilter({ games = [] }) {
               <select
                 value={currentTier}
                 onChange={(e) => updateParams("tier", e.target.value)}
-                className="w-full h-10 px-3 rounded-lg bg-muted/50 dark:bg-white/5 border-0 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                className="w-full h-10 px-3 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
               >
                 {TIER_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -201,7 +201,7 @@ function TournamentsFilter({ games = [] }) {
               <select
                 value={currentFeatured}
                 onChange={(e) => updateParams("isFeatured", e.target.value)}
-                className="w-full h-10 px-3 rounded-lg bg-muted/50 dark:bg-white/5 border-0 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                className="w-full h-10 px-3 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
               >
                 {FEATURED_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
