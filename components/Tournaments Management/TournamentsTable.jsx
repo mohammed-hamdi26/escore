@@ -1,7 +1,8 @@
 "use client";
-import { Link } from "@/i18n/navigation";
+
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import Pagination from "../ui app/Pagination";
-import Table from "../ui app/Table";
 import { Button } from "../ui/button";
 import { format } from "date-fns";
 import TournamentsFilter from "./TournamentsFilter";
@@ -9,102 +10,269 @@ import { useState } from "react";
 import { deleteTournament } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import {
+  Pencil,
+  Trash2,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Trophy,
+  Calendar,
+  Star,
+  Users,
+} from "lucide-react";
 
-const columns = [
-  {
-    id: "name",
-    header: "name",
-  },
-  {
-    id: "organizer",
-    header: "Organizer",
-  },
-  {
-    id: "description",
-    header: "Desc",
-  },
-  {
-    id: "startDate",
-    header: "Start Date",
-  },
-  {
-    id: "endDate",
-    header: "End Date",
-  },
-];
+// Status badge colors
+const STATUS_COLORS = {
+  upcoming: "bg-blue-500/10 text-blue-500",
+  ongoing: "bg-green-500/10 text-green-500",
+  completed: "bg-gray-500/10 text-gray-400",
+  cancelled: "bg-red-500/10 text-red-500",
+};
 
-function TournamentsTable({ tournaments, pagination }) {
-  const [isLoading, setIsLoading] = useState(false);
+// Tier badge colors
+const TIER_COLORS = {
+  S: "bg-yellow-500/10 text-yellow-500",
+  A: "bg-purple-500/10 text-purple-500",
+  B: "bg-cyan-500/10 text-cyan-500",
+};
+
+function TournamentsTable({ tournaments, pagination, games }) {
+  const [loadingId, setLoadingId] = useState(null);
   const t = useTranslations("TournamentsTable");
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const numPages = pagination?.totalPages || 1;
-  const totalItems = pagination?.total || tournaments.length;
+  const currentSort = searchParams.get("sortBy") || "";
+  const currentOrder = searchParams.get("sortOrder") || "desc";
+
+  const handleSort = (field) => {
+    const params = new URLSearchParams(searchParams);
+    if (currentSort === field) {
+      // Toggle order
+      params.set("sortOrder", currentOrder === "asc" ? "desc" : "asc");
+    } else {
+      params.set("sortBy", field);
+      params.set("sortOrder", "desc");
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const getSortIcon = (field) => {
+    if (currentSort !== field) {
+      return <ArrowUpDown className="size-3.5 opacity-50" />;
+    }
+    return currentOrder === "asc" ? (
+      <ArrowUp className="size-3.5 text-green-primary" />
+    ) : (
+      <ArrowDown className="size-3.5 text-green-primary" />
+    );
+  };
+
+  const handleDelete = async (id, name) => {
+    if (!confirm(t("confirmDelete") || `Are you sure you want to delete "${name}"?`)) {
+      return;
+    }
+
+    try {
+      setLoadingId(id);
+      await deleteTournament(id);
+      toast.success(t("deleteSuccess") || "Tournament deleted successfully");
+    } catch (e) {
+      toast.error(t("deleteError") || "Failed to delete tournament");
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   return (
-    <div className="space-y-8">
-      <TournamentsFilter numOfSize={totalItems} />
+    <div className="space-y-6">
+      {/* Filters */}
+      <TournamentsFilter games={games} />
 
-      <Table
-        t={t}
-        grid_cols="grid-cols-[1fr_0.5fr_1fr_0.5fr_0.5fr_1.5fr]"
-        columns={columns}
-        data={tournaments}
-      >
-        {tournaments.map((tournament) => (
-          <Table.Row
-            key={tournament.id}
-            grid_cols="grid-cols-[1fr_0.5fr_1fr_0.5fr_0.5fr_1.5fr]"
-          >
-            <Table.Cell className="flex gap-2 items-center">
-              {tournament?.logo && (
-                <img
-                  src={tournament?.logo.light}
-                  width={30}
-                  height={30}
-                  alt=""
-                  className="rounded-full"
-                />
-              )}
-              {tournament?.name}
-            </Table.Cell>
-            <Table.Cell>{tournament?.organizer}</Table.Cell>
-            <Table.Cell>{tournament?.description}</Table.Cell>
-            <Table.Cell>
-              {format(tournament?.startDate, "yyyy-MM-dd")}
-            </Table.Cell>
-            <Table.Cell>{format(tournament?.endDate, "yyyy-MM-dd")}</Table.Cell>
+      {/* Results Count */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {t("showing") || "Showing"}{" "}
+          <span className="font-medium text-foreground">{tournaments.length}</span>{" "}
+          {t("of") || "of"}{" "}
+          <span className="font-medium text-foreground">{pagination?.total || 0}</span>{" "}
+          {t("tournaments") || "tournaments"}
+        </p>
+      </div>
 
-            <Table.Cell className="flex justify-end gap-4">
-              <Link
-                href={`/dashboard/tournaments-management/edit/${tournament.id}`}
+      {/* Table */}
+      <div className="glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5">
+        {/* Table Header */}
+        <div className="bg-muted/50 dark:bg-white/5 border-b border-border">
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4">
+            <button
+              onClick={() => handleSort("name")}
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-start"
+            >
+              {t("name") || "Tournament"}
+              {getSortIcon("name")}
+            </button>
+            <button
+              onClick={() => handleSort("status")}
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {t("status") || "Status"}
+              {getSortIcon("status")}
+            </button>
+            <button
+              onClick={() => handleSort("tier")}
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {t("tier") || "Tier"}
+              {getSortIcon("tier")}
+            </button>
+            <button
+              onClick={() => handleSort("startDate")}
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {t("date") || "Date"}
+              {getSortIcon("startDate")}
+            </button>
+            <button
+              onClick={() => handleSort("prizePool")}
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {t("prize") || "Prize Pool"}
+              {getSortIcon("prizePool")}
+            </button>
+            <span className="text-sm font-medium text-muted-foreground text-end">
+              {t("actions") || "Actions"}
+            </span>
+          </div>
+        </div>
+
+        {/* Table Body */}
+        <div className="divide-y divide-border">
+          {tournaments.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+              <Trophy className="size-12 mb-4 opacity-30" />
+              <p className="text-lg font-medium">{t("noTournaments") || "No tournaments found"}</p>
+              <p className="text-sm">{t("tryAdjusting") || "Try adjusting your filters"}</p>
+            </div>
+          ) : (
+            tournaments.map((tournament) => (
+              <div
+                key={tournament.id}
+                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-white/5 transition-colors"
               >
-                <Button className="text-white bg-green-primary rounded-full min-w-[100px] cursor-pointer">
-                  {t("Edit")}
-                </Button>
-              </Link>
-              <Button
-                disabled={isLoading}
-                className={
-                  "text-white bg-[#3A469D] rounded-full min-w-[100px] cursor-pointer disabled:cursor-not-allowed"
-                }
-                onClick={async () => {
-                  try {
-                    setIsLoading(true);
-                    await deleteTournament(tournament.id);
-                    toast.success("The Tournament is Deleted");
-                  } catch (e) {
-                    toast.error("error in Delete");
-                  } finally {
-                    setIsLoading(false);
-                  }
-                }}
-              >
-                {t("Delete")}
-              </Button>
-            </Table.Cell>
-          </Table.Row>
-        ))}
-      </Table>
-      <Pagination numPages={numPages} numItems={tournaments.length} />
+                {/* Tournament Name & Logo */}
+                <div className="flex items-center gap-3 min-w-0">
+                  {tournament?.logo?.light ? (
+                    <img
+                      src={tournament.logo.light}
+                      alt={tournament.name}
+                      className="size-10 rounded-lg object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="size-10 rounded-lg bg-green-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Trophy className="size-5 text-green-primary" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground truncate">{tournament.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {tournament.organizer || tournament.game?.name || "-"}
+                    </p>
+                  </div>
+                  {tournament.isFeatured && (
+                    <Star className="size-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                  )}
+                </div>
+
+                {/* Status */}
+                <div>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium capitalize ${
+                      STATUS_COLORS[tournament.status] || STATUS_COLORS.upcoming
+                    }`}
+                  >
+                    {t(tournament.status) || tournament.status}
+                  </span>
+                </div>
+
+                {/* Tier */}
+                <div>
+                  {tournament.tier && (
+                    <span
+                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                        TIER_COLORS[tournament.tier] || TIER_COLORS.B
+                      }`}
+                    >
+                      {tournament.tier}-Tier
+                    </span>
+                  )}
+                </div>
+
+                {/* Date */}
+                <div className="text-sm">
+                  <div className="flex items-center gap-1.5 text-foreground">
+                    <Calendar className="size-3.5 text-muted-foreground" />
+                    {tournament.startDate
+                      ? format(new Date(tournament.startDate), "MMM d, yyyy")
+                      : "-"}
+                  </div>
+                  {tournament.endDate && (
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      → {format(new Date(tournament.endDate), "MMM d, yyyy")}
+                    </p>
+                  )}
+                </div>
+
+                {/* Prize Pool */}
+                <div className="text-sm">
+                  {tournament.prizePool ? (
+                    <span className="font-medium text-green-primary">
+                      ${tournament.prizePool.toLocaleString()}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                  {tournament.teams?.length > 0 && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                      <Users className="size-3" />
+                      {tournament.teams.length} teams
+                    </p>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 justify-end">
+                  <Link href={`/dashboard/tournaments-management/edit/${tournament.id}`}>
+                    <Button
+                      size="sm"
+                      className="h-8 px-3 bg-green-primary hover:bg-green-primary/90 text-white rounded-lg"
+                    >
+                      <Pencil className="size-3.5 mr-1.5 rtl:mr-0 rtl:ml-1.5" />
+                      {t("edit") || "Edit"}
+                    </Button>
+                  </Link>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={loadingId === tournament.id}
+                    onClick={() => handleDelete(tournament.id, tournament.name)}
+                    className="h-8 px-3 text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded-lg disabled:opacity-50"
+                  >
+                    <Trash2 className="size-3.5 mr-1.5 rtl:mr-0 rtl:ml-1.5" />
+                    {loadingId === tournament.id ? "..." : t("delete") || "Delete"}
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Pagination */}
+      {numPages > 1 && <Pagination numPages={numPages} />}
     </div>
   );
 }
