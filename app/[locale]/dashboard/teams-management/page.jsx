@@ -7,7 +7,7 @@ async function TeamsPage({ searchParams }) {
   const { size, page, search, game, country, region, isActive, sortBy, sortOrder } = await searchParams;
 
   // Fetch teams, games, and countries in parallel
-  const [teamsResult, games, countriesResult] = await Promise.all([
+  const [teamsResult, gamesResult, countriesResult] = await Promise.all([
     getTeams({
       size,
       page,
@@ -24,13 +24,14 @@ async function TeamsPage({ searchParams }) {
   ]);
 
   const { data: teams, pagination } = teamsResult;
+  const games = gamesResult?.data || [];
   const countries = countriesResult?.countries || [];
 
   return (
     <TeamsListRedesign
       teams={teams || []}
       pagination={pagination}
-      games={games || []}
+      games={games}
       countries={countries}
     />
   );
