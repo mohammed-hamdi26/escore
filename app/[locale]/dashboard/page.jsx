@@ -63,7 +63,7 @@ export default async function page() {
     },
     {
       title: "Games Management",
-      href: "/games-management/edit",
+      href: "/games-management",
       icon: <GamesManagement width="57" height="56" />,
       isShowed: hasPermission(user, "Game"),
     },

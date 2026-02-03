@@ -1,12 +1,14 @@
-import LinksButtons from "@/components/ui app/LinksButtons";
+import React from "react";
+import GamesHeader from "@/components/games-management/GamesHeader";
 
-function layout({ children }) {
+export default async function GamesManagementLayout({ children }) {
   return (
-    <>
-      <LinksButtons />
+    <div className="space-y-6">
+      {/* Page Header - conditionally rendered based on route */}
+      <GamesHeader />
+
+      {/* Content */}
       {children}
-    </>
+    </div>
   );
 }
-
-export default layout;

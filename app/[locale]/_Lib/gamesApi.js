@@ -1,15 +1,46 @@
 import apiClient from "./apiCLient";
 
 export async function getGames(searchParams = {}) {
-  const searchParamsString = Object?.entries(searchParams)
-    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-    .join("&");
-
   try {
-    const res = await apiClient.get(`/games?${searchParamsString}`);
-    return res.data.data;
+    const params = new URLSearchParams();
+
+    // Pagination
+    if (searchParams.page) params.set("page", searchParams.page);
+    if (searchParams.size) params.set("limit", searchParams.size);
+    if (searchParams.limit) params.set("limit", searchParams.limit);
+
+    // Search
+    if (searchParams.search) params.set("search", searchParams.search);
+
+    // Filters
+    if (searchParams.isActive !== undefined && searchParams.isActive !== "") {
+      params.set("isActive", searchParams.isActive);
+    }
+
+    // Sorting
+    if (searchParams.sortBy) params.set("sortBy", searchParams.sortBy);
+    if (searchParams.sortOrder) params.set("sortOrder", searchParams.sortOrder);
+
+    const queryString = params.toString();
+    const url = queryString ? `/games?${queryString}` : "/games";
+
+    const res = await apiClient.get(url);
+
+    return {
+      data: res.data?.data || [],
+      pagination: res.data?.meta || {
+        totalPages: 1,
+        total: res.data?.data?.length || 0,
+        page: 1,
+        limit: 10,
+      },
+    };
   } catch (e) {
-    throw new Error("Failed to get games");
+    console.error("Error fetching games:", e);
+    return {
+      data: [],
+      pagination: { totalPages: 1, total: 0, page: 1, limit: 10 },
+    };
   }
 }
 

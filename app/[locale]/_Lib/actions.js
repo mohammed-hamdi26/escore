@@ -143,7 +143,7 @@ export async function addGame(gameData) {
     console.log("Game creation error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in adding game");
   }
-  redirect("/dashboard/games-management/edit");
+  redirect("/dashboard/games-management");
 }
 
 export async function updateGame(gameData) {
@@ -163,10 +163,22 @@ export async function deleteGame(id) {
 
   try {
     const res = await apiClient.delete(`/games/${id}`);
-    revalidatePath(`/${locale}/dashboard/games-management/edit`);
+    revalidatePath(`/${locale}/dashboard/games-management`);
     return res.data;
   } catch (e) {
     throw new Error("error in Delete");
+  }
+}
+
+export async function toggleGameActive(id) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.patch(`/games/${id}/toggle-active`);
+    revalidatePath(`/${locale}/dashboard/games-management`);
+    return res.data;
+  } catch (e) {
+    throw new Error("Error toggling game active status");
   }
 }
 
