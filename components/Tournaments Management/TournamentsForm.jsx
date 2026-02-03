@@ -193,10 +193,9 @@ export default function TournamentsForm({
         );
       } catch (error) {
         // Ignore NEXT_REDIRECT - it's expected behavior for successful form submission
-        if (error?.digest?.includes("NEXT_REDIRECT") || error?.message?.includes("NEXT_REDIRECT")) {
-          return;
+        if (!error.toString().includes("NEXT_REDIRECT")) {
+          toast.error(error.message || "An error occurred");
         }
-        toast.error(error.message);
       }
     },
   });
