@@ -192,6 +192,10 @@ export default function TournamentsForm({
             : t("The Tournament Edited")
         );
       } catch (error) {
+        // Ignore NEXT_REDIRECT - it's expected behavior for successful form submission
+        if (error?.digest?.includes("NEXT_REDIRECT") || error?.message?.includes("NEXT_REDIRECT")) {
+          return;
+        }
         toast.error(error.message);
       }
     },
