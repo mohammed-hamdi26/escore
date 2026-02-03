@@ -107,9 +107,7 @@ function LinksForm({ players, teams, id, linksType = "players", link, setOpen })
       };
       linkData.isActive = values.isActive;
       try {
-        linksType === "players"
-          ? await editLinks("players", id, linkData)
-          : await editLinks("teams", id, linkData);
+        await editLinks(linksType, id, linkData);
         !link && formik.resetForm();
         toast.success(
           link ? t("Link updated successfully") : t("Link added successfully")

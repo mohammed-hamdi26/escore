@@ -29,6 +29,7 @@ import {
   Eye,
   CalendarRange,
 } from "lucide-react";
+import TournamentStandings from "@/components/Standings/TournamentStandings";
 
 // Status badge colors
 const STATUS_CONFIG = {
@@ -45,7 +46,7 @@ const TIER_CONFIG = {
   B: { color: "bg-blue-500/10 text-blue-500 border-blue-500/30", badge: "bg-blue-500" },
 };
 
-function TournamentDetails({ tournament }) {
+function TournamentDetails({ tournament, standings = [], groupedStandings = {} }) {
   const t = useTranslations("TournamentDetails");
 
   const statusConfig = STATUS_CONFIG[tournament.status] || STATUS_CONFIG.upcoming;
@@ -248,6 +249,13 @@ function TournamentDetails({ tournament }) {
               )}
             </div>
           </div>
+
+          {/* Tournament Standings */}
+          <TournamentStandings
+            standings={standings}
+            grouped={groupedStandings}
+            title={t("standings") || "Tournament Standings"}
+          />
         </div>
 
         {/* Right Column - Sidebar */}
