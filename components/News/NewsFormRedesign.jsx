@@ -31,7 +31,7 @@ import FileInput from "../ui app/FileInput";
 import FormRow from "../ui app/FormRow";
 import FormSection from "../ui app/FormSection";
 import InputApp from "../ui app/InputApp";
-import MarkDown from "../ui app/MarkDown";
+import RichTextEditor from "../ui app/RichTextEditor";
 import SelectInput from "../ui app/SelectInput";
 import DatePicker from "../ui app/DatePicker";
 import { Button } from "../ui/button";
@@ -287,8 +287,8 @@ function NewsFormRedesign({
             />
           </FormRow>
 
-          <FormRow>
-            <MarkDown
+          <FormRow cols={1}>
+            <RichTextEditor
               name="content"
               formik={formik}
               label={t("content")}
@@ -298,6 +298,7 @@ function NewsFormRedesign({
                 formik.errors.content &&
                 t(formik.errors.content)
               }
+              minHeight="500px"
             />
           </FormRow>
         </FormSection>
