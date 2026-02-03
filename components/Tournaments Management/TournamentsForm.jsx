@@ -689,10 +689,10 @@ function MultiSelectField({ label, name, options = [], formik }) {
     if (isSelected) {
       formik.setFieldValue(
         name,
-        formik.values[name].filter((g) => (g.id || g.value || g) !== gameId)
+        (formik.values[name] || []).filter((g) => (g.id || g.value || g) !== gameId)
       );
     } else {
-      formik.setFieldValue(name, [...formik.values[name], { id: gameId, name: game.name || game.label }]);
+      formik.setFieldValue(name, [...(formik.values[name] || []), { id: gameId, name: game.name || game.label }]);
     }
     formik.setFieldTouched(name, true);
   };
@@ -1041,10 +1041,10 @@ function CountrySelectField({ label, name, countries, formik, placeholder, searc
   const value = formik.values[name];
 
   // Find selected country
-  const selectedCountry = countries.find((c) => c.label === value);
+  const selectedCountry = countries?.find((c) => c.label === value);
 
   // Filter countries based on search
-  const filteredCountries = countries.filter((country) =>
+  const filteredCountries = (countries || []).filter((country) =>
     country.label.toLowerCase().includes(search.toLowerCase()) ||
     country.value.toLowerCase().includes(search.toLowerCase())
   );

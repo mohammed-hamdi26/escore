@@ -224,7 +224,7 @@ function MatchFormRedesign({
 
   // Get filtered teams based on selected game
   const getFilteredTeams = (excludeTeamId = null) => {
-    let filtered = teamsOptions;
+    let filtered = teamsOptions || [];
     if (formik.values.game) {
       filtered = filtered.filter((team) =>
         team.games?.some((g) => g.id === formik.values.game)

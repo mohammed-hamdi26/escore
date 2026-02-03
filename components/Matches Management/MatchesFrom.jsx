@@ -314,9 +314,9 @@ function MatchesFrom({
             label={t("Team 1")}
             name={"team1"}
             options={mappedArrayToSelectOptions(
-              teamsOptions
+              (teamsOptions || [])
                 .filter((team) =>
-                  team.games.find((g) => g.id === formik.values?.game)
+                  team.games?.find((g) => g.id === formik.values?.game)
                 )
                 .filter((team) => team.id !== formik.values?.team2),
               "name",
@@ -345,9 +345,9 @@ function MatchesFrom({
             label={t("Team 2")}
             name={"team2"}
             options={mappedArrayToSelectOptions(
-              teamsOptions
+              (teamsOptions || [])
                 .filter((team) =>
-                  team.games.find((g) => g.id === formik.values?.game)
+                  team.games?.find((g) => g.id === formik.values?.game)
                 )
                 .filter((team) => team.id !== formik.values?.team1),
               "name",

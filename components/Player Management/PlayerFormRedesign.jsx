@@ -1081,7 +1081,7 @@ function TournamentMultiSelectField({
 
   const handleRemove = (tournamentId, e) => {
     e?.stopPropagation();
-    const currentValue = value.filter((id) => id !== tournamentId);
+    const currentValue = (value || []).filter((id) => id !== tournamentId);
     formik.setFieldValue(name, currentValue);
     formik.setFieldTouched(name, true);
   };
@@ -1271,9 +1271,9 @@ function CountrySelectField({
   const error = formik.touched[name] && formik.errors[name];
   const value = formik.values[name];
 
-  const selectedCountry = countries.find((c) => c.label === value);
+  const selectedCountry = countries?.find((c) => c.label === value);
 
-  const filteredCountries = countries.filter(
+  const filteredCountries = (countries || []).filter(
     (country) =>
       country.label.toLowerCase().includes(search.toLowerCase()) ||
       country.value.toLowerCase().includes(search.toLowerCase())

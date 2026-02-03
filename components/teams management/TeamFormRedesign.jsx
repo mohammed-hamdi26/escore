@@ -513,13 +513,13 @@ function CountrySelectField({
   const value = formik.values[name];
   const t = useTranslations("teamForm");
 
-  const filteredCountries = countries.filter(
+  const filteredCountries = (countries || []).filter(
     (country) =>
       country.label.toLowerCase().includes(search.toLowerCase()) ||
       country.value.toLowerCase().includes(search.toLowerCase())
   );
 
-  const selectedCountry = countries.find((c) => c.label === value);
+  const selectedCountry = countries?.find((c) => c.label === value);
 
   const handleSelect = (country) => {
     formik.setFieldValue(name, country.label);
@@ -738,11 +738,11 @@ function GameMultiSelectField({
   const selectedIds = formik.values[name] || [];
   const t = useTranslations("teamForm");
 
-  const filteredGames = games.filter((game) =>
+  const filteredGames = (games || []).filter((game) =>
     game.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const selectedGames = games.filter((game) =>
+  const selectedGames = (games || []).filter((game) =>
     selectedIds.includes(game.id || game._id)
   );
 
@@ -1050,11 +1050,11 @@ function TournamentMultiSelectField({
   const selectedIds = formik.values[name] || [];
   const t = useTranslations("teamForm");
 
-  const filteredTournaments = tournaments.filter((tournament) =>
+  const filteredTournaments = (tournaments || []).filter((tournament) =>
     tournament.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const selectedTournaments = tournaments.filter((tournament) =>
+  const selectedTournaments = (tournaments || []).filter((tournament) =>
     selectedIds.includes(tournament.id || tournament._id)
   );
 
@@ -1213,13 +1213,13 @@ function PlayerMultiSelectField({
   const selectedIds = formik.values[name] || [];
   const t = useTranslations("teamForm");
 
-  const filteredPlayers = players.filter((player) =>
+  const filteredPlayers = (players || []).filter((player) =>
     player.nickname.toLowerCase().includes(search.toLowerCase()) ||
     (player.firstName && player.firstName.toLowerCase().includes(search.toLowerCase())) ||
     (player.lastName && player.lastName.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const selectedPlayers = players.filter((player) =>
+  const selectedPlayers = (players || []).filter((player) =>
     selectedIds.includes(player.id || player._id)
   );
 

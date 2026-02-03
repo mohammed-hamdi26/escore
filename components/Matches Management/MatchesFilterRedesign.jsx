@@ -230,8 +230,8 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
 
   // Filter games based on search
   const filteredGames = useMemo(() => {
-    if (!gameSearch) return games;
-    return games.filter((game) =>
+    if (!gameSearch) return games || [];
+    return (games || []).filter((game) =>
       game.name.toLowerCase().includes(gameSearch.toLowerCase())
     );
   }, [games, gameSearch]);
@@ -239,14 +239,14 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
   // Get selected game name
   const selectedGameName = useMemo(() => {
     if (currentGame === "all") return null;
-    const game = games.find((g) => (g.id || g._id) === currentGame);
+    const game = games?.find((g) => (g.id || g._id) === currentGame);
     return game?.name;
   }, [currentGame, games]);
 
   // Filter tournaments based on search
   const filteredTournaments = useMemo(() => {
-    if (!tournamentSearch) return tournaments;
-    return tournaments.filter((tournament) =>
+    if (!tournamentSearch) return tournaments || [];
+    return (tournaments || []).filter((tournament) =>
       tournament.name.toLowerCase().includes(tournamentSearch.toLowerCase())
     );
   }, [tournaments, tournamentSearch]);
@@ -254,14 +254,14 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
   // Get selected tournament name
   const selectedTournamentName = useMemo(() => {
     if (currentTournament === "all") return null;
-    const tournament = tournaments.find((t) => (t.id || t._id) === currentTournament);
+    const tournament = tournaments?.find((t) => (t.id || t._id) === currentTournament);
     return tournament?.name;
   }, [currentTournament, tournaments]);
 
   // Filter teams based on search
   const filteredTeams = useMemo(() => {
-    if (!teamSearch) return teams;
-    return teams.filter((team) =>
+    if (!teamSearch) return teams || [];
+    return (teams || []).filter((team) =>
       team.name.toLowerCase().includes(teamSearch.toLowerCase())
     );
   }, [teams, teamSearch]);
@@ -269,7 +269,7 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
   // Get selected team name
   const selectedTeamName = useMemo(() => {
     if (currentTeam === "all") return null;
-    const team = teams.find((t) => (t.id || t._id) === currentTeam);
+    const team = teams?.find((t) => (t.id || t._id) === currentTeam);
     return team?.name;
   }, [currentTeam, teams]);
 
@@ -385,9 +385,9 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
                     <span className="flex items-center gap-2 truncate">
                       {selectedGameName ? (
                         <>
-                          {games.find((g) => (g.id || g._id) === currentGame)?.logo && (
+                          {games?.find((g) => (g.id || g._id) === currentGame)?.logo && (
                             <img
-                              src={games.find((g) => (g.id || g._id) === currentGame)?.logo?.light || games.find((g) => (g.id || g._id) === currentGame)?.logo?.dark}
+                              src={games?.find((g) => (g.id || g._id) === currentGame)?.logo?.light || games?.find((g) => (g.id || g._id) === currentGame)?.logo?.dark}
                               alt=""
                               className="size-5 rounded object-contain"
                             />
@@ -479,9 +479,9 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
                     <span className="flex items-center gap-2 truncate">
                       {selectedTournamentName ? (
                         <>
-                          {tournaments.find((t) => (t.id || t._id) === currentTournament)?.logo && (
+                          {tournaments?.find((t) => (t.id || t._id) === currentTournament)?.logo && (
                             <img
-                              src={tournaments.find((t) => (t.id || t._id) === currentTournament)?.logo?.light || tournaments.find((t) => (t.id || t._id) === currentTournament)?.logo?.dark}
+                              src={tournaments?.find((t) => (t.id || t._id) === currentTournament)?.logo?.light || tournaments?.find((t) => (t.id || t._id) === currentTournament)?.logo?.dark}
                               alt=""
                               className="size-5 rounded object-contain"
                             />
@@ -573,9 +573,9 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
                     <span className="flex items-center gap-2 truncate">
                       {selectedTeamName ? (
                         <>
-                          {teams.find((t) => (t.id || t._id) === currentTeam)?.logo && (
+                          {teams?.find((t) => (t.id || t._id) === currentTeam)?.logo && (
                             <img
-                              src={teams.find((t) => (t.id || t._id) === currentTeam)?.logo?.light || teams.find((t) => (t.id || t._id) === currentTeam)?.logo?.dark}
+                              src={teams?.find((t) => (t.id || t._id) === currentTeam)?.logo?.light || teams?.find((t) => (t.id || t._id) === currentTeam)?.logo?.dark}
                               alt=""
                               className="size-5 rounded object-contain"
                             />
