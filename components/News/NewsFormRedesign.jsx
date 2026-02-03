@@ -1,5 +1,4 @@
 "use client";
-import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { useFormik } from "formik";
 import {
   Link,
@@ -7,6 +6,7 @@ import {
   Image as ImageIcon,
   User,
   Calendar,
+  CalendarDays,
   Gamepad2,
   Trophy,
   Users,
@@ -17,10 +17,10 @@ import {
   Plus,
   AlertCircle,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
-  Eye,
-  Sparkles,
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -30,10 +30,12 @@ import * as yup from "yup";
 import FileInput from "../ui app/FileInput";
 import FormRow from "../ui app/FormRow";
 import FormSection from "../ui app/FormSection";
+import ImageUpload from "../ui app/ImageUpload";
 import InputApp from "../ui app/InputApp";
 import RichTextEditor from "../ui app/RichTextEditor";
-import SelectInput from "../ui app/SelectInput";
-import DatePicker from "../ui app/DatePicker";
+import SearchableSelect from "../ui app/SearchableSelect";
+import { Calendar as CalendarComponent } from "../ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import { Switch } from "../ui/switch";
@@ -69,6 +71,228 @@ const calculateProgress = (values, errors) => {
   return Math.round((filledRequired / requiredFields.length) * 100);
 };
 
+// Future Date Picker Component for Publish Date
+function FutureDatePickerField({ label, name, formik, placeholder }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [viewDate, setViewDate] = useState(new Date());
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+  const t = useTranslations("newsForm");
+
+  const selectedDate = value ? new Date(value) : undefined;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Years from current year to +10 years in the future
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 11 }, (_, i) => currentYear + i);
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+
+  const formatDisplayDate = (dateValue) => {
+    if (!dateValue) return "";
+    const date = new Date(dateValue);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const calculateDaysUntil = (dateValue) => {
+    if (!dateValue) return null;
+    const targetDate = new Date(dateValue);
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    targetDate.setHours(0, 0, 0, 0);
+    const diffTime = targetDate - todayDate;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const handleSelect = (date) => {
+    if (date) {
+      formik.setFieldValue(name, date);
+      formik.setFieldTouched(name, true);
+    }
+    setIsOpen(false);
+  };
+
+  const handleClear = (e) => {
+    e.stopPropagation();
+    formik.setFieldValue(name, null);
+    formik.setFieldTouched(name, true);
+  };
+
+  const handleMonthChange = (monthIndex) => {
+    const newDate = new Date(viewDate);
+    newDate.setMonth(monthIndex);
+    setViewDate(newDate);
+  };
+
+  const handleYearChange = (year) => {
+    const newDate = new Date(viewDate);
+    newDate.setFullYear(year);
+    setViewDate(newDate);
+  };
+
+  const goToPreviousMonth = () => {
+    const newDate = new Date(viewDate);
+    newDate.setMonth(newDate.getMonth() - 1);
+    setViewDate(newDate);
+  };
+
+  const goToNextMonth = () => {
+    const newDate = new Date(viewDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    setViewDate(newDate);
+  };
+
+  const daysUntil = calculateDaysUntil(value);
+
+  const getTimeLabel = () => {
+    if (daysUntil === null) return null;
+    if (daysUntil === 0) return t("today") || "Today";
+    if (daysUntil === 1) return t("tomorrow") || "Tomorrow";
+    if (daysUntil < 0) return t("published") || "Published";
+    return `${t("in") || "in"} ${daysUntil} ${t("days") || "days"}`;
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+        <Calendar className="size-4" />
+        {label}
+      </label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <div
+            role="button"
+            tabIndex={0}
+            className={`w-full h-12 px-4 rounded-xl bg-gray-50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-gray-100 dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
+              error ? "ring-2 ring-red-500 border-red-500" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="size-9 rounded-lg bg-green-primary/10 flex items-center justify-center">
+                <CalendarDays className="size-5 text-green-primary" />
+              </div>
+              {value ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-foreground font-medium">
+                    {formatDisplayDate(value)}
+                  </span>
+                  {getTimeLabel() && (
+                    <span className={`text-xs px-2 py-0.5 rounded ${
+                      daysUntil === 0
+                        ? "bg-green-500/20 text-green-500"
+                        : daysUntil < 0
+                          ? "bg-blue-500/20 text-blue-500"
+                          : "bg-muted dark:bg-[#252a3d] text-muted-foreground"
+                    }`}>
+                      {getTimeLabel()}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <span className="text-muted-foreground">{placeholder}</span>
+              )}
+            </div>
+            {value && (
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={handleClear}
+                onKeyDown={(e) => e.key === "Enter" && handleClear(e)}
+                className="size-7 rounded-lg bg-muted hover:bg-red-500/20 flex items-center justify-center transition-colors group cursor-pointer"
+              >
+                <X className="size-4 text-muted-foreground group-hover:text-red-500" />
+              </span>
+            )}
+          </div>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-auto p-0 bg-background dark:bg-[#12141c] border-border"
+          align="start"
+        >
+          {/* Year/Month Navigation */}
+          <div className="p-3 border-b border-border">
+            <div className="flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={goToPreviousMonth}
+                className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
+              >
+                <ChevronLeft className="size-4 text-foreground" />
+              </button>
+
+              <div className="flex items-center gap-2">
+                <select
+                  value={viewDate.getMonth()}
+                  onChange={(e) => handleMonthChange(parseInt(e.target.value))}
+                  className="h-8 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                >
+                  {months.map((month, index) => (
+                    <option key={month} value={index}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={viewDate.getFullYear()}
+                  onChange={(e) => handleYearChange(parseInt(e.target.value))}
+                  className="h-8 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                >
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="button"
+                onClick={goToNextMonth}
+                className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
+              >
+                <ChevronRight className="size-4 text-foreground" />
+              </button>
+            </div>
+          </div>
+
+          {/* Calendar */}
+          <CalendarComponent
+            mode="single"
+            selected={selectedDate}
+            onSelect={handleSelect}
+            month={viewDate}
+            onMonthChange={setViewDate}
+            disabled={(date) => {
+              const dateToCheck = new Date(date);
+              dateToCheck.setHours(0, 0, 0, 0);
+              return dateToCheck < today;
+            }}
+            initialFocus
+            className="rounded-xl"
+            classNames={{
+              nav: "hidden",
+              caption: "hidden",
+            }}
+          />
+        </PopoverContent>
+      </Popover>
+      {error && (
+        <p className="text-xs text-red-500">{t(error) || error}</p>
+      )}
+    </div>
+  );
+}
+
 function NewsFormRedesign({
   formType = "add",
   submit,
@@ -84,11 +308,6 @@ function NewsFormRedesign({
 }) {
   const t = useTranslations("newsForm");
   const router = useRouter();
-  const [showOptionalSections, setShowOptionalSections] = useState({
-    externalLink: false,
-    relatedEntities: false,
-    publishing: false,
-  });
 
   const formik = useFormik({
     initialValues: {
@@ -159,55 +378,6 @@ function NewsFormRedesign({
   const progress = calculateProgress(formik.values, formik.errors);
   const isComplete = progress === 100;
 
-  const toggleSection = (section) => {
-    setShowOptionalSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  };
-
-  // Collapsible Section Component
-  const CollapsibleSection = ({ id, title, icon, children, hasContent = false }) => {
-    const isOpen = showOptionalSections[id];
-    return (
-      <div className="bg-white dark:bg-[#0f1118] rounded-2xl border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none overflow-hidden transition-all duration-300">
-        <button
-          type="button"
-          onClick={() => toggleSection(id)}
-          className="w-full flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center">
-              <span className="text-gray-500 dark:text-gray-400">{icon}</span>
-            </div>
-            <div className="text-left rtl:text-right">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {title}
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {t("optional")} {hasContent && <span className="text-green-500">• {t("hasContent") || "Has content"}</span>}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs bg-gray-100 dark:bg-white/5 text-gray-500 px-2 py-1 rounded-full">
-              {t("optional")}
-            </span>
-            {isOpen ? (
-              <ChevronUp className="size-5 text-gray-400" />
-            ) : (
-              <ChevronDown className="size-5 text-gray-400" />
-            )}
-          </div>
-        </button>
-        <div className={`transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
-          <div className="px-6 pb-6 space-y-6 border-t border-gray-100 dark:border-white/5 pt-6">
-            {children}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="space-y-6 pb-24">
@@ -313,45 +483,25 @@ function NewsFormRedesign({
             </span>
           }
         >
-          {/* Cover Image Preview */}
-          {formik.values.coverImageLight && (
-            <div className="mb-6 relative group">
-              <div className="aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5">
-                <img
-                  src={formik.values.coverImageLight}
-                  alt="Cover preview"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
-                <span className="text-white text-sm font-medium flex items-center gap-2">
-                  <Eye className="size-4" />
-                  {t("preview") || "Preview"}
-                </span>
-              </div>
-            </div>
-          )}
-
-          <FormRow>
-            <FileInput
-              formik={formik}
-              name="coverImageLight"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <ImageUpload
               label={t("coverImageLight")}
-              placeholder={t("coverImagePlaceholder")}
-              required
-              error={
-                formik.touched.coverImageLight &&
-                formik.errors.coverImageLight &&
-                t(formik.errors.coverImageLight)
-              }
-            />
-            <FileInput
+              name="coverImageLight"
               formik={formik}
-              name="coverImageDark"
-              label={t("coverImageDark")}
-              placeholder={t("coverImageDarkPlaceholder")}
+              aspectRatio="landscape"
+              hint={t("coverImagePlaceholder") || "Recommended: 1200x630px"}
             />
-          </FormRow>
+            <ImageUpload
+              label={t("coverImageDark")}
+              name="coverImageDark"
+              formik={formik}
+              aspectRatio="landscape"
+              hint={t("coverImageDarkPlaceholder") || "Optional dark mode version"}
+            />
+          </div>
+          {formik.touched.coverImageLight && formik.errors.coverImageLight && (
+            <p className="text-xs text-red-500 mt-2">{t(formik.errors.coverImageLight)}</p>
+          )}
         </FormSection>
 
         {/* Section 3: Author Info (Required) */}
@@ -364,30 +514,8 @@ function NewsFormRedesign({
             </span>
           }
         >
-          {/* Author Preview Card */}
-          {(formik.values.authorName || formik.values.authorPicture) && (
-            <div className="mb-6 p-4 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center gap-4">
-              {formik.values.authorPicture ? (
-                <img
-                  src={formik.values.authorPicture}
-                  alt={formik.values.authorName}
-                  className="size-14 rounded-full object-cover ring-2 ring-white dark:ring-gray-800"
-                />
-              ) : (
-                <div className="size-14 rounded-full bg-gray-200 dark:bg-white/10 flex items-center justify-center">
-                  <User className="size-6 text-gray-400" />
-                </div>
-              )}
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{t("author") || "Author"}</p>
-                <p className="font-semibold text-gray-900 dark:text-white">
-                  {formik.values.authorName || t("authorNamePlaceholder")}
-                </p>
-              </div>
-            </div>
-          )}
-
-          <FormRow>
+          <div className="space-y-4">
+            {/* Author Name */}
             <InputApp
               name="authorName"
               onChange={formik.handleChange}
@@ -406,180 +534,167 @@ function NewsFormRedesign({
               }
               required
             />
-            <FileInput
-              formik={formik}
-              name="authorPicture"
-              label={t("authorPicture")}
-              placeholder={t("authorPicturePlaceholder")}
-              required
-              error={
-                formik.touched.authorPicture &&
-                formik.errors.authorPicture &&
-                t(formik.errors.authorPicture)
-              }
-            />
-          </FormRow>
+
+            {/* Author Photo */}
+            <div className="max-w-xs">
+              <ImageUpload
+                label={t("authorPicture")}
+                name="authorPicture"
+                formik={formik}
+                aspectRatio="square"
+                hint={t("authorPicturePlaceholder") || "Author profile picture"}
+                compact
+              />
+              {formik.touched.authorPicture && formik.errors.authorPicture && (
+                <p className="text-xs text-red-500 mt-2">{t(formik.errors.authorPicture)}</p>
+              )}
+            </div>
+          </div>
         </FormSection>
 
-        {/* Featured Toggle Card */}
-        <div className="bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-orange-500/10 dark:from-amber-500/5 dark:via-yellow-500/5 dark:to-orange-500/5 rounded-2xl border border-amber-500/20 p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="size-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                <Sparkles className="size-6 text-amber-500" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  {t("featuredNews") || "Featured News"}
-                  <Star className="size-4 text-amber-500" />
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("featuredDescription") || "Featured news appears prominently on the homepage"}
-                </p>
-              </div>
-            </div>
-            <Switch
-              checked={formik.values.isFeatured}
-              onCheckedChange={(checked) => formik.setFieldValue("isFeatured", checked)}
-              className="data-[state=checked]:bg-amber-500"
+        {/* Related Entities Card */}
+        <FormSection
+          title={t("relatedEntities") || "Related Entities"}
+          icon={<Gamepad2 className="size-5" />}
+          badge={
+            <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+              {t("optional") || "Optional"}
+            </span>
+          }
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <SearchableSelect
+              label={t("game")}
+              icon={Gamepad2}
+              placeholder={t("selectGame")}
+              searchPlaceholder={t("searchGame") || "Search game..."}
+              emptyMessage={t("noGameFound") || "No game found"}
+              value={formik.values.game}
+              onChange={(value) => formik.setFieldValue("game", value)}
+              options={gamesOptions.map((g) => ({
+                value: g.id || g._id,
+                label: g.name,
+                image: g.logo?.light || g.logo?.dark,
+              }))}
+            />
+            <SearchableSelect
+              label={t("tournament")}
+              icon={Trophy}
+              placeholder={t("selectTournament")}
+              searchPlaceholder={t("searchTournament") || "Search tournament..."}
+              emptyMessage={t("noTournamentFound") || "No tournament found"}
+              value={formik.values.tournament}
+              onChange={(value) => formik.setFieldValue("tournament", value)}
+              options={tournamentsOptions.map((t) => ({
+                value: t.id || t._id,
+                label: t.name,
+                image: t.logo?.light || t.logo?.dark,
+              }))}
+            />
+            <SearchableSelect
+              label={t("team")}
+              icon={Users}
+              placeholder={t("selectTeam")}
+              searchPlaceholder={t("searchTeam") || "Search team..."}
+              emptyMessage={t("noTeamFound") || "No team found"}
+              value={formik.values.team}
+              onChange={(value) => formik.setFieldValue("team", value)}
+              options={teamsOptions.map((t) => ({
+                value: t.id || t._id,
+                label: t.name,
+                image: t.logo?.light || t.logo?.dark,
+                subtitle: t.shortName,
+              }))}
+            />
+            <SearchableSelect
+              label={t("player")}
+              icon={User}
+              placeholder={t("selectPlayer")}
+              searchPlaceholder={t("searchPlayer") || "Search player..."}
+              emptyMessage={t("noPlayerFound") || "No player found"}
+              value={formik.values.player}
+              onChange={(value) => formik.setFieldValue("player", value)}
+              options={playersOptions.map((p) => ({
+                value: p.id || p._id,
+                label: p.nickname || p.name,
+                image: p.photo?.light || p.photo?.dark,
+                subtitle: p.team?.name,
+              }))}
+            />
+            <SearchableSelect
+              label={t("match")}
+              icon={Swords}
+              placeholder={t("selectMatch")}
+              searchPlaceholder={t("searchMatch") || "Search match..."}
+              emptyMessage={t("noMatchFound") || "No match found"}
+              value={formik.values.match}
+              onChange={(value) => formik.setFieldValue("match", value)}
+              options={matchesOptions.map((m) => ({
+                value: m.id || m._id,
+                label: `${m.team1?.name || "TBD"} vs ${m.team2?.name || "TBD"}`,
+                subtitle: m.tournament?.name,
+              }))}
             />
           </div>
-        </div>
+        </FormSection>
 
-        {/* Optional Sections - Collapsible */}
-        <div className="space-y-4">
-          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1">
-            {t("optionalSections") || "Optional Sections"}
-          </h2>
+        {/* Additional Settings */}
+        <FormSection
+          title={t("optionalSections") || "Additional Settings"}
+          icon={<Settings className="size-5" />}
+          badge={
+            <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+              {t("optional") || "Optional"}
+            </span>
+          }
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Featured Toggle */}
+            <div className="flex items-center justify-between p-4 rounded-xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20">
+              <div className="flex items-center gap-3">
+                <Star className="size-5 text-amber-500" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{t("featuredNews") || "Featured News"}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t("featuredDescription") || "Show on homepage"}</p>
+                </div>
+              </div>
+              <Switch
+                checked={formik.values.isFeatured}
+                onCheckedChange={(checked) => formik.setFieldValue("isFeatured", checked)}
+                className="data-[state=checked]:bg-amber-500"
+              />
+            </div>
+
+            {/* Publish Date */}
+            <FutureDatePickerField
+              formik={formik}
+              name="publishedAt"
+              label={t("publishDate")}
+              placeholder={t("publishDatePlaceholder") || "Select publish date"}
+            />
+          </div>
 
           {/* External Link */}
-          <CollapsibleSection
-            id="externalLink"
-            title={t("externalLink")}
-            icon={<Link className="size-5" />}
-            hasContent={!!formik.values.urlExternal}
-          >
-            <FormRow>
-              <InputApp
-                name="urlExternal"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.urlExternal}
-                label={t("externalUrl")}
-                placeholder={t("externalUrlPlaceholder")}
-                className="border-0 focus:outline-none"
-                backGroundColor="bg-gray-50 dark:bg-[#0F1017]"
-                textColor="text-gray-600 dark:text-gray-400"
-                icon={<Link className="size-5 text-gray-400" />}
-                error={
-                  formik.touched.urlExternal &&
-                  formik.errors.urlExternal &&
-                  t(formik.errors.urlExternal)
-                }
-              />
-            </FormRow>
-          </CollapsibleSection>
-
-          {/* Related Entities */}
-          <CollapsibleSection
-            id="relatedEntities"
-            title={t("relatedEntities")}
-            icon={<Gamepad2 className="size-5" />}
-            hasContent={!!(formik.values.game || formik.values.tournament || formik.values.team || formik.values.player || formik.values.match)}
-          >
-            <FormRow>
-              <SelectInput
-                name="game"
-                formik={formik}
-                label={t("game")}
-                options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
-                placeholder={t("selectGame")}
-                onChange={(value) => formik.setFieldValue("game", value)}
-                icon={<Gamepad2 className="size-5 text-gray-400" />}
-              />
-              <SelectInput
-                name="tournament"
-                formik={formik}
-                label={t("tournament")}
-                options={mappedArrayToSelectOptions(
-                  tournamentsOptions,
-                  "name",
-                  "id"
-                )}
-                placeholder={t("selectTournament")}
-                onChange={(value) => formik.setFieldValue("tournament", value)}
-                icon={<Trophy className="size-5 text-gray-400" />}
-              />
-            </FormRow>
-
-            <FormRow>
-              <SelectInput
-                name="team"
-                formik={formik}
-                label={t("team")}
-                options={mappedArrayToSelectOptions(teamsOptions, "name", "id")}
-                placeholder={t("selectTeam")}
-                onChange={(value) => formik.setFieldValue("team", value)}
-                icon={<Users className="size-5 text-gray-400" />}
-              />
-              <SelectInput
-                name="player"
-                formik={formik}
-                label={t("player")}
-                options={mappedArrayToSelectOptions(
-                  playersOptions,
-                  "nickname",
-                  "id"
-                )}
-                placeholder={t("selectPlayer")}
-                onChange={(value) => formik.setFieldValue("player", value)}
-                icon={<User className="size-5 text-gray-400" />}
-              />
-            </FormRow>
-
-            <FormRow cols={1}>
-              <SelectInput
-                name="match"
-                formik={formik}
-                label={t("match")}
-                options={mappedArrayToSelectOptions(
-                  matchesOptions.map((m) => ({
-                    name: `${m.team1?.name || "TBD"} vs ${
-                      m.team2?.name || "TBD"
-                    }`,
-                    id: m.id,
-                  })),
-                  "name",
-                  "id"
-                )}
-                placeholder={t("selectMatch")}
-                onChange={(value) => formik.setFieldValue("match", value)}
-                icon={<Swords className="size-5 text-gray-400" />}
-              />
-            </FormRow>
-          </CollapsibleSection>
-
-          {/* Publishing */}
-          <CollapsibleSection
-            id="publishing"
-            title={t("publishing")}
-            icon={<Calendar className="size-5" />}
-            hasContent={!!formik.values.publishedAt}
-          >
-            <FormRow>
-              <DatePicker
-                formik={formik}
-                name="publishedAt"
-                label={t("publishDate")}
-                placeholder={t("publishDatePlaceholder")}
-                icon={<Calendar className="size-5 text-gray-400" />}
-              />
-            </FormRow>
-            <p className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 p-3 rounded-lg">
-              💡 {t("publishDateHint")}
-            </p>
-          </CollapsibleSection>
-        </div>
+          <div className="mt-4">
+            <InputApp
+              name="urlExternal"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.urlExternal}
+              label={t("externalUrl")}
+              placeholder={t("externalUrlPlaceholder")}
+              className="border-0 focus:outline-none"
+              backGroundColor="bg-gray-50 dark:bg-[#0F1017]"
+              textColor="text-gray-600 dark:text-gray-400"
+              icon={<Link className="size-5 text-gray-400" />}
+              error={
+                formik.touched.urlExternal &&
+                formik.errors.urlExternal &&
+                t(formik.errors.urlExternal)
+              }
+            />
+          </div>
+        </FormSection>
 
         {/* Sticky Submit Footer */}
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#0a0c10]/80 backdrop-blur-xl border-t border-gray-200 dark:border-white/5">

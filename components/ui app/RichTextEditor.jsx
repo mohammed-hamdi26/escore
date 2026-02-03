@@ -30,6 +30,7 @@ export default function RichTextEditor({
         ["bold", "italic", "underline", "strike"],
         [{ color: [] }, { background: [] }],
         [{ align: [] }],
+        [{ direction: "rtl" }], // RTL/LTR toggle
         [{ list: "ordered" }, { list: "bullet" }],
         ["blockquote", "code-block"],
         ["link", "image", "video"],
@@ -51,6 +52,7 @@ export default function RichTextEditor({
     "color",
     "background",
     "align",
+    "direction", // RTL support
     "list",
     "bullet",
     "blockquote",
@@ -59,6 +61,16 @@ export default function RichTextEditor({
     "image",
     "video",
   ];
+
+  // Helper function to detect RTL text
+  const isRTL = (text) => {
+    if (!text) return false;
+    // Arabic, Hebrew, Persian, Urdu character ranges
+    const rtlRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\u0590-\u05FF]/;
+    // Get first non-whitespace character
+    const firstChar = text.replace(/\s/g, '').charAt(0);
+    return rtlRegex.test(firstChar);
+  };
 
   // Handle hydration and load Quill
   useEffect(() => {
@@ -80,16 +92,19 @@ export default function RichTextEditor({
 
   // Calculate word and character count
   const updateCounts = useCallback((text) => {
-    const trimmedText = (text || "").trim();
-    setCharCount(trimmedText.length);
-    setWordCount(
-      trimmedText.length > 0
-        ? trimmedText.split(/\s+/).filter((w) => w.length > 0).length
-        : 0
-    );
+    const rawText = text || "";
+
+    // Character count (excluding trailing newline from Quill)
+    const charText = rawText.replace(/\n$/, '');
+    setCharCount(charText.length);
+
+    // Word count - match actual words (letters/numbers sequences)
+    // This regex matches words in any language including Arabic, English, etc.
+    const wordMatches = rawText.match(/[\p{L}\p{N}]+/gu);
+    setWordCount(wordMatches ? wordMatches.length : 0);
   }, []);
 
-  // Handle content change
+  // Handle content change with smart RTL detection
   const handleChange = useCallback(
     (content, delta, source, editor) => {
       // Quill returns <p><br></p> for empty content
@@ -98,6 +113,33 @@ export default function RichTextEditor({
 
       formik?.setFieldValue(name, value);
       updateCounts(editor.getText());
+
+      // Smart auto-direction: detect RTL and apply direction
+      if (quillRef.current && source === 'user') {
+        const quill = quillRef.current.getEditor();
+        const text = editor.getText();
+        const shouldBeRTL = isRTL(text);
+
+        // Get current selection to restore it
+        const selection = quill.getSelection();
+
+        // Apply direction to the whole document based on first character
+        if (text.trim().length > 0) {
+          const currentFormat = quill.getFormat();
+          const currentDirection = currentFormat.direction === 'rtl';
+
+          // Only change if different and user hasn't manually set it
+          if (shouldBeRTL !== currentDirection && delta.ops && delta.ops.some(op => op.insert)) {
+            quill.formatLine(0, quill.getLength(), 'direction', shouldBeRTL ? 'rtl' : false);
+            quill.formatLine(0, quill.getLength(), 'align', shouldBeRTL ? 'right' : false);
+          }
+        }
+
+        // Restore selection
+        if (selection) {
+          quill.setSelection(selection);
+        }
+      }
     },
     [formik, name, updateCounts]
   );
@@ -235,18 +277,34 @@ export default function RichTextEditor({
         .quill-light .ql-container {
           border: none !important;
           font-family: inherit;
+          background: #ffffff;
         }
 
         .quill-light .ql-editor {
+          color: #1f2937 !important;
           font-size: 15px;
           line-height: 1.7;
           padding: 20px 24px;
           min-height: inherit;
         }
 
+        .quill-light .ql-editor * {
+          color: inherit;
+        }
+
         .quill-light .ql-editor.ql-blank::before {
           color: #9ca3af;
           font-style: normal;
+        }
+
+        /* Light mode picker dropdown text */
+        .quill-light .ql-picker-options .ql-picker-item {
+          color: #1f2937;
+        }
+
+        .quill-light .ql-snow .ql-picker.ql-expanded .ql-picker-options {
+          background: #ffffff;
+          border-color: #e5e7eb;
         }
 
         /* Dark mode styles */
@@ -416,6 +474,74 @@ export default function RichTextEditor({
           width: 100%;
           aspect-ratio: 16/9;
           border-radius: 8px;
+        }
+
+        /* RTL Support */
+        .ql-editor[dir="rtl"],
+        .ql-editor .ql-direction-rtl {
+          direction: rtl;
+          text-align: right;
+        }
+
+        /* RTL button styling */
+        .ql-snow .ql-picker.ql-direction {
+          width: 40px;
+        }
+
+        .ql-snow .ql-picker.ql-direction .ql-picker-label::before {
+          content: "⇄";
+          font-size: 14px;
+        }
+
+        .ql-snow .ql-picker.ql-direction .ql-picker-item::before {
+          content: "LTR";
+        }
+
+        .ql-snow .ql-picker.ql-direction .ql-picker-item[data-value="rtl"]::before {
+          content: "RTL";
+        }
+
+        /* Light mode tooltip */
+        .quill-light .ql-tooltip {
+          background: #ffffff;
+          border-color: #e5e7eb;
+          color: #1f2937;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .quill-light .ql-tooltip input[type="text"] {
+          background: #f9fafb;
+          border-color: #e5e7eb;
+          color: #1f2937;
+        }
+
+        .quill-light .ql-tooltip a.ql-action::after,
+        .quill-light .ql-tooltip a.ql-remove::before {
+          color: #22c55e;
+        }
+
+        /* Headers styling for light mode */
+        .quill-light .ql-editor h1,
+        .quill-light .ql-editor h2,
+        .quill-light .ql-editor h3,
+        .quill-light .ql-editor h4 {
+          color: #111827;
+        }
+
+        /* Paragraphs in light mode */
+        .quill-light .ql-editor p {
+          color: #1f2937;
+        }
+
+        /* Lists in light mode */
+        .quill-light .ql-editor ul li,
+        .quill-light .ql-editor ol li {
+          color: #1f2937;
+        }
+
+        /* Blockquote in light mode */
+        .quill-light .ql-editor blockquote {
+          color: #4b5563;
         }
       `}</style>
     </div>

@@ -2219,7 +2219,22 @@
     "featuredNews": "Featured News",
     "featuredDescription": "Featured news appears prominently on the homepage",
     "optionalSections": "Optional Sections",
-    "readyToSubmit": "Ready to submit"
+    "readyToSubmit": "Ready to submit",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "published": "Published",
+    "in": "in",
+    "days": "days",
+    "searchGame": "Search game...",
+    "noGameFound": "No game found",
+    "searchTournament": "Search tournament...",
+    "noTournamentFound": "No tournament found",
+    "searchTeam": "Search team...",
+    "noTeamFound": "No team found",
+    "searchPlayer": "Search player...",
+    "noPlayerFound": "No player found",
+    "searchMatch": "Search match...",
+    "noMatchFound": "No match found"
   },
   "ForgetPassword": {
     "title": "Forgot Password?",

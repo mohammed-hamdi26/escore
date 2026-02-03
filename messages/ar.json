@@ -2139,7 +2139,22 @@
     "featuredNews": "خبر مميز",
     "featuredDescription": "الأخبار المميزة تظهر بشكل بارز في الصفحة الرئيسية",
     "optionalSections": "أقسام اختيارية",
-    "readyToSubmit": "جاهز للإرسال"
+    "readyToSubmit": "جاهز للإرسال",
+    "today": "اليوم",
+    "tomorrow": "غداً",
+    "published": "منشور",
+    "in": "خلال",
+    "days": "أيام",
+    "searchGame": "ابحث عن لعبة...",
+    "noGameFound": "لم يتم العثور على لعبة",
+    "searchTournament": "ابحث عن بطولة...",
+    "noTournamentFound": "لم يتم العثور على بطولة",
+    "searchTeam": "ابحث عن فريق...",
+    "noTeamFound": "لم يتم العثور على فريق",
+    "searchPlayer": "ابحث عن لاعب...",
+    "noPlayerFound": "لم يتم العثور على لاعب",
+    "searchMatch": "ابحث عن مباراة...",
+    "noMatchFound": "لم يتم العثور على مباراة"
   },
   "ForgetPassword": {
     "title": "نسيت كلمة المرور؟",
