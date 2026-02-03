@@ -31,7 +31,6 @@ import {
 } from "lucide-react";
 import { startMatch, updateMatchStatus, updateMatchResult } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
-import TournamentStandings from "@/components/Standings/TournamentStandings";
 
 const STATUS_CONFIG = {
   scheduled: {
@@ -61,7 +60,7 @@ const STATUS_CONFIG = {
   },
 };
 
-function MatchDetails({ match, standings = [], groupedStandings = {} }) {
+function MatchDetails({ match }) {
   const t = useTranslations("MatchDetails");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -566,14 +565,6 @@ function MatchDetails({ match, standings = [], groupedStandings = {} }) {
             </div>
           )}
 
-          {/* Tournament Standings */}
-          {match.tournament && (standings.length > 0 || Object.keys(groupedStandings).length > 0) && (
-            <TournamentStandings
-              standings={standings}
-              grouped={groupedStandings}
-              title={`${match.tournament?.name || t("tournament")} ${t("standings") || "Standings"}`}
-            />
-          )}
         </div>
 
         {/* Right Column - Sidebar */}

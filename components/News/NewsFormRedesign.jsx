@@ -16,9 +16,15 @@ import {
   Save,
   Plus,
   AlertCircle,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  Sparkles,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 import FileInput from "../ui app/FileInput";
@@ -30,7 +36,6 @@ import SelectInput from "../ui app/SelectInput";
 import DatePicker from "../ui app/DatePicker";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
-import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 
 // Validation schema - Required: title, content, coverImageLight, authorName, authorPicture
@@ -57,6 +62,13 @@ const validationSchema = yup.object({
   isFeatured: yup.boolean(),
 });
 
+// Progress calculation helper
+const calculateProgress = (values, errors) => {
+  const requiredFields = ['title', 'content', 'coverImageLight', 'authorName', 'authorPicture'];
+  const filledRequired = requiredFields.filter(field => values[field] && !errors[field]).length;
+  return Math.round((filledRequired / requiredFields.length) * 100);
+};
+
 function NewsFormRedesign({
   formType = "add",
   submit,
@@ -72,6 +84,11 @@ function NewsFormRedesign({
 }) {
   const t = useTranslations("newsForm");
   const router = useRouter();
+  const [showOptionalSections, setShowOptionalSections] = useState({
+    externalLink: false,
+    relatedEntities: false,
+    publishing: false,
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -139,22 +156,104 @@ function NewsFormRedesign({
     },
   });
 
-  // Count validation errors
-  const errorCount = Object.keys(formik.errors).length;
-  const touchedErrorCount = Object.keys(formik.errors).filter(
-    (key) => formik.touched[key]
-  ).length;
+  const progress = calculateProgress(formik.values, formik.errors);
+  const isComplete = progress === 100;
+
+  const toggleSection = (section) => {
+    setShowOptionalSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  // Collapsible Section Component
+  const CollapsibleSection = ({ id, title, icon, children, hasContent = false }) => {
+    const isOpen = showOptionalSections[id];
+    return (
+      <div className="bg-white dark:bg-[#0f1118] rounded-2xl border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none overflow-hidden transition-all duration-300">
+        <button
+          type="button"
+          onClick={() => toggleSection(id)}
+          className="w-full flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+              <span className="text-gray-500 dark:text-gray-400">{icon}</span>
+            </div>
+            <div className="text-left rtl:text-right">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {title}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t("optional")} {hasContent && <span className="text-green-500">• {t("hasContent") || "Has content"}</span>}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs bg-gray-100 dark:bg-white/5 text-gray-500 px-2 py-1 rounded-full">
+              {t("optional")}
+            </span>
+            {isOpen ? (
+              <ChevronUp className="size-5 text-gray-400" />
+            ) : (
+              <ChevronDown className="size-5 text-gray-400" />
+            )}
+          </div>
+        </button>
+        <div className={`transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+          <div className="px-6 pb-6 space-y-6 border-t border-gray-100 dark:border-white/5 pt-6">
+            {children}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 pb-24">
+      {/* Header with Progress */}
+      <div className="bg-white dark:bg-[#0f1118] rounded-2xl border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="size-10 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+            >
+              <ArrowLeft className="size-5 text-gray-600 dark:text-gray-400" />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {formType === "add" ? t("addNews") || "Add News" : t("editNews") || "Edit News"}
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                {t("fillRequiredFields") || "Fill in the required fields to publish your news"}
+              </p>
+            </div>
+          </div>
 
-      {/* Required Fields Notice */}
-      <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex items-center gap-2">
-        <AlertCircle className="size-4 text-blue-400" />
-        <span className="text-sm text-blue-400">
-          {t("requiredFieldsNotice")}
-        </span>
+          {/* Progress Indicator */}
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2">
+                {isComplete ? (
+                  <CheckCircle2 className="size-5 text-green-500" />
+                ) : (
+                  <AlertCircle className="size-5 text-amber-500" />
+                )}
+                <span className={`text-sm font-medium ${isComplete ? 'text-green-500' : 'text-amber-500'}`}>
+                  {progress}% {t("complete") || "Complete"}
+                </span>
+              </div>
+              <div className="w-32 h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-green-500' : 'bg-amber-500'}`}
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <form className="space-y-6" onSubmit={formik.handleSubmit}>
@@ -163,7 +262,7 @@ function NewsFormRedesign({
           title={t("basicInfo")}
           icon={<FileText className="size-5" />}
           badge={
-            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+            <span className="text-xs bg-red-500/10 text-red-500 px-2.5 py-1 rounded-full font-medium">
               {t("required")}
             </span>
           }
@@ -177,8 +276,8 @@ function NewsFormRedesign({
               label={t("title")}
               placeholder={t("titlePlaceholder")}
               className="border-0 focus:outline-none"
-              backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-              textColor="text-[#677185]"
+              backGroundColor="bg-gray-50 dark:bg-[#0F1017]"
+              textColor="text-gray-600 dark:text-gray-400"
               error={
                 formik.touched.title &&
                 formik.errors.title &&
@@ -208,11 +307,30 @@ function NewsFormRedesign({
           title={t("coverImage")}
           icon={<ImageIcon className="size-5" />}
           badge={
-            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+            <span className="text-xs bg-red-500/10 text-red-500 px-2.5 py-1 rounded-full font-medium">
               {t("required")}
             </span>
           }
         >
+          {/* Cover Image Preview */}
+          {formik.values.coverImageLight && (
+            <div className="mb-6 relative group">
+              <div className="aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5">
+                <img
+                  src={formik.values.coverImageLight}
+                  alt="Cover preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
+                <span className="text-white text-sm font-medium flex items-center gap-2">
+                  <Eye className="size-4" />
+                  {t("preview") || "Preview"}
+                </span>
+              </div>
+            </div>
+          )}
+
           <FormRow>
             <FileInput
               formik={formik}
@@ -240,11 +358,34 @@ function NewsFormRedesign({
           title={t("authorInfo")}
           icon={<User className="size-5" />}
           badge={
-            <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+            <span className="text-xs bg-red-500/10 text-red-500 px-2.5 py-1 rounded-full font-medium">
               {t("required")}
             </span>
           }
         >
+          {/* Author Preview Card */}
+          {(formik.values.authorName || formik.values.authorPicture) && (
+            <div className="mb-6 p-4 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center gap-4">
+              {formik.values.authorPicture ? (
+                <img
+                  src={formik.values.authorPicture}
+                  alt={formik.values.authorName}
+                  className="size-14 rounded-full object-cover ring-2 ring-white dark:ring-gray-800"
+                />
+              ) : (
+                <div className="size-14 rounded-full bg-gray-200 dark:bg-white/10 flex items-center justify-center">
+                  <User className="size-6 text-gray-400" />
+                </div>
+              )}
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{t("author") || "Author"}</p>
+                <p className="font-semibold text-gray-900 dark:text-white">
+                  {formik.values.authorName || t("authorNamePlaceholder")}
+                </p>
+              </div>
+            </div>
+          )}
+
           <FormRow>
             <InputApp
               name="authorName"
@@ -254,9 +395,9 @@ function NewsFormRedesign({
               label={t("authorName")}
               placeholder={t("authorNamePlaceholder")}
               className="border-0 focus:outline-none"
-              backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-              textColor="text-[#677185]"
-              icon={<User className="size-5 text-[#677185]" />}
+              backGroundColor="bg-gray-50 dark:bg-[#0F1017]"
+              textColor="text-gray-600 dark:text-gray-400"
+              icon={<User className="size-5 text-gray-400" />}
               error={
                 formik.touched.authorName &&
                 formik.errors.authorName &&
@@ -279,175 +420,211 @@ function NewsFormRedesign({
           </FormRow>
         </FormSection>
 
-        {/* Section 4: External URL (Optional) */}
-        <FormSection
-          title={t("externalLink")}
-          icon={<Link className="size-5" />}
-          badge={
-            <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
-              {t("optional")}
-            </span>
-          }
-        >
-          <FormRow>
-            <InputApp
-              name="urlExternal"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.urlExternal}
-              label={t("externalUrl")}
-              placeholder={t("externalUrlPlaceholder")}
-              className="border-0 focus:outline-none"
-              backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-              textColor="text-[#677185]"
-              icon={<Link className="size-5 text-[#677185]" />}
-              error={
-                formik.touched.urlExternal &&
-                formik.errors.urlExternal &&
-                t(formik.errors.urlExternal)
-              }
+        {/* Featured Toggle Card */}
+        <div className="bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-orange-500/10 dark:from-amber-500/5 dark:via-yellow-500/5 dark:to-orange-500/5 rounded-2xl border border-amber-500/20 p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="size-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                <Sparkles className="size-6 text-amber-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  {t("featuredNews") || "Featured News"}
+                  <Star className="size-4 text-amber-500" />
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t("featuredDescription") || "Featured news appears prominently on the homepage"}
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={formik.values.isFeatured}
+              onCheckedChange={(checked) => formik.setFieldValue("isFeatured", checked)}
+              className="data-[state=checked]:bg-amber-500"
             />
-          </FormRow>
-        </FormSection>
-
-        {/* Section 5: Related Entities (Optional) */}
-        <FormSection
-          title={t("relatedEntities")}
-          icon={<Gamepad2 className="size-5" />}
-          badge={
-            <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
-              {t("optional")}
-            </span>
-          }
-        >
-          <FormRow>
-            <SelectInput
-              name="game"
-              formik={formik}
-              label={t("game")}
-              options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
-              placeholder={t("selectGame")}
-              onChange={(value) => formik.setFieldValue("game", value)}
-              icon={<Gamepad2 className="size-5 text-[#677185]" />}
-            />
-            <SelectInput
-              name="tournament"
-              formik={formik}
-              label={t("tournament")}
-              options={mappedArrayToSelectOptions(
-                tournamentsOptions,
-                "name",
-                "id"
-              )}
-              placeholder={t("selectTournament")}
-              onChange={(value) => formik.setFieldValue("tournament", value)}
-              icon={<Trophy className="size-5 text-[#677185]" />}
-            />
-          </FormRow>
-
-          <FormRow>
-            <SelectInput
-              name="team"
-              formik={formik}
-              label={t("team")}
-              options={mappedArrayToSelectOptions(teamsOptions, "name", "id")}
-              placeholder={t("selectTeam")}
-              onChange={(value) => formik.setFieldValue("team", value)}
-              icon={<Users className="size-5 text-[#677185]" />}
-            />
-            <SelectInput
-              name="player"
-              formik={formik}
-              label={t("player")}
-              options={mappedArrayToSelectOptions(
-                playersOptions,
-                "nickname",
-                "id"
-              )}
-              placeholder={t("selectPlayer")}
-              onChange={(value) => formik.setFieldValue("player", value)}
-              icon={<User className="size-5 text-[#677185]" />}
-            />
-          </FormRow>
-
-          <FormRow>
-            <SelectInput
-              name="match"
-              formik={formik}
-              label={t("match")}
-              options={mappedArrayToSelectOptions(
-                matchesOptions.map((m) => ({
-                  name: `${m.team1?.name || "TBD"} vs ${
-                    m.team2?.name || "TBD"
-                  }`,
-                  id: m.id,
-                })),
-                "name",
-                "id"
-              )}
-              placeholder={t("selectMatch")}
-              onChange={(value) => formik.setFieldValue("match", value)}
-              icon={<Swords className="size-5 text-[#677185]" />}
-            />
-          </FormRow>
-        </FormSection>
-
-        {/* Section 6: Publishing (Optional) */}
-        <FormSection
-          title={t("publishing")}
-          icon={<Calendar className="size-5" />}
-          badge={
-            <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
-              {t("optional")}
-            </span>
-          }
-        >
-          <FormRow>
-            <DatePicker
-              formik={formik}
-              name="publishedAt"
-              label={t("publishDate")}
-              placeholder={t("publishDatePlaceholder")}
-              icon={<Calendar className="size-5 text-[#677185]" />}
-            />
-          </FormRow>
-          <p className="text-xs text-[#677185] mt-2">{t("publishDateHint")}</p>
-        </FormSection>
-
-        {/* Submit Button */}
-        <div className="flex justify-between items-center gap-4 pt-4 sticky bottom-0 bg-linear-to-t from-white to-transparent dark:from-[#0a0c10] dark:via-[#0a0c10] dark:to-transparent py-6">
-          <div className="text-sm text-[#677185]">
-            <span className="text-red-500">*</span> {t("requiredFields")}
           </div>
-          <div className="flex gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.back()}
-              className="border-[#677185] text-[#677185] hover:text-white hover:border-white"
-            >
-              <ArrowLeft className="size-4 mr-2" />
-              {t("cancel")}
-            </Button>
-            <Button
-              type="submit"
-              disabled={formik.isSubmitting || !formik.isValid}
-              className="bg-green-primary hover:bg-green-primary/80 text-white min-w-[140px] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {formik.isSubmitting ? (
-                <Spinner />
-              ) : formType === "add" ? (
-                <>
-                  <Plus className="size-4 mr-2" />
-                  {t("submit")}
-                </>
-              ) : (
-                <>
-                  <Save className="size-4 mr-2" />
-                  {t("save")}
-                </>
-              )}
-            </Button>
+        </div>
+
+        {/* Optional Sections - Collapsible */}
+        <div className="space-y-4">
+          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1">
+            {t("optionalSections") || "Optional Sections"}
+          </h2>
+
+          {/* External Link */}
+          <CollapsibleSection
+            id="externalLink"
+            title={t("externalLink")}
+            icon={<Link className="size-5" />}
+            hasContent={!!formik.values.urlExternal}
+          >
+            <FormRow>
+              <InputApp
+                name="urlExternal"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.urlExternal}
+                label={t("externalUrl")}
+                placeholder={t("externalUrlPlaceholder")}
+                className="border-0 focus:outline-none"
+                backGroundColor="bg-gray-50 dark:bg-[#0F1017]"
+                textColor="text-gray-600 dark:text-gray-400"
+                icon={<Link className="size-5 text-gray-400" />}
+                error={
+                  formik.touched.urlExternal &&
+                  formik.errors.urlExternal &&
+                  t(formik.errors.urlExternal)
+                }
+              />
+            </FormRow>
+          </CollapsibleSection>
+
+          {/* Related Entities */}
+          <CollapsibleSection
+            id="relatedEntities"
+            title={t("relatedEntities")}
+            icon={<Gamepad2 className="size-5" />}
+            hasContent={!!(formik.values.game || formik.values.tournament || formik.values.team || formik.values.player || formik.values.match)}
+          >
+            <FormRow>
+              <SelectInput
+                name="game"
+                formik={formik}
+                label={t("game")}
+                options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
+                placeholder={t("selectGame")}
+                onChange={(value) => formik.setFieldValue("game", value)}
+                icon={<Gamepad2 className="size-5 text-gray-400" />}
+              />
+              <SelectInput
+                name="tournament"
+                formik={formik}
+                label={t("tournament")}
+                options={mappedArrayToSelectOptions(
+                  tournamentsOptions,
+                  "name",
+                  "id"
+                )}
+                placeholder={t("selectTournament")}
+                onChange={(value) => formik.setFieldValue("tournament", value)}
+                icon={<Trophy className="size-5 text-gray-400" />}
+              />
+            </FormRow>
+
+            <FormRow>
+              <SelectInput
+                name="team"
+                formik={formik}
+                label={t("team")}
+                options={mappedArrayToSelectOptions(teamsOptions, "name", "id")}
+                placeholder={t("selectTeam")}
+                onChange={(value) => formik.setFieldValue("team", value)}
+                icon={<Users className="size-5 text-gray-400" />}
+              />
+              <SelectInput
+                name="player"
+                formik={formik}
+                label={t("player")}
+                options={mappedArrayToSelectOptions(
+                  playersOptions,
+                  "nickname",
+                  "id"
+                )}
+                placeholder={t("selectPlayer")}
+                onChange={(value) => formik.setFieldValue("player", value)}
+                icon={<User className="size-5 text-gray-400" />}
+              />
+            </FormRow>
+
+            <FormRow cols={1}>
+              <SelectInput
+                name="match"
+                formik={formik}
+                label={t("match")}
+                options={mappedArrayToSelectOptions(
+                  matchesOptions.map((m) => ({
+                    name: `${m.team1?.name || "TBD"} vs ${
+                      m.team2?.name || "TBD"
+                    }`,
+                    id: m.id,
+                  })),
+                  "name",
+                  "id"
+                )}
+                placeholder={t("selectMatch")}
+                onChange={(value) => formik.setFieldValue("match", value)}
+                icon={<Swords className="size-5 text-gray-400" />}
+              />
+            </FormRow>
+          </CollapsibleSection>
+
+          {/* Publishing */}
+          <CollapsibleSection
+            id="publishing"
+            title={t("publishing")}
+            icon={<Calendar className="size-5" />}
+            hasContent={!!formik.values.publishedAt}
+          >
+            <FormRow>
+              <DatePicker
+                formik={formik}
+                name="publishedAt"
+                label={t("publishDate")}
+                placeholder={t("publishDatePlaceholder")}
+                icon={<Calendar className="size-5 text-gray-400" />}
+              />
+            </FormRow>
+            <p className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 p-3 rounded-lg">
+              💡 {t("publishDateHint")}
+            </p>
+          </CollapsibleSection>
+        </div>
+
+        {/* Sticky Submit Footer */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#0a0c10]/80 backdrop-blur-xl border-t border-gray-200 dark:border-white/5">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className={`size-3 rounded-full ${isComplete ? 'bg-green-500' : 'bg-amber-500'} animate-pulse`} />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {isComplete ? (
+                    <span className="text-green-500 font-medium">{t("readyToSubmit") || "Ready to submit"}</span>
+                  ) : (
+                    <span><span className="text-red-500">*</span> {t("requiredFields")}</span>
+                  )}
+                </span>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                  className="border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5"
+                >
+                  <ArrowLeft className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {t("cancel")}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={formik.isSubmitting || !formik.isValid}
+                  className="bg-green-primary hover:bg-green-600 text-white min-w-[160px] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-green-primary/25"
+                >
+                  {formik.isSubmitting ? (
+                    <Spinner />
+                  ) : formType === "add" ? (
+                    <>
+                      <Plus className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("submit")}
+                    </>
+                  ) : (
+                    <>
+                      <Save className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("save")}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </form>

@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
-import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import {
   Search,
   Filter,
@@ -10,8 +10,8 @@ import {
   ChevronDown,
   ChevronUp,
   ListFilter,
-  CheckCircle2,
-  XCircle,
+  Power,
+  PowerOff,
   Check,
 } from "lucide-react";
 import { Button } from "../ui/button";
@@ -28,28 +28,28 @@ import {
 } from "@/components/ui/command";
 import { useTranslations } from "next-intl";
 
-const ACTIVE_OPTIONS = [
-  { value: "", label: "all", icon: ListFilter, color: "text-gray-500" },
-  { value: "true", label: "active", icon: CheckCircle2, color: "text-green-500" },
-  { value: "false", label: "inactive", icon: XCircle, color: "text-red-500" },
+const STATUS_OPTIONS = [
+  { value: "", label: "allStatus", icon: ListFilter, color: "text-gray-500" },
+  { value: "true", label: "active", icon: Power, color: "text-green-500" },
+  { value: "false", label: "inactive", icon: PowerOff, color: "text-red-500" },
 ];
 
 function GamesFilter() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const t = useTranslations("GamesFilter");
+  const t = useTranslations("gamesList");
   const searchTimeoutRef = useRef(null);
 
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
 
   // Popover states
-  const [activeOpen, setActiveOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
 
   // Get current filter values from URL
   const currentSearch = searchParams.get("search") || "";
-  const currentActive = searchParams.get("isActive") || "";
+  const currentStatus = searchParams.get("isActive") || "";
 
   // Sync search term with URL
   useEffect(() => {
@@ -57,11 +57,11 @@ function GamesFilter() {
   }, [currentSearch]);
 
   // Count active filters
-  const activeFiltersCount = [currentActive].filter(Boolean).length;
+  const activeFiltersCount = [currentStatus].filter(Boolean).length;
 
   const updateParams = useCallback(
     (key, value) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParams);
       if (value) {
         params.set(key, value);
       } else {
@@ -94,10 +94,7 @@ function GamesFilter() {
     updateParams("search", "");
   };
 
-  // Get selected active status
-  const selectedActive = useMemo(() => {
-    return ACTIVE_OPTIONS.find((a) => a.value === currentActive) || ACTIVE_OPTIONS[0];
-  }, [currentActive]);
+  const selectedStatus = STATUS_OPTIONS.find((s) => s.value === currentStatus) || STATUS_OPTIONS[0];
 
   return (
     <div className="space-y-4">
@@ -163,28 +160,28 @@ function GamesFilter() {
       {showFilters && (
         <div className="bg-gray-50 dark:bg-[#0f1118] rounded-xl p-4 border border-gray-200 dark:border-white/5 animate-in slide-in-from-top-2 duration-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Active Status Filter */}
+            {/* Status Filter */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 <ListFilter className="size-4" />
                 {t("status") || "Status"}
               </label>
-              <Popover open={activeOpen} onOpenChange={setActiveOpen}>
+              <Popover open={statusOpen} onOpenChange={setStatusOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     role="combobox"
-                    aria-expanded={activeOpen}
+                    aria-expanded={statusOpen}
                     className="w-full h-10 justify-between rounded-lg bg-white dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-gray-50 dark:hover:bg-[#252a3d]"
                   >
                     <span className="flex items-center gap-2 truncate">
                       {(() => {
-                        const ActiveIcon = selectedActive.icon;
+                        const StatusIcon = selectedStatus.icon;
                         return (
                           <>
-                            <ActiveIcon className={`size-4 ${selectedActive.color}`} />
+                            <StatusIcon className={`size-4 ${selectedStatus.color}`} />
                             <span className="text-gray-900 dark:text-white">
-                              {t(selectedActive.label) || selectedActive.label}
+                              {t(selectedStatus.label) || selectedStatus.label}
                             </span>
                           </>
                         );
@@ -197,23 +194,19 @@ function GamesFilter() {
                   <Command>
                     <CommandList>
                       <CommandGroup>
-                        {ACTIVE_OPTIONS.map((option) => {
+                        {STATUS_OPTIONS.map((option) => {
                           const OptionIcon = option.icon;
                           return (
                             <CommandItem
-                              key={option.value}
+                              key={option.value || "all"}
                               value={option.value || "all"}
                               onSelect={() => {
                                 updateParams("isActive", option.value);
-                                setActiveOpen(false);
+                                setStatusOpen(false);
                               }}
                               className="flex items-center gap-2 cursor-pointer"
                             >
-                              <Check
-                                className={`h-4 w-4 ${
-                                  currentActive === option.value ? "opacity-100" : "opacity-0"
-                                }`}
-                              />
+                              <Check className={`h-4 w-4 ${currentStatus === option.value ? "opacity-100" : "opacity-0"}`} />
                               <OptionIcon className={`size-4 ${option.color}`} />
                               <span>{t(option.label) || option.label}</span>
                             </CommandItem>

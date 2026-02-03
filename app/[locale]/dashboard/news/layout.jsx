@@ -1,12 +1,15 @@
-import LinksButtons from "@/components/ui app/LinksButtons";
+import NewsHeader from "@/components/News/NewsHeader";
 
-function layout({ children }) {
+function NewsLayout({ children }) {
   return (
-    <>
-      {/* <LinksButtons /> */}
+    <div className="space-y-6">
+      {/* Page Header - conditionally rendered based on route */}
+      <NewsHeader />
+
+      {/* Content */}
       {children}
-    </>
+    </div>
   );
 }
 
-export default layout;
+export default NewsLayout;

@@ -1,27 +1,42 @@
 import { getNews } from "@/app/[locale]/_Lib/newsApi";
+import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import NewsListRedesign from "@/components/News/NewsListRedesign";
 import { getLocale } from "next-intl/server";
 
-async function page({ searchParams }) {
+export const dynamic = "force-dynamic";
+
+async function NewsPage({ searchParams }) {
   const params = await searchParams;
   const locale = await getLocale();
 
-  const newsResponse = await getNews({
-    page: params.page || 1,
-    limit: params.limit || 10,
-    search: params.search,
-  });
+  // Fetch news with all filters
+  const [newsResponse, gamesResponse] = await Promise.all([
+    getNews({
+      page: params.page || 1,
+      limit: params.limit || 10,
+      search: params.search,
+      game: params.game,
+      status: params.status,
+      isPublished: params.isPublished,
+      isFeatured: params.isFeatured,
+      sortBy: params.sortBy || "createdAt",
+      sortOrder: params.sortOrder || "desc",
+    }),
+    getGames({ limit: 100 }),
+  ]);
 
   const news = newsResponse.data || [];
   const pagination = newsResponse.pagination || null;
+  const games = gamesResponse.data || [];
 
   return (
     <NewsListRedesign
       news={news}
       pagination={pagination}
+      games={games}
       locale={locale}
     />
   );
 }
 
-export default page;
+export default NewsPage;

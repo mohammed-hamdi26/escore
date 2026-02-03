@@ -1,20 +1,20 @@
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
-import GamesTable from "@/components/games-management/GamesTable";
+import GamesListRedesign from "@/components/games-management/GamesListRedesign";
 
 async function GamesPage({ searchParams }) {
-  const { size, page, search, isActive, sortBy, sortOrder } = await searchParams;
+  const params = await searchParams;
 
   const { data: games, pagination } = await getGames({
-    size,
-    page,
-    search,
-    isActive,
-    sortBy,
-    sortOrder,
+    size: params.size,
+    page: params.page,
+    search: params.search,
+    isActive: params.isActive,
+    sortBy: params.sortBy,
+    sortOrder: params.sortOrder,
   });
 
   return (
-    <GamesTable
+    <GamesListRedesign
       games={games || []}
       pagination={pagination}
     />

@@ -14,7 +14,7 @@ async function page() {
     { data: playersOptions },
     { data: teamsOptions },
     { data: tournamentsOptions },
-    gamesOptions,
+    { data: gamesOptions },
     { data: matchesOptions },
   ] = await Promise.all([
     getPlayers(),

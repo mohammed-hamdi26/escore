@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Image from "next/image";
+import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { format } from "date-fns";
 import {
@@ -13,6 +13,10 @@ import {
   ExternalLink,
   User,
   EyeOff,
+  Eye,
+  Newspaper,
+  Gamepad2,
+  Calendar,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -33,14 +37,16 @@ function NewsCard({
   onPublish,
   onUnpublish,
   t,
-  locale = "en",
+  viewMode = "grid",
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null);
+  const router = useRouter();
 
   const isPublished =
     news.publishedAt && new Date(news.publishedAt) <= new Date();
   const coverImage = news.coverImage?.light || news.coverImage?.dark;
+  const gameImage = news.game?.logo?.light || news.game?.logo?.dark;
 
   const handleAction = async (action, actionName) => {
     setIsLoading(true);
@@ -56,80 +62,63 @@ function NewsCard({
     }
   };
 
-  return (
-    <div className="bg-dashboard-box dark:bg-[#0F1017] rounded-xl overflow-hidden hover:ring-1 hover:ring-green-primary/30 transition-all">
-      <div className="flex flex-col md:flex-row">
+  const handleCardClick = () => {
+    router.push(`/dashboard/news/view/${news.id || news._id}`);
+  };
+
+  // Grid View Card
+  if (viewMode === "grid") {
+    return (
+      <div
+        onClick={handleCardClick}
+        className="group glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer"
+      >
         {/* Cover Image */}
-        <div className="relative w-full md:w-48 h-40 md:h-auto flex-shrink-0">
+        <div className="relative aspect-[16/9] bg-gradient-to-br from-[#1a1d2e] to-[#12141c]">
           {coverImage ? (
             <img
               src={coverImage}
               alt={news.title}
-              fill
-              className="object-cover h-full"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
-            <div className="w-full h-full bg-[#1a1f2e] flex items-center justify-center">
-              <span className="text-4xl text-[#677185]">📰</span>
+            <div className="w-full h-full flex items-center justify-center">
+              <Newspaper className="size-16 text-muted-foreground/30" />
             </div>
           )}
-          {/* Featured Badge */}
+
+          {/* Featured Badge Overlay */}
           {news.isFeatured && (
-            <div className="absolute top-2 left-2">
-              <Badge className="bg-yellow-500 dark:bg-yellow-600 text-white text-xs">
-                <Star className="size-3 mr-1" />
-                {t("featured")}
+            <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3">
+              <Badge className="bg-yellow-500 text-white border-0 gap-1">
+                <Star className="size-3 fill-white" />
+                {t("featured") || "Featured"}
               </Badge>
             </div>
           )}
-        </div>
 
-        {/* Content */}
-        <div className="flex-1 p-4 flex flex-col">
-          {/* Header */}
-          <div className="flex items-start justify-between gap-4 mb-2">
-            <div className="flex-1">
-              {/* Game & Status */}
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                {news.game && (
-                  <Badge
-                    variant="outline"
-                    className="text-xs border-[#677185] text-[#677185]"
-                  >
-                    {news.game.name}
-                  </Badge>
-                )}
-                {!isPublished && (
-                  <Badge className="bg-gray-600 text-white text-xs">
-                    {t("draft")}
-                  </Badge>
-                )}
-              </div>
-
-              {/* Title */}
-              <h3 className="text-lg font-bold text-[#677185]  dark:text-white line-clamp-2">
-                {news.title}
-              </h3>
+          {/* Status Badge */}
+          {!isPublished && (
+            <div className="absolute top-3 right-3 rtl:right-auto rtl:left-3">
+              <Badge className="bg-gray-600/90 text-white border-0">
+                {t("draft") || "Draft"}
+              </Badge>
             </div>
+          )}
 
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              <Link href={`/dashboard/news/edit/${news.id}`}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-green-primary text-green-primary hover:bg-green-primary hover:text-white"
-                >
-                  <Edit className="size-4 mr-1" />
-                  {t("edit")}
-                </Button>
-              </Link>
+          {/* Actions Menu */}
+          <div
+            className="absolute top-3 right-3 rtl:right-auto rtl:left-3 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => e.stopPropagation()}
+            style={{ display: isPublished ? "none" : "block" }}
+          >
+            {isPublished && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-[#677185] hover:text-white"
+                    className="bg-black/50 backdrop-blur-sm hover:bg-black/70 text-white size-8"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -140,106 +129,340 @@ function NewsCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  {news.urlExternal && (
-                    <>
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => window.open(news.urlExternal, "_blank")}
-                      >
-                        <ExternalLink className="size-4 mr-2" />
-                        {t("viewSource")}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
-
+                  <Link href={`/dashboard/news/view/${news.id || news._id}`}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Eye className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("viewDetails") || "View Details"}
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href={`/dashboard/news/edit/${news.id || news._id}`}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("edit") || "Edit"}
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
                   {isPublished ? (
                     <DropdownMenuItem
                       className="cursor-pointer"
-                      onClick={() =>
-                        handleAction(() => onUnpublish(news.id), "unpublish")
-                      }
+                      onClick={() => handleAction(() => onUnpublish(news.id || news._id), "unpublish")}
                       disabled={loadingAction === "unpublish"}
                     >
-                      <EyeOff className="size-4 mr-2" />
-                      {t("unpublish")}
+                      <EyeOff className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("unpublish") || "Unpublish"}
                     </DropdownMenuItem>
                   ) : (
                     <DropdownMenuItem
                       className="cursor-pointer"
-                      onClick={() =>
-                        handleAction(() => onPublish(news.id), "publish")
-                      }
+                      onClick={() => handleAction(() => onPublish(news.id || news._id), "publish")}
                       disabled={loadingAction === "publish"}
                     >
-                      <Send className="size-4 mr-2" />
-                      {t("publish")}
+                      <Send className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("publish") || "Publish"}
                     </DropdownMenuItem>
                   )}
-
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() =>
-                      handleAction(
-                        () => onToggleFeatured(news.id),
-                        "toggleFeatured"
-                      )
-                    }
+                    onClick={() => handleAction(() => onToggleFeatured(news.id || news._id), "toggleFeatured")}
                     disabled={loadingAction === "toggleFeatured"}
                   >
-                    <Star
-                      className={`size-4 mr-2 ${
-                        news.isFeatured ? "fill-yellow-500 text-yellow-500" : ""
-                      }`}
-                    />
-                    {news.isFeatured ? t("removeFeatured") : t("makeFeatured")}
+                    <Star className={`size-4 mr-2 rtl:mr-0 rtl:ml-2 ${news.isFeatured ? "fill-yellow-500 text-yellow-500" : ""}`} />
+                    {news.isFeatured ? t("removeFeatured") || "Remove Featured" : t("makeFeatured") || "Make Featured"}
                   </DropdownMenuItem>
-
                   <DropdownMenuSeparator />
-
                   <DropdownMenuItem
                     className="cursor-pointer text-red-400 focus:text-red-400"
-                    onClick={() =>
-                      handleAction(() => onDelete(news.id), "delete")
-                    }
+                    onClick={() => handleAction(() => onDelete(news.id || news._id, news.title), "delete")}
                     disabled={loadingAction === "delete"}
                   >
-                    <Trash2 className="size-4 mr-2" />
-                    {t("delete")}
+                    <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("delete") || "Delete"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
+            )}
           </div>
 
+          {/* Always show menu on grid */}
+          <div
+            className="absolute top-3 right-3 rtl:right-auto rtl:left-3 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="bg-black/50 backdrop-blur-sm hover:bg-black/70 text-white size-8"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Spinner className="size-4" />
+                  ) : (
+                    <MoreVertical className="size-4" />
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <Link href={`/dashboard/news/view/${news.id || news._id}`}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Eye className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("viewDetails") || "View Details"}
+                  </DropdownMenuItem>
+                </Link>
+                <Link href={`/dashboard/news/edit/${news.id || news._id}`}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("edit") || "Edit"}
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuSeparator />
+                {news.urlExternal && (
+                  <>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => window.open(news.urlExternal, "_blank")}
+                    >
+                      <ExternalLink className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("viewSource") || "View Source"}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                {isPublished ? (
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => handleAction(() => onUnpublish(news.id || news._id), "unpublish")}
+                    disabled={loadingAction === "unpublish"}
+                  >
+                    <EyeOff className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("unpublish") || "Unpublish"}
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => handleAction(() => onPublish(news.id || news._id), "publish")}
+                    disabled={loadingAction === "publish"}
+                  >
+                    <Send className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("publish") || "Publish"}
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => handleAction(() => onToggleFeatured(news.id || news._id), "toggleFeatured")}
+                  disabled={loadingAction === "toggleFeatured"}
+                >
+                  <Star className={`size-4 mr-2 rtl:mr-0 rtl:ml-2 ${news.isFeatured ? "fill-yellow-500 text-yellow-500" : ""}`} />
+                  {news.isFeatured ? t("removeFeatured") || "Remove Featured" : t("makeFeatured") || "Make Featured"}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer text-red-400 focus:text-red-400"
+                  onClick={() => handleAction(() => onDelete(news.id || news._id, news.title), "delete")}
+                  disabled={loadingAction === "delete"}
+                >
+                  <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {t("delete") || "Delete"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          {/* Game Badge */}
+          {news.game && (
+            <div className="flex items-center gap-1.5 mb-2">
+              {gameImage ? (
+                <img src={gameImage} alt={news.game.name} className="size-4 rounded" />
+              ) : (
+                <Gamepad2 className="size-4 text-muted-foreground" />
+              )}
+              <span className="text-xs text-muted-foreground">{news.game.name}</span>
+            </div>
+          )}
+
+          {/* Title */}
+          <h3 className="text-base font-bold text-foreground line-clamp-2 mb-2">
+            {news.title}
+          </h3>
+
           {/* Meta Info */}
-          <div className="mt-auto flex flex-wrap items-center gap-4 text-xs text-[#677185]">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             {/* Author */}
             <div className="flex items-center gap-1">
-              <User className="size-3" />
-              <span>{news.authorName || t("unknownAuthor")}</span>
+              <User className="size-3.5" />
+              <span className="truncate">{news.authorName || t("unknownAuthor") || "Unknown"}</span>
             </div>
-
-            {/* Read Time */}
-            {news.readTime && (
-              <div className="flex items-center gap-1">
-                <Clock className="size-3" />
-                <span>
-                  {news.readTime} {t("minRead")}
-                </span>
-              </div>
-            )}
 
             {/* Published Date */}
             {news.publishedAt && (
               <div className="flex items-center gap-1">
-                <span>
-                  {isPublished ? t("published") : t("scheduled")}:{" "}
-                  {format(new Date(news.publishedAt), "yyyy-MM-dd HH:mm")}
-                </span>
+                <Calendar className="size-3.5" />
+                <span>{format(new Date(news.publishedAt), "MMM d, yyyy")}</span>
               </div>
             )}
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // List View Card
+  return (
+    <div
+      onClick={handleCardClick}
+      className="group glass rounded-xl overflow-hidden border border-transparent dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer"
+    >
+      <div className="flex items-center gap-4 p-4">
+        {/* Cover Image */}
+        <div className="relative size-16 sm:size-20 rounded-xl overflow-hidden bg-gradient-to-br from-[#1a1d2e] to-[#12141c] flex-shrink-0">
+          {coverImage ? (
+            <img
+              src={coverImage}
+              alt={news.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Newspaper className="size-8 text-muted-foreground/30" />
+            </div>
+          )}
+          {/* Featured indicator */}
+          {news.isFeatured && (
+            <div className="absolute top-1 left-1">
+              <Star className="size-4 text-yellow-500 fill-yellow-500" />
+            </div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <h3 className="font-bold text-foreground truncate">
+              {news.title}
+            </h3>
+            {!isPublished && (
+              <Badge className="bg-gray-500/10 text-gray-500 text-xs border-0">
+                {t("draft") || "Draft"}
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <User className="size-3.5" />
+              <span className="truncate">{news.authorName || t("unknownAuthor") || "Unknown"}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Game */}
+        <div className="hidden sm:flex items-center gap-4">
+          {news.game && (
+            <Badge className="bg-muted/50 text-foreground border-0 gap-1.5">
+              {gameImage ? (
+                <img src={gameImage} alt={news.game.name} className="size-3.5 rounded" />
+              ) : (
+                <Gamepad2 className="size-3.5" />
+              )}
+              {news.game.name}
+            </Badge>
+          )}
+        </div>
+
+        {/* Date */}
+        <div className="hidden md:flex items-center gap-4 text-sm text-muted-foreground">
+          {news.publishedAt && (
+            <div className="flex items-center gap-1">
+              <Calendar className="size-4" />
+              <span>{format(new Date(news.publishedAt), "MMM d, yyyy")}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div onClick={(e) => e.stopPropagation()}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Spinner className="size-4" />
+                ) : (
+                  <MoreVertical className="size-4" />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <Link href={`/dashboard/news/view/${news.id || news._id}`}>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Eye className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {t("viewDetails") || "View Details"}
+                </DropdownMenuItem>
+              </Link>
+              <Link href={`/dashboard/news/edit/${news.id || news._id}`}>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {t("edit") || "Edit"}
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuSeparator />
+              {news.urlExternal && (
+                <>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => window.open(news.urlExternal, "_blank")}
+                  >
+                    <ExternalLink className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("viewSource") || "View Source"}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              {isPublished ? (
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => handleAction(() => onUnpublish(news.id || news._id), "unpublish")}
+                  disabled={loadingAction === "unpublish"}
+                >
+                  <EyeOff className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {t("unpublish") || "Unpublish"}
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => handleAction(() => onPublish(news.id || news._id), "publish")}
+                  disabled={loadingAction === "publish"}
+                >
+                  <Send className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {t("publish") || "Publish"}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => handleAction(() => onToggleFeatured(news.id || news._id), "toggleFeatured")}
+                disabled={loadingAction === "toggleFeatured"}
+              >
+                <Star className={`size-4 mr-2 rtl:mr-0 rtl:ml-2 ${news.isFeatured ? "fill-yellow-500 text-yellow-500" : ""}`} />
+                {news.isFeatured ? t("removeFeatured") || "Remove Featured" : t("makeFeatured") || "Make Featured"}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="cursor-pointer text-red-400 focus:text-red-400"
+                onClick={() => handleAction(() => onDelete(news.id || news._id, news.title), "delete")}
+                disabled={loadingAction === "delete"}
+              >
+                <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                {t("delete") || "Delete"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
