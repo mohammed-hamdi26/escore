@@ -402,10 +402,6 @@ function TournamentDetails({ tournament }) {
             </h3>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("views") || "Views"}</span>
-                <span className="font-medium text-foreground">{tournament.viewsCount || 0}</span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-muted-foreground">{t("followers") || "Followers"}</span>
                 <span className="font-medium text-foreground">{tournament.followersCount || 0}</span>
               </div>
