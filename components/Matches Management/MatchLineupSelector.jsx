@@ -59,7 +59,7 @@ function MatchLineupSelector({
   };
 
   const handleSelectAll = () => {
-    const allPlayerIds = players.map((p) => p.id || p._id);
+    const allPlayerIds = players?.map((p) => p.id || p._id) || [];
     onSelectionChange(allPlayerIds);
   };
 
@@ -136,7 +136,7 @@ function MatchLineupSelector({
         </div>
       ) : (
         <div className="space-y-2 max-h-64 overflow-y-auto">
-          {players.map((player) => {
+          {players?.map((player) => {
             const playerId = player.id || player._id;
             const isSelected = selectedPlayers.includes(playerId);
             const photoUrl = player?.photo?.light || player?.photo?.dark;

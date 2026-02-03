@@ -598,7 +598,7 @@ function CountrySelectField({
             />
           </div>
           <div className="max-h-64 overflow-y-auto">
-            {filteredCountries.slice(0, 50).map((country) => (
+            {filteredCountries?.slice(0, 50).map((country) => (
               <button
                 key={country.value}
                 type="button"
@@ -830,7 +830,7 @@ function GameMultiSelectField({
             />
           </div>
           <div className="max-h-64 overflow-y-auto">
-            {filteredGames.map((game) => {
+            {filteredGames?.map((game) => {
               const isSelected = selectedIds.includes(game.id || game._id);
               return (
                 <button
@@ -1145,7 +1145,7 @@ function TournamentMultiSelectField({
             />
           </div>
           <div className="max-h-64 overflow-y-auto">
-            {filteredTournaments.map((tournament) => {
+            {filteredTournaments?.map((tournament) => {
               const isSelected = selectedIds.includes(tournament.id || tournament._id);
               return (
                 <button
@@ -1310,7 +1310,7 @@ function PlayerMultiSelectField({
             />
           </div>
           <div className="max-h-64 overflow-y-auto">
-            {filteredPlayers.map((player) => {
+            {filteredPlayers?.map((player) => {
               const isSelected = selectedIds.includes(player.id || player._id);
               return (
                 <button

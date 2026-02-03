@@ -1386,7 +1386,7 @@ function CountrySelectField({
                 No countries found
               </div>
             ) : (
-              filteredCountries.map((country) => {
+              filteredCountries?.map((country) => {
                 const isSelected = value === country.label;
                 return (
                   <button
