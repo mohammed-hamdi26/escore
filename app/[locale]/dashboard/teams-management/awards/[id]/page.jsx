@@ -6,13 +6,19 @@ import AwardsPageContainer from "@/components/Awards/AwardsPageContainer";
 
 async function page({ params }) {
   const { id } = await params;
-  const [teams, games, tournaments, players, awards] = await Promise.all([
+  const [teamsResult, gamesResult, tournamentsResult, playersResult, awards] = await Promise.all([
     getTeams(),
     getGames(),
     getTournaments(),
     getPlayers(),
     getAwardsTeam(id),
   ]);
+
+  // Extract data arrays from API responses
+  const teams = teamsResult?.data || [];
+  const games = gamesResult?.data || [];
+  const tournaments = tournamentsResult?.data || [];
+  const players = playersResult?.data || [];
 
   return (
     <AwardsPageContainer
