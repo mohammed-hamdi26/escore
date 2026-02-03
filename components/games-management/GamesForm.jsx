@@ -55,44 +55,42 @@ export default function GamesForm({
     validationSchema,
     onSubmit: async (values) => {
       try {
-        let dataValues = data ? { id: data.id || data._id, ...values } : values;
+        let dataValues = data ? { id: data.id || data._id } : {};
 
-        // Build logo object
-        dataValues.logo = dataValues.logoLight
-          ? {
-              light: dataValues.logoLight,
-              dark: dataValues.logoDark || dataValues.logoLight,
-            }
-          : null;
+        // Required field
+        dataValues.name = values.name;
 
-        // Build coverImage object
-        dataValues.coverImage = dataValues.coverImageLight
-          ? {
-              light: dataValues.coverImageLight,
-              dark: dataValues.coverImageDark || dataValues.coverImageLight,
-            }
-          : null;
+        // Auto-generate slug if not provided, otherwise use provided slug
+        dataValues.slug = values.slug || values.name.replace(/\s+/g, "-").toLowerCase();
 
-        // Auto-generate slug if not provided
-        if (!dataValues.slug && dataValues.name) {
-          dataValues.slug = dataValues.name.replace(/\s+/g, "-").toLowerCase();
+        // Optional description - only include if has value
+        if (values.description && values.description.trim()) {
+          dataValues.description = values.description.trim();
         }
 
-        // Convert date to ISO format for backend
-        if (dataValues.releaseDate) {
-          dataValues.releaseDate = new Date(dataValues.releaseDate).toISOString();
-        } else {
-          dataValues.releaseDate = null;
+        // Build logo object - only include if has at least light image
+        if (values.logoLight) {
+          dataValues.logo = {
+            light: values.logoLight,
+            dark: values.logoDark || values.logoLight,
+          };
         }
 
-        // Convert empty strings to null
-        if (!dataValues.description) dataValues.description = null;
+        // Build coverImage object - only include if has at least light image
+        if (values.coverImageLight) {
+          dataValues.coverImage = {
+            light: values.coverImageLight,
+            dark: values.coverImageDark || values.coverImageLight,
+          };
+        }
 
-        // Clean up temporary fields
-        delete dataValues.logoLight;
-        delete dataValues.logoDark;
-        delete dataValues.coverImageLight;
-        delete dataValues.coverImageDark;
+        // Convert date to ISO format for backend - only include if has value
+        if (values.releaseDate) {
+          dataValues.releaseDate = new Date(values.releaseDate).toISOString();
+        }
+
+        // isActive is always included
+        dataValues.isActive = values.isActive;
 
         await submitFunction(dataValues);
         typeForm === "add" && formik.resetForm();
