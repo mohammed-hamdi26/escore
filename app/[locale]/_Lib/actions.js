@@ -275,13 +275,20 @@ export async function uploadPhoto(formData) {
 
 export async function addTournament(tournamentData) {
   try {
-    const res = await apiClient.post("/tournaments", tournamentData);
+    // Remove null/undefined values - backend expects fields to be absent, not null
+    const cleanData = Object.fromEntries(
+      Object.entries(tournamentData).filter(([_, v]) => v !== null && v !== undefined && v !== "")
+    );
+
+    // Also remove status field for create (only allowed in update)
+    delete cleanData.status;
+
+    const res = await apiClient.post("/tournaments", cleanData);
 
     // return res.data;
   } catch (e) {
-    console.log(e.response);
-    console.log(e.response.data.errors);
-    throw new Error("Error in adding tournament");
+    console.log("Tournament creation error:", e.response?.data || e.message);
+    throw new Error(e.response?.data?.message || "Error in adding tournament");
   }
   redirect("/dashboard/tournaments-management");
 }
