@@ -488,14 +488,14 @@ function NewsFormRedesign({
               label={t("coverImageLight")}
               name="coverImageLight"
               formik={formik}
-              aspectRatio="landscape"
+              aspectRatio="news-cover"
               hint={t("coverImagePlaceholder") || "Recommended: 1200x630px"}
             />
             <ImageUpload
               label={t("coverImageDark")}
               name="coverImageDark"
               formik={formik}
-              aspectRatio="landscape"
+              aspectRatio="news-cover"
               hint={t("coverImageDarkPlaceholder") || "Optional dark mode version"}
             />
           </div>

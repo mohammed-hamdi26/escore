@@ -19,9 +19,34 @@ const ASPECT_RATIOS = {
   "1:1": 1,
   "16:9": 16 / 9,
   "4:3": 4 / 3,
+  "3:2": 3 / 2,
+  "2:1": 2 / 1,
+  "1200x630": 1200 / 630, // Social media / News cover
+  "3:4": 3 / 4,
 };
 
-function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete }) {
+// Standard output sizes for each aspect ratio (width x height)
+const OUTPUT_SIZES = {
+  "1:1": { width: 800, height: 800 },
+  "16:9": { width: 1280, height: 720 },
+  "4:3": { width: 1024, height: 768 },
+  "3:2": { width: 1200, height: 800 },
+  "2:1": { width: 1200, height: 600 },
+  "1200x630": { width: 1200, height: 630 },
+  "3:4": { width: 600, height: 800 },
+  free: null, // Use original crop size
+};
+
+// Map aspect ratio names to cropper ratios
+const ASPECT_TO_RATIO = {
+  square: "1:1",
+  landscape: "16:9",
+  portrait: "3:4",
+  "news-cover": "1200x630",
+  "wide": "2:1",
+};
+
+function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete, defaultAspect = "free" }) {
   const t = useTranslations("imageCropper");
   const imgRef = useRef(null);
 
@@ -36,9 +61,11 @@ function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete }) {
       setCrop(undefined);
       setCompletedCrop(null);
       setScale(1);
-      setSelectedRatio("free");
+      // Set default aspect ratio based on prop
+      const initialRatio = ASPECT_TO_RATIO[defaultAspect] || defaultAspect;
+      setSelectedRatio(initialRatio in ASPECT_RATIOS ? initialRatio : "free");
     }
-  }, [isOpen, imageSrc]);
+  }, [isOpen, imageSrc, defaultAspect]);
 
   const onImageLoad = useCallback(
     (e) => {
@@ -83,7 +110,7 @@ function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete }) {
     });
   };
 
-  // ✅ شفافية حقيقية
+  // Get cropped image with standardized output size
   const getCroppedImage = useCallback(() => {
     if (!completedCrop || !imgRef.current) return null;
 
@@ -96,18 +123,46 @@ function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete }) {
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
 
-    canvas.width = completedCrop.width * scaleX;
-    canvas.height = completedCrop.height * scaleY;
+    // Source crop dimensions (from original image)
+    const srcX = completedCrop.x * scaleX;
+    const srcY = completedCrop.y * scaleY;
+    const srcWidth = completedCrop.width * scaleX;
+    const srcHeight = completedCrop.height * scaleY;
 
-    // مهم جدًا
+    // Get standard output size for the selected aspect ratio
+    const outputSize = OUTPUT_SIZES[selectedRatio];
+
+    if (outputSize) {
+      // Use standardized output size
+      canvas.width = outputSize.width;
+      canvas.height = outputSize.height;
+    } else {
+      // Free aspect - use cropped size but limit to max 1600px
+      const maxDimension = 1600;
+      if (srcWidth > maxDimension || srcHeight > maxDimension) {
+        const ratio = Math.min(maxDimension / srcWidth, maxDimension / srcHeight);
+        canvas.width = Math.round(srcWidth * ratio);
+        canvas.height = Math.round(srcHeight * ratio);
+      } else {
+        canvas.width = Math.round(srcWidth);
+        canvas.height = Math.round(srcHeight);
+      }
+    }
+
+    // Clear canvas for transparency
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Enable image smoothing for better quality
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // Draw the cropped image scaled to output size
     ctx.drawImage(
       image,
-      completedCrop.x * scaleX,
-      completedCrop.y * scaleY,
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY,
+      srcX,
+      srcY,
+      srcWidth,
+      srcHeight,
       0,
       0,
       canvas.width,
@@ -117,10 +172,11 @@ function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete }) {
     return new Promise((resolve) => {
       canvas.toBlob(
         (blob) => resolve(blob),
-        "image/png" // ✅ PNG = شفافية
+        "image/png", // PNG for transparency support
+        1.0 // Maximum quality
       );
     });
-  }, [completedCrop]);
+  }, [completedCrop, selectedRatio]);
 
   const handleApplyCrop = async () => {
     const croppedBlob = await getCroppedImage();
@@ -130,7 +186,8 @@ function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete }) {
 
   const handleReset = () => {
     setScale(1);
-    setSelectedRatio("free");
+    const initialRatio = ASPECT_TO_RATIO[defaultAspect] || defaultAspect;
+    setSelectedRatio(initialRatio in ASPECT_RATIOS ? initialRatio : "free");
     if (imgRef.current) {
       onImageLoad({ currentTarget: imgRef.current });
     }
@@ -175,7 +232,14 @@ function ImageCropper({ isOpen, onClose, imageSrc, onCropComplete }) {
 
           {/* Aspect Ratio */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t("aspectRatio")}</label>
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">{t("aspectRatio")}</label>
+              {OUTPUT_SIZES[selectedRatio] && (
+                <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                  {t("output") || "Output"}: {OUTPUT_SIZES[selectedRatio].width} × {OUTPUT_SIZES[selectedRatio].height}px
+                </span>
+              )}
+            </div>
             <div className="flex gap-2 flex-wrap">
               {Object.keys(ASPECT_RATIOS).map((ratio) => (
                 <Button

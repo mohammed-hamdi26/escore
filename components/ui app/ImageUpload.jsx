@@ -14,7 +14,7 @@ function ImageUpload({
   name,
   formik,
   placeholder = "Drop image here or click to upload",
-  aspectRatio = "square", // square, landscape, portrait
+  aspectRatio = "square", // square, landscape, portrait, news-cover, wide
   enableCrop = true,
   showUrlInput = false,
   compact = false, // Smaller version for compact layouts
@@ -30,10 +30,15 @@ function ImageUpload({
   const hasImage = !!currentValue;
   const error = formik?.touched?.[name] && formik?.errors?.[name];
 
+  // Aspect ratio CSS classes
   const aspectClasses = {
     square: "aspect-square",
-    landscape: "aspect-video",
+    landscape: "aspect-video", // 16:9
     portrait: "aspect-[3/4]",
+    "news-cover": "aspect-[1200/630]", // Social media standard
+    wide: "aspect-[2/1]",
+    "4:3": "aspect-[4/3]",
+    "3:2": "aspect-[3/2]",
   };
 
   const handleDragOver = useCallback((e) => {
@@ -240,12 +245,18 @@ function ImageUpload({
         <p className="text-xs text-red-500">{error}</p>
       )}
 
+      {/* Hint text */}
+      {hint && !hasImage && (
+        <p className="text-xs text-muted-foreground">{hint}</p>
+      )}
+
       {/* Image Cropper */}
       <ImageCropper
         isOpen={showCropper}
         onClose={handleCropperClose}
         imageSrc={previewUrl}
         onCropComplete={handleCropComplete}
+        defaultAspect={aspectRatio}
       />
     </div>
   );
