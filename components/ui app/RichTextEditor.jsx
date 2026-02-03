@@ -53,8 +53,7 @@ export default function RichTextEditor({
     "background",
     "align",
     "direction", // RTL support
-    "list",
-    "bullet",
+    "list",      // handles both ordered and bullet lists
     "blockquote",
     "code-block",
     "link",
@@ -70,6 +69,72 @@ export default function RichTextEditor({
     // Get first non-whitespace character
     const firstChar = text.replace(/\s/g, '').charAt(0);
     return rtlRegex.test(firstChar);
+  };
+
+  // Helper function to detect if text is HTML
+  const isHTML = (text) => {
+    if (!text) return false;
+    const trimmed = text.trim();
+    // Check if it starts with < and contains closing tags
+    return trimmed.startsWith('<') && /<\/?[a-z][\s\S]*>/i.test(trimmed);
+  };
+
+  // Helper function to convert Markdown to HTML
+  const markdownToHTML = (md) => {
+    if (!md) return '';
+    let html = md
+      // Headers
+      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      // Bold
+      .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+      .replace(/__(.*?)__/gim, '<strong>$1</strong>')
+      // Italic
+      .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+      .replace(/_(.*?)_/gim, '<em>$1</em>')
+      // Strikethrough
+      .replace(/~~(.*?)~~/gim, '<s>$1</s>')
+      // Links
+      .replace(/\[(.*?)\]\((.*?)\)/gim, '<a href="$2">$1</a>')
+      // Images
+      .replace(/!\[(.*?)\]\((.*?)\)/gim, '<img alt="$1" src="$2" />')
+      // Inline code
+      .replace(/`([^`]+)`/gim, '<code>$1</code>')
+      // Code blocks
+      .replace(/```[\s\S]*?```/gim, (match) => {
+        const code = match.replace(/```\w*\n?/g, '').replace(/```/g, '');
+        return '<pre>' + code + '</pre>';
+      })
+      // Blockquotes
+      .replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>')
+      // Unordered lists
+      .replace(/^\* (.*$)/gim, '<li>$1</li>')
+      .replace(/^\- (.*$)/gim, '<li>$1</li>')
+      // Line breaks
+      .replace(/\n/gim, '<br />');
+
+    // Wrap consecutive <li> in <ul>
+    html = html.replace(/(<li>.*<\/li>)(\s*<br \/>)*(<li>)/gim, '$1$3');
+    html = html.replace(/(<li>.*<\/li>)+/gim, '<ul>$&</ul>');
+
+    return html;
+  };
+
+  // Helper function to detect if text is Markdown
+  const isMarkdown = (text) => {
+    if (!text) return false;
+    const mdPatterns = [
+      /^#{1,6}\s/m,           // Headers
+      /\*\*.*?\*\*/,          // Bold
+      /\*.*?\*/,              // Italic
+      /\[.*?\]\(.*?\)/,       // Links
+      /^\s*[-*]\s/m,          // Lists
+      /^\s*\d+\.\s/m,         // Numbered lists
+      /```/,                  // Code blocks
+      /^\>/m,                 // Blockquotes
+    ];
+    return mdPatterns.some(pattern => pattern.test(text));
   };
 
   // Handle hydration and load Quill
@@ -148,6 +213,97 @@ export default function RichTextEditor({
   const handleBlur = useCallback(() => {
     formik?.setFieldTouched(name, true);
   }, [formik, name]);
+
+  // Setup paste handler for HTML/Markdown
+  useEffect(() => {
+    if (!quillRef.current) return;
+
+    const quill = quillRef.current.getEditor();
+    if (!quill) return;
+
+    const handlePaste = (e) => {
+      const clipboardData = e.clipboardData || window.clipboardData;
+      if (!clipboardData) return;
+
+      const pastedText = clipboardData.getData('text/plain');
+
+      // Check if pasted text looks like HTML code (from code editor)
+      if (isHTML(pastedText)) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const selection = quill.getSelection(true);
+        const index = selection ? selection.index : quill.getLength();
+
+        // Delete any selected content
+        if (selection && selection.length > 0) {
+          quill.deleteText(selection.index, selection.length);
+        }
+
+        // Extract just the body content if it's a full HTML document
+        let htmlToInsert = pastedText;
+
+        // If it's a full HTML document, extract the body content
+        const bodyMatch = pastedText.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        if (bodyMatch) {
+          htmlToInsert = bodyMatch[1];
+        } else {
+          // Remove doctype, html, head tags if present
+          htmlToInsert = pastedText
+            .replace(/<!DOCTYPE[^>]*>/gi, '')
+            .replace(/<html[^>]*>/gi, '')
+            .replace(/<\/html>/gi, '')
+            .replace(/<head>[\s\S]*?<\/head>/gi, '')
+            .replace(/<body[^>]*>/gi, '')
+            .replace(/<\/body>/gi, '')
+            .trim();
+        }
+
+        // Insert the cleaned HTML content
+        quill.clipboard.dangerouslyPasteHTML(index, htmlToInsert);
+
+        // Trigger change event
+        const newContent = quill.root.innerHTML;
+        formik?.setFieldValue(name, newContent);
+        updateCounts(quill.getText());
+
+        return;
+      }
+
+      // Check if pasted text is Markdown
+      if (isMarkdown(pastedText)) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const selection = quill.getSelection(true);
+        const index = selection ? selection.index : quill.getLength();
+
+        // Delete any selected content
+        if (selection && selection.length > 0) {
+          quill.deleteText(selection.index, selection.length);
+        }
+
+        // Convert Markdown to HTML and insert
+        const html = markdownToHTML(pastedText);
+        quill.clipboard.dangerouslyPasteHTML(index, html);
+
+        // Trigger change event
+        const newContent = quill.root.innerHTML;
+        formik?.setFieldValue(name, newContent);
+        updateCounts(quill.getText());
+
+        return;
+      }
+    };
+
+    // Add paste listener to Quill's root element
+    const editorRoot = quill.root;
+    editorRoot.addEventListener('paste', handlePaste, true);
+
+    return () => {
+      editorRoot.removeEventListener('paste', handlePaste, true);
+    };
+  }, [QuillComponent, formik, name, updateCounts]);
 
   // Update counts on initial load
   useEffect(() => {
