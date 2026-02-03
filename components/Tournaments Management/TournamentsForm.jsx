@@ -677,7 +677,8 @@ function TierSelectField({ label, name, options, formik, placeholder }) {
 }
 
 // Multi-Select Field for Games
-function MultiSelectField({ label, name, options, formik }) {
+function MultiSelectField({ label, name, options = [], formik }) {
+  const safeOptions = Array.isArray(options) ? options : [];
   const selectedIds = formik.values[name]?.map((g) => g.id || g.value || g) || [];
   const error = formik.touched[name] && formik.errors[name];
 
@@ -700,7 +701,7 @@ function MultiSelectField({ label, name, options, formik }) {
     <div className="space-y-3">
       <label className="text-sm font-medium text-muted-foreground">{label}</label>
       <div className="flex flex-wrap gap-2">
-        {options.map((game) => {
+        {safeOptions.map((game) => {
           const gameId = game.id || game.value;
           const isSelected = selectedIds.includes(gameId);
 
