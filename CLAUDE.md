@@ -68,7 +68,13 @@ Escore is a Next.js 15 admin dashboard for managing esports content (players, te
 
 ### Environment Variables
 - `NEXT_PUBLIC_BASE_URL` - Backend API base URL (API path: `/api/v1`)
+- `SESSION_SECRET` or `NEXTAUTH_SECRET` - Used for AES-256-GCM encryption of session tokens
 
 ### Internationalization
 Locales: `en` (default), `ar`. All routes are prefixed with locale. Use `next-intl` for translations and `getLocale()` for server-side locale access.
-- بعد كدا متعملش كوميت ولا بوش الا لما تستأذن
+
+### Role-Based Permissions
+User roles: `user`, `admin`, `content`, `support`. Permission checks use `PermissionsContext` with entities (Game, Team, Player, Tournament, Match, News, Transfer, etc.) and actions (create, read, update, delete). Use `usePermissions()` hook in client components or check `user.permissions` server-side.
+
+### Important
+- بعد كدا متعملش كوميت ولا بوش الا لما تستأذن (Don't commit or push without asking first)
