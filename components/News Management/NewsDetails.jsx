@@ -7,9 +7,8 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { deleteNew } from "@/app/[locale]/_Lib/actions";
-import { toggleNewsFeatured, toggleNewsPinned, publishNews, unpublishNews } from "@/app/[locale]/_Lib/newsApi";
+import { toggleNewsFeatured, publishNews, unpublishNews } from "@/app/[locale]/_Lib/newsApi";
 import {
-  Newspaper,
   Calendar,
   User,
   Eye,
@@ -20,8 +19,6 @@ import {
   ArrowLeft,
   Star,
   StarOff,
-  Pin,
-  PinOff,
   FileText,
   Tag,
   Gamepad2,
@@ -34,35 +31,14 @@ import {
   Send,
   EyeOff,
   Loader2,
-  Megaphone,
-  Mic,
-  BarChart3,
-  BookOpen,
-  MessageSquare,
-  ThumbsUp,
 } from "lucide-react";
-
-// Category configuration
-const CATEGORY_CONFIG = {
-  news: { color: "bg-blue-500/10 text-blue-500 border-blue-500/30", icon: Newspaper, label: "News" },
-  announcement: { color: "bg-purple-500/10 text-purple-500 border-purple-500/30", icon: Megaphone, label: "Announcement" },
-  interview: { color: "bg-pink-500/10 text-pink-500 border-pink-500/30", icon: Mic, label: "Interview" },
-  analysis: { color: "bg-orange-500/10 text-orange-500 border-orange-500/30", icon: BarChart3, label: "Analysis" },
-  guide: { color: "bg-cyan-500/10 text-cyan-500 border-cyan-500/30", icon: BookOpen, label: "Guide" },
-  review: { color: "bg-green-500/10 text-green-500 border-green-500/30", icon: MessageSquare, label: "Review" },
-  opinion: { color: "bg-yellow-500/10 text-yellow-500 border-yellow-500/30", icon: ThumbsUp, label: "Opinion" },
-};
 
 function NewsDetails({ news }) {
   const t = useTranslations("NewsDetails");
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [togglingFeatured, setTogglingFeatured] = useState(false);
-  const [togglingPinned, setTogglingPinned] = useState(false);
   const [togglingPublish, setTogglingPublish] = useState(false);
-
-  const categoryConfig = CATEGORY_CONFIG[news.category] || CATEGORY_CONFIG.news;
-  const CategoryIcon = categoryConfig.icon;
 
   const formatDate = (date) => {
     if (!date) return "-";
@@ -104,19 +80,6 @@ function NewsDetails({ news }) {
       toast.error(t("toggleFeaturedError") || "Failed to update featured status");
     } finally {
       setTogglingFeatured(false);
-    }
-  };
-
-  const handleTogglePinned = async () => {
-    try {
-      setTogglingPinned(true);
-      await toggleNewsPinned(news.id);
-      toast.success(t("togglePinnedSuccess") || "Pinned status updated");
-      router.refresh();
-    } catch (e) {
-      toast.error(t("togglePinnedError") || "Failed to update pinned status");
-    } finally {
-      setTogglingPinned(false);
     }
   };
 
@@ -238,12 +201,6 @@ function NewsDetails({ news }) {
             <div className="space-y-4">
               {/* Badges Row */}
               <div className="flex flex-wrap items-center gap-2">
-                {/* Category Badge */}
-                <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${categoryConfig.color}`}>
-                  <CategoryIcon className="size-4" />
-                  {categoryConfig.label}
-                </span>
-
                 {/* Status Badge */}
                 <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${
                   news.isPublished
@@ -261,23 +218,10 @@ function NewsDetails({ news }) {
                     {t("featured") || "Featured"}
                   </span>
                 )}
-
-                {/* Pinned Badge */}
-                {news.isPinned && (
-                  <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border bg-red-500/10 text-red-500 border-red-500/30">
-                    <Pin className="size-4 fill-red-500" />
-                    {t("pinned") || "Pinned"}
-                  </span>
-                )}
               </div>
 
               {/* Title */}
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">{news.title}</h2>
-
-              {/* Excerpt */}
-              {news.excerpt && (
-                <p className="text-muted-foreground text-lg">{news.excerpt}</p>
-              )}
 
               {/* Meta Info Row */}
               <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-border">
@@ -395,27 +339,6 @@ function NewsDetails({ news }) {
                   <Star className="size-4" />
                 )}
                 {news.isFeatured ? t("removeFeatured") || "Remove Featured" : t("makeFeatured") || "Make Featured"}
-              </Button>
-
-              {/* Toggle Pinned */}
-              <Button
-                variant="outline"
-                onClick={handleTogglePinned}
-                disabled={togglingPinned}
-                className={`w-full gap-2 justify-start ${
-                  news.isPinned
-                    ? "border-gray-500/30 text-gray-500 hover:bg-gray-500/10"
-                    : "border-red-500/30 text-red-500 hover:bg-red-500/10"
-                }`}
-              >
-                {togglingPinned ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : news.isPinned ? (
-                  <PinOff className="size-4" />
-                ) : (
-                  <Pin className="size-4" />
-                )}
-                {news.isPinned ? t("unpin") || "Unpin" : t("pin") || "Pin Article"}
               </Button>
 
               <div className="h-px bg-border my-2" />

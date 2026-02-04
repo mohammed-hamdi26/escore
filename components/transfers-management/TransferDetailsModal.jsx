@@ -229,15 +229,15 @@ export default function TransferDetailsModal({ transferId, onClose }) {
             </div>
           )}
 
-          {/* Notes */}
-          {transfer.notes && (
+          {/* Content */}
+          {transfer.content && (
             <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
               <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
                 <FileText className="w-4 h-4" />
-                <span className="text-xs">{t("Notes")}</span>
+                <span className="text-xs">{t("Content")}</span>
               </div>
               <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
-                {transfer.notes}
+                {transfer.content}
               </p>
             </div>
           )}

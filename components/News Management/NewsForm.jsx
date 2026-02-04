@@ -7,7 +7,6 @@ import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import FormSection from "../ui app/FormSection";
-import FormRow from "../ui app/FormRow";
 import ImageUpload from "../ui app/ImageUpload";
 import RichTextEditor from "../ui app/RichTextEditor";
 import { Calendar as CalendarComponent } from "../ui/calendar";
@@ -32,32 +31,13 @@ import {
   Trophy,
   Users,
   UserCircle,
-  Pin,
   Send,
   ChevronLeft,
   ChevronRight,
   Languages,
-  Megaphone,
-  Mic,
-  BarChart3,
-  BookOpen,
-  MessageSquare,
-  ThumbsUp,
   Settings2,
   ArrowLeft,
-  Plus,
 } from "lucide-react";
-
-// Category options with colors and icons
-const CATEGORY_OPTIONS = [
-  { value: "news", label: "News", icon: Newspaper, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/30" },
-  { value: "announcement", label: "Announcement", icon: Megaphone, color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/30" },
-  { value: "interview", label: "Interview", icon: Mic, color: "text-pink-500", bg: "bg-pink-500/10", border: "border-pink-500/30" },
-  { value: "analysis", label: "Analysis", icon: BarChart3, color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/30" },
-  { value: "guide", label: "Guide", icon: BookOpen, color: "text-cyan-500", bg: "bg-cyan-500/10", border: "border-cyan-500/30" },
-  { value: "review", label: "Review", icon: MessageSquare, color: "text-green-500", bg: "bg-green-500/10", border: "border-green-500/30" },
-  { value: "opinion", label: "Opinion", icon: ThumbsUp, color: "text-yellow-500", bg: "bg-yellow-500/10", border: "border-yellow-500/30" },
-];
 
 // Language options
 const LANGUAGE_OPTIONS = [
@@ -78,8 +58,6 @@ const LANGUAGE_OPTIONS = [
 const validateSchema = yup.object({
   title: yup.string().required("Title is required"),
   content: yup.string().required("Content is required"),
-  category: yup.string().required("Category is required"),
-  excerpt: yup.string().max(500, "Excerpt must be at most 500 characters"),
   externalUrl: yup.string().url("Must be a valid URL").nullable(),
 });
 
@@ -99,7 +77,6 @@ export default function NewsForm({
     initialValues: {
       title: news?.title || "",
       slug: news?.slug || "",
-      excerpt: news?.excerpt || "",
       content: news?.content || "",
       coverImageLight: news?.coverImage?.light || "",
       coverImageDark: news?.coverImage?.dark || "",
@@ -107,7 +84,6 @@ export default function NewsForm({
       authorImageLight: news?.authorImage?.light || "",
       authorImageDark: news?.authorImage?.dark || "",
       externalUrl: news?.externalUrl || "",
-      category: news?.category || "news",
       tags: news?.tags || [],
       game: news?.game?.id || news?.game?._id || news?.game || "",
       tournament: news?.tournament?.id || news?.tournament?._id || news?.tournament || "",
@@ -115,7 +91,6 @@ export default function NewsForm({
       player: news?.player?.id || news?.player?._id || news?.player || "",
       publishedAt: news?.publishedAt ? new Date(news.publishedAt).toISOString().slice(0, 16) : "",
       isFeatured: news?.isFeatured || false,
-      isPinned: news?.isPinned || false,
       originalLanguage: news?.originalLanguage || "en",
     },
     validationSchema: validateSchema,
@@ -150,7 +125,6 @@ export default function NewsForm({
 
         // Convert empty strings to null
         if (!dataValues.externalUrl) dataValues.externalUrl = null;
-        if (!dataValues.excerpt) dataValues.excerpt = null;
         if (!dataValues.game) dataValues.game = null;
         if (!dataValues.tournament) dataValues.tournament = null;
         if (!dataValues.team) dataValues.team = null;
@@ -183,8 +157,8 @@ export default function NewsForm({
 
   const handleSaveAsDraft = async () => {
     const errors = await formik.validateForm();
-    if (errors.title || errors.content || errors.category) {
-      formik.setTouched({ title: true, content: true, category: true });
+    if (errors.title || errors.content) {
+      formik.setTouched({ title: true, content: true });
       toast.error("Please fill in required fields");
       return;
     }
@@ -238,51 +212,18 @@ export default function NewsForm({
               )}
             </div>
 
-            <FormRow cols={2}>
-              {/* Category */}
-              <CategorySelectField
-                label={t("category") || "Category"}
-                name="category"
-                options={CATEGORY_OPTIONS}
-                formik={formik}
-                placeholder={t("selectCategory") || "Select Category"}
-                required
-              />
-
-              {/* Slug */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">
-                  {t("slug") || "Slug"}
-                </label>
-                <input
-                  type="text"
-                  name="slug"
-                  value={formik.values.slug}
-                  onChange={formik.handleChange}
-                  placeholder={t("slugPlaceholder") || "auto-generated-from-title"}
-                  className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
-                />
-              </div>
-            </FormRow>
-
-            {/* Excerpt */}
+            {/* Slug */}
             <div className="space-y-2">
-              <div className="flex justify-between">
-                <label className="text-sm font-medium text-muted-foreground">
-                  {t("excerpt") || "Excerpt"}
-                </label>
-                <span className={`text-xs ${(formik.values.excerpt?.length || 0) > 500 ? "text-red-500" : "text-muted-foreground"}`}>
-                  {formik.values.excerpt?.length || 0}/500
-                </span>
-              </div>
-              <textarea
-                name="excerpt"
-                value={formik.values.excerpt}
+              <label className="text-sm font-medium text-muted-foreground">
+                {t("slug") || "Slug"}
+              </label>
+              <input
+                type="text"
+                name="slug"
+                value={formik.values.slug}
                 onChange={formik.handleChange}
-                placeholder={t("excerptPlaceholder") || "Write a brief summary that appears in article previews..."}
-                rows={3}
-                maxLength={500}
-                className="w-full px-4 py-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all resize-none"
+                placeholder={t("slugPlaceholder") || "auto-generated-from-title"}
+                className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
               />
             </div>
           </FormSection>
@@ -342,7 +283,7 @@ export default function NewsForm({
             title={t("publishSettings") || "Publishing"}
             icon={<Settings2 className="size-5" />}
           >
-            {/* Featured & Pinned Toggles */}
+            {/* Featured Toggle */}
             <div className="space-y-4">
               <ToggleCard
                 icon={<Star className="size-5" />}
@@ -351,14 +292,6 @@ export default function NewsForm({
                 isChecked={formik.values.isFeatured}
                 onChange={() => formik.setFieldValue("isFeatured", !formik.values.isFeatured)}
                 color="yellow"
-              />
-              <ToggleCard
-                icon={<Pin className="size-5" />}
-                label={t("pinned") || "Pinned Article"}
-                description={t("pinnedDesc") || "Keep at top of news list"}
-                isChecked={formik.values.isPinned}
-                onChange={() => formik.setFieldValue("isPinned", !formik.values.isPinned)}
-                color="red"
               />
             </div>
 
@@ -621,81 +554,6 @@ function ToggleCard({ icon, label, description, isChecked, onChange, color = "gr
         />
       </div>
     </button>
-  );
-}
-
-// Category Select Field
-function CategorySelectField({ label, name, options, formik, placeholder, required }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const error = formik.touched[name] && formik.errors[name];
-  const value = formik.values[name];
-  const selectedOption = options.find((opt) => opt.value === value);
-
-  return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-muted-foreground">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
-              error ? "ring-2 ring-red-500 border-red-500" : selectedOption ? selectedOption.border : "border-transparent"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              {selectedOption ? (
-                <>
-                  <div className={`size-8 rounded-lg ${selectedOption.bg} flex items-center justify-center`}>
-                    <selectedOption.icon className={`size-4 ${selectedOption.color}`} />
-                  </div>
-                  <span className={`font-medium ${selectedOption.color}`}>{selectedOption.label}</span>
-                </>
-              ) : (
-                <>
-                  <div className="size-8 rounded-lg bg-muted dark:bg-[#252a3d] flex items-center justify-center">
-                    <FileText className="size-4 text-muted-foreground" />
-                  </div>
-                  <span className="text-muted-foreground">{placeholder}</span>
-                </>
-              )}
-            </div>
-            <ChevronDown className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2 bg-background dark:bg-[#12141c] border-border" align="start">
-          {options.map((option) => {
-            const isSelected = value === option.value;
-            const IconComponent = option.icon;
-            return (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => {
-                  formik.setFieldValue(name, option.value);
-                  formik.setFieldTouched(name, true);
-                  setIsOpen(false);
-                }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
-                  isSelected ? `${option.bg} ${option.color}` : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
-                }`}
-              >
-                <div className={`size-8 rounded-lg ${option.bg} flex items-center justify-center`}>
-                  <IconComponent className={`size-4 ${option.color}`} />
-                </div>
-                <span className={`flex-1 text-sm font-medium ${isSelected ? option.color : "text-foreground"}`}>
-                  {option.label}
-                </span>
-                {isSelected && <Check className={`size-4 ${option.color}`} />}
-              </button>
-            );
-          })}
-        </PopoverContent>
-      </Popover>
-      {error && <p className="text-xs text-red-500">{error}</p>}
-    </div>
   );
 }
 

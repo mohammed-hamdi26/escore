@@ -10,20 +10,11 @@ import {
   ChevronDown,
   ChevronUp,
   Gamepad2,
-  Newspaper,
   Star,
   ListFilter,
   Check,
-  Pin,
   Eye,
   EyeOff,
-  FileText,
-  Megaphone,
-  Mic,
-  BarChart3,
-  BookOpen,
-  MessageSquare,
-  ThumbsUp,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -41,17 +32,6 @@ import {
 } from "@/components/ui/command";
 import { useTranslations } from "next-intl";
 
-const CATEGORY_OPTIONS = [
-  { value: "", label: "allCategories", icon: ListFilter, color: "text-gray-500" },
-  { value: "news", label: "news", icon: Newspaper, color: "text-blue-500" },
-  { value: "announcement", label: "announcement", icon: Megaphone, color: "text-purple-500" },
-  { value: "interview", label: "interview", icon: Mic, color: "text-pink-500" },
-  { value: "analysis", label: "analysis", icon: BarChart3, color: "text-orange-500" },
-  { value: "guide", label: "guide", icon: BookOpen, color: "text-cyan-500" },
-  { value: "review", label: "review", icon: MessageSquare, color: "text-green-500" },
-  { value: "opinion", label: "opinion", icon: ThumbsUp, color: "text-yellow-500" },
-];
-
 const PUBLISHED_OPTIONS = [
   { value: "", label: "all", icon: ListFilter, color: "text-gray-500" },
   { value: "true", label: "published", icon: Eye, color: "text-green-500" },
@@ -62,12 +42,6 @@ const FEATURED_OPTIONS = [
   { value: "", label: "all", icon: ListFilter, color: "text-gray-500" },
   { value: "true", label: "featured", icon: Star, color: "text-yellow-500" },
   { value: "false", label: "notFeatured", icon: Star, color: "text-gray-400" },
-];
-
-const PINNED_OPTIONS = [
-  { value: "", label: "all", icon: ListFilter, color: "text-gray-500" },
-  { value: "true", label: "pinned", icon: Pin, color: "text-red-500" },
-  { value: "false", label: "notPinned", icon: Pin, color: "text-gray-400" },
 ];
 
 function NewsFilter({ games = [] }) {
@@ -83,18 +57,14 @@ function NewsFilter({ games = [] }) {
   // Popover states
   const [gameSearchOpen, setGameSearchOpen] = useState(false);
   const [gameSearch, setGameSearch] = useState("");
-  const [categoryOpen, setCategoryOpen] = useState(false);
   const [publishedOpen, setPublishedOpen] = useState(false);
   const [featuredOpen, setFeaturedOpen] = useState(false);
-  const [pinnedOpen, setPinnedOpen] = useState(false);
 
   // Get current filter values from URL
   const currentSearch = searchParams.get("search") || "";
   const currentGame = searchParams.get("game") || "";
-  const currentCategory = searchParams.get("category") || "";
   const currentPublished = searchParams.get("isPublished") || "";
   const currentFeatured = searchParams.get("isFeatured") || "";
-  const currentPinned = searchParams.get("isPinned") || "";
 
   // Sync search term with URL
   useEffect(() => {
@@ -102,7 +72,7 @@ function NewsFilter({ games = [] }) {
   }, [currentSearch]);
 
   // Count active filters
-  const activeFiltersCount = [currentGame, currentCategory, currentPublished, currentFeatured, currentPinned].filter(Boolean).length;
+  const activeFiltersCount = [currentGame, currentPublished, currentFeatured].filter(Boolean).length;
 
   const updateParams = useCallback(
     (key, value) => {
@@ -154,11 +124,6 @@ function NewsFilter({ games = [] }) {
     return game?.name;
   }, [currentGame, games]);
 
-  // Get selected category
-  const selectedCategory = useMemo(() => {
-    return CATEGORY_OPTIONS.find((c) => c.value === currentCategory) || CATEGORY_OPTIONS[0];
-  }, [currentCategory]);
-
   // Get selected published status
   const selectedPublished = useMemo(() => {
     return PUBLISHED_OPTIONS.find((p) => p.value === currentPublished) || PUBLISHED_OPTIONS[0];
@@ -168,11 +133,6 @@ function NewsFilter({ games = [] }) {
   const selectedFeatured = useMemo(() => {
     return FEATURED_OPTIONS.find((f) => f.value === currentFeatured) || FEATURED_OPTIONS[0];
   }, [currentFeatured]);
-
-  // Get selected pinned
-  const selectedPinned = useMemo(() => {
-    return PINNED_OPTIONS.find((p) => p.value === currentPinned) || PINNED_OPTIONS[0];
-  }, [currentPinned]);
 
   return (
     <div className="space-y-4">
@@ -237,70 +197,7 @@ function NewsFilter({ games = [] }) {
       {/* Expanded Filters */}
       {showFilters && (
         <div className="bg-gray-50 dark:bg-[#0f1118] rounded-xl p-4 border border-gray-200 dark:border-white/5 animate-in slide-in-from-top-2 duration-200">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* Category Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                <FileText className="size-4" />
-                {t("category") || "Category"}
-              </label>
-              <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={categoryOpen}
-                    className="w-full h-10 justify-between rounded-lg bg-white dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-gray-50 dark:hover:bg-[#252a3d]"
-                  >
-                    <span className="flex items-center gap-2 truncate">
-                      {(() => {
-                        const CategoryIcon = selectedCategory.icon;
-                        return (
-                          <>
-                            <CategoryIcon className={`size-4 ${selectedCategory.color}`} />
-                            <span className="text-gray-900 dark:text-white">
-                              {t(selectedCategory.label) || selectedCategory.label}
-                            </span>
-                          </>
-                        );
-                      })()}
-                    </span>
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[220px] p-0" align="start">
-                  <Command>
-                    <CommandList>
-                      <CommandGroup>
-                        {CATEGORY_OPTIONS.map((option) => {
-                          const OptionIcon = option.icon;
-                          return (
-                            <CommandItem
-                              key={option.value}
-                              value={option.value || "all"}
-                              onSelect={() => {
-                                updateParams("category", option.value);
-                                setCategoryOpen(false);
-                              }}
-                              className="flex items-center gap-2 cursor-pointer"
-                            >
-                              <Check
-                                className={`h-4 w-4 ${
-                                  currentCategory === option.value ? "opacity-100" : "opacity-0"
-                                }`}
-                              />
-                              <OptionIcon className={`size-4 ${option.color}`} />
-                              <span>{t(option.label) || option.label}</span>
-                            </CommandItem>
-                          );
-                        })}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Game Filter */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
@@ -507,69 +404,6 @@ function NewsFilter({ games = [] }) {
                               <Check
                                 className={`h-4 w-4 ${
                                   currentFeatured === option.value ? "opacity-100" : "opacity-0"
-                                }`}
-                              />
-                              <OptionIcon className={`size-4 ${option.color}`} />
-                              <span>{t(option.label) || option.label}</span>
-                            </CommandItem>
-                          );
-                        })}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Pinned Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                <Pin className="size-4" />
-                {t("pinned") || "Pinned"}
-              </label>
-              <Popover open={pinnedOpen} onOpenChange={setPinnedOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={pinnedOpen}
-                    className="w-full h-10 justify-between rounded-lg bg-white dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-gray-50 dark:hover:bg-[#252a3d]"
-                  >
-                    <span className="flex items-center gap-2 truncate">
-                      {(() => {
-                        const PinnedIcon = selectedPinned.icon;
-                        return (
-                          <>
-                            <PinnedIcon className={`size-4 ${selectedPinned.color}`} />
-                            <span className="text-gray-900 dark:text-white">
-                              {t(selectedPinned.label) || selectedPinned.label}
-                            </span>
-                          </>
-                        );
-                      })()}
-                    </span>
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0" align="start">
-                  <Command>
-                    <CommandList>
-                      <CommandGroup>
-                        {PINNED_OPTIONS.map((option) => {
-                          const OptionIcon = option.icon;
-                          return (
-                            <CommandItem
-                              key={option.value}
-                              value={option.value || "all"}
-                              onSelect={() => {
-                                updateParams("isPinned", option.value);
-                                setPinnedOpen(false);
-                              }}
-                              className="flex items-center gap-2 cursor-pointer"
-                            >
-                              <Check
-                                className={`h-4 w-4 ${
-                                  currentPinned === option.value ? "opacity-100" : "opacity-0"
                                 }`}
                               />
                               <OptionIcon className={`size-4 ${option.color}`} />

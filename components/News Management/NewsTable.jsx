@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import NewsFilter from "./NewsFilter";
 import { useState } from "react";
 import { deleteNew } from "@/app/[locale]/_Lib/actions";
-import { toggleNewsFeatured, toggleNewsPinned, publishNews, unpublishNews } from "@/app/[locale]/_Lib/newsApi";
+import { toggleNewsFeatured, publishNews, unpublishNews } from "@/app/[locale]/_Lib/newsApi";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -25,30 +25,11 @@ import {
   Eye,
   StarOff,
   Loader2,
-  Pin,
-  PinOff,
   User,
   FileText,
-  Megaphone,
-  Mic,
-  BarChart3,
-  BookOpen,
-  MessageSquare,
-  ThumbsUp,
   EyeOff,
   Send,
 } from "lucide-react";
-
-// Category badge colors and icons
-const CATEGORY_CONFIG = {
-  news: { color: "bg-blue-500/10 text-blue-500", icon: Newspaper, label: "News" },
-  announcement: { color: "bg-purple-500/10 text-purple-500", icon: Megaphone, label: "Announcement" },
-  interview: { color: "bg-pink-500/10 text-pink-500", icon: Mic, label: "Interview" },
-  analysis: { color: "bg-orange-500/10 text-orange-500", icon: BarChart3, label: "Analysis" },
-  guide: { color: "bg-cyan-500/10 text-cyan-500", icon: BookOpen, label: "Guide" },
-  review: { color: "bg-green-500/10 text-green-500", icon: MessageSquare, label: "Review" },
-  opinion: { color: "bg-yellow-500/10 text-yellow-500", icon: ThumbsUp, label: "Opinion" },
-};
 
 // Status badge colors
 const STATUS_COLORS = {
@@ -126,20 +107,13 @@ function NewsTable({ news, pagination, games }) {
       <div className="glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5">
         {/* Table Header */}
         <div className="bg-muted/50 dark:bg-[#1a1d2e] border-b border-border">
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_0.7fr_0.7fr_0.7fr_auto] gap-4 px-6 py-4">
+          <div className="grid grid-cols-[2fr_1fr_1fr_0.7fr_0.7fr_0.7fr_auto] gap-4 px-6 py-4">
             <button
               onClick={() => handleSort("title")}
               className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-start"
             >
               {t("title") || "Title"}
               {getSortIcon("title")}
-            </button>
-            <button
-              onClick={() => handleSort("category")}
-              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {t("category") || "Category"}
-              {getSortIcon("category")}
             </button>
             <span className="text-sm font-medium text-muted-foreground">
               {t("author") || "Author"}
@@ -162,7 +136,7 @@ function NewsTable({ news, pagination, games }) {
               {getSortIcon("viewsCount")}
             </button>
             <span className="text-sm font-medium text-muted-foreground text-center">
-              {t("flags") || "Flags"}
+              {t("featured") || "Featured"}
             </span>
             <span className="text-sm font-medium text-muted-foreground text-end">
               {t("actions") || "Actions"}
@@ -183,7 +157,7 @@ function NewsTable({ news, pagination, games }) {
               <div
                 key={article.id}
                 onClick={() => router.push(`/dashboard/news-management/view/${article.id}`)}
-                className="grid grid-cols-[2fr_1fr_1fr_1fr_0.7fr_0.7fr_0.7fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors cursor-pointer"
+                className="grid grid-cols-[2fr_1fr_1fr_0.7fr_0.7fr_0.7fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors cursor-pointer"
               >
                 {/* Title & Cover Image */}
                 <div className="flex items-center gap-3 min-w-0">
@@ -206,13 +180,6 @@ function NewsTable({ news, pagination, games }) {
                       </p>
                     )}
                   </div>
-                </div>
-
-                {/* Category */}
-                <div>
-                  {article.category && (
-                    <CategoryBadge category={article.category} />
-                  )}
                 </div>
 
                 {/* Author */}
@@ -273,15 +240,11 @@ function NewsTable({ news, pagination, games }) {
                   </span>
                 </div>
 
-                {/* Flags (Featured & Pinned) */}
-                <div className="flex items-center justify-center gap-1">
-                  {article.isFeatured && (
+                {/* Featured */}
+                <div className="flex items-center justify-center">
+                  {article.isFeatured ? (
                     <Star className="size-4 text-yellow-500 fill-yellow-500" />
-                  )}
-                  {article.isPinned && (
-                    <Pin className="size-4 text-red-500 fill-red-500" />
-                  )}
-                  {!article.isFeatured && !article.isPinned && (
+                  ) : (
                     <span className="text-muted-foreground">-</span>
                   )}
                 </div>
@@ -305,24 +268,10 @@ function NewsTable({ news, pagination, games }) {
   );
 }
 
-// Category Badge Component
-function CategoryBadge({ category }) {
-  const config = CATEGORY_CONFIG[category] || CATEGORY_CONFIG.news;
-  const Icon = config.icon;
-
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.color}`}>
-      <Icon className="size-3" />
-      {config.label}
-    </span>
-  );
-}
-
 // Actions Dropdown Component
 function ActionsDropdown({ article, loadingId, onDelete, t }) {
   const [isOpen, setIsOpen] = useState(false);
   const [togglingFeatured, setTogglingFeatured] = useState(false);
-  const [togglingPinned, setTogglingPinned] = useState(false);
   const [togglingPublish, setTogglingPublish] = useState(false);
   const router = useRouter();
 
@@ -349,20 +298,6 @@ function ActionsDropdown({ article, loadingId, onDelete, t }) {
       toast.error(t("toggleFeaturedError") || "Failed to update featured status");
     } finally {
       setTogglingFeatured(false);
-    }
-  };
-
-  const handleTogglePinned = async () => {
-    try {
-      setTogglingPinned(true);
-      await toggleNewsPinned(article.id);
-      toast.success(t("togglePinnedSuccess") || "Pinned status updated");
-      setIsOpen(false);
-      router.refresh();
-    } catch (e) {
-      toast.error(t("togglePinnedError") || "Failed to update pinned status");
-    } finally {
-      setTogglingPinned(false);
     }
   };
 
@@ -473,30 +408,6 @@ function ActionsDropdown({ article, loadingId, onDelete, t }) {
                 <>
                   <Star className="size-4 text-yellow-500" />
                   {t("makeFeatured") || "Make Featured"}
-                </>
-              )}
-            </button>
-
-            {/* Toggle Pinned */}
-            <button
-              onClick={handleTogglePinned}
-              disabled={togglingPinned}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted dark:hover:bg-[#1a1d2e] transition-colors text-left rtl:text-right disabled:opacity-50"
-            >
-              {togglingPinned ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" />
-                  {t("updating") || "Updating..."}
-                </>
-              ) : article.isPinned ? (
-                <>
-                  <PinOff className="size-4 text-muted-foreground" />
-                  {t("removePinned") || "Unpin"}
-                </>
-              ) : (
-                <>
-                  <Pin className="size-4 text-red-500" />
-                  {t("makePinned") || "Pin Article"}
                 </>
               )}
             </button>
