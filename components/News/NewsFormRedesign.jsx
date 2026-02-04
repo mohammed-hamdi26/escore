@@ -21,6 +21,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Languages,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -325,6 +326,7 @@ function NewsFormRedesign({
       match: newData?.match?.id || "",
       publishedAt: newData?.publishedAt ? new Date(newData.publishedAt) : null,
       isFeatured: newData?.isFeatured || false,
+      originalLanguage: newData?.originalLanguage || locale || "en",
     },
     validationSchema,
     validateOnChange: true,
@@ -354,6 +356,7 @@ function NewsFormRedesign({
             ? values.publishedAt.toISOString()
             : undefined,
           isFeatured: values.isFeatured,
+          originalLanguage: values.originalLanguage || "en",
         };
 
         await submit(dataValues);
@@ -490,6 +493,7 @@ function NewsFormRedesign({
               formik={formik}
               aspectRatio="news-cover"
               hint={t("coverImagePlaceholder") || "Recommended: 1200x630px"}
+              showUrlInput
             />
             <ImageUpload
               label={t("coverImageDark")}
@@ -648,6 +652,40 @@ function NewsFormRedesign({
             </span>
           }
         >
+          {/* Content Language - Important for translation */}
+          <div className="mb-4 p-4 rounded-xl bg-blue-500/10 dark:bg-blue-500/5 border border-blue-500/20">
+            <div className="flex items-start gap-3">
+              <Languages className="size-5 text-blue-500 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                  {t("originalLanguage") || "Content Language"}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  {t("originalLanguageHint") || "Select the language you're writing in. Auto-translation will be applied."}
+                </p>
+                <select
+                  name="originalLanguage"
+                  value={formik.values.originalLanguage}
+                  onChange={formik.handleChange}
+                  className="w-full md:w-auto h-10 px-3 rounded-lg bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 cursor-pointer"
+                >
+                  <option value="en">{t("languages.en") || "English"}</option>
+                  <option value="ar">{t("languages.ar") || "Arabic"}</option>
+                  <option value="fr">{t("languages.fr") || "French"}</option>
+                  <option value="es">{t("languages.es") || "Spanish"}</option>
+                  <option value="de">{t("languages.de") || "German"}</option>
+                  <option value="tr">{t("languages.tr") || "Turkish"}</option>
+                  <option value="pt">{t("languages.pt") || "Portuguese"}</option>
+                  <option value="it">{t("languages.it") || "Italian"}</option>
+                  <option value="ru">{t("languages.ru") || "Russian"}</option>
+                  <option value="zh">{t("languages.zh") || "Chinese"}</option>
+                  <option value="ja">{t("languages.ja") || "Japanese"}</option>
+                  <option value="ko">{t("languages.ko") || "Korean"}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Featured Toggle */}
             <div className="flex items-center justify-between p-4 rounded-xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20">

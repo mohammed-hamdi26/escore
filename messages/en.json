@@ -2334,7 +2334,24 @@
     "searchPlayer": "Search player...",
     "noPlayerFound": "No player found",
     "searchMatch": "Search match...",
-    "noMatchFound": "No match found"
+    "noMatchFound": "No match found",
+    "originalLanguage": "Content Language",
+    "selectOriginalLanguage": "Select content language",
+    "originalLanguageHint": "Select the language you're writing in. Auto-translation will be applied for Arabic/English content.",
+    "languages": {
+      "en": "English",
+      "ar": "Arabic",
+      "fr": "French",
+      "es": "Spanish",
+      "de": "German",
+      "tr": "Turkish",
+      "pt": "Portuguese",
+      "it": "Italian",
+      "ru": "Russian",
+      "zh": "Chinese",
+      "ja": "Japanese",
+      "ko": "Korean"
+    }
   },
   "ForgetPassword": {
     "title": "Forgot Password?",
