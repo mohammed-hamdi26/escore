@@ -13,6 +13,7 @@ import {
   Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import ThemeDialog from "./theme-dialog";
-import { deleteTheme } from "@/app/[locale]/_Lib/actions";
+import { deleteTheme, updateTheme } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -47,31 +48,41 @@ function ThemeCard({ theme, onDelete, onEdit, t }) {
     }
   };
 
+  const handleToggleActive = async (isActive) => {
+    try {
+      await updateTheme({ isActive }, theme.id);
+      onEdit(theme.id, { isActive });
+      toast.success(isActive ? t("Theme enabled") : t("Theme disabled"));
+    } catch (e) {
+      toast.error(t("Failed to update theme status"));
+    }
+  };
+
   return (
     <>
-      <div className="bg-dashboard-box dark:bg-[#0F1017] rounded-xl overflow-hidden hover:ring-1 hover:ring-green-primary/30 transition-all">
-        <div className="flex items-center p-4 gap-4">
+      <div className="bg-white dark:bg-[#0F1017] rounded-xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-green-primary/30 dark:hover:ring-1 dark:hover:ring-green-primary/30 transition-all">
+        <div className="flex flex-col sm:flex-row sm:items-center p-4 gap-4">
           {/* Color Preview */}
           <div
-            className="w-14 h-14 rounded-xl flex-shrink-0 shadow-lg border-2 border-gray-700"
+            className="w-14 h-14 rounded-xl flex-shrink-0 shadow-lg ring-2 ring-white/20 dark:ring-white/10"
             style={{ backgroundColor: theme.color }}
           />
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <code className="text-lg font-mono font-semibold text-white">
+              <code className="text-lg font-mono font-semibold text-gray-900 dark:text-white">
                 {theme.color}
               </code>
             </div>
             <div className="flex items-center gap-2">
               {isDark ? (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-200">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
                   <Moon className="w-3 h-3" />
                   {t("Dark")}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400">
                   <Sun className="w-3 h-3" />
                   {t("Light")}
                 </span>
@@ -79,17 +90,34 @@ function ThemeCard({ theme, onDelete, onEdit, t }) {
             </div>
           </div>
 
+          {/* Status Toggle */}
+          <div className="flex items-center gap-2 sm:border-l sm:border-gray-200 sm:dark:border-white/10 sm:pl-4">
+            <Switch
+              checked={theme.isActive !== false}
+              onCheckedChange={handleToggleActive}
+            />
+            <span
+              className={`text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${
+                theme.isActive !== false
+                  ? "bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400"
+                  : "bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400"
+              }`}
+            >
+              {theme.isActive !== false ? t("Active") : t("Inactive")}
+            </span>
+          </div>
+
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:border-l sm:border-gray-200 sm:dark:border-white/10 sm:pl-4">
             <ThemeDialog
               theme={theme}
               trigger={
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-green-primary text-green-primary hover:bg-green-primary hover:text-white"
+                  className="border-green-primary text-green-primary hover:bg-green-primary hover:text-white gap-1"
                 >
-                  <Edit className="w-4 h-4 mr-1" />
+                  <Edit className="w-4 h-4" />
                   {t("Edit")}
                 </Button>
               }
@@ -102,7 +130,7 @@ function ThemeCard({ theme, onDelete, onEdit, t }) {
             <Button
               variant="ghost"
               size="icon"
-              className="text-[#677185] hover:text-red-400 hover:bg-red-400/10"
+              className="text-gray-500 dark:text-[#677185] hover:text-red-500 hover:bg-red-500/10"
               onClick={() => setShowDeleteDialog(true)}
               disabled={isLoading}
             >
@@ -114,17 +142,31 @@ function ThemeCard({ theme, onDelete, onEdit, t }) {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white dark:bg-[#0F1017] border-gray-200 dark:border-gray-800">
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("DialogDeleteTitle")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("DialogDeleteDescription")}
-            </AlertDialogDescription>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-red-100 dark:bg-red-500/10">
+                <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <AlertDialogTitle className="text-gray-900 dark:text-white">
+                  {t("DialogDeleteTitle")}
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-500 dark:text-[#677185] mt-1">
+                  {t("DialogDeleteDescription")}
+                </AlertDialogDescription>
+              </div>
+            </div>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading}>{t("Cancel")}</AlertDialogCancel>
+          <AlertDialogFooter className="border-t border-gray-200 dark:border-gray-800 pt-4 mt-2">
+            <AlertDialogCancel
+              disabled={isLoading}
+              className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              {t("Cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
               onClick={handleDelete}
               disabled={isLoading}
             >
@@ -168,9 +210,16 @@ function ThemesTable({ initialThemes }) {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white">{t("Themes")}</h1>
-          <p className="text-[#677185] mt-1">{t("Manage app color themes")}</p>
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-green-primary/20 to-green-primary/5 dark:from-green-primary/20 dark:to-green-primary/5">
+            <Palette className="size-6 text-green-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("Themes")}</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {t("Managing")} {themes?.length || 0} {t("themes")}
+            </p>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button
@@ -178,15 +227,15 @@ function ThemesTable({ initialThemes }) {
             size="icon"
             onClick={handleRefresh}
             disabled={isPending}
-            className="border-[#677185] text-[#677185] hover:text-white"
+            className="border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <RefreshCw className={`w-4 h-4 ${isPending ? "animate-spin" : ""}`} />
           </Button>
           <ThemeDialog
             t={t}
             trigger={
-              <Button className="bg-green-primary hover:bg-green-primary/80 text-white">
-                <Plus className="w-4 h-4 mr-2" />
+              <Button className="bg-green-primary hover:bg-green-primary/90 text-white gap-2">
+                <Plus className="w-4 h-4" />
                 {t("Add new theme")}
               </Button>
             }
@@ -197,21 +246,21 @@ function ThemesTable({ initialThemes }) {
       </div>
 
       {/* Themes List */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {!themes || themes.length === 0 ? (
-          <div className="bg-dashboard-box dark:bg-[#0F1017] rounded-xl p-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-[#1a1f2e] flex items-center justify-center mx-auto mb-4">
-              <Palette className="w-8 h-8 text-[#677185]" />
+          <div className="bg-white dark:bg-[#0F1017] rounded-xl p-12 text-center border border-gray-200 dark:border-white/5">
+            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-[#1a1f2e] flex items-center justify-center mx-auto mb-4">
+              <Palette className="w-8 h-8 text-gray-400 dark:text-[#677185]" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               {t("No themes found")}
             </h3>
-            <p className="text-[#677185] mb-6">{t("Add your first theme to get started")}</p>
+            <p className="text-gray-600 dark:text-[#677185] mb-6">{t("Add your first theme to get started")}</p>
             <ThemeDialog
               t={t}
               trigger={
-                <Button className="bg-green-primary hover:bg-green-primary/80 text-white">
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button className="bg-green-primary hover:bg-green-primary/90 text-white gap-2">
+                  <Plus className="w-4 h-4" />
                   {t("Add new theme")}
                 </Button>
               }

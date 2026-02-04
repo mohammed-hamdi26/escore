@@ -14,12 +14,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { TriangleAlertIcon } from "lucide-react";
+import { Trash2, AlertTriangle } from "lucide-react";
+import { useLocale } from "next-intl";
 import { useState } from "react";
 import toast from "react-hot-toast";
+
 function DictionaryDeleteDialog({ code, word, onDelete, t }) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const locale = useLocale();
+  const isRTL = locale === "ar";
 
   async function handleDelete() {
     try {
@@ -34,36 +38,56 @@ function DictionaryDeleteDialog({ code, word, onDelete, t }) {
       setIsLoading(false);
     }
   }
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button
-          className="rounded-full min-w-[100px] bg-[#3a469d] hover:bg-[#4656bf] text-amber-50 cursor-pointer"
+          variant="ghost"
+          size="icon"
+          className="text-gray-500 dark:text-[#677185] hover:text-red-500 hover:bg-red-500/10"
           disabled={isLoading}
         >
-          {isLoading ? <Spinner /> : t("Delete")}
+          {isLoading ? (
+            <Spinner className="w-4 h-4" />
+          ) : (
+            <Trash2 className="w-4 h-4" />
+          )}
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader className="items-center">
-          <div className="bg-destructive/10 mx-auto mb-2 flex size-12 items-center justify-center rounded-full">
-            <TriangleAlertIcon className="text-destructive size-6" />
+      <AlertDialogContent
+        className="bg-white dark:bg-[#0F1017] border-gray-200 dark:border-gray-800"
+        dir={isRTL ? "rtl" : "ltr"}
+      >
+        <AlertDialogHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-red-100 dark:bg-red-500/10">
+              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+            </div>
+            <div className={isRTL ? "text-right" : "text-left"}>
+              <AlertDialogTitle className="text-gray-900 dark:text-white">
+                {t("Are you absolutely sure you want to delete this word?")}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-500 dark:text-[#677185] mt-1">
+                {t("DialogDeleteDescription")}
+              </AlertDialogDescription>
+            </div>
           </div>
-          <AlertDialogTitle>{t("DialogDeleteTitle")}</AlertDialogTitle>
-          <AlertDialogDescription className="text-center">
-            {t(`DialogDeleteDescription`)}
-          </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>
+        <AlertDialogFooter className={`border-t border-gray-200 dark:border-gray-800 pt-4 mt-2 ${isRTL ? "flex-row-reverse gap-2" : ""}`}>
+          <AlertDialogCancel
+            disabled={isLoading}
+            className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
             {t("Cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isLoading}
-            className="bg-destructive dark:bg-destructive/60 hover:bg-destructive focus-visible:ring-destructive text-white"
+            className="bg-red-600 hover:bg-red-700 text-white"
           >
-            {isLoading ? <Spinner /> : t("Delete")}
+            {isLoading ? <Spinner className={`w-4 h-4 ${isRTL ? "ml-2" : "mr-2"}`} /> : null}
+            {t("Delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

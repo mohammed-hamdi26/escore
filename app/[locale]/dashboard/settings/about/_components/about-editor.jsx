@@ -1,44 +1,90 @@
 "use client";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   addAboutContent,
   getAboutContent,
   updateAboutContent,
 } from "@/app/[locale]/_Lib/actions";
-import LoadingScreen from "@/components/ui app/loading-screen";
 import { Button } from "@/components/ui/button";
-import {
-  Bold,
-  Code,
-  Heading1,
-  Heading2,
-  Italic,
-  Link,
-  List,
-  ListOrdered,
-  Undo2,
-  Redo2,
-} from "lucide-react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { Spinner } from "@/components/ui/spinner";
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { useTheme } from "next-themes";
+import { Loader2, Save, Maximize2, Minimize2 } from "lucide-react";
 import toast from "react-hot-toast";
 import AboutDeleteDialog from "./about-delete-dialog";
 
 const contentCache = new Map();
+
 function AboutEditor({ languageCode }) {
   const t = useTranslations("AboutPage");
-  const [content, setContent] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasAbout, setHasAbout] = useState(false);
-  const [history, setHistory] = useState([""]);
-  const [historyIndex, setHistoryIndex] = useState(0);
-  const [mounted, setMounted] = useState(false);
-  const textareaRef = useRef(null);
+  const tEditor = useTranslations("RichTextEditor");
+  const locale = useLocale();
+  const isRTL = locale === "ar";
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
+  const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasAbout, setHasAbout] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
+  const [charCount, setCharCount] = useState(0);
+  const [QuillComponent, setQuillComponent] = useState(null);
+  const quillRef = useRef(null);
+
+  // Quill modules configuration
+  const modules = {
+    toolbar: {
+      container: [
+        [{ header: [1, 2, 3, 4, false] }],
+        ["bold", "italic", "underline", "strike"],
+        [{ color: [] }, { background: [] }],
+        [{ align: [] }],
+        [{ direction: "rtl" }],
+        [{ list: "ordered" }, { list: "bullet" }],
+        ["blockquote", "code-block"],
+        ["link", "image", "video"],
+        ["clean"],
+      ],
+    },
+    clipboard: {
+      matchVisual: false,
+    },
+  };
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "color",
+    "background",
+    "align",
+    "direction",
+    "list",
+    "blockquote",
+    "code-block",
+    "link",
+    "image",
+    "video",
+  ];
+
   useEffect(() => {
     setMounted(true);
+    const loadQuill = async () => {
+      try {
+        const ReactQuill = (await import("react-quill-new")).default;
+        await import("react-quill-new/dist/quill.snow.css");
+        setQuillComponent(() => ReactQuill);
+      } catch (err) {
+        console.error("Failed to load Quill:", err);
+      }
+    };
+    loadQuill();
   }, []);
 
   useEffect(() => {
@@ -47,9 +93,8 @@ function AboutEditor({ languageCode }) {
       if (contentCache.has(languageCode)) {
         const cachedContent = contentCache.get(languageCode);
         setContent(cachedContent);
-        setHistory([cachedContent]);
-        setHistoryIndex(0);
         setHasAbout(true);
+        updateCounts(cachedContent);
         return;
       }
       setIsLoading(true);
@@ -60,17 +105,15 @@ function AboutEditor({ languageCode }) {
             .replace(/\\n/g, "\n")
             .replace(/^"|"$/g, "");
           setContent(cleanedData);
-          setHistory([cleanedData]);
-          setHistoryIndex(0);
           contentCache.set(languageCode, cleanedData);
           setHasAbout(true);
+          updateCounts(cleanedData);
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {
           setContent("");
-          setHistory([""]);
-          setHistoryIndex(0);
           setHasAbout(false);
+          updateCounts("");
         } else {
           console.error("Failed to fetch about content:", error);
         }
@@ -78,81 +121,39 @@ function AboutEditor({ languageCode }) {
         setIsLoading(false);
       }
     };
-
     fetchContent();
   }, [languageCode]);
 
-  // Add to history for undo/redo
-  const addToHistory = useCallback((newContent) => {
-    setHistory(prev => {
-      const newHistory = prev.slice(0, historyIndex + 1);
-      newHistory.push(newContent);
-      if (newHistory.length > 50) newHistory.shift();
-      return newHistory;
-    });
-    setHistoryIndex(prev => Math.min(prev + 1, 49));
-  }, [historyIndex]);
+  const updateCounts = useCallback((text) => {
+    const plainText = text.replace(/<[^>]*>/g, "").replace(/\n$/, "");
+    setCharCount(plainText.length);
+    const wordMatches = plainText.match(/[\p{L}\p{N}]+/gu);
+    setWordCount(wordMatches ? wordMatches.length : 0);
+  }, []);
 
-  // Undo function
-  const handleUndo = useCallback(() => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      setContent(history[newIndex]);
+  const handleChange = useCallback(
+    (value, delta, source, editor) => {
+      const isEmpty = value === "<p><br></p>" || value === "<p></p>" || !value;
+      const newContent = isEmpty ? "" : value;
+      setContent(newContent);
+      updateCounts(editor.getText());
+    },
+    [updateCounts]
+  );
+
+  const handleSubmit = async () => {
+    if (!content.trim() || content === "<p><br></p>") {
+      toast.error(t("Please enter content"));
+      return;
     }
-  }, [historyIndex, history]);
-
-  // Redo function
-  const handleRedo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      setContent(history[newIndex]);
-    }
-  }, [historyIndex, history]);
-
-  // Handle paste
-  const handlePaste = useCallback(async (e) => {
-    const clipboardData = e.clipboardData;
-    const items = clipboardData.items;
-
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf("image") !== -1) {
-        e.preventDefault();
-        const file = items[i].getAsFile();
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const base64 = event.target.result;
-            const textarea = textareaRef.current;
-            const start = textarea.selectionStart;
-            const imageMarkdown = `![pasted-image](${base64})`;
-            const newContent = content.substring(0, start) + imageMarkdown + content.substring(start);
-            setContent(newContent);
-            addToHistory(newContent);
-          };
-          reader.readAsDataURL(file);
-        }
-        return;
-      }
-    }
-
-    setTimeout(() => {
-      const newContent = textareaRef.current?.value || "";
-      if (newContent !== content) {
-        addToHistory(newContent);
-      }
-    }, 0);
-  }, [content, addToHistory]);
-
-  const submitContent = async (languageCode) => {
-    setIsLoading(true);
+    setIsSaving(true);
     try {
       if (!hasAbout) {
         await addAboutContent(languageCode, content);
         toast.success(t("Content created successfully"));
         contentCache.set(languageCode, content);
-      } else if (hasAbout) {
+        setHasAbout(true);
+      } else {
         await updateAboutContent(languageCode, content);
         toast.success(t("Content updated successfully"));
         contentCache.set(languageCode, content);
@@ -160,268 +161,140 @@ function AboutEditor({ languageCode }) {
     } catch (error) {
       toast.error(error.message);
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
-  };
-
-  const handleSubmit = async () => {
-    if (!content.trim()) {
-      toast.error(t("Please enter content"));
-      return;
-    }
-    await submitContent(languageCode);
-  };
-
-  const insertMarkdown = (before, after = "") => {
-    const textarea = textareaRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = content.substring(start, end);
-    const newText =
-      content.substring(0, start) +
-      before +
-      selectedText +
-      after +
-      content.substring(end);
-
-    setContent(newText);
-    addToHistory(newText);
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + before.length, end + before.length);
-    }, 0);
-  };
-
-  const handleKeyDown = (e) => {
-    // Undo: Ctrl+Z
-    if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
-      e.preventDefault();
-      handleUndo();
-      return;
-    }
-
-    // Redo: Ctrl+Y or Ctrl+Shift+Z
-    if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) {
-      e.preventDefault();
-      handleRedo();
-      return;
-    }
-
-    if (e.key === "Enter") {
-      const textarea = textareaRef.current;
-      const cursorPos = textarea.selectionStart;
-      const textBeforeCursor = content.substring(0, cursorPos);
-      const textAfterCursor = content.substring(cursorPos);
-
-      const lines = textBeforeCursor.split("\n");
-      const currentLine = lines[lines.length - 1];
-
-      const numberedMatch = currentLine.match(/^(\s*)(\d+)\.\s(.*)$/);
-      if (numberedMatch) {
-        e.preventDefault();
-        const indent = numberedMatch[1];
-        const currentNumber = parseInt(numberedMatch[2]);
-        const lineContent = numberedMatch[3];
-
-        if (lineContent.trim() === "") {
-          const newContent =
-            textBeforeCursor.slice(0, -currentLine.length) + textAfterCursor;
-          setContent(newContent);
-          addToHistory(newContent);
-          setTimeout(() => {
-            textarea.setSelectionRange(
-              cursorPos - currentLine.length,
-              cursorPos - currentLine.length
-            );
-          }, 0);
-        } else {
-          const nextNumber = currentNumber + 1;
-          const newContent =
-            textBeforeCursor +
-            "\n" +
-            indent +
-            nextNumber +
-            ". " +
-            textAfterCursor;
-          setContent(newContent);
-          addToHistory(newContent);
-          setTimeout(() => {
-            const newPos =
-              cursorPos + indent.length + nextNumber.toString().length + 3;
-            textarea.setSelectionRange(newPos, newPos);
-          }, 0);
-        }
-        return;
-      }
-
-      const bulletMatch = currentLine.match(/^(\s*)([-*+])\s(.*)$/);
-      if (bulletMatch) {
-        e.preventDefault();
-        const indent = bulletMatch[1];
-        const bulletChar = bulletMatch[2];
-        const lineContent = bulletMatch[3];
-
-        if (lineContent.trim() === "") {
-          const newContent =
-            textBeforeCursor.slice(0, -currentLine.length) + textAfterCursor;
-          setContent(newContent);
-          addToHistory(newContent);
-          setTimeout(() => {
-            textarea.setSelectionRange(
-              cursorPos - currentLine.length,
-              cursorPos - currentLine.length
-            );
-          }, 0);
-        } else {
-          const newContent =
-            textBeforeCursor +
-            "\n" +
-            indent +
-            bulletChar +
-            " " +
-            textAfterCursor;
-          setContent(newContent);
-          addToHistory(newContent);
-          setTimeout(() => {
-            const newPos = cursorPos + indent.length + 3;
-            textarea.setSelectionRange(newPos, newPos);
-          }, 0);
-        }
-        return;
-      }
-    }
-  };
-
-  const handleContentChange = (e) => {
-    setContent(e.target.value);
-  };
-
-  // Debounced history update
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (content !== history[historyIndex]) {
-        addToHistory(content);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [content]);
-
-  const toolbarButtons = [
-    {
-      icon: Undo2,
-      action: handleUndo,
-      title: "Undo (Ctrl+Z)",
-      disabled: historyIndex <= 0,
-    },
-    {
-      icon: Redo2,
-      action: handleRedo,
-      title: "Redo (Ctrl+Y)",
-      disabled: historyIndex >= history.length - 1,
-    },
-    { type: "divider" },
-    { icon: Bold, action: () => insertMarkdown("**", "**"), title: t("Bold") },
-    { icon: Italic, action: () => insertMarkdown("*", "*"), title: t("Italic") },
-    { icon: Heading1, action: () => insertMarkdown("# "), title: t("Heading 1") },
-    { icon: Heading2, action: () => insertMarkdown("## "), title: t("Heading 2") },
-    { icon: List, action: () => insertMarkdown("- "), title: t("Bullet List") },
-    {
-      icon: ListOrdered,
-      action: () => insertMarkdown("1. "),
-      title: t("Numbered List"),
-    },
-    { icon: Link, action: () => insertMarkdown("[", "](url)"), title: t("Link") },
-    {
-      icon: Code,
-      action: () => insertMarkdown("`", "`"),
-      title: t("Inline Code"),
-    },
-  ];
-
-  const renderMarkdown = (text) => {
-    let html = text;
-
-    html = html.replace(
-      /^### (.*$)/gim,
-      `<h3 class="text-lg font-bold mt-4 mb-2 ${isDark ? 'text-gray-100' : 'text-gray-800'}">$1</h3>`
-    );
-    html = html.replace(
-      /^## (.*$)/gim,
-      `<h2 class="text-xl font-bold mt-4 mb-2 ${isDark ? 'text-gray-100' : 'text-gray-800'}">$1</h2>`
-    );
-    html = html.replace(
-      /^# (.*$)/gim,
-      `<h1 class="text-2xl font-bold mt-4 mb-2 ${isDark ? 'text-gray-100' : 'text-gray-800'}">$1</h1>`
-    );
-    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-    html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-    html = html.replace(
-      /\[([^\]]+)\]\(([^)]+)\)/g,
-      `<a href="$2" class="${isDark ? 'text-blue-400' : 'text-blue-600'} underline">$1</a>`
-    );
-    html = html.replace(
-      /!\[([^\]]*)\]\(([^)]+)\)/g,
-      '<img src="$2" alt="$1" class="max-w-full my-2" />'
-    );
-    html = html.replace(
-      /`([^`]+)`/g,
-      `<code class="${isDark ? 'bg-gray-700 text-red-400' : 'bg-gray-200 text-red-600'} px-1 rounded">$1</code>`
-    );
-    html = html.replace(/\n/g, "<br />");
-
-    return html;
   };
 
   if (!mounted) {
     return (
-      <div className="w-full min-h-[65vh] bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />
+      <div className="p-6">
+        <div
+          className="w-full bg-gray-100 dark:bg-gray-800 rounded-xl animate-pulse"
+          style={{ minHeight: "400px" }}
+        />
+      </div>
     );
   }
 
-  return (
-    <>
-      {isLoading ? (
-        <LoadingScreen />
-      ) : (
+  if (isLoading) {
+    return (
+      <div
+        className="flex items-center justify-center"
+        style={{ minHeight: "400px" }}
+      >
+        <Spinner className="size-8" />
+      </div>
+    );
+  }
+
+  const editorHeight = isFullscreen ? "calc(100vh - 180px)" : "400px";
+
+  // Fullscreen mode
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-white dark:bg-[#0F1017] p-4 flex flex-col">
         <div
-          dir={languageCode === "ar" ? "rtl" : "ltr"}
-          className={`w-full min-h-[65vh] flex flex-col rounded-lg overflow-hidden border ${
-            isDark
-              ? 'bg-gray-900 border-gray-700 text-gray-100'
-              : 'bg-gray-50 border-gray-200 text-gray-900'
+          className={`flex-1 flex flex-col rounded-xl overflow-hidden border border-gray-200 dark:border-white/5 ${
+            isDark ? "quill-dark" : "quill-light"
           }`}
         >
-          <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} border-b p-2 flex items-center gap-1 flex-wrap`}>
-            {toolbarButtons.map((btn, idx) =>
-              btn.type === "divider" ? (
-                <div key={idx} className={`h-6 w-px ${isDark ? 'bg-gray-600' : 'bg-gray-300'} mx-1`} />
-              ) : (
-                <button
-                  key={idx}
-                  onClick={btn.action}
-                  title={btn.title}
-                  disabled={btn.disabled}
-                  className={`p-2 rounded transition-colors ${
-                    btn.disabled
-                      ? 'opacity-40 cursor-not-allowed'
-                      : isDark
-                        ? 'hover:bg-gray-700 text-gray-300 hover:text-white'
-                        : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <btn.icon size={18} />
-                </button>
-              )
-            )}
+          {/* Header */}
+          <div
+            className={`flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/5 ${
+              isDark ? "bg-[#1a1d2e]" : "bg-gray-50"
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {charCount} {tEditor("characters") || "characters"} · {wordCount}{" "}
+                {tEditor("words") || "words"}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <AboutDeleteDialog
+                contentCache={contentCache}
+                languageCode={languageCode}
+                setHasAbout={setHasAbout}
+                setContent={setContent}
+              />
+              <Button
+                onClick={handleSubmit}
+                disabled={isSaving || !languageCode}
+                className="bg-green-primary hover:bg-green-primary/90 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              >
+                {isSaving ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Save className="size-4" />
+                )}
+                {hasAbout ? t("Update") : t("Submit")}
+              </Button>
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(false)}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-[#252a3d] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all"
+                title={tEditor("exitFullscreen") || "Exit Fullscreen"}
+              >
+                <Minimize2 className="size-4" />
+              </button>
+            </div>
+          </div>
 
-            <div className={`h-6 w-px ${isDark ? 'bg-gray-600' : 'bg-gray-300'} mx-2`} />
-            <Button
-              onClick={handleSubmit}
-              disabled={isLoading || !languageCode}
-              className="rounded-full min-w-[50px] bg-blue-600 hover:bg-blue-500 text-white cursor-pointer transition-all duration-300 font-medium text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
+          {/* Editor */}
+          {QuillComponent ? (
+            <div
+              className={`quill-wrapper ${isDark ? "dark" : ""} flex-1 overflow-hidden`}
+              style={{ height: "calc(100vh - 120px)" }}
             >
-              {hasAbout ? t("Update") : t("Submit")}
-            </Button>
+              <QuillComponent
+                ref={quillRef}
+                theme="snow"
+                value={content}
+                onChange={handleChange}
+                modules={modules}
+                formats={formats}
+                placeholder={t("placeholder")}
+              />
+            </div>
+          ) : (
+            <div
+              className={`flex-1 flex items-center justify-center ${
+                isDark ? "bg-[#0f1118]" : "bg-white"
+              }`}
+            >
+              <Spinner className="size-6" />
+            </div>
+          )}
+        </div>
+        <style jsx global>{quillStyles}</style>
+      </div>
+    );
+  }
+
+  // Normal mode
+  return (
+    <div className="p-4">
+      <div
+        className={`relative rounded-xl overflow-hidden border border-gray-200 dark:border-white/5 ${
+          isDark ? "quill-dark" : "quill-light"
+        }`}
+      >
+        {/* Header */}
+        <div
+          className={`flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/5 ${
+            isDark ? "bg-[#1a1d2e]" : "bg-gray-50"
+          }`}
+        >
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {charCount} {tEditor("characters") || "characters"} · {wordCount}{" "}
+              {tEditor("words") || "words"}
+            </span>
+            <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:block">
+              Ctrl+B Bold · Ctrl+I Italic · Ctrl+U Underline
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
             {hasAbout && (
               <AboutDeleteDialog
                 contentCache={contentCache}
@@ -430,53 +303,299 @@ function AboutEditor({ languageCode }) {
                 setContent={setContent}
               />
             )}
-          </div>
-
-          <div className="flex-1 flex overflow-hidden">
-            <div className={`w-1/2 flex flex-col`}>
-              <div className={`${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-700'} px-4 py-2 text-sm font-medium flex justify-between`}>
-                <span>{t("Markdown")}</span>
-              </div>
-              <textarea
-                ref={textareaRef}
-                value={content}
-                onChange={handleContentChange}
-                onKeyDown={handleKeyDown}
-                onPaste={handlePaste}
-                placeholder={t("Select language first")}
-                disabled={isLoading}
-                className={`flex-1 p-4 font-mono text-sm resize-none focus:outline-none ${
-                  isDark
-                    ? 'bg-gray-900 text-gray-100 placeholder:text-gray-500 disabled:bg-gray-800'
-                    : 'bg-white text-gray-900 placeholder:text-gray-400 disabled:bg-gray-100'
-                } disabled:cursor-not-allowed`}
-              />
-            </div>
-            <div className={`w-1/2 flex flex-col ${isDark ? 'border-gray-700' : 'border-gray-300'} border-l`}>
-              <div className={`${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-700'} px-4 py-2 text-sm font-medium`}>
-                {t("Preview")}
-              </div>
-              <div
-                className={`flex-1 p-4 overflow-auto prose prose-sm max-w-none ${
-                  isDark
-                    ? 'bg-gray-800 prose-invert text-gray-100'
-                    : 'bg-white text-gray-900'
-                }`}
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
-              />
-            </div>
-          </div>
-
-          <div className={`${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-600'} px-4 py-2 text-xs flex justify-between`}>
-            <span>{content.length} {t("characters")}</span>
-            <span>
-              {content.split(/\s+/).filter((w) => w.length > 0).length} {t("words")}
-            </span>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSaving || !languageCode}
+              className="bg-green-primary hover:bg-green-primary/90 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              {isSaving ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Save className="size-4" />
+              )}
+              {hasAbout ? t("Update") : t("Submit")}
+            </Button>
+            <button
+              type="button"
+              onClick={() => setIsFullscreen(true)}
+              className="p-2 rounded-lg bg-gray-100 dark:bg-[#252a3d] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all"
+              title={tEditor("fullscreen") || "Fullscreen"}
+            >
+              <Maximize2 className="size-4" />
+            </button>
           </div>
         </div>
-      )}
-    </>
+
+        {/* Editor */}
+        {QuillComponent ? (
+          <div
+            className={`quill-wrapper ${isDark ? "dark" : ""}`}
+            style={{ minHeight: editorHeight }}
+          >
+            <QuillComponent
+              ref={quillRef}
+              theme="snow"
+              value={content}
+              onChange={handleChange}
+              modules={modules}
+              formats={formats}
+              placeholder={t("placeholder")}
+              style={{ height: editorHeight }}
+            />
+          </div>
+        ) : (
+          <div
+            className={`flex items-center justify-center ${
+              isDark ? "bg-[#0f1118]" : "bg-white"
+            }`}
+            style={{ minHeight: editorHeight }}
+          >
+            <Spinner className="size-6" />
+          </div>
+        )}
+      </div>
+      <style jsx global>{quillStyles}</style>
+    </div>
   );
 }
+
+const quillStyles = `
+  /* Light mode styles */
+  .quill-light .ql-toolbar {
+    background: #f9fafb;
+    border: none !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 12px !important;
+  }
+
+  .quill-light .ql-container {
+    border: none !important;
+    font-family: inherit;
+    background: #ffffff;
+  }
+
+  .quill-light .ql-editor {
+    color: #1f2937 !important;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 20px 24px;
+    min-height: inherit;
+  }
+
+  .quill-light .ql-editor * {
+    color: inherit;
+  }
+
+  .quill-light .ql-editor.ql-blank::before {
+    color: #9ca3af;
+    font-style: normal;
+  }
+
+  .quill-light .ql-picker-options .ql-picker-item {
+    color: #1f2937;
+  }
+
+  .quill-light .ql-snow .ql-picker.ql-expanded .ql-picker-options {
+    background: #ffffff;
+    border-color: #e5e7eb;
+  }
+
+  /* Dark mode styles */
+  .quill-dark .ql-toolbar {
+    background: #1a1d2e;
+    border: none !important;
+    border-bottom: 1px solid #2d3348 !important;
+    padding: 12px !important;
+  }
+
+  .quill-dark .ql-container {
+    border: none !important;
+    background: #0f1118;
+    font-family: inherit;
+  }
+
+  .quill-dark .ql-editor {
+    color: #e5e7eb;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 20px 24px;
+    min-height: inherit;
+  }
+
+  .quill-dark .ql-editor.ql-blank::before {
+    color: #6b7280;
+    font-style: normal;
+  }
+
+  .quill-dark .ql-toolbar .ql-stroke {
+    stroke: #9ca3af;
+  }
+
+  .quill-dark .ql-toolbar .ql-fill {
+    fill: #9ca3af;
+  }
+
+  .quill-dark .ql-toolbar .ql-picker {
+    color: #9ca3af;
+  }
+
+  .quill-dark .ql-toolbar .ql-picker-options {
+    background: #1a1d2e;
+    border-color: #2d3348;
+  }
+
+  .quill-dark .ql-toolbar .ql-picker-item:hover,
+  .quill-dark .ql-toolbar .ql-picker-item.ql-selected {
+    color: #22c55e;
+  }
+
+  .quill-dark .ql-toolbar button:hover .ql-stroke,
+  .quill-dark .ql-toolbar button.ql-active .ql-stroke {
+    stroke: #22c55e;
+  }
+
+  .quill-dark .ql-toolbar button:hover .ql-fill,
+  .quill-dark .ql-toolbar button.ql-active .ql-fill {
+    fill: #22c55e;
+  }
+
+  /* Light mode toolbar hover */
+  .quill-light .ql-toolbar button:hover .ql-stroke,
+  .quill-light .ql-toolbar button.ql-active .ql-stroke {
+    stroke: #22c55e;
+  }
+
+  .quill-light .ql-toolbar button:hover .ql-fill,
+  .quill-light .ql-toolbar button.ql-active .ql-fill {
+    fill: #22c55e;
+  }
+
+  .quill-light .ql-toolbar .ql-picker-item:hover,
+  .quill-light .ql-toolbar .ql-picker-item.ql-selected {
+    color: #22c55e;
+  }
+
+  /* Quill wrapper for proper height */
+  .quill-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quill-wrapper .quill {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+  }
+
+  .quill-wrapper .ql-toolbar {
+    flex-shrink: 0;
+  }
+
+  .quill-wrapper .ql-container {
+    flex: 1;
+    overflow: auto;
+    height: auto !important;
+  }
+
+  /* Code block styling */
+  .ql-editor pre.ql-syntax {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  .quill-light .ql-editor pre.ql-syntax {
+    background: #f3f4f6;
+    color: #1f2937;
+  }
+
+  /* Blockquote styling */
+  .ql-editor blockquote {
+    border-left: 4px solid #22c55e;
+    padding-left: 16px;
+    margin: 16px 0;
+    color: #6b7280;
+  }
+
+  .quill-dark .ql-editor blockquote {
+    color: #9ca3af;
+  }
+
+  /* Link styling */
+  .ql-editor a {
+    color: #22c55e;
+  }
+
+  /* Image styling */
+  .ql-editor img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 16px 0;
+  }
+
+  /* Headers styling for light mode */
+  .quill-light .ql-editor h1,
+  .quill-light .ql-editor h2,
+  .quill-light .ql-editor h3,
+  .quill-light .ql-editor h4 {
+    color: #111827;
+  }
+
+  .quill-light .ql-editor p {
+    color: #1f2937;
+  }
+
+  .quill-light .ql-editor ul li,
+  .quill-light .ql-editor ol li {
+    color: #1f2937;
+  }
+
+  .quill-light .ql-editor blockquote {
+    color: #4b5563;
+  }
+
+  /* Dark mode tooltip */
+  .quill-dark .ql-tooltip {
+    background: #1a1d2e;
+    border-color: #2d3348;
+    color: #e5e7eb;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .quill-dark .ql-tooltip input[type="text"] {
+    background: #0f1118;
+    border-color: #2d3348;
+    color: #e5e7eb;
+  }
+
+  /* Light mode tooltip */
+  .quill-light .ql-tooltip {
+    background: #ffffff;
+    border-color: #e5e7eb;
+    color: #1f2937;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .quill-light .ql-tooltip input[type="text"] {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+    color: #1f2937;
+  }
+
+  /* Dark picker items */
+  .quill-dark .ql-picker-options .ql-picker-item {
+    color: #e5e7eb;
+  }
+
+  /* RTL Support */
+  .ql-editor[dir="rtl"],
+  .ql-editor .ql-direction-rtl {
+    direction: rtl;
+    text-align: right;
+  }
+`;
 
 export default AboutEditor;

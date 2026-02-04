@@ -11,9 +11,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash, TriangleAlertIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { Trash2, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import toast from "react-hot-toast";
 
 function AboutDeleteDialog({
@@ -23,6 +26,8 @@ function AboutDeleteDialog({
   setContent,
 }) {
   const t = useTranslations("AboutPage");
+  const locale = useLocale();
+  const isRTL = locale === "ar";
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -34,6 +39,7 @@ function AboutDeleteDialog({
       contentCache.delete(languageCode);
       setHasAbout(false);
       toast.success(t("Content deleted successfully"));
+      setOpen(false);
     } catch (error) {
       toast.error(error.message || t("Failed to delete content"));
     } finally {
@@ -44,33 +50,57 @@ function AboutDeleteDialog({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-gray-500 dark:text-gray-400 hover:text-red-500 hover:bg-red-500/10"
           disabled={isLoading}
-          className="p-2 hover:bg-gray-100 rounded transition-colors cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
-          title={t("Delete Content")}
         >
-          <Trash size={18} />
-        </button>
+          {isLoading ? (
+            <Spinner className="size-4" />
+          ) : (
+            <Trash2 className="size-4" />
+          )}
+        </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader className="items-center">
-          <div className="bg-destructive/10 mx-auto mb-2 flex size-12 items-center justify-center rounded-full">
-            <TriangleAlertIcon className="text-destructive size-6" />
+      <AlertDialogContent
+        className="bg-white dark:bg-[#0F1017] border-gray-200 dark:border-gray-800"
+        dir={isRTL ? "rtl" : "ltr"}
+      >
+        <AlertDialogHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-red-100 dark:bg-red-500/10">
+              <AlertTriangle className="size-5 text-red-600 dark:text-red-400" />
+            </div>
+            <div className={isRTL ? "text-right" : "text-left"}>
+              <AlertDialogTitle className="text-gray-900 dark:text-white">
+                {t("Delete confirmation title")}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-500 dark:text-[#677185] mt-1">
+                {t("Delete confirmation description")}
+              </AlertDialogDescription>
+            </div>
           </div>
-          <AlertDialogTitle>
-            {t("Delete confirmation title")}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-center">
-            {t("Delete confirmation description")}
-          </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>{t("Cancel")}</AlertDialogCancel>
+        <AlertDialogFooter
+          className={`border-t border-gray-200 dark:border-gray-800 pt-4 mt-2 ${
+            isRTL ? "flex-row-reverse gap-2" : ""
+          }`}
+        >
+          <AlertDialogCancel
+            disabled={isLoading}
+            className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            {t("Cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isLoading}
-            className="bg-destructive dark:bg-destructive/60 hover:bg-destructive focus-visible:ring-destructive text-white"
+            className="bg-red-600 hover:bg-red-700 text-white"
           >
+            {isLoading ? (
+              <Spinner className={`size-4 ${isRTL ? "ml-2" : "mr-2"}`} />
+            ) : null}
             {isLoading ? t("Deleting") : t("Delete")}
           </AlertDialogAction>
         </AlertDialogFooter>

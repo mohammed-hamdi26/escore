@@ -54,7 +54,7 @@ function TopNav({ user }) {
                     <EscoreLogo width={80} height={40} />
                   </Link>
                   {user && <HeaderSideNavBar user={user} t={t} />}
-                  <NavItems t={t} />
+                  <NavItems user={user} t={t} />
                 </div>
               </SheetContent>
             </Sheet>

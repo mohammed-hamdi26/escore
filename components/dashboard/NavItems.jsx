@@ -3,56 +3,192 @@
 import NavItem from "./NavItem";
 import SettingsIcon from "./SettingsIcon";
 import { logout } from "@/app/[locale]/_Lib/actions";
-import { LogOut } from "lucide-react";
-import PasswordIcon from "../icons/PasswordIcon";
+import {
+  LogOut,
+  Trophy,
+  Swords,
+  Users,
+  UsersRound,
+  ArrowRightLeft,
+  Gamepad2,
+  Newspaper,
+  UserCog,
+  HeadphonesIcon,
+  Bell,
+  LayoutDashboard,
+  Settings,
+  KeyRound,
+} from "lucide-react";
 import { usePathname } from "@/i18n/navigation";
 
-const pages = [
-  {
-    icon: <SettingsIcon />,
-    title: "Settings",
-    href: "/dashboard/settings",
-  },
-  {
-    icon: <PasswordIcon width="18" height="18" />,
-    title: "Change Password",
-    href: "/dashboard/change-password",
-  },
-];
+/**
+ * Check if user has permission for an entity
+ */
+function hasPermission(user, entity) {
+  if (user?.role === "admin") return true;
+  return user?.permissions?.some((perm) => perm.entity === entity) || false;
+}
 
-function NavItems({ t }) {
+function NavItems({ user, t }) {
   const pathname = usePathname();
+  const isAdmin = user?.role === "admin";
+
+  // Dashboard modules
+  const dashboardModules = [
+    {
+      icon: <LayoutDashboard />,
+      title: "Dashboard",
+      href: "/dashboard",
+      isShowed: true,
+    },
+    {
+      icon: <Trophy />,
+      title: "Tournaments",
+      href: "/dashboard/tournaments-management",
+      isShowed: hasPermission(user, "Tournament"),
+    },
+    {
+      icon: <Swords />,
+      title: "Matches",
+      href: "/dashboard/matches-management",
+      isShowed: hasPermission(user, "Match"),
+    },
+    {
+      icon: <Users />,
+      title: "Players",
+      href: "/dashboard/player-management",
+      isShowed: hasPermission(user, "Player"),
+    },
+    {
+      icon: <UsersRound />,
+      title: "Teams",
+      href: "/dashboard/teams-management",
+      isShowed: hasPermission(user, "Team"),
+    },
+    {
+      icon: <ArrowRightLeft />,
+      title: "Transfers",
+      href: "/dashboard/transfers-management",
+      isShowed: hasPermission(user, "Transfer"),
+    },
+    {
+      icon: <Gamepad2 />,
+      title: "Games",
+      href: "/dashboard/games-management",
+      isShowed: hasPermission(user, "Game"),
+    },
+    {
+      icon: <Newspaper />,
+      title: "News",
+      href: "/dashboard/news",
+      isShowed: hasPermission(user, "News"),
+    },
+    {
+      icon: <UserCog />,
+      title: "Users",
+      href: "/dashboard/users",
+      isShowed: isAdmin,
+    },
+    {
+      icon: <HeadphonesIcon />,
+      title: "Support",
+      href: "/dashboard/support-center",
+      isShowed: hasPermission(user, "Support"),
+    },
+    {
+      icon: <Bell />,
+      title: "Notifications",
+      href: "/dashboard/notifications",
+      isShowed: isAdmin,
+    },
+  ];
+
+  // Settings pages
+  const settingsPages = [
+    {
+      icon: <Settings />,
+      title: "Settings",
+      href: "/dashboard/settings",
+    },
+    {
+      icon: <KeyRound />,
+      title: "Change Password",
+      href: "/dashboard/change-password",
+    },
+  ];
+
+  const visibleModules = dashboardModules.filter((module) => module.isShowed);
 
   return (
-    <div className="space-y-2">
-      {/* Main Navigation */}
-      <ul className="space-y-1">
-        {pages.map((page) => (
-          <NavItem
-            isActive={pathname === page.href}
-            key={page.title}
-            icon={page.icon}
-            label={t(page.title)}
-            href={page.href}
-          />
-        ))}
+    <div className="space-y-1 max-h-[calc(100vh-240px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent pr-1">
+      {/* Dashboard Modules */}
+      <div className="px-3 py-1.5">
+        <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+          {t("modules") || "Modules"}
+        </span>
+      </div>
+      <ul className="space-y-0.5">
+        {visibleModules.map((module) => {
+          // Dashboard should only be active when exactly on /dashboard
+          const isActive = module.href === "/dashboard"
+            ? pathname === "/dashboard"
+            : pathname === module.href || pathname.startsWith(module.href + "/");
+
+          return (
+            <NavItem
+              isActive={isActive}
+              key={module.title}
+              icon={module.icon}
+              label={t(module.title) || module.title}
+              href={module.href}
+            />
+          );
+        })}
       </ul>
 
       {/* Divider */}
-      <div className="mx-4 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent" />
+      <div className="mx-3 my-2 h-px bg-gray-200 dark:bg-white/10" />
+
+      {/* Settings Section */}
+      <div className="px-3 py-1.5">
+        <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+          {t("settings") || "Settings"}
+        </span>
+      </div>
+      <ul className="space-y-0.5">
+        {settingsPages.map((page) => {
+          // Settings should be active on /dashboard/settings and all sub-pages
+          const isSettingsActive = page.href === "/dashboard/settings"
+            ? pathname === "/dashboard/settings" || pathname.startsWith("/dashboard/settings/")
+            : pathname === page.href;
+
+          return (
+            <NavItem
+              isActive={isSettingsActive}
+              key={page.title}
+              icon={page.icon}
+              label={t(page.title) || page.title}
+              href={page.href}
+            />
+          );
+        })}
+      </ul>
+
+      {/* Divider */}
+      <div className="mx-3 my-2 h-px bg-gray-200 dark:bg-white/10" />
 
       {/* Logout Button */}
       <div
-        className="group relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-500/10"
+        className="group flex items-center gap-2.5 px-3 py-2 mx-0 rounded-lg cursor-pointer transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-500/10"
         onClick={() => logout()}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => e.key === "Enter" && logout()}
       >
-        <span className="flex items-center justify-center size-9 rounded-lg bg-gray-100 dark:bg-white/5 transition-all duration-200 group-hover:bg-red-100 dark:group-hover:bg-red-500/20">
-          <LogOut className="size-[18px] text-gray-500 dark:text-gray-400 transition-colors duration-200 group-hover:text-red-500 rtl:rotate-180" />
+        <span className="flex items-center justify-center size-7 rounded-md transition-all duration-200 text-gray-500 dark:text-gray-400 group-hover:text-red-500">
+          <LogOut className="size-4 rtl:rotate-180" />
         </span>
-        <span className="text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200 group-hover:text-red-500">
+        <span className="text-[13px] font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200 group-hover:text-red-500">
           {t("Logout")}
         </span>
       </div>

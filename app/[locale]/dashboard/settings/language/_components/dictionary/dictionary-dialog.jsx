@@ -8,6 +8,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { BookOpen, PenLine } from "lucide-react";
+import { useLocale } from "next-intl";
 import DictionaryForm from "./dictionary-form";
 
 function DictionaryDialog({
@@ -20,17 +22,43 @@ function DictionaryDialog({
   t,
 }) {
   const [open, setOpen] = useState(false);
-  const dialogTitle =
-    formType === "add" ? t("DialogAddTitle") : `${t("Edit")} : ${word}`;
-  const dialogDescription =
-    formType === "add" ? t("DialogAddDescription") : t("DialogEditDescription");
+  const locale = useLocale();
+  const isRTL = locale === "ar";
+  const isEditing = formType === "edit";
+  const dialogTitle = isEditing ? `${t("Edit")} : ${word}` : t("DialogAddTitle");
+  const dialogDescription = isEditing
+    ? t("DialogEditDescription")
+    : t("DialogAddDescription");
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className="max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-[#0F1017] border-gray-200 dark:border-gray-800"
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         <DialogHeader>
-          <DialogTitle>{dialogTitle}</DialogTitle>
-          <DialogDescription>{dialogDescription}</DialogDescription>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-xl ${
+              isEditing
+                ? "bg-gradient-to-br from-blue-500/20 to-blue-500/5"
+                : "bg-gradient-to-br from-green-primary/20 to-green-primary/5"
+            }`}>
+              {isEditing ? (
+                <PenLine className="w-5 h-5 text-blue-500" />
+              ) : (
+                <BookOpen className="w-5 h-5 text-green-primary" />
+              )}
+            </div>
+            <div className={isRTL ? "text-right" : "text-left"}>
+              <DialogTitle className="text-gray-900 dark:text-white">
+                {dialogTitle}
+              </DialogTitle>
+              <DialogDescription className="text-gray-500 dark:text-[#677185]">
+                {dialogDescription}
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
         <DictionaryForm
           t={t}
