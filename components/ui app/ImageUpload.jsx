@@ -108,8 +108,9 @@ function ImageUpload({
       const formData = new FormData();
       formData.append("image", file);
       const url = await uploadPhoto(formData);
-      formik?.setFieldValue(name, url);
-      formik?.setFieldTouched(name, true, false);
+      await formik?.setFieldValue(name, url);
+      await formik?.setFieldTouched(name, true, true);
+      formik?.validateField(name);
       toast.success(t?.("uploadSuccess") || "Image uploaded successfully");
     } catch (error) {
       console.error(error);
@@ -119,13 +120,15 @@ function ImageUpload({
     }
   };
 
-  const handleRemove = () => {
-    formik?.setFieldValue(name, "");
-    formik?.setFieldTouched(name, true, false);
+  const handleRemove = async () => {
+    await formik?.setFieldValue(name, "");
+    await formik?.setFieldTouched(name, true, true);
+    formik?.validateField(name);
   };
 
-  const handleUrlChange = (e) => {
-    formik?.setFieldValue(name, e.target.value);
+  const handleUrlChange = async (e) => {
+    await formik?.setFieldValue(name, e.target.value);
+    formik?.validateField(name);
   };
 
   return (

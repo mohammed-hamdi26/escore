@@ -72,6 +72,17 @@ function TeamFormRedesign({
   const t = useTranslations("teamForm");
   const router = useRouter();
 
+  // Helper function to format date to YYYY-MM-DD using local timezone
+  const formatDateToLocal = (dateInput) => {
+    if (!dateInput) return "";
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const formik = useFormik({
     initialValues: {
       name: team?.name || "",
@@ -80,9 +91,7 @@ function TeamFormRedesign({
       description: team?.description || "",
       country: team?.country?.name || "",
       region: team?.region || "",
-      foundedDate: team?.foundedDate
-        ? new Date(team.foundedDate).toISOString().split("T")[0]
-        : "",
+      foundedDate: formatDateToLocal(team?.foundedDate),
       logoLight: team?.logo?.light || "",
       logoDark: team?.logo?.dark || "",
       games: team?.games?.map(g => g.id || g._id) || [],
@@ -382,9 +391,9 @@ function TeamFormRedesign({
       <div className="flex justify-end gap-4">
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           onClick={() => router.back()}
-          className="h-11 px-6 rounded-xl"
+          className="h-11 px-6 rounded-xl border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           {t("cancel") || "Cancel"}
         </Button>
@@ -443,7 +452,7 @@ function InputField({
         <input
           type={type}
           name={name}
-          value={formik.values[name]}
+          value={formik.values[name] ?? ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           placeholder={placeholder}
@@ -481,7 +490,7 @@ function TextAreaField({
       </label>
       <textarea
         name={name}
-        value={formik.values[name]}
+        value={formik.values[name] ?? ""}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         placeholder={placeholder}
@@ -521,17 +530,19 @@ function CountrySelectField({
 
   const selectedCountry = countries?.find((c) => c.label === value);
 
-  const handleSelect = (country) => {
-    formik.setFieldValue(name, country.label);
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (country) => {
+    await formik.setFieldValue(name, country.label);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
     setSearch("");
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   return (
@@ -646,16 +657,18 @@ function RegionSelectField({
   const value = formik.values[name];
   const t = useTranslations("teamForm");
 
-  const handleSelect = (region) => {
-    formik.setFieldValue(name, region);
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (region) => {
+    await formik.setFieldValue(name, region);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   return (
@@ -746,7 +759,7 @@ function GameMultiSelectField({
     selectedIds.includes(game.id || game._id)
   );
 
-  const handleSelect = (gameId) => {
+  const handleSelect = async (gameId) => {
     const currentIds = [...selectedIds];
     const index = currentIds.indexOf(gameId);
 
@@ -756,15 +769,17 @@ function GameMultiSelectField({
       currentIds.push(gameId);
     }
 
-    formik.setFieldValue(name, currentIds);
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, currentIds);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
-  const handleRemove = (e, gameId) => {
+  const handleRemove = async (e, gameId) => {
     e.stopPropagation();
     const currentIds = selectedIds.filter((id) => id !== gameId);
-    formik.setFieldValue(name, currentIds);
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, currentIds);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   return (
@@ -898,18 +913,28 @@ function DatePickerField({
     (_, i) => new Date().getFullYear() - i
   );
 
-  const handleDateSelect = (date) => {
+  // Format date to YYYY-MM-DD using local timezone
+  const formatLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleDateSelect = async (date) => {
     if (date) {
-      formik.setFieldValue(name, date.toISOString().split("T")[0]);
-      formik.setFieldTouched(name, true);
+      await formik.setFieldValue(name, formatLocalDate(date));
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
       setIsOpen(false);
     }
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   const formatDisplayDate = (dateStr) => {
@@ -973,7 +998,7 @@ function DatePickerField({
               }
               className="p-1 hover:bg-muted rounded-lg"
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className="size-4 rtl:rotate-180" />
             </button>
             <div className="flex items-center gap-2">
               <select
@@ -1016,7 +1041,7 @@ function DatePickerField({
               }
               className="p-1 hover:bg-muted rounded-lg"
             >
-              <ChevronRight className="size-4" />
+              <ChevronRight className="size-4 rtl:rotate-180" />
             </button>
           </div>
           <CalendarComponent
@@ -1058,7 +1083,7 @@ function TournamentMultiSelectField({
     selectedIds.includes(tournament.id || tournament._id)
   );
 
-  const handleSelect = (tournamentId) => {
+  const handleSelect = async (tournamentId) => {
     const currentIds = [...selectedIds];
     const index = currentIds.indexOf(tournamentId);
 
@@ -1068,16 +1093,18 @@ function TournamentMultiSelectField({
       currentIds.push(tournamentId);
     }
 
-    formik.setFieldValue(name, currentIds);
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, currentIds);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
-  const handleRemove = (e, tournamentId) => {
+  const handleRemove = async (e, tournamentId) => {
     e.stopPropagation();
     e.preventDefault();
     const currentIds = selectedIds.filter((id) => id !== tournamentId);
-    formik.setFieldValue(name, currentIds);
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, currentIds);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   return (
@@ -1223,7 +1250,7 @@ function PlayerMultiSelectField({
     selectedIds.includes(player.id || player._id)
   );
 
-  const handleSelect = (playerId) => {
+  const handleSelect = async (playerId) => {
     const currentIds = [...selectedIds];
     const index = currentIds.indexOf(playerId);
 
@@ -1233,16 +1260,18 @@ function PlayerMultiSelectField({
       currentIds.push(playerId);
     }
 
-    formik.setFieldValue(name, currentIds);
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, currentIds);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
-  const handleRemove = (e, playerId) => {
+  const handleRemove = async (e, playerId) => {
     e.stopPropagation();
     e.preventDefault();
     const currentIds = selectedIds.filter((id) => id !== playerId);
-    formik.setFieldValue(name, currentIds);
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, currentIds);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   return (

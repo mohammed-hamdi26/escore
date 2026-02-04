@@ -117,7 +117,7 @@ function NewsDetails({ news }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/dashboard/news">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
               <ArrowLeft className="size-4" />
               {t("back") || "Back"}
             </Button>
@@ -137,7 +137,7 @@ function NewsDetails({ news }) {
         {/* Left Column - Main Info */}
         <div className="lg:col-span-2 space-y-6">
           {/* News Header Card */}
-          <div className="glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5">
+          <div className="glass rounded-2xl overflow-hidden border border-gray-200 dark:border-white/5">
             {/* Cover Image */}
             {news.coverImage?.light && (
               <div className="relative h-64 w-full">
@@ -159,8 +159,8 @@ function NewsDetails({ news }) {
                 {/* Status */}
                 <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${
                   isPublished()
-                    ? "bg-green-500/10 text-green-500 border-green-500/30"
-                    : "bg-gray-500/10 text-gray-400 border-gray-500/30"
+                    ? "bg-green-500/10 text-green-600 dark:text-green-500 border-green-500/30"
+                    : "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/30"
                 }`}>
                   {isPublished() ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
                   {isPublished() ? t("published") || "Published" : t("draft") || "Draft"}
@@ -183,7 +183,7 @@ function NewsDetails({ news }) {
           </div>
 
           {/* Meta Info Card */}
-          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+          <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <User className="size-5 text-green-primary" />
               {t("authorInfo") || "Author & Meta"}
@@ -224,20 +224,20 @@ function NewsDetails({ news }) {
           </div>
 
           {/* Content */}
-          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+          <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <FileText className="size-5 text-green-primary" />
               {t("content") || "Content"}
             </h3>
             <div
-              className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground"
+              className="prose prose-sm prose-gray dark:prose-invert max-w-none text-gray-700 dark:text-gray-300"
               dangerouslySetInnerHTML={{ __html: news.content || "<p>No content</p>" }}
             />
           </div>
 
           {/* Tags */}
           {news.tags && news.tags.length > 0 && (
-            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+            <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Tag className="size-5 text-green-primary" />
                 {t("tags") || "Tags"}
@@ -257,7 +257,7 @@ function NewsDetails({ news }) {
 
           {/* External URL */}
           {news.urlExternal && (
-            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+            <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <ExternalLink className="size-5 text-green-primary" />
                 {t("externalUrl") || "External URL"}
@@ -276,7 +276,7 @@ function NewsDetails({ news }) {
 
           {/* Cover Images */}
           {(news.coverImage?.light || news.coverImage?.dark) && (
-            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+            <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <ImageIcon className="size-5 text-green-primary" />
                 {t("coverImages") || "Cover Images"}
@@ -298,7 +298,7 @@ function NewsDetails({ news }) {
                     <img
                       src={news.coverImage.dark}
                       alt="Cover Dark"
-                      className="w-full h-40 object-cover rounded-xl ring-1 ring-white/10"
+                      className="w-full h-40 object-cover rounded-xl ring-1 ring-gray-200 dark:ring-white/10"
                     />
                   </div>
                 )}
@@ -311,7 +311,7 @@ function NewsDetails({ news }) {
         <div className="space-y-6">
           {/* Related Game */}
           {news.game && (
-            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+            <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Gamepad2 className="size-5 text-green-primary" />
                 {t("relatedGame") || "Related Game"}
@@ -340,7 +340,7 @@ function NewsDetails({ news }) {
 
           {/* Related Tournament */}
           {news.tournament && (
-            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+            <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Trophy className="size-5 text-green-primary" />
                 {t("relatedTournament") || "Related Tournament"}
@@ -369,7 +369,7 @@ function NewsDetails({ news }) {
 
           {/* Related Team */}
           {news.team && (
-            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+            <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Users className="size-5 text-green-primary" />
                 {t("relatedTeam") || "Related Team"}
@@ -398,7 +398,7 @@ function NewsDetails({ news }) {
 
           {/* Related Player */}
           {news.player && (
-            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+            <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <User className="size-5 text-green-primary" />
                 {t("relatedPlayer") || "Related Player"}
@@ -427,7 +427,7 @@ function NewsDetails({ news }) {
 
           {/* Related Match */}
           {news.match && (
-            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+            <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Swords className="size-5 text-green-primary" />
                 {t("relatedMatch") || "Related Match"}
@@ -467,7 +467,7 @@ function NewsDetails({ news }) {
           )}
 
           {/* Actions */}
-          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+          <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <FileText className="size-5 text-green-primary" />
               {t("actions") || "Actions"}
@@ -477,7 +477,7 @@ function NewsDetails({ news }) {
               <Button
                 onClick={isPublished() ? handleUnpublish : handlePublish}
                 disabled={actionLoading === "publish" || actionLoading === "unpublish"}
-                className="w-full justify-start gap-2"
+                className="w-full justify-start gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 variant="outline"
               >
                 {actionLoading === "publish" || actionLoading === "unpublish" ? (
@@ -502,7 +502,7 @@ function NewsDetails({ news }) {
               <Button
                 onClick={handleToggleFeatured}
                 disabled={actionLoading === "featured"}
-                className="w-full justify-start gap-2"
+                className="w-full justify-start gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 variant="outline"
               >
                 {actionLoading === "featured" ? (
@@ -527,7 +527,7 @@ function NewsDetails({ news }) {
               <Button
                 onClick={handleDelete}
                 disabled={actionLoading === "delete"}
-                className="w-full justify-start gap-2 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                className="w-full justify-start gap-2 border-red-300 dark:border-red-500/30 text-red-600 dark:text-red-500 hover:bg-red-500/10"
                 variant="outline"
               >
                 {actionLoading === "delete" ? (
@@ -546,7 +546,7 @@ function NewsDetails({ news }) {
           </div>
 
           {/* Metadata */}
-          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+          <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Clock className="size-5 text-green-primary" />
               {t("metadata") || "Metadata"}

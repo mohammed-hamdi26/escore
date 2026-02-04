@@ -10,37 +10,37 @@ function NavItem({ icon, label, href, isActive, children }) {
     <li className="group relative">
       {/* Active indicator line */}
       {isActive && (
-        <div className="absolute left-0 rtl:left-auto rtl:right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-green-primary rounded-r-full rtl:rounded-r-none rtl:rounded-l-full" />
+        <div className="absolute left-0 rtl:left-auto rtl:right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-green-primary rounded-r-full rtl:rounded-r-none rtl:rounded-l-full" />
       )}
 
       <Link
         href={href}
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200 ${
           isActive
-            ? "bg-green-primary/10 dark:bg-green-primary/10"
-            : "hover:bg-gray-100 dark:hover:bg-white/5"
+            ? "bg-green-primary/10 dark:bg-green-primary/15"
+            : "hover:bg-gray-50 dark:hover:bg-white/5"
         }`}
       >
-        {/* Icon container */}
+        {/* Icon */}
         <span
-          className={`flex items-center justify-center size-9 rounded-lg transition-all duration-200 ${
+          className={`flex items-center justify-center size-7 rounded-md transition-all duration-200 ${
             isActive
-              ? "bg-green-primary shadow-lg shadow-green-primary/30"
-              : "bg-gray-100 dark:bg-white/5 group-hover:bg-green-primary/20"
+              ? "bg-green-primary text-white shadow-sm shadow-green-primary/25"
+              : "text-gray-500 dark:text-gray-400 group-hover:text-green-primary"
           }`}
         >
           {cloneElement(icon, {
-            className: `size-[18px] transition-colors duration-200 ${
+            className: `size-4 transition-colors duration-200 ${
               isActive
-                ? "fill-white text-white"
-                : "fill-gray-500 dark:fill-gray-400 text-gray-500 dark:text-gray-400 group-hover:fill-green-primary group-hover:text-green-primary"
+                ? "text-white"
+                : "text-inherit"
             }`,
           })}
         </span>
 
         {/* Label */}
         <span
-          className={`text-sm font-medium transition-colors duration-200 ${
+          className={`text-[13px] font-medium transition-colors duration-200 ${
             isActive
               ? "text-gray-900 dark:text-white"
               : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"

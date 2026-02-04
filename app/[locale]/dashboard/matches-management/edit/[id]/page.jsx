@@ -11,7 +11,7 @@ export default async function EditMatchPage({ params }) {
   const { id } = await params;
   const t = await getTranslations("MatchForm");
 
-  const [match, { data: teamsOptions }, gamesOptions, { data: tournamentsOptions }] =
+  const [match, { data: teamsOptions }, { data: gamesOptions }, { data: tournamentsOptions }] =
     await Promise.all([
       getMatch(id),
       getTeams({ size: 500 }),
@@ -22,13 +22,13 @@ export default async function EditMatchPage({ params }) {
   return (
     <div className="space-y-6">
       <BackPage title={t("editMatch") || "Edit Match"} />
-      <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+      <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
         <MatchFormRedesign
-          gamesOptions={gamesOptions}
-          teamsOptions={teamsOptions}
+          gamesOptions={gamesOptions || []}
+          teamsOptions={teamsOptions || []}
           match={match}
           formType="edit"
-          tournamentsOptions={tournamentsOptions}
+          tournamentsOptions={tournamentsOptions || []}
           submit={updateMatch}
         />
       </div>

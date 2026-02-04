@@ -12,6 +12,10 @@ export async function getTransfers(searchParams = {}) {
     if (searchParams.limit) params.set("limit", searchParams.limit);
     if (searchParams.size) params.set("limit", searchParams.size);
 
+    // Sorting
+    if (searchParams.sortBy) params.set("sortBy", searchParams.sortBy);
+    if (searchParams.sortOrder) params.set("sortOrder", searchParams.sortOrder);
+
     // Filters
     if (searchParams.search) params.set("search", searchParams.search);
     if (searchParams.game) params.set("game", searchParams.game);
@@ -23,6 +27,8 @@ export async function getTransfers(searchParams = {}) {
     if (searchParams.dateTo) params.set("dateTo", searchParams.dateTo);
     if (searchParams.isActive !== undefined)
       params.set("isActive", searchParams.isActive);
+    if (searchParams.isFeatured)
+      params.set("isFeatured", searchParams.isFeatured);
 
     const queryString = params.toString();
     const url = queryString ? `/transfers?${queryString}` : "/transfers";

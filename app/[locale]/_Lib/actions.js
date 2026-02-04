@@ -958,7 +958,7 @@ export async function addTransfer(data) {
   const locale = await getLocale();
   try {
     const res = await apiClient.post(`/transfers`, data);
-    revalidatePath(`/${locale}/dashboard/transfers-management/edit`);
+    revalidatePath(`/${locale}/dashboard/transfers-management`);
     return { success: true, data: res.data.data };
   } catch (error) {
     console.error("Failed to add transfer:", error.response?.data || error);
@@ -973,7 +973,7 @@ export async function editTransfer(data) {
   const locale = await getLocale();
   try {
     const res = await apiClient.put(`/transfers/${data.id}`, data);
-    revalidatePath(`/${locale}/dashboard/transfers-management/edit`);
+    revalidatePath(`/${locale}/dashboard/transfers-management`);
     revalidatePath(`/${locale}/dashboard/transfers-management/edit/${data.id}`);
     return { success: true, data: res.data.data };
   } catch (error) {
@@ -989,7 +989,7 @@ export async function deleteTransfer(id) {
   const locale = await getLocale();
   try {
     await apiClient.delete(`/transfers/${id}`);
-    revalidatePath(`/${locale}/dashboard/transfers-management/edit`);
+    revalidatePath(`/${locale}/dashboard/transfers-management`);
     return { success: true };
   } catch (error) {
     console.error("Failed to delete transfer:", error.response?.data || error);
@@ -1009,6 +1009,30 @@ export async function getTransferByIdAction(id) {
     return {
       success: false,
       error: error.response?.data?.message || "Failed to get transfer",
+    };
+  }
+}
+
+export async function toggleTransferFeatured(id) {
+  const locale = await getLocale();
+  try {
+    // Get current transfer to check featured status
+    const getRes = await apiClient.get(`/transfers/${id}`);
+    const currentFeatured = getRes.data.data.isFeatured;
+
+    // Toggle the featured status
+    const res = await apiClient.put(`/transfers/${id}`, {
+      isFeatured: !currentFeatured,
+    });
+
+    revalidatePath(`/${locale}/dashboard/transfers-management`);
+    revalidatePath(`/${locale}/dashboard/transfers-management/view/${id}`);
+    return { success: true, data: res.data.data };
+  } catch (error) {
+    console.error("Failed to toggle transfer featured:", error.response?.data || error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to toggle featured status",
     };
   }
 }

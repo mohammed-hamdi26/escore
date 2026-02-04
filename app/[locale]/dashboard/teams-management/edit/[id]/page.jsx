@@ -9,7 +9,7 @@ import TeamFormRedesign from "@/components/teams management/TeamFormRedesign";
 export default async function page({ params }) {
   const { id } = await params;
 
-  const [countries, gamesOptions, team, tournamentsResult, playersResult] = await Promise.all([
+  const [countries, { data: gamesOptions }, team, tournamentsResult, playersResult] = await Promise.all([
     getCountries(),
     getGames(),
     getTeam(id),
@@ -42,7 +42,7 @@ export default async function page({ params }) {
       submit={updateTeam}
       countries={countries.countries}
       team={team}
-      OptionsData={{ gamesOptions, tournamentsOptions, playersOptions }}
+      OptionsData={{ gamesOptions: gamesOptions || [], tournamentsOptions, playersOptions }}
       formType="edit"
     />
   );

@@ -8,7 +8,7 @@ import PlayerFormRedesign from "@/components/Player Management/PlayerFormRedesig
 
 async function page({ params }) {
   const { id } = await params;
-  const [countries, player, { data: teamsOptions }, gamesOptions, { data: tournamentsOptions }] =
+  const [countries, player, { data: teamsOptions }, { data: gamesOptions }, { data: tournamentsOptions }] =
     await Promise.all([
       getCountries(),
       getPlayer(id),

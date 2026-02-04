@@ -6,7 +6,7 @@ import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import TeamFormRedesign from "@/components/teams management/TeamFormRedesign";
 
 async function page() {
-  const [countries, gamesOptions, tournamentsResult, playersResult] = await Promise.all([
+  const [countries, { data: gamesOptions }, tournamentsResult, playersResult] = await Promise.all([
     getCountries(),
     getGames(),
     getTournaments({ size: 200 }),
@@ -38,7 +38,7 @@ async function page() {
       submit={addTeam}
       countries={countries.countries}
       OptionsData={{
-        gamesOptions,
+        gamesOptions: gamesOptions || [],
         tournamentsOptions,
         playersOptions,
       }}

@@ -1,0 +1,1038 @@
+"use client";
+import { useState } from "react";
+import { useFormik } from "formik";
+import * as yup from "yup";
+import { Button } from "../ui/button";
+import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import FormSection from "../ui app/FormSection";
+import FormRow from "../ui app/FormRow";
+import ImageUpload from "../ui app/ImageUpload";
+import RichTextEditor from "../ui app/RichTextEditor";
+import { Calendar as CalendarComponent } from "../ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import {
+  Newspaper,
+  Calendar,
+  User,
+  Image as ImageIcon,
+  Save,
+  Loader2,
+  Star,
+  CalendarDays,
+  X,
+  Search,
+  ChevronDown,
+  Check,
+  FileText,
+  Tag,
+  Link as LinkIcon,
+  Gamepad2,
+  Trophy,
+  Users,
+  UserCircle,
+  Pin,
+  Send,
+  ChevronLeft,
+  ChevronRight,
+  Languages,
+  Megaphone,
+  Mic,
+  BarChart3,
+  BookOpen,
+  MessageSquare,
+  ThumbsUp,
+  Settings2,
+  ArrowLeft,
+  Plus,
+} from "lucide-react";
+
+// Category options with colors and icons
+const CATEGORY_OPTIONS = [
+  { value: "news", label: "News", icon: Newspaper, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/30" },
+  { value: "announcement", label: "Announcement", icon: Megaphone, color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/30" },
+  { value: "interview", label: "Interview", icon: Mic, color: "text-pink-500", bg: "bg-pink-500/10", border: "border-pink-500/30" },
+  { value: "analysis", label: "Analysis", icon: BarChart3, color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/30" },
+  { value: "guide", label: "Guide", icon: BookOpen, color: "text-cyan-500", bg: "bg-cyan-500/10", border: "border-cyan-500/30" },
+  { value: "review", label: "Review", icon: MessageSquare, color: "text-green-500", bg: "bg-green-500/10", border: "border-green-500/30" },
+  { value: "opinion", label: "Opinion", icon: ThumbsUp, color: "text-yellow-500", bg: "bg-yellow-500/10", border: "border-yellow-500/30" },
+];
+
+// Language options
+const LANGUAGE_OPTIONS = [
+  { value: "en", label: "English", flag: "🇺🇸" },
+  { value: "ar", label: "العربية", flag: "🇸🇦" },
+  { value: "fr", label: "Français", flag: "🇫🇷" },
+  { value: "es", label: "Español", flag: "🇪🇸" },
+  { value: "de", label: "Deutsch", flag: "🇩🇪" },
+  { value: "tr", label: "Türkçe", flag: "🇹🇷" },
+  { value: "pt", label: "Português", flag: "🇵🇹" },
+  { value: "it", label: "Italiano", flag: "🇮🇹" },
+  { value: "ru", label: "Русский", flag: "🇷🇺" },
+  { value: "zh", label: "中文", flag: "🇨🇳" },
+  { value: "ja", label: "日本語", flag: "🇯🇵" },
+  { value: "ko", label: "한국어", flag: "🇰🇷" },
+];
+
+const validateSchema = yup.object({
+  title: yup.string().required("Title is required"),
+  content: yup.string().required("Content is required"),
+  category: yup.string().required("Category is required"),
+  excerpt: yup.string().max(500, "Excerpt must be at most 500 characters"),
+  externalUrl: yup.string().url("Must be a valid URL").nullable(),
+});
+
+export default function NewsForm({
+  news,
+  submit,
+  formType = "add",
+  games = [],
+  tournaments = [],
+  teams = [],
+  players = [],
+}) {
+  const t = useTranslations("NewsForm");
+  const router = useRouter();
+
+  const formik = useFormik({
+    initialValues: {
+      title: news?.title || "",
+      slug: news?.slug || "",
+      excerpt: news?.excerpt || "",
+      content: news?.content || "",
+      coverImageLight: news?.coverImage?.light || "",
+      coverImageDark: news?.coverImage?.dark || "",
+      authorName: news?.authorName || "",
+      authorImageLight: news?.authorImage?.light || "",
+      authorImageDark: news?.authorImage?.dark || "",
+      externalUrl: news?.externalUrl || "",
+      category: news?.category || "news",
+      tags: news?.tags || [],
+      game: news?.game?.id || news?.game?._id || news?.game || "",
+      tournament: news?.tournament?.id || news?.tournament?._id || news?.tournament || "",
+      team: news?.team?.id || news?.team?._id || news?.team || "",
+      player: news?.player?.id || news?.player?._id || news?.player || "",
+      publishedAt: news?.publishedAt ? new Date(news.publishedAt).toISOString().slice(0, 16) : "",
+      isFeatured: news?.isFeatured || false,
+      isPinned: news?.isPinned || false,
+      originalLanguage: news?.originalLanguage || "en",
+    },
+    validationSchema: validateSchema,
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        let dataValues = news ? { id: news.id, ...values } : values;
+
+        // Build coverImage object
+        dataValues.coverImage = dataValues.coverImageLight
+          ? {
+              light: dataValues.coverImageLight,
+              dark: dataValues.coverImageDark || dataValues.coverImageLight,
+            }
+          : null;
+
+        // Build authorImage object
+        dataValues.authorImage = dataValues.authorImageLight
+          ? {
+              light: dataValues.authorImageLight,
+              dark: dataValues.authorImageDark || dataValues.authorImageLight,
+            }
+          : null;
+
+        // Auto-generate slug if not provided
+        if (!dataValues.slug && dataValues.title) {
+          dataValues.slug = dataValues.title
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
+        }
+
+        // Convert empty strings to null
+        if (!dataValues.externalUrl) dataValues.externalUrl = null;
+        if (!dataValues.excerpt) dataValues.excerpt = null;
+        if (!dataValues.game) dataValues.game = null;
+        if (!dataValues.tournament) dataValues.tournament = null;
+        if (!dataValues.team) dataValues.team = null;
+        if (!dataValues.player) dataValues.player = null;
+        if (!dataValues.publishedAt) dataValues.publishedAt = null;
+        if (!dataValues.authorName) dataValues.authorName = null;
+
+        // Clean up temporary fields
+        delete dataValues.coverImageLight;
+        delete dataValues.coverImageDark;
+        delete dataValues.authorImageLight;
+        delete dataValues.authorImageDark;
+
+        await submit(dataValues);
+        formType === "add" && formik.resetForm();
+        toast.success(
+          formType === "add"
+            ? t("newsAdded") || "News added successfully"
+            : t("newsUpdated") || "News updated successfully"
+        );
+      } catch (error) {
+        if (!error.toString().includes("NEXT_REDIRECT")) {
+          toast.error(error.message || "An error occurred");
+        }
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
+
+  const handleSaveAsDraft = async () => {
+    const errors = await formik.validateForm();
+    if (errors.title || errors.content || errors.category) {
+      formik.setTouched({ title: true, content: true, category: true });
+      toast.error("Please fill in required fields");
+      return;
+    }
+    const originalPublishedAt = formik.values.publishedAt;
+    formik.setFieldValue("publishedAt", null);
+    await formik.submitForm();
+    formik.setFieldValue("publishedAt", originalPublishedAt);
+  };
+
+  const handlePublish = async () => {
+    if (!formik.values.publishedAt) {
+      formik.setFieldValue("publishedAt", new Date().toISOString().slice(0, 16));
+    }
+    await formik.submitForm();
+  };
+
+  return (
+    <form onSubmit={formik.handleSubmit} className="space-y-6">
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Left Column - Main Content */}
+        <div className="xl:col-span-2 space-y-6">
+          {/* Title & Category - Quick Entry */}
+          <FormSection
+            title={t("basicInfo") || "Article Information"}
+            icon={<Newspaper className="size-5" />}
+            badge={
+              <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+                {t("required") || "Required"}
+              </span>
+            }
+          >
+            {/* Title Field */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t("title") || "Title"} <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formik.values.title}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder={t("titlePlaceholder") || "Enter a compelling title for your article"}
+                className={`w-full h-14 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-lg font-medium text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all ${
+                  formik.touched.title && formik.errors.title ? "ring-2 ring-red-500" : ""
+                }`}
+              />
+              {formik.touched.title && formik.errors.title && (
+                <p className="text-xs text-red-500">{formik.errors.title}</p>
+              )}
+            </div>
+
+            <FormRow cols={2}>
+              {/* Category */}
+              <CategorySelectField
+                label={t("category") || "Category"}
+                name="category"
+                options={CATEGORY_OPTIONS}
+                formik={formik}
+                placeholder={t("selectCategory") || "Select Category"}
+                required
+              />
+
+              {/* Slug */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">
+                  {t("slug") || "Slug"}
+                </label>
+                <input
+                  type="text"
+                  name="slug"
+                  value={formik.values.slug}
+                  onChange={formik.handleChange}
+                  placeholder={t("slugPlaceholder") || "auto-generated-from-title"}
+                  className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
+                />
+              </div>
+            </FormRow>
+
+            {/* Excerpt */}
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <label className="text-sm font-medium text-muted-foreground">
+                  {t("excerpt") || "Excerpt"}
+                </label>
+                <span className={`text-xs ${(formik.values.excerpt?.length || 0) > 500 ? "text-red-500" : "text-muted-foreground"}`}>
+                  {formik.values.excerpt?.length || 0}/500
+                </span>
+              </div>
+              <textarea
+                name="excerpt"
+                value={formik.values.excerpt}
+                onChange={formik.handleChange}
+                placeholder={t("excerptPlaceholder") || "Write a brief summary that appears in article previews..."}
+                rows={3}
+                maxLength={500}
+                className="w-full px-4 py-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all resize-none"
+              />
+            </div>
+          </FormSection>
+
+          {/* Content Editor */}
+          <FormSection
+            title={t("content") || "Article Content"}
+            icon={<FileText className="size-5" />}
+            badge={
+              <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
+                {t("required") || "Required"}
+              </span>
+            }
+          >
+            <RichTextEditor
+              formik={formik}
+              name="content"
+              placeholder={t("contentPlaceholder") || "Start writing your article content here..."}
+              error={formik.touched.content && formik.errors.content}
+              minHeight="350px"
+            />
+          </FormSection>
+
+          {/* Cover Images */}
+          <FormSection
+            title={t("coverImage") || "Cover Image"}
+            icon={<ImageIcon className="size-5" />}
+            badge={
+              <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+                {t("optional") || "Optional"}
+              </span>
+            }
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ImageUpload
+                label={t("lightMode") || "Light Mode"}
+                name="coverImageLight"
+                formik={formik}
+                aspectRatio="landscape"
+                hint={t("coverLightHint") || "Recommended: 1200x630px"}
+              />
+              <ImageUpload
+                label={t("darkMode") || "Dark Mode"}
+                name="coverImageDark"
+                formik={formik}
+                aspectRatio="landscape"
+                hint={t("coverDarkHint") || "Optional dark mode version"}
+              />
+            </div>
+          </FormSection>
+        </div>
+
+        {/* Right Column - Settings & Meta */}
+        <div className="space-y-6">
+          {/* Publishing Settings */}
+          <FormSection
+            title={t("publishSettings") || "Publishing"}
+            icon={<Settings2 className="size-5" />}
+          >
+            {/* Featured & Pinned Toggles */}
+            <div className="space-y-4">
+              <ToggleCard
+                icon={<Star className="size-5" />}
+                label={t("featured") || "Featured Article"}
+                description={t("featuredDesc") || "Show in featured section"}
+                isChecked={formik.values.isFeatured}
+                onChange={() => formik.setFieldValue("isFeatured", !formik.values.isFeatured)}
+                color="yellow"
+              />
+              <ToggleCard
+                icon={<Pin className="size-5" />}
+                label={t("pinned") || "Pinned Article"}
+                description={t("pinnedDesc") || "Keep at top of news list"}
+                isChecked={formik.values.isPinned}
+                onChange={() => formik.setFieldValue("isPinned", !formik.values.isPinned)}
+                color="red"
+              />
+            </div>
+
+            {/* Schedule */}
+            <div className="pt-4 border-t border-border">
+              <DateTimePickerField
+                label={t("publishDate") || "Publish Date"}
+                name="publishedAt"
+                formik={formik}
+                placeholder={t("selectDateTime") || "Select date and time"}
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                {t("scheduleHint") || "Leave empty to save as draft"}
+              </p>
+            </div>
+
+            {/* Language */}
+            <div className="pt-4 border-t border-border">
+              <LanguageSelectField
+                label={t("originalLanguage") || "Content Language"}
+                name="originalLanguage"
+                options={LANGUAGE_OPTIONS}
+                formik={formik}
+              />
+            </div>
+          </FormSection>
+
+          {/* Author Information */}
+          <FormSection
+            title={t("authorInfo") || "Author"}
+            icon={<User className="size-5" />}
+            badge={
+              <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+                {t("optional") || "Optional"}
+              </span>
+            }
+          >
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t("authorName") || "Author Name"}
+              </label>
+              <div className="relative">
+                <UserCircle className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 size-5 text-muted-foreground" />
+                <input
+                  type="text"
+                  name="authorName"
+                  value={formik.values.authorName}
+                  onChange={formik.handleChange}
+                  placeholder={t("authorNamePlaceholder") || "Enter author name"}
+                  className="w-full h-12 px-4 pl-11 rtl:pl-4 rtl:pr-11 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Author Photo */}
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <ImageUpload
+                label={t("photoLight") || "Photo (Light)"}
+                name="authorImageLight"
+                formik={formik}
+                aspectRatio="square"
+                compact
+              />
+              <ImageUpload
+                label={t("photoDark") || "Photo (Dark)"}
+                name="authorImageDark"
+                formik={formik}
+                aspectRatio="square"
+                compact
+              />
+            </div>
+          </FormSection>
+
+          {/* Related Entities */}
+          <FormSection
+            title={t("relatedEntities") || "Related To"}
+            icon={<LinkIcon className="size-5" />}
+            badge={
+              <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+                {t("optional") || "Optional"}
+              </span>
+            }
+          >
+            <EntitySelectField
+              label={t("game") || "Game"}
+              name="game"
+              options={games}
+              formik={formik}
+              placeholder={t("selectGame") || "Select Game"}
+              icon={<Gamepad2 className="size-4 text-green-500" />}
+            />
+            <EntitySelectField
+              label={t("tournament") || "Tournament"}
+              name="tournament"
+              options={tournaments}
+              formik={formik}
+              placeholder={t("selectTournament") || "Select Tournament"}
+              icon={<Trophy className="size-4 text-yellow-500" />}
+            />
+            <EntitySelectField
+              label={t("team") || "Team"}
+              name="team"
+              options={teams}
+              formik={formik}
+              placeholder={t("selectTeam") || "Select Team"}
+              icon={<Users className="size-4 text-blue-500" />}
+            />
+            <EntitySelectField
+              label={t("player") || "Player"}
+              name="player"
+              options={players}
+              formik={formik}
+              placeholder={t("selectPlayer") || "Select Player"}
+              icon={<UserCircle className="size-4 text-purple-500" />}
+            />
+          </FormSection>
+
+          {/* Tags */}
+          <FormSection
+            title={t("tags") || "Tags"}
+            icon={<Tag className="size-5" />}
+            badge={
+              <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+                {t("optional") || "Optional"}
+              </span>
+            }
+          >
+            <TagsInput
+              name="tags"
+              formik={formik}
+              placeholder={t("tagsPlaceholder") || "Type and press Enter"}
+              maxTags={10}
+            />
+          </FormSection>
+
+          {/* External URL */}
+          <FormSection
+            title={t("externalUrl") || "External Link"}
+            icon={<LinkIcon className="size-5" />}
+            badge={
+              <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
+                {t("optional") || "Optional"}
+              </span>
+            }
+          >
+            <div className="space-y-2">
+              <input
+                type="url"
+                name="externalUrl"
+                value={formik.values.externalUrl}
+                onChange={formik.handleChange}
+                placeholder="https://..."
+                className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
+              />
+              {formik.errors.externalUrl && (
+                <p className="text-xs text-red-500">{formik.errors.externalUrl}</p>
+              )}
+            </div>
+          </FormSection>
+        </div>
+      </div>
+
+      {/* Submit Buttons - Sticky Footer */}
+      <div className="sticky bottom-0 -mx-6 -mb-6 px-6 py-4 bg-background/95 backdrop-blur-sm border-t border-border">
+        <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            className="h-11 px-6 gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            <ArrowLeft className="size-4" />
+            {t("cancel") || "Cancel"}
+          </Button>
+
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleSaveAsDraft}
+              disabled={formik.isSubmitting}
+              className="h-11 px-6 rounded-xl"
+            >
+              {formik.isSubmitting ? (
+                <>
+                  <Loader2 className="size-4 mr-2 animate-spin" />
+                  {t("saving") || "Saving..."}
+                </>
+              ) : (
+                <>
+                  <Save className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {t("saveAsDraft") || "Save Draft"}
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              onClick={handlePublish}
+              disabled={formik.isSubmitting}
+              className="h-11 px-8 rounded-xl bg-green-primary hover:bg-green-primary/90 text-white font-medium"
+            >
+              {formik.isSubmitting ? (
+                <>
+                  <Loader2 className="size-4 mr-2 animate-spin" />
+                  {t("publishing") || "Publishing..."}
+                </>
+              ) : (
+                <>
+                  <Send className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {formType === "add" ? t("publish") || "Publish" : t("update") || "Update"}
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </form>
+  );
+}
+
+// Toggle Card Component
+function ToggleCard({ icon, label, description, isChecked, onChange, color = "green" }) {
+  const colors = {
+    green: { bg: "bg-green-500/20", border: "border-green-500/50", text: "text-green-500", gradient: "from-green-400 to-green-600" },
+    yellow: { bg: "bg-yellow-500/20", border: "border-yellow-500/50", text: "text-yellow-500", gradient: "from-yellow-400 to-orange-500" },
+    red: { bg: "bg-red-500/20", border: "border-red-500/50", text: "text-red-500", gradient: "from-red-400 to-red-600" },
+  };
+  const c = colors[color];
+
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      className={`w-full p-4 rounded-xl border transition-all flex items-center gap-4 ${
+        isChecked
+          ? `${c.bg} ${c.border}`
+          : "bg-muted/50 dark:bg-[#1a1d2e] border-transparent hover:bg-muted dark:hover:bg-[#252a3d]"
+      }`}
+    >
+      <div
+        className={`size-10 rounded-xl flex items-center justify-center transition-all ${
+          isChecked ? `bg-gradient-to-br ${c.gradient}` : "bg-muted dark:bg-[#252a3d]"
+        }`}
+      >
+        <span className={isChecked ? "text-white" : "text-muted-foreground"}>{icon}</span>
+      </div>
+      <div className="flex-1 text-left">
+        <p className={`text-sm font-medium ${isChecked ? c.text : "text-foreground"}`}>{label}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+      <div
+        className={`w-12 h-6 rounded-full relative transition-colors ${
+          isChecked ? `bg-gradient-to-r ${c.gradient}` : "bg-muted dark:bg-[#252a3d]"
+        }`}
+      >
+        <div
+          className={`absolute top-[2px] size-5 rounded-full bg-white shadow-md transition-all ${
+            isChecked ? "left-[26px] rtl:left-[2px]" : "left-[2px] rtl:left-[26px]"
+          }`}
+        />
+      </div>
+    </button>
+  );
+}
+
+// Category Select Field
+function CategorySelectField({ label, name, options, formik, placeholder, required }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
+              error ? "ring-2 ring-red-500 border-red-500" : selectedOption ? selectedOption.border : "border-transparent"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {selectedOption ? (
+                <>
+                  <div className={`size-8 rounded-lg ${selectedOption.bg} flex items-center justify-center`}>
+                    <selectedOption.icon className={`size-4 ${selectedOption.color}`} />
+                  </div>
+                  <span className={`font-medium ${selectedOption.color}`}>{selectedOption.label}</span>
+                </>
+              ) : (
+                <>
+                  <div className="size-8 rounded-lg bg-muted dark:bg-[#252a3d] flex items-center justify-center">
+                    <FileText className="size-4 text-muted-foreground" />
+                  </div>
+                  <span className="text-muted-foreground">{placeholder}</span>
+                </>
+              )}
+            </div>
+            <ChevronDown className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2 bg-background dark:bg-[#12141c] border-border" align="start">
+          {options.map((option) => {
+            const isSelected = value === option.value;
+            const IconComponent = option.icon;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  formik.setFieldValue(name, option.value);
+                  formik.setFieldTouched(name, true);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                  isSelected ? `${option.bg} ${option.color}` : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
+                }`}
+              >
+                <div className={`size-8 rounded-lg ${option.bg} flex items-center justify-center`}>
+                  <IconComponent className={`size-4 ${option.color}`} />
+                </div>
+                <span className={`flex-1 text-sm font-medium ${isSelected ? option.color : "text-foreground"}`}>
+                  {option.label}
+                </span>
+                {isSelected && <Check className={`size-4 ${option.color}`} />}
+              </button>
+            );
+          })}
+        </PopoverContent>
+      </Popover>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// Language Select Field
+function LanguageSelectField({ label, name, options, formik }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const value = formik.values[name];
+  const selectedOption = options.find((opt) => opt.value === value) || options[0];
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-3">
+              <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <Languages className="size-4 text-blue-500" />
+              </div>
+              <span className="text-2xl mr-1">{selectedOption.flag}</span>
+              <span className="font-medium text-foreground">{selectedOption.label}</span>
+            </div>
+            <ChevronDown className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2 bg-background dark:bg-[#12141c] border-border max-h-64 overflow-y-auto" align="start">
+          {options.map((option) => {
+            const isSelected = value === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  formik.setFieldValue(name, option.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                  isSelected ? "bg-green-primary/10 text-green-primary" : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
+                }`}
+              >
+                <span className="text-xl">{option.flag}</span>
+                <span className={`flex-1 text-sm font-medium ${isSelected ? "text-green-primary" : "text-foreground"}`}>
+                  {option.label}
+                </span>
+                {isSelected && <Check className="size-4 text-green-primary" />}
+              </button>
+            );
+          })}
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+// Entity Select Field
+function EntitySelectField({ label, name, options, formik, placeholder, icon }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const value = formik.values[name];
+
+  const selectedOption = options.find((opt) => (opt.id || opt._id) === value);
+  const filteredOptions = options.filter((opt) =>
+    (opt.name || opt.nickname || opt.fullName || "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleClear = (e) => {
+    e.stopPropagation();
+    formik.setFieldValue(name, "");
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+        {icon}
+        {label}
+      </label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {selectedOption ? (
+                <>
+                  {(selectedOption.logo?.light || selectedOption.logo?.dark || selectedOption.photo?.light) && (
+                    <img
+                      src={selectedOption.logo?.light || selectedOption.logo?.dark || selectedOption.photo?.light}
+                      alt=""
+                      className="size-8 rounded-lg object-cover"
+                    />
+                  )}
+                  <span className="font-medium text-foreground truncate">
+                    {selectedOption.name || selectedOption.nickname || selectedOption.fullName}
+                  </span>
+                </>
+              ) : (
+                <span className="text-muted-foreground">{placeholder}</span>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {selectedOption && (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={handleClear}
+                  onKeyDown={(e) => e.key === "Enter" && handleClear(e)}
+                  className="size-7 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors group cursor-pointer"
+                >
+                  <X className="size-4 text-muted-foreground group-hover:text-red-500" />
+                </span>
+              )}
+              <ChevronDown className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </div>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border" align="start">
+          <div className="p-3 border-b border-border">
+            <div className="relative">
+              <Search className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search..."
+                className="w-full h-10 pl-10 pr-4 rtl:pl-4 rtl:pr-10 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50"
+                autoFocus
+              />
+            </div>
+          </div>
+          <div className="max-h-64 overflow-y-auto p-2">
+            <button
+              type="button"
+              onClick={() => {
+                formik.setFieldValue(name, "");
+                setIsOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                !value ? "bg-green-primary/10 text-green-primary" : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
+              }`}
+            >
+              <span className="text-sm font-medium">{placeholder}</span>
+              {!value && <Check className="size-4 ml-auto" />}
+            </button>
+            {filteredOptions.map((option) => {
+              const optionId = option.id || option._id;
+              const isSelected = value === optionId;
+              const optionName = option.name || option.nickname || option.fullName;
+              const optionLogo = option.logo?.light || option.logo?.dark || option.photo?.light;
+              return (
+                <button
+                  key={optionId}
+                  type="button"
+                  onClick={() => {
+                    formik.setFieldValue(name, optionId);
+                    setIsOpen(false);
+                    setSearch("");
+                  }}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                    isSelected ? "bg-green-primary/10 text-green-primary" : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
+                  }`}
+                >
+                  {optionLogo && <img src={optionLogo} alt={optionName} className="size-8 rounded-lg object-cover" />}
+                  <span className={`flex-1 text-sm font-medium truncate ${isSelected ? "text-green-primary" : "text-foreground"}`}>
+                    {optionName}
+                  </span>
+                  {isSelected && <Check className="size-4 flex-shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+// Tags Input
+function TagsInput({ name, formik, placeholder, maxTags }) {
+  const [inputValue, setInputValue] = useState("");
+  const tags = formik.values[name] || [];
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTag();
+    }
+    if (e.key === "Backspace" && !inputValue && tags.length > 0) {
+      removeTag(tags.length - 1);
+    }
+  };
+
+  const addTag = () => {
+    const tag = inputValue.trim().toLowerCase();
+    if (tag && !tags.includes(tag) && tags.length < maxTags) {
+      formik.setFieldValue(name, [...tags, tag]);
+      setInputValue("");
+    }
+  };
+
+  const removeTag = (index) => {
+    formik.setFieldValue(name, tags.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between">
+        <span className="text-xs text-muted-foreground">{tags.length}/{maxTags}</span>
+      </div>
+      <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] min-h-[48px]">
+        {tags.map((tag, index) => (
+          <span
+            key={index}
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-green-primary/10 text-green-primary text-sm font-medium"
+          >
+            #{tag}
+            <button type="button" onClick={() => removeTag(index)} className="size-4 rounded-full hover:bg-green-primary/20 flex items-center justify-center">
+              <X className="size-3" />
+            </button>
+          </span>
+        ))}
+        {tags.length < maxTags && (
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={addTag}
+            placeholder={tags.length === 0 ? placeholder : ""}
+            className="flex-1 min-w-[120px] bg-transparent border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// DateTime Picker Field
+function DateTimePickerField({ label, name, formik, placeholder }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [viewDate, setViewDate] = useState(new Date());
+  const value = formik.values[name];
+  const selectedDate = value ? new Date(value) : undefined;
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 11 }, (_, i) => currentYear - 1 + i);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const formatDisplayDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return date.toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  };
+
+  const handleDateSelect = (date) => {
+    if (date) {
+      const currentTime = value ? new Date(value) : new Date();
+      date.setHours(currentTime.getHours(), currentTime.getMinutes());
+      formik.setFieldValue(name, date.toISOString().slice(0, 16));
+    }
+  };
+
+  const handleTimeChange = (e) => {
+    const [hours, minutes] = e.target.value.split(":");
+    const date = value ? new Date(value) : new Date();
+    date.setHours(parseInt(hours), parseInt(minutes));
+    formik.setFieldValue(name, date.toISOString().slice(0, 16));
+  };
+
+  const handleClear = (e) => {
+    e.stopPropagation();
+    formik.setFieldValue(name, "");
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-3">
+              <div className="size-9 rounded-lg bg-green-primary/10 flex items-center justify-center">
+                <CalendarDays className="size-5 text-green-primary" />
+              </div>
+              {value ? (
+                <span className="text-foreground font-medium">{formatDisplayDate(value)}</span>
+              ) : (
+                <span className="text-muted-foreground">{placeholder}</span>
+              )}
+            </div>
+            {value && (
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={handleClear}
+                onKeyDown={(e) => e.key === "Enter" && handleClear(e)}
+                className="size-7 rounded-lg bg-muted hover:bg-red-500/20 flex items-center justify-center transition-colors group cursor-pointer"
+              >
+                <X className="size-4 text-muted-foreground group-hover:text-red-500" />
+              </span>
+            )}
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 bg-background dark:bg-[#12141c] border-border" align="start">
+          <div className="p-3 border-b border-border">
+            <div className="flex items-center justify-between gap-2">
+              <button type="button" onClick={() => setViewDate(new Date(viewDate.setMonth(viewDate.getMonth() - 1)))} className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors">
+                <ChevronLeft className="size-4 text-foreground rtl:rotate-180" />
+              </button>
+              <div className="flex items-center gap-2">
+                <select value={viewDate.getMonth()} onChange={(e) => setViewDate(new Date(viewDate.setMonth(parseInt(e.target.value))))} className="h-8 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground font-medium focus:outline-none cursor-pointer">
+                  {months.map((month, index) => <option key={month} value={index}>{month}</option>)}
+                </select>
+                <select value={viewDate.getFullYear()} onChange={(e) => setViewDate(new Date(viewDate.setFullYear(parseInt(e.target.value))))} className="h-8 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground font-medium focus:outline-none cursor-pointer">
+                  {years.map((year) => <option key={year} value={year}>{year}</option>)}
+                </select>
+              </div>
+              <button type="button" onClick={() => setViewDate(new Date(viewDate.setMonth(viewDate.getMonth() + 1)))} className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors">
+                <ChevronRight className="size-4 text-foreground rtl:rotate-180" />
+              </button>
+            </div>
+          </div>
+          <CalendarComponent mode="single" selected={selectedDate} onSelect={handleDateSelect} month={viewDate} onMonthChange={setViewDate} initialFocus className="rounded-xl" classNames={{ nav: "hidden", caption: "hidden" }} />
+          <div className="p-3 border-t border-border">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-muted-foreground">Time:</span>
+              <input type="time" value={value ? new Date(value).toTimeString().slice(0, 5) : ""} onChange={handleTimeChange} className="flex-1 h-10 px-3 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50" />
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}

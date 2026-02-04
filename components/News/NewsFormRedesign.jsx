@@ -114,18 +114,20 @@ function FutureDatePickerField({ label, name, formik, placeholder }) {
     return diffDays;
   };
 
-  const handleSelect = (date) => {
+  const handleSelect = async (date) => {
     if (date) {
-      formik.setFieldValue(name, date);
-      formik.setFieldTouched(name, true);
+      await formik.setFieldValue(name, date);
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
     }
     setIsOpen(false);
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, null);
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, null);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   const handleMonthChange = (monthIndex) => {
@@ -227,7 +229,7 @@ function FutureDatePickerField({ label, name, formik, placeholder }) {
                 onClick={goToPreviousMonth}
                 className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
               >
-                <ChevronLeft className="size-4 text-foreground" />
+                <ChevronLeft className="size-4 text-foreground rtl:rotate-180" />
               </button>
 
               <div className="flex items-center gap-2">
@@ -261,7 +263,7 @@ function FutureDatePickerField({ label, name, formik, placeholder }) {
                 onClick={goToNextMonth}
                 className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
               >
-                <ChevronRight className="size-4 text-foreground" />
+                <ChevronRight className="size-4 text-foreground rtl:rotate-180" />
               </button>
             </div>
           </div>
@@ -574,7 +576,7 @@ function NewsFormRedesign({
               searchPlaceholder={t("searchGame") || "Search game..."}
               emptyMessage={t("noGameFound") || "No game found"}
               value={formik.values.game}
-              onChange={(value) => formik.setFieldValue("game", value)}
+              onChange={async (value) => { await formik.setFieldValue("game", value); formik.validateField("game"); }}
               options={gamesOptions.map((g) => ({
                 value: g.id || g._id,
                 label: g.name,
@@ -588,7 +590,7 @@ function NewsFormRedesign({
               searchPlaceholder={t("searchTournament") || "Search tournament..."}
               emptyMessage={t("noTournamentFound") || "No tournament found"}
               value={formik.values.tournament}
-              onChange={(value) => formik.setFieldValue("tournament", value)}
+              onChange={async (value) => { await formik.setFieldValue("tournament", value); formik.validateField("tournament"); }}
               options={tournamentsOptions.map((t) => ({
                 value: t.id || t._id,
                 label: t.name,
@@ -602,7 +604,7 @@ function NewsFormRedesign({
               searchPlaceholder={t("searchTeam") || "Search team..."}
               emptyMessage={t("noTeamFound") || "No team found"}
               value={formik.values.team}
-              onChange={(value) => formik.setFieldValue("team", value)}
+              onChange={async (value) => { await formik.setFieldValue("team", value); formik.validateField("team"); }}
               options={teamsOptions.map((t) => ({
                 value: t.id || t._id,
                 label: t.name,
@@ -617,7 +619,7 @@ function NewsFormRedesign({
               searchPlaceholder={t("searchPlayer") || "Search player..."}
               emptyMessage={t("noPlayerFound") || "No player found"}
               value={formik.values.player}
-              onChange={(value) => formik.setFieldValue("player", value)}
+              onChange={async (value) => { await formik.setFieldValue("player", value); formik.validateField("player"); }}
               options={playersOptions.map((p) => ({
                 value: p.id || p._id,
                 label: p.nickname || p.name,
@@ -632,7 +634,7 @@ function NewsFormRedesign({
               searchPlaceholder={t("searchMatch") || "Search match..."}
               emptyMessage={t("noMatchFound") || "No match found"}
               value={formik.values.match}
-              onChange={(value) => formik.setFieldValue("match", value)}
+              onChange={async (value) => { await formik.setFieldValue("match", value); formik.validateField("match"); }}
               options={matchesOptions.map((m) => ({
                 value: m.id || m._id,
                 label: `${m.team1?.name || "TBD"} vs ${m.team2?.name || "TBD"}`,

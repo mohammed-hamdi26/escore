@@ -1,25 +1,25 @@
-import { getTransfers, getTransferStats } from "@/app/[locale]/_Lib/transferApi";
+import { getTransfers } from "@/app/[locale]/_Lib/transferApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
-import TransfersStatsCards from "@/components/transfers-management/TransfersStatsCards";
+import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import TransfersTable from "@/components/transfers-management/TransfersTable";
 
 async function TransfersListPage({ searchParams }) {
   const params = await searchParams;
-  const { page, limit, game, search } = params || {};
+  const { page, limit, game, search, team, isFeatured, sortBy, sortOrder } = params || {};
 
-  // Fetch transfers, stats, and games in parallel
+  // Fetch transfers, games, and teams in parallel
   let transfersData = { data: [], pagination: { totalPages: 1, total: 0 } };
-  let stats = null;
-  let games = [];
+  let gamesData = { data: [] };
+  let teamsData = { data: [] };
 
   try {
-    [transfersData, stats, games] = await Promise.all([
-      getTransfers({ page, limit: limit || 10, game, search }).catch(() => ({
+    [transfersData, gamesData, teamsData] = await Promise.all([
+      getTransfers({ page, limit: limit || 10, game, search, team, isFeatured, sortBy, sortOrder }).catch(() => ({
         data: [],
         pagination: { totalPages: 1, total: 0 },
       })),
-      getTransferStats().catch(() => null),
-      getGames().catch(() => []),
+      getGames().catch(() => ({ data: [] })),
+      getTeams({ size: 500 }).catch(() => ({ data: [] })),
     ]);
   } catch (error) {
     console.error("Error fetching transfers data:", error);
@@ -27,14 +27,12 @@ async function TransfersListPage({ searchParams }) {
 
   return (
     <div className="space-y-6">
-      {/* Stats Cards */}
-      <TransfersStatsCards stats={stats} />
-
       {/* Transfers Table with Filters */}
       <TransfersTable
         transfers={transfersData?.data || []}
         pagination={transfersData?.pagination || { totalPages: 1, total: 0 }}
-        games={games || []}
+        games={gamesData?.data || []}
+        teams={teamsData?.data || []}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -83,6 +83,24 @@ const validateSchema = Yup.object({
   game: Yup.string().required("gameRequired"),
   team1: Yup.string().required("team1Required"),
   team2: Yup.string().required("team2Required"),
+  startedAt: Yup.string()
+    .nullable()
+    .test("startedAt-min", "Start time cannot be before match time", function (value) {
+      const { time } = this.parent;
+      if (!value || !time) return true;
+      return value >= time;
+    }),
+  endedAt: Yup.string()
+    .nullable()
+    .test("endedAt-min", "End time cannot be before start time", function (value) {
+      const { startedAt, time } = this.parent;
+      if (!value) return true;
+      const minTime = startedAt || time;
+      if (!minTime) return true;
+      return value >= minTime;
+    }),
+  team1Lineup: Yup.array().nullable(),
+  team2Lineup: Yup.array().nullable(),
 });
 
 function MatchFormRedesign({
@@ -221,6 +239,103 @@ function MatchFormRedesign({
       }
     },
   });
+
+  // Auto-fill Start Time when Match Time changes
+  const matchTimeForStarted = formik.values.time || "";
+  const currentStartedAt = formik.values.startedAt || "";
+  useEffect(() => {
+    if (matchTimeForStarted) {
+      // If Start Time is empty or less than Match Time, auto-fill it
+      if (!currentStartedAt || currentStartedAt < matchTimeForStarted) {
+        formik.setFieldValue("startedAt", matchTimeForStarted);
+      }
+    }
+  }, [matchTimeForStarted]);
+
+  // Auto-adjust End Time if it becomes invalid (less than Start Time)
+  const currentEndedAt = formik.values.endedAt || "";
+  useEffect(() => {
+    if (currentStartedAt && currentEndedAt && currentEndedAt < currentStartedAt) {
+      formik.setFieldValue("endedAt", currentStartedAt);
+    }
+  }, [currentStartedAt]);
+
+  // Smart Status Auto-Selection based on date and time
+  const matchDateValue = formik.values.date || "";
+  const matchTimeValue = formik.values.time || "";
+  const matchEndedAtValue = formik.values.endedAt || "";
+  const currentStatus = formik.values.status;
+
+  useEffect(() => {
+    // Skip auto-update if status is postponed or cancelled (manual only)
+    if (currentStatus === "postponed" || currentStatus === "cancelled") return;
+
+    // Skip if date is not set
+    if (!matchDateValue) return;
+
+    const now = new Date();
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0); // Normalize to start of day
+
+    const matchDate = new Date(matchDateValue);
+    matchDate.setHours(0, 0, 0, 0);
+
+    let newStatus = currentStatus;
+
+    if (today < matchDate) {
+      // Match is in the future
+      newStatus = "scheduled";
+    } else if (today.getTime() === matchDate.getTime()) {
+      // Match is today - check end time first, then start time
+
+      // If end time is set and has passed, match is completed
+      if (matchEndedAtValue) {
+        const [endHours, endMinutes] = matchEndedAtValue.split(":").map(Number);
+        const matchEndDateTime = new Date(matchDateValue);
+        matchEndDateTime.setHours(endHours, endMinutes, 0, 0);
+
+        if (now >= matchEndDateTime) {
+          // End time has passed - match is completed
+          newStatus = "completed";
+        } else if (matchTimeValue) {
+          // End time not reached yet, check if match started
+          const [hours, minutes] = matchTimeValue.split(":").map(Number);
+          const matchDateTime = new Date(matchDateValue);
+          matchDateTime.setHours(hours, minutes, 0, 0);
+
+          if (now >= matchDateTime) {
+            newStatus = "live";
+          } else {
+            newStatus = "scheduled";
+          }
+        }
+      } else if (matchTimeValue) {
+        // No end time set, check start time
+        const [hours, minutes] = matchTimeValue.split(":").map(Number);
+        const matchDateTime = new Date(matchDateValue);
+        matchDateTime.setHours(hours, minutes, 0, 0);
+
+        if (now >= matchDateTime) {
+          // Match time has passed or is now - should be live
+          newStatus = "live";
+        } else {
+          // Match time hasn't come yet
+          newStatus = "scheduled";
+        }
+      } else {
+        // No time set, keep as scheduled on match day
+        newStatus = "scheduled";
+      }
+    } else if (today > matchDate) {
+      // Match date has passed
+      newStatus = "completed";
+    }
+
+    // Only update if status actually changed
+    if (newStatus !== currentStatus) {
+      formik.setFieldValue("status", newStatus);
+    }
+  }, [matchDateValue, matchTimeValue, matchEndedAtValue]);
 
   // Get filtered teams based on selected game
   const getFilteredTeams = (excludeTeamId = null) => {
@@ -543,9 +658,9 @@ function MatchFormRedesign({
       <div className="flex justify-end gap-4">
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           onClick={() => router.back()}
-          className="h-11 px-6 rounded-xl"
+          className="h-11 px-6 rounded-xl border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           {t("cancel") || "Cancel"}
         </Button>
@@ -595,7 +710,7 @@ function InputField({ label, name, type = "text", placeholder, formik, icon, req
         <input
           type={type}
           name={name}
-          value={formik.values[name]}
+          value={formik.values[name] ?? ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           placeholder={placeholder}
@@ -627,28 +742,32 @@ function TimeInputField({ label, name, formik, placeholder, required, hint }) {
     return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
   };
 
-  const handleHourChange = (newHour) => {
+  const handleHourChange = async (newHour) => {
     const h = Math.max(0, Math.min(23, newHour));
-    formik.setFieldValue(name, formatTime(h, minutes || 0));
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, formatTime(h, minutes || 0));
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
-  const handleMinuteChange = (newMinute) => {
+  const handleMinuteChange = async (newMinute) => {
     const m = Math.max(0, Math.min(59, newMinute));
-    formik.setFieldValue(name, formatTime(hours || 0, m));
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, formatTime(hours || 0, m));
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
-  const handleQuickTime = (h, m) => {
-    formik.setFieldValue(name, formatTime(h, m));
-    formik.setFieldTouched(name, true);
+  const handleQuickTime = async (h, m) => {
+    await formik.setFieldValue(name, formatTime(h, m));
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   const quickTimes = [
@@ -802,7 +921,7 @@ function TimeInputField({ label, name, formik, placeholder, required, hint }) {
         </PopoverContent>
       </Popover>
       {hint && !error && <p className="text-xs text-gray-600 dark:text-gray-400">{hint}</p>}
-      {error && <p className="text-xs text-red-500">{t(error) || error}</p>}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }
@@ -855,7 +974,7 @@ function ScoreInputField({ label, name, formik, teamLogo }) {
           <input
             type="number"
             name={name}
-            value={formik.values[name]}
+            value={formik.values[name] ?? ""}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             min="0"
@@ -904,18 +1023,20 @@ function TournamentSelectField({
       tournament.slug?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelect = (tournament) => {
-    formik.setFieldValue(name, getTournamentId(tournament));
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (tournament) => {
+    await formik.setFieldValue(name, getTournamentId(tournament));
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     if (onTournamentChange) onTournamentChange();
     setIsOpen(false);
     setSearch("");
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     if (onTournamentChange) onTournamentChange();
   };
 
@@ -1042,27 +1163,32 @@ function GameSelectField({ label, name, games, formik, placeholder, searchPlaceh
   const value = formik.values[name];
   const t = useTranslations("MatchForm");
 
-  const getGameId = (game) => game?.id || game?._id;
-  const selectedGame = games?.find((g) => getGameId(g) === value);
+  // Ensure games is an array
+  const safeGames = Array.isArray(games) ? games : [];
 
-  const filteredGames = games?.filter(
+  const getGameId = (game) => game?.id || game?._id;
+  const selectedGame = safeGames.find((g) => getGameId(g) === value);
+
+  const filteredGames = safeGames.filter(
     (game) =>
       game.name?.toLowerCase().includes(search.toLowerCase()) ||
       game.slug?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelect = (game) => {
-    formik.setFieldValue(name, getGameId(game));
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (game) => {
+    await formik.setFieldValue(name, getGameId(game));
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     if (onGameChange) onGameChange();
     setIsOpen(false);
     setSearch("");
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     if (onGameChange) onGameChange();
   };
 
@@ -1195,17 +1321,19 @@ function TeamSelectField({ label, name, teams, formik, placeholder, searchPlaceh
       team.shortName?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelect = (team) => {
-    formik.setFieldValue(name, getTeamId(team));
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (team) => {
+    await formik.setFieldValue(name, getTeamId(team));
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
     setSearch("");
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   return (
@@ -1334,9 +1462,10 @@ function StatusSelectField({ label, name, formik, placeholder, required }) {
 
   const selectedStatus = STATUS_OPTIONS.find((s) => s.value === value);
 
-  const handleSelect = (status) => {
-    formik.setFieldValue(name, status.value);
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (status) => {
+    await formik.setFieldValue(name, status.value);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
   };
 
@@ -1438,9 +1567,10 @@ function BestOfSelectField({ label, name, formik, placeholder }) {
 
   const selectedFormat = BEST_OF_OPTIONS.find((f) => f.value === value);
 
-  const handleSelect = (format) => {
-    formik.setFieldValue(name, format.value);
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (format) => {
+    await formik.setFieldValue(name, format.value);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
   };
 
@@ -1529,19 +1659,29 @@ function DatePickerField({ label, name, formik, placeholder, required }) {
     });
   };
 
-  const handleSelect = (date) => {
+  // Format date to YYYY-MM-DD using local timezone
+  const formatLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleSelect = async (date) => {
     if (date) {
-      const formattedDate = date.toISOString().split("T")[0];
-      formik.setFieldValue(name, formattedDate);
-      formik.setFieldTouched(name, true);
+      const formattedDate = formatLocalDate(date);
+      await formik.setFieldValue(name, formattedDate);
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
     }
     setIsOpen(false);
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   const handleMonthChange = (monthIndex) => {
@@ -1615,16 +1755,16 @@ function DatePickerField({ label, name, formik, placeholder, required }) {
               <button
                 type="button"
                 onClick={goToPreviousMonth}
-                className="size-8 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] dark:bg-[#1a1d2e] hover:bg-gray-200 dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
+                className="size-8 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] hover:bg-gray-200 dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
               >
-                <ChevronLeft className="size-4 text-gray-900 dark:text-white" />
+                <ChevronLeft className="size-4 text-gray-900 dark:text-white rtl:rotate-180" />
               </button>
 
               <div className="flex items-center gap-2">
                 <select
                   value={viewDate.getMonth()}
                   onChange={(e) => handleMonthChange(parseInt(e.target.value))}
-                  className="h-8 px-2 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                  className="h-8 px-2 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
                 >
                   {months.map((month, index) => (
                     <option key={month} value={index}>
@@ -1636,7 +1776,7 @@ function DatePickerField({ label, name, formik, placeholder, required }) {
                 <select
                   value={viewDate.getFullYear()}
                   onChange={(e) => handleYearChange(parseInt(e.target.value))}
-                  className="h-8 px-2 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                  className="h-8 px-2 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
                 >
                   {years.map((year) => (
                     <option key={year} value={year}>
@@ -1649,9 +1789,9 @@ function DatePickerField({ label, name, formik, placeholder, required }) {
               <button
                 type="button"
                 onClick={goToNextMonth}
-                className="size-8 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] dark:bg-[#1a1d2e] hover:bg-gray-200 dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
+                className="size-8 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] hover:bg-gray-200 dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
               >
-                <ChevronRight className="size-4 text-gray-900 dark:text-white" />
+                <ChevronRight className="size-4 text-gray-900 dark:text-white rtl:rotate-180" />
               </button>
             </div>
           </div>

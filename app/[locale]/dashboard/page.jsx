@@ -54,8 +54,8 @@ export default async function page() {
       isShowed: hasPermission(user, "Team"),
     },
     {
-      title: "transfers Management",
-      href: "/transfers-management/edit",
+      title: "Transfers Management",
+      href: "/transfers-management",
       icon: (
         <ArrowRightLeft className="icon-transition" width="57" height="56" />
       ),

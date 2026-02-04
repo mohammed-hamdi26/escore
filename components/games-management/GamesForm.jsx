@@ -40,6 +40,17 @@ export default function GamesForm({
 }) {
   const t = useTranslations("GameForm");
 
+  // Helper function to format date to YYYY-MM-DD using local timezone
+  const formatDateToLocal = (dateInput) => {
+    if (!dateInput) return "";
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const formik = useFormik({
     initialValues: {
       name: data?.name || "",
@@ -49,10 +60,12 @@ export default function GamesForm({
       logoDark: data?.logo?.dark || "",
       coverImageLight: data?.coverImage?.light || "",
       coverImageDark: data?.coverImage?.dark || "",
-      releaseDate: data?.releaseDate ? new Date(data.releaseDate).toISOString().split("T")[0] : "",
+      releaseDate: formatDateToLocal(data?.releaseDate),
       isActive: data?.isActive !== undefined ? data.isActive : true,
     },
     validationSchema,
+    validateOnChange: true,
+    validateOnBlur: true,
     onSubmit: async (values) => {
       try {
         let dataValues = data ? { id: data.id || data._id } : {};
@@ -280,12 +293,20 @@ export default function GamesForm({
         </div>
       </FormSection>
 
-      {/* Submit Button */}
-      <div className="flex justify-end pt-4">
+      {/* Submit Buttons */}
+      <div className="flex justify-end gap-4 pt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => formik.resetForm()}
+          className="h-11 px-6 rounded-xl border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          {t("reset") || "Reset"}
+        </Button>
         <Button
           type="submit"
           disabled={formik.isSubmitting}
-          className="h-11 px-6 rounded-xl bg-green-primary hover:bg-green-primary/90 text-white font-medium gap-2"
+          className="h-11 px-8 rounded-xl bg-green-primary hover:bg-green-primary/90 text-white font-medium gap-2"
         >
           {formik.isSubmitting ? (
             <>
@@ -331,19 +352,29 @@ function DatePickerField({ label, name, formik, placeholder }) {
     });
   };
 
-  const handleSelect = (date) => {
+  // Format date to YYYY-MM-DD using local timezone
+  const formatLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleSelect = async (date) => {
     if (date) {
-      const formattedDate = date.toISOString().split("T")[0];
-      formik.setFieldValue(name, formattedDate);
-      formik.setFieldTouched(name, true);
+      const formattedDate = formatLocalDate(date);
+      await formik.setFieldValue(name, formattedDate);
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
     }
     setIsOpen(false);
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   const handleMonthChange = (monthIndex) => {
@@ -424,7 +455,7 @@ function DatePickerField({ label, name, formik, placeholder }) {
                 onClick={goToPreviousMonth}
                 className="size-8 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] hover:bg-gray-200 dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
               >
-                <ChevronLeft className="size-4 text-foreground" />
+                <ChevronLeft className="size-4 text-foreground rtl:rotate-180" />
               </button>
 
               <div className="flex items-center gap-2">
@@ -458,7 +489,7 @@ function DatePickerField({ label, name, formik, placeholder }) {
                 onClick={goToNextMonth}
                 className="size-8 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] hover:bg-gray-200 dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
               >
-                <ChevronRight className="size-4 text-foreground" />
+                <ChevronRight className="size-4 text-foreground rtl:rotate-180" />
               </button>
             </div>
           </div>

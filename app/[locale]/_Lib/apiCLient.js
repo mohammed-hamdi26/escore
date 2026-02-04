@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getSession, deleteSession } from "./session";
+import { getSession } from "./session";
 
 const apiClient = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1`,
@@ -37,14 +37,11 @@ apiClient.interceptors.response.use(
     if (error.response) {
       const { status } = error.response;
 
-      // Handle 401 (Unauthorized) and 403 (Forbidden) - clear session
+      // Handle 401 (Unauthorized) and 403 (Forbidden)
+      // Note: We don't delete session here because cookies can only be modified
+      // in Server Actions or Route Handlers, not during server component renders.
+      // The calling code should handle session deletion via a Server Action.
       if (status === 401 || status === 403) {
-        try {
-          await deleteSession();
-          console.log("Session cleared due to authentication error");
-        } catch (sessionError) {
-          console.error("Failed to clear session:", sessionError.message);
-        }
         // Add a flag to the error for easier handling
         error.isAuthError = true;
       }

@@ -4,25 +4,47 @@ import { useFormik } from "formik";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import * as Yup from "yup";
-import FormSection from "../ui app/FormSection";
-import SelectInput from "../ui app/SelectInput";
-import DatePicker from "../ui app/DatePicker";
-import FormRow from "../ui app/FormRow";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
-import InputApp from "../ui app/InputApp";
-import { Textarea } from "../ui/textarea";
-import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import toast from "react-hot-toast";
+import { useState, useMemo } from "react";
+import {
+  User,
+  Users,
+  Gamepad2,
+  DollarSign,
+  CalendarDays,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  X,
+  ArrowRight,
+} from "lucide-react";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import RichTextEditor from "../ui app/RichTextEditor";
 
 const CURRENCY_OPTIONS = [
-  { value: "USD", label: "USD" },
-  { value: "EUR", label: "EUR" },
-  { value: "GBP", label: "GBP" },
-  { value: "SAR", label: "SAR" },
-  { value: "AED", label: "AED" },
+  { value: "USD", label: "USD - US Dollar" },
+  { value: "EUR", label: "EUR - Euro" },
+  { value: "GBP", label: "GBP - British Pound" },
+  { value: "SAR", label: "SAR - Saudi Riyal" },
+  { value: "AED", label: "AED - UAE Dirham" },
 ];
 
 function TransfersForm({
@@ -36,18 +58,30 @@ function TransfersForm({
   const t = useTranslations("TransfersManagement");
   const router = useRouter();
 
+  // Popover states
+  const [playerOpen, setPlayerOpen] = useState(false);
+  const [playerSearch, setPlayerSearch] = useState("");
+  const [gameOpen, setGameOpen] = useState(false);
+  const [gameSearch, setGameSearch] = useState("");
+  const [fromTeamOpen, setFromTeamOpen] = useState(false);
+  const [fromTeamSearch, setFromTeamSearch] = useState("");
+  const [toTeamOpen, setToTeamOpen] = useState(false);
+  const [toTeamSearch, setToTeamSearch] = useState("");
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [dateOpen, setDateOpen] = useState(false);
+  const [viewDate, setViewDate] = useState(new Date());
+
   const validationSchema = Yup.object({
-    player: Yup.string().required(t("Player is required")),
+    player: Yup.string().required("Player is required"),
+    game: Yup.string().nullable(),
     fromTeam: Yup.string().nullable(),
     toTeam: Yup.string().nullable(),
-    fee: Yup.number().min(0, t("Fee must be positive")).nullable(),
-    contractLength: Yup.number()
-      .min(1, t("Contract length must be at least 1 month"))
-      .max(120, t("Contract length cannot exceed 120 months"))
-      .nullable(),
+    fee: Yup.number().min(0, "Fee must be positive").nullable(),
+    transferDate: Yup.string().nullable(),
+    content: Yup.string().nullable(),
   }).test(
     "at-least-one-team",
-    t("At least one team (From or To) is required"),
+    "At least one team (From or To) is required",
     function (values) {
       return values.fromTeam || values.toTeam;
     }
@@ -61,30 +95,23 @@ function TransfersForm({
       toTeam: transfer?.toTeam?.id || transfer?.toTeam?._id || "",
       fee: transfer?.fee || "",
       currency: transfer?.currency || "USD",
-      contractLength: transfer?.contractLength || "",
       transferDate: transfer?.transferDate
         ? transfer.transferDate.split("T")[0]
         : "",
-      source: transfer?.source || "",
-      notes: transfer?.notes || "",
-      isFeatured: transfer?.isFeatured || false,
+      content: transfer?.content || "",
     },
     validationSchema,
+    validateOnChange: true,
     onSubmit: async (values) => {
       try {
-        // Clean up data
         const dataValues = {
           ...values,
           fee: values.fee ? Number(values.fee) : undefined,
-          contractLength: values.contractLength
-            ? Number(values.contractLength)
-            : undefined,
           fromTeam: values.fromTeam || undefined,
           toTeam: values.toTeam || undefined,
           game: values.game || undefined,
           transferDate: values.transferDate || undefined,
-          source: values.source || undefined,
-          notes: values.notes || undefined,
+          content: values.content || undefined,
         };
 
         if (transfer) {
@@ -101,7 +128,7 @@ function TransfersForm({
           );
           if (formType === "add") {
             formik.resetForm();
-            router.push("/dashboard/transfers-management/edit");
+            router.push("/dashboard/transfers-management");
           }
         } else {
           toast.error(result?.error || t("An error occurred"));
@@ -112,221 +139,616 @@ function TransfersForm({
     },
   });
 
-  // Auto-set fromTeam when player is selected
-  const handlePlayerChange = (playerId) => {
-    formik.setFieldValue("player", playerId);
+  // Auto-set game and fromTeam when player is selected
+  const handlePlayerChange = async (playerId) => {
+    await formik.setFieldValue("player", playerId);
+    formik.validateField("player");
+
     const player = playersOptions.find(
-      (p) => p.id === playerId || p._id === playerId
+      (p) => (p.id || p._id) === playerId
     );
-    if (player?.team) {
-      formik.setFieldValue(
-        "fromTeam",
-        player.team.id || player.team._id || player.team
-      );
-    }
-    if (player?.game) {
-      formik.setFieldValue(
-        "game",
-        player.game.id || player.game._id || player.game
-      );
+
+    if (player) {
+      // Auto-set game from player's game
+      if (player.game) {
+        const gameId = typeof player.game === 'string'
+          ? player.game
+          : (player.game._id || player.game.id);
+        if (gameId) {
+          await formik.setFieldValue("game", gameId);
+        }
+      }
+
+      // Auto-set fromTeam from player's current team
+      if (player.team) {
+        const teamId = typeof player.team === 'string'
+          ? player.team
+          : (player.team._id || player.team.id);
+        if (teamId) {
+          await formik.setFieldValue("fromTeam", teamId);
+        }
+      } else {
+        // Player is free agent, clear fromTeam
+        await formik.setFieldValue("fromTeam", "");
+      }
     }
   };
 
+  // Filtered options
+  const filteredPlayers = useMemo(() => {
+    if (!playerSearch) return playersOptions;
+    return playersOptions.filter((player) =>
+      (player.nickname || player.name || "").toLowerCase().includes(playerSearch.toLowerCase())
+    );
+  }, [playersOptions, playerSearch]);
+
+  const filteredGames = useMemo(() => {
+    if (!gameSearch) return gamesOptions;
+    return gamesOptions.filter((game) =>
+      game.name.toLowerCase().includes(gameSearch.toLowerCase())
+    );
+  }, [gamesOptions, gameSearch]);
+
+  const filteredFromTeams = useMemo(() => {
+    const teams = teamsOptions.filter(
+      (team) => (team.id || team._id) !== formik.values.toTeam
+    );
+    if (!fromTeamSearch) return teams;
+    return teams.filter((team) =>
+      team.name.toLowerCase().includes(fromTeamSearch.toLowerCase())
+    );
+  }, [teamsOptions, fromTeamSearch, formik.values.toTeam]);
+
+  const filteredToTeams = useMemo(() => {
+    const teams = teamsOptions.filter(
+      (team) => (team.id || team._id) !== formik.values.fromTeam
+    );
+    if (!toTeamSearch) return teams;
+    return teams.filter((team) =>
+      team.name.toLowerCase().includes(toTeamSearch.toLowerCase())
+    );
+  }, [teamsOptions, toTeamSearch, formik.values.fromTeam]);
+
+  // Get selected names
+  const selectedPlayer = playersOptions.find(
+    (p) => (p.id || p._id) === formik.values.player
+  );
+  const selectedGame = gamesOptions.find(
+    (g) => (g.id || g._id) === formik.values.game
+  );
+  const selectedFromTeam = teamsOptions.find(
+    (t) => (t.id || t._id) === formik.values.fromTeam
+  );
+  const selectedToTeam = teamsOptions.find(
+    (t) => (t.id || t._id) === formik.values.toTeam
+  );
+  const selectedCurrency = CURRENCY_OPTIONS.find(
+    (c) => c.value === formik.values.currency
+  );
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-8">
-      {/* Basic Info */}
-      <FormSection title={t("Basic Information")}>
-        <FormRow>
-          <SelectInput
-            name="player"
-            label={t("Player")}
-            formik={formik}
-            placeholder={t("Select Player")}
-            options={mappedArrayToSelectOptions(
-              playersOptions,
-              "nickname",
-              "id"
+      {/* Player & Game Section */}
+      <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
+        <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
+          <User className="size-5 text-green-primary" />
+          {t("Basic Information")}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Player Select */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <User className="size-4" />
+              {t("Player")} <span className="text-red-500">*</span>
+            </Label>
+            <Popover open={playerOpen} onOpenChange={setPlayerOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={playerOpen}
+                  className={`w-full h-12 justify-between rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-muted dark:hover:bg-[#252a3d] ${
+                    formik.touched.player && formik.errors.player ? "border-red-500" : ""
+                  }`}
+                >
+                  <span className="flex items-center gap-2 truncate">
+                    {selectedPlayer ? (
+                      <>
+                        {selectedPlayer.photo && (
+                          <img
+                            src={selectedPlayer.photo.light || selectedPlayer.photo}
+                            alt=""
+                            className="size-6 rounded-full object-cover"
+                          />
+                        )}
+                        <span className="text-foreground truncate">
+                          {selectedPlayer.nickname || selectedPlayer.name}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">{t("Select Player")}</span>
+                    )}
+                  </span>
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[320px] p-0" align="start">
+                <Command>
+                  <CommandInput
+                    placeholder={t("searchPlayer")}
+                    value={playerSearch}
+                    onValueChange={setPlayerSearch}
+                  />
+                  <CommandList>
+                    <CommandEmpty>{t("noPlayerFound")}</CommandEmpty>
+                    <CommandGroup>
+                      {filteredPlayers.map((player) => {
+                        const playerId = player.id || player._id;
+                        return (
+                          <CommandItem
+                            key={playerId}
+                            value={player.nickname || player.name}
+                            onSelect={() => {
+                              handlePlayerChange(playerId);
+                              setPlayerOpen(false);
+                              setPlayerSearch("");
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formik.values.player === playerId ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {player.photo && (
+                              <img
+                                src={player.photo.light || player.photo}
+                                alt=""
+                                className="size-6 rounded-full mr-2 object-cover"
+                              />
+                            )}
+                            <span className="truncate">{player.nickname || player.name}</span>
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            {formik.touched.player && formik.errors.player && (
+              <p className="text-red-500 text-sm">{formik.errors.player}</p>
             )}
-            error={formik.touched.player && formik.errors.player}
-            onChange={handlePlayerChange}
-            required
-          />
-          <SelectInput
-            name="game"
-            label={t("Game")}
-            formik={formik}
-            placeholder={t("Select Game")}
-            options={mappedArrayToSelectOptions(gamesOptions, "name", "id")}
-            error={formik.touched.game && formik.errors.game}
-            onChange={(value) => formik.setFieldValue("game", value)}
-          />
-        </FormRow>
-      </FormSection>
+          </div>
 
-      {/* Teams */}
-      <FormSection title={t("Teams")}>
-        <FormRow>
-          <SelectInput
-            name="fromTeam"
-            label={t("From Team")}
-            formik={formik}
-            placeholder={t("Select From Team")}
-            options={mappedArrayToSelectOptions(
-              teamsOptions.filter(
-                (team) => (team.id || team._id) !== formik.values.toTeam
-              ),
-              "name",
-              "id"
-            )}
-            error={formik.touched.fromTeam && formik.errors.fromTeam}
-            onChange={(value) => formik.setFieldValue("fromTeam", value)}
-          />
-          <SelectInput
-            name="toTeam"
-            label={t("To Team")}
-            formik={formik}
-            placeholder={t("Select To Team")}
-            options={mappedArrayToSelectOptions(
-              teamsOptions.filter(
-                (team) => (team.id || team._id) !== formik.values.fromTeam
-              ),
-              "name",
-              "id"
-            )}
-            error={formik.touched.toTeam && formik.errors.toTeam}
-            onChange={(value) => formik.setFieldValue("toTeam", value)}
-          />
-        </FormRow>
+          {/* Game Select */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <Gamepad2 className="size-4" />
+              {t("Game")}
+            </Label>
+            <Popover open={gameOpen} onOpenChange={setGameOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={gameOpen}
+                  className="w-full h-12 justify-between rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-muted dark:hover:bg-[#252a3d]"
+                >
+                  <span className="flex items-center gap-2 truncate">
+                    {selectedGame ? (
+                      <>
+                        {selectedGame.logo && (
+                          <img
+                            src={selectedGame.logo.light || selectedGame.logo.dark}
+                            alt=""
+                            className="size-6 rounded object-contain"
+                          />
+                        )}
+                        <span className="text-foreground truncate">{selectedGame.name}</span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">{t("Select Game")}</span>
+                    )}
+                  </span>
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[320px] p-0" align="start">
+                <Command>
+                  <CommandInput
+                    placeholder={t("searchGame")}
+                    value={gameSearch}
+                    onValueChange={setGameSearch}
+                  />
+                  <CommandList>
+                    <CommandEmpty>{t("noGameFound")}</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        value="no-game"
+                        onSelect={() => {
+                          formik.setFieldValue("game", "");
+                          setGameOpen(false);
+                          setGameSearch("");
+                        }}
+                      >
+                        <Check
+                          className={`mr-2 h-4 w-4 ${!formik.values.game ? "opacity-100" : "opacity-0"}`}
+                        />
+                        <span className="text-muted-foreground">{t("noGame")}</span>
+                      </CommandItem>
+                      {filteredGames.map((game) => {
+                        const gameId = game.id || game._id;
+                        return (
+                          <CommandItem
+                            key={gameId}
+                            value={game.name}
+                            onSelect={() => {
+                              formik.setFieldValue("game", gameId);
+                              formik.validateField("game");
+                              setGameOpen(false);
+                              setGameSearch("");
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formik.values.game === gameId ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {game.logo && (
+                              <img
+                                src={game.logo.light || game.logo.dark}
+                                alt=""
+                                className="size-6 rounded mr-2 object-contain"
+                              />
+                            )}
+                            <span className="truncate">{game.name}</span>
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+      </div>
+
+      {/* Teams Section */}
+      <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
+        <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
+          <Users className="size-5 text-green-primary" />
+          {t("Teams")}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+          {/* From Team */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("From Team")}
+            </Label>
+            <Popover open={fromTeamOpen} onOpenChange={setFromTeamOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={fromTeamOpen}
+                  className="w-full h-12 justify-between rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-muted dark:hover:bg-[#252a3d]"
+                >
+                  <span className="flex items-center gap-2 truncate">
+                    {selectedFromTeam ? (
+                      <>
+                        {selectedFromTeam.logo && (
+                          <img
+                            src={selectedFromTeam.logo.light || selectedFromTeam.logo.dark}
+                            alt=""
+                            className="size-6 rounded object-contain"
+                          />
+                        )}
+                        <span className="text-foreground truncate">{selectedFromTeam.name}</span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">{t("Free Agent")}</span>
+                    )}
+                  </span>
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[320px] p-0" align="start">
+                <Command>
+                  <CommandInput
+                    placeholder={t("searchTeam")}
+                    value={fromTeamSearch}
+                    onValueChange={setFromTeamSearch}
+                  />
+                  <CommandList>
+                    <CommandEmpty>{t("noTeamFound")}</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        value="free-agent"
+                        onSelect={() => {
+                          formik.setFieldValue("fromTeam", "");
+                          formik.validateField("fromTeam");
+                          setFromTeamOpen(false);
+                          setFromTeamSearch("");
+                        }}
+                      >
+                        <Check
+                          className={`mr-2 h-4 w-4 ${!formik.values.fromTeam ? "opacity-100" : "opacity-0"}`}
+                        />
+                        <User className="size-5 mr-2 text-muted-foreground" />
+                        <span className="text-muted-foreground">{t("Free Agent")}</span>
+                      </CommandItem>
+                      {filteredFromTeams.map((team) => {
+                        const teamId = team.id || team._id;
+                        return (
+                          <CommandItem
+                            key={teamId}
+                            value={team.name}
+                            onSelect={() => {
+                              formik.setFieldValue("fromTeam", teamId);
+                              formik.validateField("fromTeam");
+                              setFromTeamOpen(false);
+                              setFromTeamSearch("");
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formik.values.fromTeam === teamId ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {team.logo && (
+                              <img
+                                src={team.logo.light || team.logo.dark}
+                                alt=""
+                                className="size-6 rounded mr-2 object-contain"
+                              />
+                            )}
+                            <span className="truncate">{team.name}</span>
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Arrow */}
+          <div className="hidden md:flex items-center justify-center pb-2">
+            <ArrowRight className="size-8 text-green-primary" />
+          </div>
+
+          {/* To Team */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("To Team")}
+            </Label>
+            <Popover open={toTeamOpen} onOpenChange={setToTeamOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={toTeamOpen}
+                  className="w-full h-12 justify-between rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-muted dark:hover:bg-[#252a3d]"
+                >
+                  <span className="flex items-center gap-2 truncate">
+                    {selectedToTeam ? (
+                      <>
+                        {selectedToTeam.logo && (
+                          <img
+                            src={selectedToTeam.logo.light || selectedToTeam.logo.dark}
+                            alt=""
+                            className="size-6 rounded object-contain"
+                          />
+                        )}
+                        <span className="text-foreground truncate">{selectedToTeam.name}</span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">{t("selectTeam")}</span>
+                    )}
+                  </span>
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[320px] p-0" align="start">
+                <Command>
+                  <CommandInput
+                    placeholder={t("searchTeam")}
+                    value={toTeamSearch}
+                    onValueChange={setToTeamSearch}
+                  />
+                  <CommandList>
+                    <CommandEmpty>{t("noTeamFound")}</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        value="no-team"
+                        onSelect={() => {
+                          formik.setFieldValue("toTeam", "");
+                          formik.validateField("toTeam");
+                          setToTeamOpen(false);
+                          setToTeamSearch("");
+                        }}
+                      >
+                        <Check
+                          className={`mr-2 h-4 w-4 ${!formik.values.toTeam ? "opacity-100" : "opacity-0"}`}
+                        />
+                        <span className="text-muted-foreground">{t("noTeam")}</span>
+                      </CommandItem>
+                      {filteredToTeams.map((team) => {
+                        const teamId = team.id || team._id;
+                        return (
+                          <CommandItem
+                            key={teamId}
+                            value={team.name}
+                            onSelect={() => {
+                              formik.setFieldValue("toTeam", teamId);
+                              formik.validateField("toTeam");
+                              setToTeamOpen(false);
+                              setToTeamSearch("");
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formik.values.toTeam === teamId ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {team.logo && (
+                              <img
+                                src={team.logo.light || team.logo.dark}
+                                alt=""
+                                className="size-6 rounded mr-2 object-contain"
+                              />
+                            )}
+                            <span className="truncate">{team.name}</span>
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
         {formik.errors["at-least-one-team"] && (
-          <p className="text-red-500 text-sm mt-2">
-            {t("At least one team (From or To) is required")}
+          <p className="text-red-500 text-sm mt-4">
+            {t("atLeastOneTeamRequired")}
           </p>
         )}
-      </FormSection>
+      </div>
 
-      {/* Financial Details */}
-      <FormSection title={t("Financial Details")}>
-        <FormRow>
-          <InputApp
-            name="fee"
-            label={t("Transfer Fee")}
+      {/* Financial Details Section */}
+      <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
+        <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
+          <DollarSign className="size-5 text-green-primary" />
+          {t("Financial Details")}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Transfer Fee */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("Transfer Fee")}
+            </Label>
+            <input
+              type="number"
+              name="fee"
+              value={formik.values.fee}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder={t("Enter Fee")}
+              disabled={formik.isSubmitting}
+              className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50"
+            />
+            {formik.touched.fee && formik.errors.fee && (
+              <p className="text-red-500 text-sm">{formik.errors.fee}</p>
+            )}
+          </div>
+
+          {/* Currency */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("Currency")}
+            </Label>
+            <Popover open={currencyOpen} onOpenChange={setCurrencyOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={currencyOpen}
+                  className="w-full h-12 justify-between rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-muted dark:hover:bg-[#252a3d]"
+                >
+                  <span className="text-foreground">
+                    {selectedCurrency?.label || "USD - US Dollar"}
+                  </span>
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[280px] p-0" align="start">
+                <Command>
+                  <CommandList>
+                    <CommandGroup>
+                      {CURRENCY_OPTIONS.map((currency) => (
+                        <CommandItem
+                          key={currency.value}
+                          value={currency.value}
+                          onSelect={() => {
+                            formik.setFieldValue("currency", currency.value);
+                            setCurrencyOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              formik.values.currency === currency.value ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          {currency.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+      </div>
+
+      {/* Date & Additional Info Section */}
+      <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
+        <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
+          <CalendarDays className="size-5 text-green-primary" />
+          {t("dateAndAdditionalInfo")}
+        </h3>
+        {/* Transfer Date */}
+        <TransferDatePicker
+          value={formik.values.transferDate}
+          onChange={async (date) => {
+            await formik.setFieldValue("transferDate", date);
+          }}
+          onClear={async () => {
+            await formik.setFieldValue("transferDate", "");
+          }}
+          isOpen={dateOpen}
+          setIsOpen={setDateOpen}
+          viewDate={viewDate}
+          setViewDate={setViewDate}
+          placeholder={t("selectTransferDate") || "Select transfer date"}
+          label={t("Transfer Date")}
+        />
+
+        {/* Content */}
+        <div className="mt-6">
+          <RichTextEditor
+            name="content"
             formik={formik}
-            placeholder={t("Enter Fee")}
-            type="number"
-            error={formik.touched.fee && formik.errors.fee}
-            className="border-0 focus:outline-none"
-            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-            textColor="text-[#677185]"
-            disabled={formik.isSubmitting}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.fee}
-          />
-          <SelectInput
-            name="currency"
-            label={t("Currency")}
-            formik={formik}
-            placeholder={t("Select Currency")}
-            options={CURRENCY_OPTIONS}
-            onChange={(value) => formik.setFieldValue("currency", value)}
-          />
-          <InputApp
-            name="contractLength"
-            label={t("Contract Length (months)")}
-            formik={formik}
-            placeholder={t("Enter Contract Length")}
-            type="number"
+            label={t("Content")}
+            placeholder={t("enterContent")}
             error={
-              formik.touched.contractLength && formik.errors.contractLength
+              formik.touched.content &&
+              formik.errors.content &&
+              formik.errors.content
             }
-            className="border-0 focus:outline-none"
-            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-            textColor="text-[#677185]"
-            disabled={formik.isSubmitting}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.contractLength}
-          />
-        </FormRow>
-      </FormSection>
-
-      {/* Dates */}
-      <FormSection title={t("Dates")}>
-        <FormRow>
-          <DatePicker
-            formik={formik}
-            name="transferDate"
-            label={t("Transfer Date")}
-            disabled={formik.isSubmitting}
-            placeholder={t("Select Transfer Date")}
-          />
-        </FormRow>
-      </FormSection>
-
-      {/* Additional Information */}
-      <FormSection title={t("Additional Information")}>
-        <FormRow>
-          <InputApp
-            name="source"
-            label={t("Source")}
-            formik={formik}
-            placeholder={t("enterSource")}
-            className="border-0 focus:outline-none"
-            backGroundColor="bg-dashboard-box dark:bg-[#0F1017]"
-            textColor="text-[#677185]"
-            disabled={formik.isSubmitting}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.source}
-          />
-        </FormRow>
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t("Notes")}
-          </Label>
-          <Textarea
-            name="notes"
-            placeholder={t("enterNotes")}
-            value={formik.values.notes}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            disabled={formik.isSubmitting}
-            className="min-h-[100px] bg-dashboard-box dark:bg-[#0F1017] border-0"
+            minHeight="300px"
           />
         </div>
-        <div className="flex items-center gap-3 pt-4">
-          <Switch
-            id="isFeatured"
-            checked={formik.values.isFeatured}
-            onCheckedChange={(checked) =>
-              formik.setFieldValue("isFeatured", checked)
-            }
-            disabled={formik.isSubmitting}
-          />
-          <Label
-            htmlFor="isFeatured"
-            className="text-sm text-gray-700 dark:text-gray-300"
-          >
-            {t("Featured Transfer")}
-          </Label>
-        </div>
-      </FormSection>
+      </div>
 
-      {/* Submit Button */}
+      {/* Submit Buttons */}
       <div className="flex justify-end gap-4">
         <Button
-          className={"text-black dark:text-white"}
           type="button"
           variant="outline"
           onClick={() => router.back()}
           disabled={formik.isSubmitting}
+          className="h-11 px-6 rounded-xl border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           {t("Cancel")}
         </Button>
         <Button
           disabled={formik.isSubmitting || !formik.isValid}
           type="submit"
-          className="text-white text-center min-w-[120px] px-5 py-2 rounded-lg bg-green-primary cursor-pointer hover:bg-green-primary/80"
+          className="h-11 px-8 rounded-xl bg-green-primary hover:bg-green-primary/90 text-white font-medium"
         >
           {formik.isSubmitting ? (
             <Spinner />
@@ -338,6 +760,190 @@ function TransfersForm({
         </Button>
       </div>
     </form>
+  );
+}
+
+// Transfer Date Picker Component
+function TransferDatePicker({
+  value,
+  onChange,
+  onClear,
+  isOpen,
+  setIsOpen,
+  viewDate,
+  setViewDate,
+  placeholder,
+  label,
+}) {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 2000 + 10 }, (_, i) => 2000 + i).reverse();
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+
+  const formatDisplayDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const formatLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleSelect = (date) => {
+    if (date) {
+      const formattedDate = formatLocalDate(date);
+      onChange(formattedDate);
+    }
+    setIsOpen(false);
+  };
+
+  const handleClear = (e) => {
+    e.stopPropagation();
+    onClear();
+  };
+
+  const handleMonthChange = (monthIndex) => {
+    const newDate = new Date(viewDate);
+    newDate.setMonth(monthIndex);
+    setViewDate(newDate);
+  };
+
+  const handleYearChange = (year) => {
+    const newDate = new Date(viewDate);
+    newDate.setFullYear(year);
+    setViewDate(newDate);
+  };
+
+  const goToPreviousMonth = () => {
+    const newDate = new Date(viewDate);
+    newDate.setMonth(newDate.getMonth() - 1);
+    setViewDate(newDate);
+  };
+
+  const goToNextMonth = () => {
+    const newDate = new Date(viewDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    setViewDate(newDate);
+  };
+
+  const selectedDate = value ? new Date(value) : undefined;
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        {label}
+      </label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <div
+            role="button"
+            tabIndex={0}
+            className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-3">
+              <div className="size-9 rounded-lg bg-green-primary/10 flex items-center justify-center">
+                <CalendarDays className="size-5 text-green-primary" />
+              </div>
+              {value ? (
+                <span className="text-foreground font-medium">
+                  {formatDisplayDate(value)}
+                </span>
+              ) : (
+                <span className="text-muted-foreground">{placeholder}</span>
+              )}
+            </div>
+            {value && (
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={handleClear}
+                onKeyDown={(e) => e.key === "Enter" && handleClear(e)}
+                className="size-7 rounded-lg bg-muted hover:bg-red-500/20 flex items-center justify-center transition-colors group cursor-pointer"
+              >
+                <X className="size-4 text-muted-foreground group-hover:text-red-500" />
+              </span>
+            )}
+          </div>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-auto p-0 bg-background dark:bg-[#12141c] border-border"
+          align="start"
+        >
+          {/* Year/Month Navigation */}
+          <div className="p-3 border-b border-border">
+            <div className="flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={goToPreviousMonth}
+                className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
+              >
+                <ChevronLeft className="size-4 text-foreground rtl:rotate-180" />
+              </button>
+
+              <div className="flex items-center gap-2">
+                <select
+                  value={viewDate.getMonth()}
+                  onChange={(e) => handleMonthChange(parseInt(e.target.value))}
+                  className="h-8 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                >
+                  {months.map((month, index) => (
+                    <option key={month} value={index}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={viewDate.getFullYear()}
+                  onChange={(e) => handleYearChange(parseInt(e.target.value))}
+                  className="h-8 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer"
+                >
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="button"
+                onClick={goToNextMonth}
+                className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
+              >
+                <ChevronRight className="size-4 text-foreground rtl:rotate-180" />
+              </button>
+            </div>
+          </div>
+
+          {/* Calendar */}
+          <CalendarComponent
+            mode="single"
+            selected={selectedDate}
+            onSelect={handleSelect}
+            month={viewDate}
+            onMonthChange={setViewDate}
+            initialFocus
+            className="rounded-xl"
+            classNames={{
+              nav: "hidden",
+              caption: "hidden",
+            }}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }
 

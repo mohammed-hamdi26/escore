@@ -6,7 +6,7 @@ import TournamentsForm from "@/components/Tournaments Management/TournamentsForm
 
 async function page({ params }) {
   const { id } = await params;
-  const [tournament, countries, games] = await Promise.all([
+  const [tournament, countries, gamesResponse] = await Promise.all([
     getTournament(id),
     getCountries(),
     getGames(),
@@ -16,7 +16,7 @@ async function page({ params }) {
     <TournamentsForm
       countries={countries.countries}
       formType="edit"
-      gameOptions={games}
+      gameOptions={gamesResponse.data || []}
       submit={editTournament}
       tournament={tournament}
     />

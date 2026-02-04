@@ -67,12 +67,23 @@ function PlayerFormRedesign({
   const t = useTranslations("playerForm");
   const router = useRouter();
 
+  // Helper function to format date to YYYY-MM-DD using local timezone
+  const formatDateToLocal = (dateInput) => {
+    if (!dateInput) return "";
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const formik = useFormik({
     initialValues: {
       fullName: player?.fullName || "",
       nickname: player?.nickname || "",
       dateOfBirth: player?.dateOfBirth
-        ? new Date(player.dateOfBirth).toISOString().split("T")[0]
+        ? formatDateToLocal(player.dateOfBirth)
         : "2000-01-01",
       country: player?.country?.name || "",
       photoLight: player?.photo?.light || "",
@@ -358,9 +369,9 @@ function PlayerFormRedesign({
       <div className="flex justify-end gap-4">
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           onClick={() => router.back()}
-          className="h-11 px-6 rounded-xl"
+          className="h-11 px-6 rounded-xl border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           {t("cancel")}
         </Button>
@@ -419,7 +430,7 @@ function InputField({
         <input
           type={type}
           name={name}
-          value={formik.values[name]}
+          value={formik.values[name] ?? ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           placeholder={placeholder}
@@ -492,26 +503,29 @@ function RoleSelectField({
     return acc;
   }, {});
 
-  const handleSelect = (role) => {
-    formik.setFieldValue(name, role);
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (role) => {
+    await formik.setFieldValue(name, role);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
     setSearch("");
   };
 
-  const handleCustomInput = () => {
+  const handleCustomInput = async () => {
     if (search.trim()) {
-      formik.setFieldValue(name, search.trim());
-      formik.setFieldTouched(name, true);
+      await formik.setFieldValue(name, search.trim());
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
       setIsOpen(false);
       setSearch("");
     }
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   return (
@@ -653,7 +667,7 @@ function TextAreaField({
       </label>
       <textarea
         name={name}
-        value={formik.values[name]}
+        value={formik.values[name] ?? ""}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         placeholder={placeholder}
@@ -697,17 +711,19 @@ function GameSelectField({
       game.slug?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelect = (game) => {
-    formik.setFieldValue(name, getGameId(game));
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (game) => {
+    await formik.setFieldValue(name, getGameId(game));
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
     setSearch("");
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   return (
@@ -873,18 +889,20 @@ function TeamSelectField({
       team.slug?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelect = (team) => {
-    formik.setFieldValue(name, getTeamId(team));
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (team) => {
+    await formik.setFieldValue(name, getTeamId(team));
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     if (onTeamChange) onTeamChange();
     setIsOpen(false);
     setSearch("");
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     if (onTeamChange) onTeamChange();
   };
 
@@ -1064,7 +1082,7 @@ function TournamentMultiSelectField({
       tournament.slug?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleToggle = (tournament) => {
+  const handleToggle = async (tournament) => {
     const tournamentId = getTournamentId(tournament);
     const currentValue = [...value];
     const index = currentValue.indexOf(tournamentId);
@@ -1075,21 +1093,24 @@ function TournamentMultiSelectField({
       currentValue.splice(index, 1);
     }
 
-    formik.setFieldValue(name, currentValue);
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, currentValue);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
-  const handleRemove = (tournamentId, e) => {
+  const handleRemove = async (tournamentId, e) => {
     e?.stopPropagation();
     const currentValue = (value || []).filter((id) => id !== tournamentId);
-    formik.setFieldValue(name, currentValue);
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, currentValue);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
-  const handleClearAll = (e) => {
+  const handleClearAll = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, []);
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, []);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   return (
@@ -1279,17 +1300,19 @@ function CountrySelectField({
       country.value.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelect = (country) => {
-    formik.setFieldValue(name, country.label);
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (country) => {
+    await formik.setFieldValue(name, country.label);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
     setSearch("");
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   const getFlagUrl = (code) =>
@@ -1489,19 +1512,29 @@ function DatePickerField({ label, name, formik, placeholder, maxDate }) {
     return age;
   };
 
-  const handleSelect = (date) => {
+  // Format date to YYYY-MM-DD using local timezone
+  const formatLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleSelect = async (date) => {
     if (date) {
-      const formattedDate = date.toISOString().split("T")[0];
-      formik.setFieldValue(name, formattedDate);
-      formik.setFieldTouched(name, true);
+      const formattedDate = formatLocalDate(date);
+      await formik.setFieldValue(name, formattedDate);
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
     }
     setIsOpen(false);
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   const handleMonthChange = (monthIndex) => {
@@ -1588,7 +1621,7 @@ function DatePickerField({ label, name, formik, placeholder, maxDate }) {
                 onClick={goToPreviousMonth}
                 className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
               >
-                <ChevronLeft className="size-4 text-foreground" />
+                <ChevronLeft className="size-4 text-foreground rtl:rotate-180" />
               </button>
 
               <div className="flex items-center gap-2">
@@ -1622,7 +1655,7 @@ function DatePickerField({ label, name, formik, placeholder, maxDate }) {
                 onClick={goToNextMonth}
                 className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
               >
-                <ChevronRight className="size-4 text-foreground" />
+                <ChevronRight className="size-4 text-foreground rtl:rotate-180" />
               </button>
             </div>
           </div>

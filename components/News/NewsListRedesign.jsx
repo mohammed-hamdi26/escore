@@ -119,7 +119,7 @@ function NewsListRedesign({ news, pagination, games = [], locale = "en" }) {
             size="icon"
             onClick={handleRefresh}
             disabled={isPending}
-            className="border-0 bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d]"
+            className="border-gray-300 dark:border-0 bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] text-gray-700 dark:text-gray-300"
           >
             <RefreshCw
               className={`size-4 ${isPending ? "animate-spin" : ""}`}

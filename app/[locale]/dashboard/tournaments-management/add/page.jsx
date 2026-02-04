@@ -5,15 +5,13 @@ import TournamentsForm from "@/components/Tournaments Management/TournamentsForm
 import React from "react";
 
 export default async function page() {
-  const [countries, games] = await Promise.all([getCountries(), getGames()]);
-
-  console.log(games, "games");
+  const [countries, gamesResponse] = await Promise.all([getCountries(), getGames()]);
 
   return (
     <div>
       <TournamentsForm
         submit={addTournament}
-        gameOptions={games}
+        gameOptions={gamesResponse.data || []}
         countries={countries.countries}
       />
     </div>

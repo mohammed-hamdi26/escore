@@ -55,7 +55,7 @@ function TeamDetails({ team }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/dashboard/teams-management">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
               <ArrowLeft className="size-4" />
               {t("back") || "Back"}
             </Button>

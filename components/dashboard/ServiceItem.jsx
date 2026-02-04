@@ -19,7 +19,7 @@ function ServiceItem({ title, icon, href, description }) {
           <div className="inline-flex items-center justify-center size-14 md:size-16 rounded-2xl bg-green-primary/10 group-hover:bg-green-primary group-hover:shadow-lg group-hover:shadow-green-primary/30 transition-all duration-300">
             {cloneElement(icon, {
               className:
-                "size-7 md:size-8 fill-green-primary group-hover:fill-white transition-colors duration-300",
+                "size-7 md:size-8 fill-green-primary text-green-primary group-hover:fill-white group-hover:text-white transition-colors duration-300",
             })}
           </div>
 

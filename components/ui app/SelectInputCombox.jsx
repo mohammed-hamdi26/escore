@@ -71,15 +71,18 @@ const SelectInputCombox = ({
                       ? option.value.split(" ")[1]
                       : option.value
                   }
-                  onSelect={(currentValue) => {
+                  onSelect={async (currentValue) => {
                     // console.log(option.value);
                     setValue(option.value === value ? "" : option.value);
-                    onChange
-                      ? onChange(option.value === value ? "" : option.value)
-                      : formik.setFieldValue(
-                          name,
-                          option.value === value ? "" : { id: option.value }
-                        );
+                    if (onChange) {
+                      onChange(option.value === value ? "" : option.value);
+                    } else {
+                      await formik.setFieldValue(
+                        name,
+                        option.value === value ? "" : { id: option.value }
+                      );
+                      formik.validateField(name);
+                    }
                     setOpen(false);
                   }}
                 >

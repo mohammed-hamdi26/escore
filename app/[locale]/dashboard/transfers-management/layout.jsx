@@ -1,9 +1,12 @@
-import LinksButtons from "@/components/ui app/LinksButtons";
+import TransfersHeader from "@/components/transfers-management/TransfersHeader";
 
 function layout({ children }) {
   return (
-    <div>
-      <LinksButtons />
+    <div className="space-y-6">
+      {/* Page Header - conditionally rendered based on route */}
+      <TransfersHeader />
+
+      {/* Content */}
       {children}
     </div>
   );

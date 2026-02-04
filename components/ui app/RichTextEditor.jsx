@@ -177,6 +177,7 @@ export default function RichTextEditor({
       const value = isEmpty ? "" : content;
 
       formik?.setFieldValue(name, value);
+      formik?.validateField(name);
       updateCounts(editor.getText());
 
       // Smart auto-direction: detect RTL and apply direction
@@ -212,6 +213,7 @@ export default function RichTextEditor({
   // Handle blur
   const handleBlur = useCallback(() => {
     formik?.setFieldTouched(name, true);
+    formik?.validateField(name);
   }, [formik, name]);
 
   // Setup paste handler for HTML/Markdown
@@ -332,22 +334,90 @@ export default function RichTextEditor({
     );
   }
 
-  const containerClass = isFullscreen
-    ? "fixed inset-0 z-50 bg-background p-4"
-    : "relative";
+  const editorHeight = isFullscreen ? "calc(100vh - 140px)" : minHeight;
 
-  const editorHeight = isFullscreen ? "calc(100vh - 180px)" : minHeight;
+  // Fullscreen wrapper
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-background p-4 flex flex-col">
+        <div
+          className={`flex-1 flex flex-col rounded-xl overflow-hidden border border-border ${
+            isDark ? "quill-dark" : "quill-light"
+          }`}
+        >
+          {/* Custom header with Preview and Fullscreen */}
+          <div
+            className={`flex items-center justify-between px-3 py-2 border-b border-border ${
+              isDark ? "bg-[#1a1d2e]" : "bg-gray-50"
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-muted-foreground">
+                {charCount} {t("characters") || "characters"} · {wordCount}{" "}
+                {t("words") || "words"}
+              </span>
+              <span className="text-xs text-muted-foreground/60 hidden sm:block">
+                Ctrl+B Bold · Ctrl+I Italic · Ctrl+U Underline
+              </span>
+            </div>
 
+            <div className="flex items-center gap-2">
+              {/* Fullscreen toggle */}
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(false)}
+                className="p-1.5 rounded-lg bg-muted dark:bg-[#252a3d] text-muted-foreground hover:text-foreground transition-all"
+                title={t("exitFullscreen") || "Exit Fullscreen"}
+              >
+                <Minimize2 className="size-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Editor */}
+          {QuillComponent ? (
+            <div
+              className={`quill-wrapper ${isDark ? "dark" : ""} flex-1 overflow-hidden`}
+              style={{ height: "calc(100vh - 120px)" }}
+            >
+              <QuillComponent
+                ref={quillRef}
+                theme="snow"
+                value={formik?.values[name] || ""}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                modules={modules}
+                formats={formats}
+                placeholder={placeholder || t("placeholder") || "Start writing..."}
+              />
+            </div>
+          ) : (
+            <div
+              className={`flex-1 flex items-center justify-center ${
+                isDark ? "bg-[#0f1118]" : "bg-white"
+              }`}
+            >
+              <span className="text-muted-foreground text-sm">Loading editor...</span>
+            </div>
+          )}
+        </div>
+
+        {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
+      </div>
+    );
+  }
+
+  // Normal view
   return (
     <div className="space-y-2">
-      {label && !isFullscreen && (
+      {label && (
         <label className="text-sm font-medium text-muted-foreground">
           {label} <span className="text-red-500">*</span>
         </label>
       )}
 
       <div
-        className={`${containerClass} rounded-xl overflow-hidden border border-border ${
+        className={`relative rounded-xl overflow-hidden border border-border ${
           isDark ? "quill-dark" : "quill-light"
         }`}
       >
@@ -371,19 +441,11 @@ export default function RichTextEditor({
             {/* Fullscreen toggle */}
             <button
               type="button"
-              onClick={() => setIsFullscreen(!isFullscreen)}
+              onClick={() => setIsFullscreen(true)}
               className="p-1.5 rounded-lg bg-muted dark:bg-[#252a3d] text-muted-foreground hover:text-foreground transition-all"
-              title={
-                isFullscreen
-                  ? t("exitFullscreen") || "Exit Fullscreen"
-                  : t("fullscreen") || "Fullscreen"
-              }
+              title={t("fullscreen") || "Fullscreen"}
             >
-              {isFullscreen ? (
-                <Minimize2 className="size-4" />
-              ) : (
-                <Maximize2 className="size-4" />
-              )}
+              <Maximize2 className="size-4" />
             </button>
           </div>
         </div>
@@ -540,14 +602,26 @@ export default function RichTextEditor({
         }
 
         /* Quill wrapper for proper height */
+        .quill-wrapper {
+          display: flex;
+          flex-direction: column;
+        }
+
         .quill-wrapper .quill {
           display: flex;
           flex-direction: column;
+          flex: 1;
+          height: 100%;
+        }
+
+        .quill-wrapper .ql-toolbar {
+          flex-shrink: 0;
         }
 
         .quill-wrapper .ql-container {
           flex: 1;
           overflow: auto;
+          height: auto !important;
         }
 
         /* Code block styling */

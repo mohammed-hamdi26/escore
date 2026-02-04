@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { Button } from "../ui/button";
@@ -95,13 +95,24 @@ export default function TournamentsForm({
 }) {
   const t = useTranslations("TournamentForm");
 
+  // Helper function to format date to YYYY-MM-DD using local timezone
+  const formatDateToLocal = (dateInput) => {
+    if (!dateInput) return "";
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const formik = useFormik({
     initialValues: {
       name: tournament?.name || "",
       organizer: tournament?.organizer || "",
       description: tournament?.description || "",
-      startDate: tournament?.startDate ? new Date(tournament.startDate).toISOString().split("T")[0] : "",
-      endDate: tournament?.endDate ? new Date(tournament.endDate).toISOString().split("T")[0] : "",
+      startDate: formatDateToLocal(tournament?.startDate),
+      endDate: formatDateToLocal(tournament?.endDate),
       location: tournament?.location || "",
       prizePool: tournament?.prizePool || "",
       currency: tournament?.currency || "USD",
@@ -151,12 +162,18 @@ export default function TournamentsForm({
             }
           : null;
 
-        // Convert dates to ISO datetime format for backend
+        // Convert dates to ISO datetime format for backend (preserving local date)
         if (dataValues.startDate) {
-          dataValues.startDate = new Date(dataValues.startDate).toISOString();
+          const [year, month, day] = dataValues.startDate.split('-').map(Number);
+          // Create date at noon local time to avoid timezone edge cases
+          const date = new Date(year, month - 1, day, 12, 0, 0);
+          dataValues.startDate = date.toISOString();
         }
         if (dataValues.endDate) {
-          dataValues.endDate = new Date(dataValues.endDate).toISOString();
+          const [year, month, day] = dataValues.endDate.split('-').map(Number);
+          // Create date at noon local time to avoid timezone edge cases
+          const date = new Date(year, month - 1, day, 12, 0, 0);
+          dataValues.endDate = date.toISOString();
         }
 
         dataValues.slug = dataValues?.name.replace(/\s+/g, "-").toLowerCase();
@@ -199,6 +216,51 @@ export default function TournamentsForm({
       }
     },
   });
+
+  // Smart Status Auto-Selection based on dates
+  const tournamentStartDate = formik.values.startDate || "";
+  const tournamentEndDate = formik.values.endDate || "";
+  const tournamentStatus = formik.values.status;
+
+  useEffect(() => {
+    // Skip auto-update if status is cancelled (manual only)
+    if (tournamentStatus === "cancelled") return;
+
+    // Skip if start date is not set
+    if (!tournamentStartDate) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to start of day
+
+    const start = new Date(tournamentStartDate);
+    start.setHours(0, 0, 0, 0);
+
+    let newStatus = tournamentStatus;
+
+    if (today < start) {
+      // Tournament hasn't started yet
+      newStatus = "upcoming";
+    } else if (tournamentEndDate) {
+      // Both dates are set - check end date
+      const end = new Date(tournamentEndDate);
+      end.setHours(0, 0, 0, 0);
+
+      if (today >= start && today <= end) {
+        newStatus = "ongoing";
+      } else if (today > end) {
+        newStatus = "completed";
+      }
+    } else {
+      // Only start date is set and today >= start date
+      // Assume ongoing if no end date specified
+      newStatus = "ongoing";
+    }
+
+    // Only update if status actually changed
+    if (newStatus !== tournamentStatus) {
+      formik.setFieldValue("status", newStatus);
+    }
+  }, [tournamentStartDate, tournamentEndDate]);
 
   const statusOptions = [
     { value: "upcoming", label: t("Upcoming"), icon: Clock, color: "text-blue-500", bg: "bg-blue-500/10" },
@@ -330,6 +392,7 @@ export default function TournamentsForm({
             name="startDate"
             formik={formik}
             placeholder={t("Select start date")}
+            required
           />
           <DatePickerField
             label={t("End Date")}
@@ -337,6 +400,7 @@ export default function TournamentsForm({
             formik={formik}
             placeholder={t("Select end date")}
             minDate={formik.values.startDate}
+            required
           />
         </FormRow>
       </FormSection>
@@ -348,6 +412,7 @@ export default function TournamentsForm({
           name="gamesData"
           options={gameOptions}
           formik={formik}
+          required
         />
       </FormSection>
 
@@ -427,9 +492,9 @@ export default function TournamentsForm({
       <div className="flex justify-end gap-4">
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           onClick={() => formik.resetForm()}
-          className="h-11 px-6 rounded-xl"
+          className="h-11 px-6 rounded-xl border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           {t("Reset")}
         </Button>
@@ -474,7 +539,7 @@ function InputField({ label, name, type = "text", placeholder, formik, icon, req
         <input
           type={type}
           name={name}
-          value={formik.values[name]}
+          value={formik.values[name] ?? ""}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           placeholder={placeholder}
@@ -525,9 +590,10 @@ function StatusSelectField({ label, name, options, formik, placeholder }) {
 
   const selectedOption = options.find((opt) => opt.value === value);
 
-  const handleSelect = (option) => {
-    formik.setFieldValue(name, option.value);
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (option) => {
+    await formik.setFieldValue(name, option.value);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
   };
 
@@ -605,9 +671,10 @@ function TierSelectField({ label, name, options, formik, placeholder }) {
 
   const selectedOption = options.find((opt) => opt.value === value);
 
-  const handleSelect = (option) => {
-    formik.setFieldValue(name, option.value);
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (option) => {
+    await formik.setFieldValue(name, option.value);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
   };
 
@@ -677,29 +744,33 @@ function TierSelectField({ label, name, options, formik, placeholder }) {
 }
 
 // Multi-Select Field for Games
-function MultiSelectField({ label, name, options = [], formik }) {
+function MultiSelectField({ label, name, options = [], formik, required }) {
   const safeOptions = Array.isArray(options) ? options : [];
   const selectedIds = formik.values[name]?.map((g) => g.id || g.value || g) || [];
   const error = formik.touched[name] && formik.errors[name];
 
-  const toggleGame = (game) => {
+  const toggleGame = async (game) => {
     const gameId = game.id || game.value;
     const isSelected = selectedIds.includes(gameId);
 
+    let newValue;
     if (isSelected) {
-      formik.setFieldValue(
-        name,
-        (formik.values[name] || []).filter((g) => (g.id || g.value || g) !== gameId)
-      );
+      newValue = (formik.values[name] || []).filter((g) => (g.id || g.value || g) !== gameId);
     } else {
-      formik.setFieldValue(name, [...(formik.values[name] || []), { id: gameId, name: game.name || game.label }]);
+      newValue = [...(formik.values[name] || []), { id: gameId, name: game.name || game.label }];
     }
-    formik.setFieldTouched(name, true);
+
+    await formik.setFieldValue(name, newValue);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   return (
     <div className="space-y-3">
-      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <label className="text-sm font-medium text-muted-foreground">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
       <div className="flex flex-wrap gap-2">
         {safeOptions.map((game) => {
           const gameId = game.id || game.value;
@@ -727,14 +798,35 @@ function MultiSelectField({ label, name, options = [], formik }) {
 }
 
 // Enhanced Date Picker Field with Year/Month Navigation
-function DatePickerField({ label, name, formik, placeholder, minDate }) {
+function DatePickerField({ label, name, formik, placeholder, minDate, required }) {
   const [isOpen, setIsOpen] = useState(false);
   const [viewDate, setViewDate] = useState(new Date());
   const error = formik.touched[name] && formik.errors[name];
   const value = formik.values[name];
 
-  const selectedDate = value ? new Date(value) : undefined;
-  const minDateObj = minDate ? new Date(minDate) : undefined;
+  // Parse date string to local date (avoiding timezone issues)
+  const parseLocalDate = (dateStr) => {
+    if (!dateStr) return undefined;
+    // If it's already a Date object
+    if (dateStr instanceof Date) return dateStr;
+    // Parse YYYY-MM-DD format as local date
+    const [year, month, day] = dateStr.split('-').map(Number);
+    if (year && month && day) {
+      return new Date(year, month - 1, day);
+    }
+    return new Date(dateStr);
+  };
+
+  // Format date to YYYY-MM-DD using local timezone
+  const formatLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const selectedDate = parseLocalDate(value);
+  const minDateObj = parseLocalDate(minDate);
 
   // Generate years from 1990 to current year + 10
   const currentYear = new Date().getFullYear();
@@ -747,7 +839,8 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
 
   const formatDisplayDate = (dateStr) => {
     if (!dateStr) return "";
-    const date = new Date(dateStr);
+    const date = parseLocalDate(dateStr);
+    if (!date || isNaN(date.getTime())) return "";
     return date.toLocaleDateString("en-US", {
       weekday: "short",
       year: "numeric",
@@ -756,19 +849,22 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
     });
   };
 
-  const handleSelect = (date) => {
+  const handleSelect = async (date) => {
     if (date) {
-      const formattedDate = date.toISOString().split("T")[0];
-      formik.setFieldValue(name, formattedDate);
-      formik.setFieldTouched(name, true);
+      // Use local date formatting to avoid timezone shift
+      const formattedDate = formatLocalDate(date);
+      await formik.setFieldValue(name, formattedDate);
+      await formik.setFieldTouched(name, true, true); // third param validates
+      formik.validateField(name);
     }
     setIsOpen(false);
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   const handleMonthChange = (monthIndex) => {
@@ -797,7 +893,10 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
 
   return (
     <div className="flex-1 space-y-2">
-      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <label className="text-sm font-medium text-muted-foreground">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <button
@@ -838,7 +937,7 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
                 onClick={goToPreviousMonth}
                 className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
               >
-                <ChevronLeft className="size-4 text-foreground" />
+                <ChevronLeft className="size-4 text-foreground rtl:rotate-180" />
               </button>
 
               <div className="flex items-center gap-2">
@@ -870,7 +969,7 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
                 onClick={goToNextMonth}
                 className="size-8 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-center transition-colors"
               >
-                <ChevronRight className="size-4 text-foreground" />
+                <ChevronRight className="size-4 text-foreground rtl:rotate-180" />
               </button>
             </div>
           </div>
@@ -882,7 +981,13 @@ function DatePickerField({ label, name, formik, placeholder, minDate }) {
             onSelect={handleSelect}
             month={viewDate}
             onMonthChange={setViewDate}
-            disabled={(date) => minDateObj && date < minDateObj}
+            disabled={(date) => {
+              if (!minDateObj) return false;
+              // Compare dates without time
+              const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+              const minDateOnly = new Date(minDateObj.getFullYear(), minDateObj.getMonth(), minDateObj.getDate());
+              return dateOnly < minDateOnly;
+            }}
             initialFocus
             className="rounded-xl"
             classNames={{
@@ -911,13 +1016,15 @@ function PrizePoolWithCurrencyField({ label, name, currencyName, formik, currenc
     return new Intl.NumberFormat("en-US").format(num);
   };
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const rawValue = e.target.value.replace(/[^0-9]/g, "");
-    formik.setFieldValue(name, rawValue ? parseInt(rawValue, 10) : "");
+    await formik.setFieldValue(name, rawValue ? parseInt(rawValue, 10) : "");
+    formik.validateField(name);
   };
 
-  const handleCurrencySelect = (curr) => {
-    formik.setFieldValue(currencyName, curr.value);
+  const handleCurrencySelect = async (curr) => {
+    await formik.setFieldValue(currencyName, curr.value);
+    formik.validateField(currencyName);
     setIsOpen(false);
   };
 
@@ -1024,7 +1131,7 @@ function FeaturedToggle({ label, name, formik }) {
         >
           <div
             className={`absolute top-[2px] size-5 rounded-full bg-white shadow-md transition-all ${
-              isChecked ? "left-[22px] rtl:left-[2px]" : "left-[2px] rtl:left-[22px]"
+              isChecked ? "ltr:left-[22px] rtl:right-[22px]" : "ltr:left-[2px] rtl:right-[2px]"
             }`}
           />
         </div>
@@ -1049,17 +1156,19 @@ function CountrySelectField({ label, name, countries, formik, placeholder, searc
     country.value.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelect = (country) => {
-    formik.setFieldValue(name, country.label);
-    formik.setFieldTouched(name, true);
+  const handleSelect = async (country) => {
+    await formik.setFieldValue(name, country.label);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
     setIsOpen(false);
     setSearch("");
   };
 
-  const handleClear = (e) => {
+  const handleClear = async (e) => {
     e.stopPropagation();
-    formik.setFieldValue(name, "");
-    formik.setFieldTouched(name, true);
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
   };
 
   const getFlagUrl = (code) => `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
@@ -1201,7 +1310,7 @@ function TextAreaField({ label, name, placeholder, formik, rows = 4 }) {
       <label className="text-sm font-medium text-muted-foreground">{label}</label>
       <textarea
         name={name}
-        value={formik.values[name]}
+        value={formik.values[name] ?? ""}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         placeholder={placeholder}
@@ -1309,7 +1418,7 @@ function BooleanToggle({ label, name, formik, iconOn, iconOff, labelOn, labelOff
         >
           <div
             className={`absolute top-[2px] size-5 rounded-full bg-white shadow-md transition-all ${
-              isChecked ? "left-[22px] rtl:left-[2px]" : "left-[2px] rtl:left-[22px]"
+              isChecked ? "ltr:left-[22px] rtl:right-[22px]" : "ltr:left-[2px] rtl:right-[2px]"
             }`}
           />
         </div>

@@ -9,7 +9,7 @@ import { getTranslations } from "next-intl/server";
 export default async function AddMatchPage() {
   const t = await getTranslations("MatchForm");
 
-  const [{ data: teamsOptions }, gamesOptions, { data: tournamentsOptions }] =
+  const [{ data: teamsOptions }, { data: gamesOptions }, { data: tournamentsOptions }] =
     await Promise.all([
       getTeams({ size: 500 }),
       getGames({ limit: 100 }),
@@ -19,12 +19,12 @@ export default async function AddMatchPage() {
   return (
     <div className="space-y-6">
       <BackPage title={t("addMatch") || "Add Match"} />
-      <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+      <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
         <MatchFormRedesign
           submit={addMatch}
-          gamesOptions={gamesOptions}
-          teamsOptions={teamsOptions}
-          tournamentsOptions={tournamentsOptions}
+          gamesOptions={gamesOptions || []}
+          teamsOptions={teamsOptions || []}
+          tournamentsOptions={tournamentsOptions || []}
           formType="add"
         />
       </div>
