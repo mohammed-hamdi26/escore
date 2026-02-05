@@ -439,11 +439,11 @@ export default async function PrivacyPolicyPage() {
               </p>
               <div className="bg-gray-800/50 rounded-lg p-4 space-y-2">
                 <a
-                  href="mailto:Escoressa@gmail.com"
+                  href="mailto:support@escore.com"
                   className="flex items-center gap-2 text-green-primary hover:text-green-400 transition-colors"
                 >
                   <Mail className="w-4 h-4" />
-                  Escoressa@gmail.com
+                  support@escore.com
                 </a>
                 <p className="text-gray-400 text-sm">
                   {isArabic

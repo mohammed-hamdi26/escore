@@ -25,11 +25,17 @@ import {
 } from "../ui/dropdown-menu";
 import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
+import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 
 function GameCard({ game, onDelete, onToggleActive, t, viewMode = "grid" }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null);
   const router = useRouter();
+  const { hasPermission } = usePermissions();
+
+  // Permission checks
+  const canUpdate = hasPermission(ENTITIES.GAME, ACTIONS.UPDATE);
+  const canDelete = hasPermission(ENTITIES.GAME, ACTIONS.DELETE);
 
   const gameImage = game.logo?.light || game.logo?.dark;
   const coverImage = game.coverImage?.light || game.coverImage?.dark;
@@ -131,39 +137,45 @@ function GameCard({ game, onDelete, onToggleActive, t, viewMode = "grid" }) {
                     {t("viewDetails") || "View Details"}
                   </DropdownMenuItem>
                 </Link>
-                <Link href={`/dashboard/games-management/edit/${game.id || game._id}`}>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                    {t("edit") || "Edit"}
+                {canUpdate && (
+                  <Link href={`/dashboard/games-management/edit/${game.id || game._id}`}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("edit") || "Edit"}
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+                {canUpdate && <DropdownMenuSeparator />}
+                {canUpdate && (
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => handleAction(() => onToggleActive(game.id || game._id), "toggleActive")}
+                    disabled={loadingAction === "toggleActive"}
+                  >
+                    {game.isActive !== false ? (
+                      <>
+                        <PowerOff className="size-4 mr-2 rtl:mr-0 rtl:ml-2 text-red-500" />
+                        {t("deactivate") || "Deactivate"}
+                      </>
+                    ) : (
+                      <>
+                        <Power className="size-4 mr-2 rtl:mr-0 rtl:ml-2 text-green-500" />
+                        {t("activate") || "Activate"}
+                      </>
+                    )}
                   </DropdownMenuItem>
-                </Link>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => handleAction(() => onToggleActive(game.id || game._id), "toggleActive")}
-                  disabled={loadingAction === "toggleActive"}
-                >
-                  {game.isActive !== false ? (
-                    <>
-                      <PowerOff className="size-4 mr-2 rtl:mr-0 rtl:ml-2 text-red-500" />
-                      {t("deactivate") || "Deactivate"}
-                    </>
-                  ) : (
-                    <>
-                      <Power className="size-4 mr-2 rtl:mr-0 rtl:ml-2 text-green-500" />
-                      {t("activate") || "Activate"}
-                    </>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="cursor-pointer text-red-400 focus:text-red-400"
-                  onClick={() => handleAction(() => onDelete(game.id || game._id, game.name), "delete")}
-                  disabled={loadingAction === "delete"}
-                >
-                  <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {t("delete") || "Delete"}
-                </DropdownMenuItem>
+                )}
+                {canDelete && <DropdownMenuSeparator />}
+                {canDelete && (
+                  <DropdownMenuItem
+                    className="cursor-pointer text-red-400 focus:text-red-400"
+                    onClick={() => handleAction(() => onDelete(game.id || game._id, game.name), "delete")}
+                    disabled={loadingAction === "delete"}
+                  >
+                    <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("delete") || "Delete"}
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -298,39 +310,45 @@ function GameCard({ game, onDelete, onToggleActive, t, viewMode = "grid" }) {
                   {t("viewDetails") || "View Details"}
                 </DropdownMenuItem>
               </Link>
-              <Link href={`/dashboard/games-management/edit/${game.id || game._id}`}>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {t("edit") || "Edit"}
+              {canUpdate && (
+                <Link href={`/dashboard/games-management/edit/${game.id || game._id}`}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("edit") || "Edit"}
+                  </DropdownMenuItem>
+                </Link>
+              )}
+              {canUpdate && <DropdownMenuSeparator />}
+              {canUpdate && (
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => handleAction(() => onToggleActive(game.id || game._id), "toggleActive")}
+                  disabled={loadingAction === "toggleActive"}
+                >
+                  {game.isActive !== false ? (
+                    <>
+                      <PowerOff className="size-4 mr-2 rtl:mr-0 rtl:ml-2 text-red-500" />
+                      {t("deactivate") || "Deactivate"}
+                    </>
+                  ) : (
+                    <>
+                      <Power className="size-4 mr-2 rtl:mr-0 rtl:ml-2 text-green-500" />
+                      {t("activate") || "Activate"}
+                    </>
+                  )}
                 </DropdownMenuItem>
-              </Link>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => handleAction(() => onToggleActive(game.id || game._id), "toggleActive")}
-                disabled={loadingAction === "toggleActive"}
-              >
-                {game.isActive !== false ? (
-                  <>
-                    <PowerOff className="size-4 mr-2 rtl:mr-0 rtl:ml-2 text-red-500" />
-                    {t("deactivate") || "Deactivate"}
-                  </>
-                ) : (
-                  <>
-                    <Power className="size-4 mr-2 rtl:mr-0 rtl:ml-2 text-green-500" />
-                    {t("activate") || "Activate"}
-                  </>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer text-red-400 focus:text-red-400"
-                onClick={() => handleAction(() => onDelete(game.id || game._id, game.name), "delete")}
-                disabled={loadingAction === "delete"}
-              >
-                <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                {t("delete") || "Delete"}
-              </DropdownMenuItem>
+              )}
+              {canDelete && <DropdownMenuSeparator />}
+              {canDelete && (
+                <DropdownMenuItem
+                  className="cursor-pointer text-red-400 focus:text-red-400"
+                  onClick={() => handleAction(() => onDelete(game.id || game._id, game.name), "delete")}
+                  disabled={loadingAction === "delete"}
+                >
+                  <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {t("delete") || "Delete"}
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

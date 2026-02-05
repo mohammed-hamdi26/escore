@@ -5,6 +5,7 @@ import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import MatchesListRedesign from "@/components/Matches Management/MatchesListRedesign";
 import MatchesFilterRedesign from "@/components/Matches Management/MatchesFilterRedesign";
 import MatchesHeader from "@/components/Matches Management/MatchesHeader";
+import { MatchListWrapper } from "@/components/Matches Management/MatchFormWrapper";
 import { getTranslations } from "next-intl/server";
 
 export default async function MatchesPage({ searchParams }) {
@@ -57,15 +58,17 @@ export default async function MatchesPage({ searchParams }) {
   const teams = teamsResult?.data || [];
 
   return (
-    <div className="space-y-6">
-      <MatchesHeader matchesCount={pagination.total} />
-      <MatchesFilterRedesign games={games} tournaments={tournaments} teams={teams} />
-      <MatchesListRedesign
-        matches={matches}
-        pagination={pagination}
-        games={games}
-        tournaments={tournaments}
-      />
-    </div>
+    <MatchListWrapper>
+      <div className="space-y-6">
+        <MatchesHeader matchesCount={pagination.total} />
+        <MatchesFilterRedesign games={games} tournaments={tournaments} teams={teams} />
+        <MatchesListRedesign
+          matches={matches}
+          pagination={pagination}
+          games={games}
+          tournaments={tournaments}
+        />
+      </div>
+    </MatchListWrapper>
   );
 }

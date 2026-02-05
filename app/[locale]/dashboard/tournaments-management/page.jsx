@@ -1,6 +1,7 @@
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import TournamentsTable from "@/components/Tournaments Management/TournamentsTable";
+import { TournamentListWrapper } from "@/components/tournaments/TournamentFormWrapper";
 
 async function TournamentsPage({ searchParams }) {
   const { size, page, search, game, status, tier, isFeatured, sortBy, sortOrder } = await searchParams;
@@ -24,11 +25,13 @@ async function TournamentsPage({ searchParams }) {
   const { data: tournaments, pagination } = tournamentsResult;
 
   return (
-    <TournamentsTable
-      tournaments={tournaments || []}
-      pagination={pagination}
-      games={games || []}
-    />
+    <TournamentListWrapper>
+      <TournamentsTable
+        tournaments={tournaments || []}
+        pagination={pagination}
+        games={games || []}
+      />
+    </TournamentListWrapper>
   );
 }
 

@@ -1,5 +1,6 @@
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import GamesListRedesign from "@/components/games-management/GamesListRedesign";
+import { GameListWrapper } from "@/components/games-management/GameFormWrapper";
 
 async function GamesPage({ searchParams }) {
   const params = await searchParams;
@@ -14,10 +15,12 @@ async function GamesPage({ searchParams }) {
   });
 
   return (
-    <GamesListRedesign
-      games={games || []}
-      pagination={pagination}
-    />
+    <GameListWrapper>
+      <GamesListRedesign
+        games={games || []}
+        pagination={pagination}
+      />
+    </GameListWrapper>
   );
 }
 

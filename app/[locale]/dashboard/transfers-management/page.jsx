@@ -2,6 +2,7 @@ import { getTransfers } from "@/app/[locale]/_Lib/transferApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import TransfersTable from "@/components/transfers-management/TransfersTable";
+import { TransferListWrapper } from "@/components/transfers/TransferFormWrapper";
 
 async function TransfersListPage({ searchParams }) {
   const params = await searchParams;
@@ -26,15 +27,17 @@ async function TransfersListPage({ searchParams }) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Transfers Table with Filters */}
-      <TransfersTable
-        transfers={transfersData?.data || []}
-        pagination={transfersData?.pagination || { totalPages: 1, total: 0 }}
-        games={gamesData?.data || []}
-        teams={teamsData?.data || []}
-      />
-    </div>
+    <TransferListWrapper>
+      <div className="space-y-6">
+        {/* Transfers Table with Filters */}
+        <TransfersTable
+          transfers={transfersData?.data || []}
+          pagination={transfersData?.pagination || { totalPages: 1, total: 0 }}
+          games={gamesData?.data || []}
+          teams={teamsData?.data || []}
+        />
+      </div>
+    </TransferListWrapper>
   );
 }
 

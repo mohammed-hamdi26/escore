@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, usePathname } from "@/i18n/navigation";
-import { Users, BarChart3, UserPlus, Shield, UserCheck } from "lucide-react";
+import { Users, BarChart3, UserPlus, UserCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const navItems = [
@@ -53,15 +53,24 @@ export default function UsersLayout({ children }) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Users className="w-8 h-8 text-green-primary" />
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {t("title")}
-        </h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-xl bg-green-primary/10 flex items-center justify-center">
+            <Users className="size-5 text-green-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {t("title")}
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("description") || "Manage users, roles and permissions"}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap gap-4 border-b border-gray-200 dark:border-gray-700 pb-4">
+      <div className="flex flex-wrap gap-2 p-1 bg-gray-100 dark:bg-[#1a1d2e] rounded-xl w-fit">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href, item.exact);
@@ -70,13 +79,13 @@ export default function UsersLayout({ children }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium ${
                 active
-                  ? "bg-green-primary/20 text-green-primary"
-                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                  ? "bg-white dark:bg-[#0f1118] text-green-primary shadow-sm"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className="size-4" />
               <span>{t(item.labelKey)}</span>
             </Link>
           );

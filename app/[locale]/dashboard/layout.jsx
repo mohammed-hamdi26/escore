@@ -20,14 +20,19 @@ export default async function DashboardLayout({ children }) {
 
   return (
     <PermissionsProvider user={user}>
-      <div className="min-h-dvh">
-        {/* Fixed Header */}
+      <div className="min-h-screen bg-gray-50 dark:bg-[#05060e]">
+        {/* Header */}
         <TopNav user={user} />
 
-        {/* Main Content Area */}
-        <div className="flex gap-5 px-4 md:px-6 lg:px-8 pb-6">
+        {/* Main Layout */}
+        <div className="flex">
+          {/* Sidebar */}
           <SideNavBar user={user} />
-          <main className="flex-1 min-w-0">{children}</main>
+
+          {/* Content */}
+          <main className="flex-1 min-h-[calc(100vh-64px)] p-4 md:p-6">
+            {children}
+          </main>
         </div>
       </div>
     </PermissionsProvider>

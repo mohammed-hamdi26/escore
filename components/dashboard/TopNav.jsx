@@ -21,15 +21,10 @@ function TopNav({ user }) {
   const t = useTranslations("nav");
 
   return (
-    <header className="sticky top-0 z-50 mb-4 bg-white/80 dark:bg-[#0a0c10]/80 backdrop-blur-xl border-b border-gray-200 dark:border-green-primary/20 shadow-sm dark:shadow-none">
-      <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-3">
+    <header className="sticky top-0 z-50 h-16 bg-white dark:bg-[#0a0c10] border-b border-gray-200 dark:border-white/10">
+      <div className="h-full flex items-center justify-between px-4 lg:px-6">
         {/* Left section: Logo + Mobile Menu */}
         <div className="flex items-center gap-3">
-          {/* Logo - always visible */}
-          <Link href="/dashboard" className="flex-shrink-0">
-            <EscoreLogo width={80} height={40} className="md:w-[100px] md:h-[50px]" />
-          </Link>
-
           {/* Mobile Menu Button */}
           <div className="lg:hidden">
             <Sheet>
@@ -37,37 +32,48 @@ function TopNav({ user }) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-gray-700 dark:text-white hover:bg-green-primary/10 hover:text-green-primary transition-colors"
+                  className="text-gray-700 dark:text-white hover:bg-green-primary/10"
                 >
                   <Menu className="size-5" />
                 </Button>
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="w-[280px] bg-white dark:bg-[#0f1118] border-0 border-r border-gray-200 dark:border-green-primary/20"
+                className="w-[280px] p-0 bg-white dark:bg-[#0f1118] border-r border-gray-200 dark:border-white/10"
               >
-                <SheetHeader>
-                  <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Navigation Menu</SheetTitle>
                 </SheetHeader>
-                <div className="flex flex-col gap-6 mt-6">
-                  <Link href="/dashboard" className="mx-auto">
-                    <EscoreLogo width={80} height={40} />
-                  </Link>
-                  {user && <HeaderSideNavBar user={user} t={t} />}
-                  <NavItems user={user} t={t} />
+                <div className="flex flex-col h-full">
+                  <div className="p-4 border-b border-gray-200 dark:border-white/10">
+                    <Link href="/dashboard" className="inline-block">
+                      <EscoreLogo width={120} height={45} />
+                    </Link>
+                  </div>
+                  <div className="p-4">
+                    {user && <HeaderSideNavBar user={user} t={t} />}
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-2">
+                    <NavItems user={user} t={t} />
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
           </div>
+
+          {/* Logo */}
+          <Link href="/dashboard" className="flex-shrink-0 group">
+            <EscoreLogo width={140} height={52} className="group-hover:opacity-90" />
+          </Link>
         </div>
 
-        {/* Center section: Back button + Page title */}
-        <div className="flex-1 flex justify-center px-4">
+        {/* Center section: Back button */}
+        <div className="hidden md:flex flex-1 justify-center">
           <BackPage />
         </div>
 
         {/* Right section: Controls */}
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex items-center gap-2">
           <ToggleThemeMode />
           <LocaleChange />
         </div>

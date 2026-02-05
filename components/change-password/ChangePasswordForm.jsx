@@ -10,13 +10,30 @@ import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import { changePassword } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import { Info, Check, X } from "lucide-react";
+
 const validationSchema = Yup.object({
   currentPassword: Yup.string().required("Current password is required"),
-  newPassword: Yup.string().required("New password is required"),
+  newPassword: Yup.string()
+    .required("New password is required")
+    .min(8, "Password must be at least 8 characters")
+    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .matches(/[0-9]/, "Password must contain at least one number"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
     .required("Confirm password is required"),
 });
+
+function PasswordRequirement({ met, text }) {
+  return (
+    <div className={`flex items-center gap-2 text-xs ${met ? "text-green-500" : "text-gray-400 dark:text-gray-500"}`}>
+      {met ? <Check className="size-3.5" /> : <X className="size-3.5" />}
+      <span>{text}</span>
+    </div>
+  );
+}
+
 function ChangePasswordForm() {
   const t = useTranslations("ChangePassword");
   const formik = useFormik({
@@ -33,15 +50,22 @@ function ChangePasswordForm() {
       };
 
       try {
-        // Call your change password action here
         await changePassword(passwordValues);
         toast.success(t("Password changed successfully"));
         formik.resetForm();
       } catch (error) {
-        toast.error(error.message);
+        const errorMessage = error?.response?.data?.message || error.message || t("Failed to change password");
+        toast.error(errorMessage);
       }
     },
   });
+
+  // Password validation checks
+  const password = formik.values.newPassword;
+  const hasMinLength = password.length >= 8;
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       <FormSection>
@@ -61,21 +85,36 @@ function ChangePasswordForm() {
             textColor="text-[#677185]"
             {...formik.getFieldProps("currentPassword")}
           />
-          <InputApp
-            label={t("New Password")}
-            type="password"
-            name="newPassword"
-            error={
-              formik.touched.newPassword &&
-              formik.errors.newPassword &&
-              t(formik.errors.newPassword)
-            }
-            placeholder={t("New Password")}
-            className="border-0 focus:outline-none"
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            {...formik.getFieldProps("newPassword")}
-          />
+          <div className="flex-1 space-y-3">
+            <InputApp
+              label={t("New Password")}
+              type="password"
+              name="newPassword"
+              error={
+                formik.touched.newPassword &&
+                formik.errors.newPassword &&
+                t(formik.errors.newPassword)
+              }
+              placeholder={t("New Password")}
+              className="border-0 focus:outline-none"
+              backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+              textColor="text-[#677185]"
+              {...formik.getFieldProps("newPassword")}
+            />
+            {/* Password Requirements */}
+            {password && (
+              <div className="bg-gray-50 dark:bg-[#1a1d2e] rounded-lg p-3 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                  <Info className="size-3.5" />
+                  {t("Password Requirements")}
+                </div>
+                <PasswordRequirement met={hasMinLength} text={t("At least 8 characters")} />
+                <PasswordRequirement met={hasUppercase} text={t("At least one uppercase letter")} />
+                <PasswordRequirement met={hasLowercase} text={t("At least one lowercase letter")} />
+                <PasswordRequirement met={hasNumber} text={t("At least one number")} />
+              </div>
+            )}
+          </div>
         </FormRow>
         <InputApp
           label={t("Confirm Password")}

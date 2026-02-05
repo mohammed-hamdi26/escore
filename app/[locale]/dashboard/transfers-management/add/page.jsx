@@ -3,6 +3,7 @@ import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import TransfersForm from "@/components/transfers-management/TransfersForm";
+import { TransferAddWrapper } from "@/components/transfers/TransferFormWrapper";
 
 async function AddTransferPage() {
   const [gamesData, playersData, teamsData] = await Promise.all([
@@ -12,13 +13,15 @@ async function AddTransferPage() {
   ]);
 
   return (
-    <TransfersForm
-      submit={addTransfer}
-      gamesOptions={gamesData?.data || []}
-      playersOptions={playersData?.data || []}
-      teamsOptions={teamsData?.data || []}
-      formType="add"
-    />
+    <TransferAddWrapper>
+      <TransfersForm
+        submit={addTransfer}
+        gamesOptions={gamesData?.data || []}
+        playersOptions={playersData?.data || []}
+        teamsOptions={teamsData?.data || []}
+        formType="add"
+      />
+    </TransferAddWrapper>
   );
 }
 

@@ -17,6 +17,7 @@ import TeamCard from "./TeamCard";
 import TeamsFilterRedesign from "./TeamsFilterRedesign";
 import Pagination from "../ui app/Pagination";
 import { deleteTeam } from "@/app/[locale]/_Lib/actions";
+import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 
 function TeamsListRedesign({ teams, pagination, games = [], countries = [] }) {
   const t = useTranslations("teamList");
@@ -25,6 +26,8 @@ function TeamsListRedesign({ teams, pagination, games = [], countries = [] }) {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [viewMode, setViewMode] = useState("grid"); // grid or list
+  const { hasPermission } = usePermissions();
+  const canCreate = hasPermission(ENTITIES.TEAM, ACTIONS.CREATE);
 
   const currentSort = searchParams.get("sortBy") || "";
   const currentOrder = searchParams.get("sortOrder") || "asc";
@@ -181,12 +184,14 @@ function TeamsListRedesign({ teams, pagination, games = [], countries = [] }) {
           <p className="text-muted-foreground mb-4">
             {t("noTeamsDescription") || "Try adjusting your filters or add a new team"}
           </p>
-          <Button
-            className="bg-green-primary hover:bg-green-primary/80"
-            onClick={() => router.push("/dashboard/teams-management/add")}
-          >
-            {t("addFirstTeam") || "Add First Team"}
-          </Button>
+          {canCreate && (
+            <Button
+              className="bg-green-primary hover:bg-green-primary/80"
+              onClick={() => router.push("/dashboard/teams-management/add")}
+            >
+              {t("addFirstTeam") || "Add First Team"}
+            </Button>
+          )}
         </div>
       ) : (
         <div

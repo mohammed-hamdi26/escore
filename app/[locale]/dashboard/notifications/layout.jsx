@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, usePathname } from "@/i18n/navigation";
-import { Bell, Send, Smartphone, BarChart3 } from "lucide-react";
+import { Bell, Send, Smartphone, BarChart3, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const navItems = [
@@ -10,18 +10,24 @@ const navItems = [
     icon: BarChart3,
     labelKey: "dashboard",
     exact: true,
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10",
   },
   {
     href: "/dashboard/notifications/send",
     icon: Send,
     labelKey: "send",
     exact: false,
+    color: "text-purple-500",
+    bgColor: "bg-purple-500/10",
   },
   {
     href: "/dashboard/notifications/devices",
     icon: Smartphone,
     labelKey: "devices",
     exact: false,
+    color: "text-orange-500",
+    bgColor: "bg-orange-500/10",
   },
 ];
 
@@ -39,32 +45,63 @@ export default function NotificationsLayout({ children }) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Bell className="w-8 h-8 text-green-primary" />
-        <h1 className="text-2xl font-bold text-white">{t("title")}</h1>
+      <div className="relative bg-white dark:bg-[#0f1118] rounded-2xl border border-gray-200 dark:border-white/5 p-6 overflow-hidden">
+        {/* Decorative gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-green-primary/5 via-transparent to-purple-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-green-primary/10 to-transparent rounded-full blur-3xl" />
+
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="relative group">
+              <div className="size-14 rounded-2xl bg-gradient-to-br from-green-primary to-green-primary/70 flex items-center justify-center shadow-lg shadow-green-primary/25 transition-transform duration-300 group-hover:scale-105">
+                <Bell className="size-7 text-white" />
+              </div>
+              <Sparkles className="absolute -top-1 -right-1 size-4 text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {t("title")}
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                {t("description")}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex gap-4 border-b border-gray-700 pb-4">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.href, item.exact);
+      <div className="bg-white dark:bg-[#0f1118] rounded-2xl border border-gray-200 dark:border-white/5 p-2">
+        <div className="flex flex-wrap gap-2">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.href, item.exact);
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                active
-                  ? "bg-green-primary/20 text-green-primary"
-                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              <span>{t(item.labelKey)}</span>
-            </Link>
-          );
-        })}
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`group flex items-center gap-2.5 px-5 py-3 rounded-xl transition-all duration-300 text-sm font-medium ${
+                  active
+                    ? "bg-gradient-to-r from-green-primary/10 to-green-primary/5 text-green-primary ring-1 ring-green-primary/20 shadow-sm"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#1a1d2e]"
+                }`}
+              >
+                <div className={`p-1.5 rounded-lg transition-all duration-300 ${
+                  active
+                    ? "bg-green-primary/10"
+                    : `${item.bgColor} group-hover:scale-110`
+                }`}>
+                  <Icon className={`size-4 ${active ? "text-green-primary" : item.color}`} />
+                </div>
+                <span>{t(item.labelKey)}</span>
+                {active && (
+                  <div className="ml-auto size-1.5 rounded-full bg-green-primary animate-pulse" />
+                )}
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {/* Content */}

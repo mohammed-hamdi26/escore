@@ -1,8 +1,18 @@
 import Image from "next/image";
 import LogoImage from "../../public/images/logo.png";
-function EscoreLogo({ className, width, height }) {
+
+function EscoreLogo({ className = "", width = 120, height = 48 }) {
   return (
-    <Image src={LogoImage} alt="escore logo" width={width} height={height} />
+    <div className={`relative flex items-center ${className}`}>
+      <Image
+        src={LogoImage}
+        alt="Escore Logo"
+        width={width}
+        height={height}
+        className="object-contain transition-transform duration-200 hover:scale-105"
+        priority
+      />
+    </div>
   );
 }
 

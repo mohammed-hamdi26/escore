@@ -39,6 +39,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { startMatch, updateMatchStatus, updateMatchResult } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 
 const STATUS_CONFIG = {
   scheduled: {
@@ -71,6 +72,11 @@ const STATUS_CONFIG = {
 function MatchCard({ match, viewMode = "grid", t, onDelete }) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { hasPermission } = usePermissions();
+
+  // Permission checks
+  const canUpdate = hasPermission(ENTITIES.MATCH, ACTIONS.UPDATE);
+  const canDelete = hasPermission(ENTITIES.MATCH, ACTIONS.DELETE);
 
   const statusConfig = STATUS_CONFIG[match.status] || STATUS_CONFIG.scheduled;
   const StatusIcon = statusConfig.icon;
@@ -295,23 +301,27 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
                     {t("viewDetails")}
                   </DropdownMenuItem>
                 </Link>
-                <Link href={`/dashboard/matches-management/edit/${match.id || match._id}`}>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                    {t("edit")}
+                {canUpdate && (
+                  <Link href={`/dashboard/matches-management/edit/${match.id || match._id}`}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("edit")}
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+                {(canUpdate || canDelete) && <DropdownMenuSeparator />}
+                {/* Quick Actions - only show if user can update */}
+                {canUpdate && renderQuickActions()}
+                {canUpdate && renderQuickActions().length > 0 && <DropdownMenuSeparator />}
+                {canDelete && (
+                  <DropdownMenuItem
+                    onClick={handleDelete}
+                    className="cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+                  >
+                    <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("delete")}
                   </DropdownMenuItem>
-                </Link>
-                <DropdownMenuSeparator />
-                {/* Quick Actions */}
-                {renderQuickActions()}
-                {renderQuickActions().length > 0 && <DropdownMenuSeparator />}
-                <DropdownMenuItem
-                  onClick={handleDelete}
-                  className="cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
-                >
-                  <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {t("delete")}
-                </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -331,27 +341,33 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
               </div>
               <p className="font-medium text-sm truncate">{match.team1?.name}</p>
               {match.status === "live" ? (
-                <div className="flex items-center justify-center gap-1 mt-2" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    type="button"
-                    onClick={(e) => handleScoreUpdate(e, 1, -1)}
-                    disabled={isLoading || (match.result?.team1Score || 0) <= 0}
-                    className="size-8 rounded-lg bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 text-red-600 dark:text-red-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    <Minus className="size-4" />
-                  </button>
-                  <span className="text-2xl font-bold text-green-primary min-w-[40px]">
+                canUpdate ? (
+                  <div className="flex items-center justify-center gap-1 mt-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={(e) => handleScoreUpdate(e, 1, -1)}
+                      disabled={isLoading || (match.result?.team1Score || 0) <= 0}
+                      className="size-8 rounded-lg bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 text-red-600 dark:text-red-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <Minus className="size-4" />
+                    </button>
+                    <span className="text-2xl font-bold text-green-primary min-w-[40px]">
+                      {match.result?.team1Score || 0}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => handleScoreUpdate(e, 1, 1)}
+                      disabled={isLoading}
+                      className="size-8 rounded-lg bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-600 dark:text-green-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <Plus className="size-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-2xl font-bold text-green-primary mt-1">
                     {match.result?.team1Score || 0}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={(e) => handleScoreUpdate(e, 1, 1)}
-                    disabled={isLoading}
-                    className="size-8 rounded-lg bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-600 dark:text-green-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    <Plus className="size-4" />
-                  </button>
-                </div>
+                  </p>
+                )
               ) : match.result && (
                 <p className="text-2xl font-bold text-green-primary mt-1">
                   {match.result.team1Score}
@@ -378,27 +394,33 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
               </div>
               <p className="font-medium text-sm truncate">{match.team2?.name}</p>
               {match.status === "live" ? (
-                <div className="flex items-center justify-center gap-1 mt-2" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    type="button"
-                    onClick={(e) => handleScoreUpdate(e, 2, -1)}
-                    disabled={isLoading || (match.result?.team2Score || 0) <= 0}
-                    className="size-8 rounded-lg bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 text-red-600 dark:text-red-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    <Minus className="size-4" />
-                  </button>
-                  <span className="text-2xl font-bold text-green-primary min-w-[40px]">
+                canUpdate ? (
+                  <div className="flex items-center justify-center gap-1 mt-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={(e) => handleScoreUpdate(e, 2, -1)}
+                      disabled={isLoading || (match.result?.team2Score || 0) <= 0}
+                      className="size-8 rounded-lg bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 text-red-600 dark:text-red-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <Minus className="size-4" />
+                    </button>
+                    <span className="text-2xl font-bold text-green-primary min-w-[40px]">
+                      {match.result?.team2Score || 0}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => handleScoreUpdate(e, 2, 1)}
+                      disabled={isLoading}
+                      className="size-8 rounded-lg bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-600 dark:text-green-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <Plus className="size-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-2xl font-bold text-green-primary mt-1">
                     {match.result?.team2Score || 0}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={(e) => handleScoreUpdate(e, 2, 1)}
-                    disabled={isLoading}
-                    className="size-8 rounded-lg bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-600 dark:text-green-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    <Plus className="size-4" />
-                  </button>
-                </div>
+                  </p>
+                )
               ) : match.result && (
                 <p className="text-2xl font-bold text-green-primary mt-1">
                   {match.result.team2Score}
@@ -452,25 +474,29 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
             )}
             <span className="font-medium truncate max-w-[100px]">{match.team1?.name}</span>
             {match.status === "live" ? (
-              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                <button
-                  type="button"
-                  onClick={(e) => handleScoreUpdate(e, 1, -1)}
-                  disabled={isLoading || (match.result?.team1Score || 0) <= 0}
-                  className="size-6 rounded bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 text-red-600 dark:text-red-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <Minus className="size-3" />
-                </button>
-                <span className="font-bold text-green-primary min-w-[24px] text-center">{match.result?.team1Score || 0}</span>
-                <button
-                  type="button"
-                  onClick={(e) => handleScoreUpdate(e, 1, 1)}
-                  disabled={isLoading}
-                  className="size-6 rounded bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-600 dark:text-green-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <Plus className="size-3" />
-                </button>
-              </div>
+              canUpdate ? (
+                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    type="button"
+                    onClick={(e) => handleScoreUpdate(e, 1, -1)}
+                    disabled={isLoading || (match.result?.team1Score || 0) <= 0}
+                    className="size-6 rounded bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 text-red-600 dark:text-red-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <Minus className="size-3" />
+                  </button>
+                  <span className="font-bold text-green-primary min-w-[24px] text-center">{match.result?.team1Score || 0}</span>
+                  <button
+                    type="button"
+                    onClick={(e) => handleScoreUpdate(e, 1, 1)}
+                    disabled={isLoading}
+                    className="size-6 rounded bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-600 dark:text-green-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <Plus className="size-3" />
+                  </button>
+                </div>
+              ) : (
+                <span className="font-bold text-green-primary">{match.result?.team1Score || 0}</span>
+              )
             ) : match.result && (
               <span className="font-bold text-green-primary">{match.result.team1Score}</span>
             )}
@@ -485,25 +511,29 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
             )}
             <span className="font-medium truncate max-w-[100px]">{match.team2?.name}</span>
             {match.status === "live" ? (
-              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                <button
-                  type="button"
-                  onClick={(e) => handleScoreUpdate(e, 2, -1)}
-                  disabled={isLoading || (match.result?.team2Score || 0) <= 0}
-                  className="size-6 rounded bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 text-red-600 dark:text-red-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <Minus className="size-3" />
-                </button>
-                <span className="font-bold text-green-primary min-w-[24px] text-center">{match.result?.team2Score || 0}</span>
-                <button
-                  type="button"
-                  onClick={(e) => handleScoreUpdate(e, 2, 1)}
-                  disabled={isLoading}
-                  className="size-6 rounded bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-600 dark:text-green-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <Plus className="size-3" />
-                </button>
-              </div>
+              canUpdate ? (
+                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    type="button"
+                    onClick={(e) => handleScoreUpdate(e, 2, -1)}
+                    disabled={isLoading || (match.result?.team2Score || 0) <= 0}
+                    className="size-6 rounded bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 text-red-600 dark:text-red-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <Minus className="size-3" />
+                  </button>
+                  <span className="font-bold text-green-primary min-w-[24px] text-center">{match.result?.team2Score || 0}</span>
+                  <button
+                    type="button"
+                    onClick={(e) => handleScoreUpdate(e, 2, 1)}
+                    disabled={isLoading}
+                    className="size-6 rounded bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-600 dark:text-green-500 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <Plus className="size-3" />
+                  </button>
+                </div>
+              ) : (
+                <span className="font-bold text-green-primary">{match.result?.team2Score || 0}</span>
+              )
             ) : match.result && (
               <span className="font-bold text-green-primary">{match.result.team2Score}</span>
             )}
@@ -549,23 +579,27 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
                   {t("viewDetails")}
                 </DropdownMenuItem>
               </Link>
-              <Link href={`/dashboard/matches-management/edit/${match.id || match._id}`}>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {t("edit")}
+              {canUpdate && (
+                <Link href={`/dashboard/matches-management/edit/${match.id || match._id}`}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("edit")}
+                  </DropdownMenuItem>
+                </Link>
+              )}
+              {(canUpdate || canDelete) && <DropdownMenuSeparator />}
+              {/* Quick Actions - only show if user can update */}
+              {canUpdate && renderQuickActions()}
+              {canUpdate && renderQuickActions().length > 0 && <DropdownMenuSeparator />}
+              {canDelete && (
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  className="cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+                >
+                  <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {t("delete")}
                 </DropdownMenuItem>
-              </Link>
-              <DropdownMenuSeparator />
-              {/* Quick Actions */}
-              {renderQuickActions()}
-              {renderQuickActions().length > 0 && <DropdownMenuSeparator />}
-              <DropdownMenuItem
-                onClick={handleDelete}
-                className="cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
-              >
-                <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                {t("delete")}
-              </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

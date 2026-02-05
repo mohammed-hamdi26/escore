@@ -6,6 +6,7 @@ import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import NewsFormRedesign from "@/components/News/NewsFormRedesign";
+import { NewsEditWrapper } from "@/components/News/NewsFormWrapper";
 import { getLocale } from "next-intl/server";
 
 async function page({ params }) {
@@ -29,19 +30,21 @@ async function page({ params }) {
   ]);
 
   return (
-    <NewsFormRedesign
-      options={{
-        teamsOptions,
-        tournamentsOptions,
-        gamesOptions,
-        playersOptions,
-        matchesOptions,
-      }}
-      newData={newData}
-      formType="edit"
-      submit={editNews}
-      locale={locale}
-    />
+    <NewsEditWrapper>
+      <NewsFormRedesign
+        options={{
+          teamsOptions,
+          tournamentsOptions,
+          gamesOptions,
+          playersOptions,
+          matchesOptions,
+        }}
+        newData={newData}
+        formType="edit"
+        submit={editNews}
+        locale={locale}
+      />
+    </NewsEditWrapper>
   );
 }
 

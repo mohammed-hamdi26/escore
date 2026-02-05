@@ -1,6 +1,7 @@
 import { getNews } from "@/app/[locale]/_Lib/newsApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import NewsListRedesign from "@/components/News/NewsListRedesign";
+import { NewsListWrapper } from "@/components/News/NewsFormWrapper";
 import { getLocale } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
@@ -30,12 +31,14 @@ async function NewsPage({ searchParams }) {
   const games = gamesResponse.data || [];
 
   return (
-    <NewsListRedesign
-      news={news}
-      pagination={pagination}
-      games={games}
-      locale={locale}
-    />
+    <NewsListWrapper>
+      <NewsListRedesign
+        news={news}
+        pagination={pagination}
+        games={games}
+        locale={locale}
+      />
+    </NewsListWrapper>
   );
 }
 

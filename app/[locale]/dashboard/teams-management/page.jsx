@@ -2,6 +2,7 @@ import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getCountries } from "@/app/[locale]/_Lib/countriesApi";
 import TeamsListRedesign from "@/components/teams management/TeamsListRedesign";
+import { TeamListWrapper } from "@/components/teams management/TeamFormWrapper";
 
 async function TeamsPage({ searchParams }) {
   const { size, page, search, game, country, region, isActive, sortBy, sortOrder } = await searchParams;
@@ -28,12 +29,14 @@ async function TeamsPage({ searchParams }) {
   const countries = countriesResult?.countries || [];
 
   return (
-    <TeamsListRedesign
-      teams={teams || []}
-      pagination={pagination}
-      games={games}
-      countries={countries}
-    />
+    <TeamListWrapper>
+      <TeamsListRedesign
+        teams={teams || []}
+        pagination={pagination}
+        games={games}
+        countries={countries}
+      />
+    </TeamListWrapper>
   );
 }
 

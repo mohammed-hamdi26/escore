@@ -109,18 +109,22 @@ function NavItems({ user, t }) {
       icon: <Settings />,
       title: "Settings",
       href: "/dashboard/settings",
+      isShowed: hasPermission(user, "Settings"),
     },
     {
       icon: <KeyRound />,
       title: "Change Password",
       href: "/dashboard/change-password",
+      isShowed: true, // All users can change their password
     },
   ];
+
+  const visibleSettings = settingsPages.filter((page) => page.isShowed);
 
   const visibleModules = dashboardModules.filter((module) => module.isShowed);
 
   return (
-    <div className="space-y-1 max-h-[calc(100vh-240px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent pr-1">
+    <div className="space-y-1">
       {/* Dashboard Modules */}
       <div className="px-3 py-1.5">
         <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
@@ -156,7 +160,7 @@ function NavItems({ user, t }) {
         </span>
       </div>
       <ul className="space-y-0.5">
-        {settingsPages.map((page) => {
+        {visibleSettings.map((page) => {
           // Settings should be active on /dashboard/settings and all sub-pages
           const isSettingsActive = page.href === "/dashboard/settings"
             ? pathname === "/dashboard/settings" || pathname.startsWith("/dashboard/settings/")
@@ -178,19 +182,15 @@ function NavItems({ user, t }) {
       <div className="mx-3 my-2 h-px bg-gray-200 dark:bg-white/10" />
 
       {/* Logout Button */}
-      <div
-        className="group flex items-center gap-2.5 px-3 py-2 mx-0 rounded-lg cursor-pointer transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-500/10"
-        onClick={() => logout()}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === "Enter" && logout()}
-      >
-        <span className="flex items-center justify-center size-7 rounded-md transition-all duration-200 text-gray-500 dark:text-gray-400 group-hover:text-red-500">
+      <div className="px-3 pt-2">
+        <button
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg cursor-pointer transition-all duration-200 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 hover:border-red-500 font-medium text-sm"
+          onClick={() => logout()}
+          type="button"
+        >
           <LogOut className="size-4 rtl:rotate-180" />
-        </span>
-        <span className="text-[13px] font-medium text-gray-600 dark:text-gray-400 transition-colors duration-200 group-hover:text-red-500">
-          {t("Logout")}
-        </span>
+          <span>{t("Logout")}</span>
+        </button>
       </div>
     </div>
   );

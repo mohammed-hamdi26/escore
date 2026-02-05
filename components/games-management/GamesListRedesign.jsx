@@ -18,6 +18,7 @@ import GamesFilter from "./GamesFilter";
 import Pagination from "../ui app/Pagination";
 import { deleteGame, toggleGameActive } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 
 function GamesListRedesign({ games, pagination }) {
   const t = useTranslations("gamesList");
@@ -26,6 +27,8 @@ function GamesListRedesign({ games, pagination }) {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [viewMode, setViewMode] = useState("grid");
+  const { hasPermission } = usePermissions();
+  const canCreate = hasPermission(ENTITIES.GAME, ACTIONS.CREATE);
 
   const currentSort = searchParams.get("sortBy") || "";
   const currentOrder = searchParams.get("sortOrder") || "asc";
@@ -185,12 +188,14 @@ function GamesListRedesign({ games, pagination }) {
           <p className="text-muted-foreground mb-4">
             {t("noGamesDescription") || "Try adjusting your filters or add a new game"}
           </p>
-          <Button
-            className="bg-green-primary hover:bg-green-primary/80"
-            onClick={() => router.push("/dashboard/games-management/add")}
-          >
-            {t("addFirstGame") || "Add First Game"}
-          </Button>
+          {canCreate && (
+            <Button
+              className="bg-green-primary hover:bg-green-primary/80"
+              onClick={() => router.push("/dashboard/games-management/add")}
+            >
+              {t("addFirstGame") || "Add First Game"}
+            </Button>
+          )}
         </div>
       ) : (
         <div

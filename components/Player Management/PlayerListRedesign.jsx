@@ -18,6 +18,7 @@ import PlayersFilter from "./PlayersFilter";
 import Pagination from "../ui app/Pagination";
 import { deletePlayer } from "@/app/[locale]/_Lib/actions";
 import { useState } from "react";
+import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 
 function PlayerListRedesign({ players, pagination, games = [], teams = [] }) {
   const t = useTranslations("playerList");
@@ -26,6 +27,8 @@ function PlayerListRedesign({ players, pagination, games = [], teams = [] }) {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [viewMode, setViewMode] = useState("grid"); // grid or list
+  const { hasPermission } = usePermissions();
+  const canCreate = hasPermission(ENTITIES.PLAYER, ACTIONS.CREATE);
 
   const currentSort = searchParams.get("sortBy") || "";
   const currentOrder = searchParams.get("sortOrder") || "asc";
@@ -171,12 +174,14 @@ function PlayerListRedesign({ players, pagination, games = [], teams = [] }) {
           <p className="text-muted-foreground mb-4">
             {t("noPlayersDescription") || "Try adjusting your filters or add a new player"}
           </p>
-          <Button
-            className="bg-green-primary hover:bg-green-primary/80"
-            onClick={() => router.push("/dashboard/player-management/add")}
-          >
-            {t("addFirstPlayer") || "Add First Player"}
-          </Button>
+          {canCreate && (
+            <Button
+              className="bg-green-primary hover:bg-green-primary/80"
+              onClick={() => router.push("/dashboard/player-management/add")}
+            >
+              {t("addFirstPlayer") || "Add First Player"}
+            </Button>
+          )}
         </div>
       ) : (
         <div

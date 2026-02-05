@@ -28,11 +28,17 @@ import {
 } from "../ui/dropdown-menu";
 import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
+import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 
 function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null);
   const router = useRouter();
+  const { hasPermission } = usePermissions();
+
+  // Permission checks
+  const canUpdate = hasPermission(ENTITIES.PLAYER, ACTIONS.UPDATE);
+  const canDelete = hasPermission(ENTITIES.PLAYER, ACTIONS.DELETE);
 
   const playerImage = player.photo?.light || player.photo?.dark;
   const teamImage = player.team?.logo?.light || player.team?.logo?.dark;
@@ -185,40 +191,48 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
                     {t("viewDetails") || "View Details"}
                   </DropdownMenuItem>
                 </Link>
-                <Link href={`/dashboard/player-management/edit/${player.id}`}>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                    {t("edit")}
+                {canUpdate && (
+                  <Link href={`/dashboard/player-management/edit/${player.id}`}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("edit")}
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+                {canUpdate && <DropdownMenuSeparator />}
+                {canUpdate && (
+                  <>
+                    <Link href={`/dashboard/player-management/awards/${player.id}`}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <Award className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                        {t("awards")}
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={`/dashboard/player-management/links/${player.id}`}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <LinkIcon className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                        {t("links")}
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={`/dashboard/player-management/favorites-characters/${player.id}`}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <Star className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                        {t("favoritesCharacters")}
+                      </DropdownMenuItem>
+                    </Link>
+                  </>
+                )}
+                {canDelete && <DropdownMenuSeparator />}
+                {canDelete && (
+                  <DropdownMenuItem
+                    className="cursor-pointer text-red-400 focus:text-red-400"
+                    onClick={() => handleAction(() => onDelete(player.id), "delete")}
+                    disabled={loadingAction === "delete"}
+                  >
+                    <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("delete")}
                   </DropdownMenuItem>
-                </Link>
-                <DropdownMenuSeparator />
-                <Link href={`/dashboard/player-management/awards/${player.id}`}>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Award className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                    {t("awards")}
-                  </DropdownMenuItem>
-                </Link>
-                <Link href={`/dashboard/player-management/links/${player.id}`}>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <LinkIcon className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                    {t("links")}
-                  </DropdownMenuItem>
-                </Link>
-                <Link href={`/dashboard/player-management/favorites-characters/${player.id}`}>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Star className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                    {t("favoritesCharacters")}
-                  </DropdownMenuItem>
-                </Link>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="cursor-pointer text-red-400 focus:text-red-400"
-                  onClick={() => handleAction(() => onDelete(player.id), "delete")}
-                  disabled={loadingAction === "delete"}
-                >
-                  <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {t("delete")}
-                </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -398,40 +412,48 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
                   {t("viewDetails") || "View Details"}
                 </DropdownMenuItem>
               </Link>
-              <Link href={`/dashboard/player-management/edit/${player.id}`}>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {t("edit")}
+              {canUpdate && (
+                <Link href={`/dashboard/player-management/edit/${player.id}`}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Edit className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {t("edit")}
+                  </DropdownMenuItem>
+                </Link>
+              )}
+              {canUpdate && <DropdownMenuSeparator />}
+              {canUpdate && (
+                <>
+                  <Link href={`/dashboard/player-management/awards/${player.id}`}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Award className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("awards")}
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href={`/dashboard/player-management/links/${player.id}`}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <LinkIcon className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("links")}
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href={`/dashboard/player-management/favorites-characters/${player.id}`}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Star className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                      {t("favoritesCharacters")}
+                    </DropdownMenuItem>
+                  </Link>
+                </>
+              )}
+              {canDelete && <DropdownMenuSeparator />}
+              {canDelete && (
+                <DropdownMenuItem
+                  className="cursor-pointer text-red-400 focus:text-red-400"
+                  onClick={() => handleAction(() => onDelete(player.id), "delete")}
+                  disabled={loadingAction === "delete"}
+                >
+                  <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  {t("delete")}
                 </DropdownMenuItem>
-              </Link>
-              <DropdownMenuSeparator />
-              <Link href={`/dashboard/player-management/awards/${player.id}`}>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Award className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {t("awards")}
-                </DropdownMenuItem>
-              </Link>
-              <Link href={`/dashboard/player-management/links/${player.id}`}>
-                <DropdownMenuItem className="cursor-pointer">
-                  <LinkIcon className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {t("links")}
-                </DropdownMenuItem>
-              </Link>
-              <Link href={`/dashboard/player-management/favorites-characters/${player.id}`}>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Star className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {t("favoritesCharacters")}
-                </DropdownMenuItem>
-              </Link>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer text-red-400 focus:text-red-400"
-                onClick={() => handleAction(() => onDelete(player.id), "delete")}
-                disabled={loadingAction === "delete"}
-              >
-                <Trash2 className="size-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                {t("delete")}
-              </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

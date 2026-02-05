@@ -3,6 +3,7 @@ import { getCountries } from "@/app/[locale]/_Lib/countriesApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getTournament } from "@/app/[locale]/_Lib/tournamentsApi";
 import TournamentsForm from "@/components/Tournaments Management/TournamentsForm";
+import { TournamentEditWrapper } from "@/components/tournaments/TournamentFormWrapper";
 
 async function page({ params }) {
   const { id } = await params;
@@ -13,13 +14,15 @@ async function page({ params }) {
   ]);
 
   return (
-    <TournamentsForm
-      countries={countries.countries}
-      formType="edit"
-      gameOptions={gamesResponse.data || []}
-      submit={editTournament}
-      tournament={tournament}
-    />
+    <TournamentEditWrapper>
+      <TournamentsForm
+        countries={countries.countries}
+        formType="edit"
+        gameOptions={gamesResponse.data || []}
+        submit={editTournament}
+        tournament={tournament}
+      />
+    </TournamentEditWrapper>
   );
 }
 

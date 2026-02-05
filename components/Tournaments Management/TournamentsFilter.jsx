@@ -124,20 +124,23 @@ function TournamentsFilter({ games = [] }) {
     updateParams("search", "");
   };
 
+  // Ensure games is always an array
+  const gamesArray = Array.isArray(games) ? games : [];
+
   // Filter games based on search
   const filteredGames = useMemo(() => {
-    if (!gameSearch) return games;
-    return games.filter((game) =>
-      game.name.toLowerCase().includes(gameSearch.toLowerCase())
+    if (!gameSearch) return gamesArray;
+    return gamesArray.filter((game) =>
+      game.name?.toLowerCase().includes(gameSearch.toLowerCase())
     );
-  }, [games, gameSearch]);
+  }, [gamesArray, gameSearch]);
 
   // Get selected game name
   const selectedGameName = useMemo(() => {
     if (!currentGame) return null;
-    const game = games.find((g) => (g.id || g._id) === currentGame);
+    const game = gamesArray.find((g) => (g.id || g._id) === currentGame);
     return game?.name;
-  }, [currentGame, games]);
+  }, [currentGame, gamesArray]);
 
   // Get selected status
   const selectedStatus = useMemo(() => {
@@ -235,9 +238,9 @@ function TournamentsFilter({ games = [] }) {
                     <span className="flex items-center gap-2 truncate">
                       {selectedGameName ? (
                         <>
-                          {games.find((g) => (g.id || g._id) === currentGame)?.logo && (
+                          {gamesArray.find((g) => (g.id || g._id) === currentGame)?.logo && (
                             <img
-                              src={games.find((g) => (g.id || g._id) === currentGame)?.logo?.light || games.find((g) => (g.id || g._id) === currentGame)?.logo?.dark}
+                              src={gamesArray.find((g) => (g.id || g._id) === currentGame)?.logo?.light || gamesArray.find((g) => (g.id || g._id) === currentGame)?.logo?.dark}
                               alt=""
                               className="size-5 rounded object-contain"
                             />

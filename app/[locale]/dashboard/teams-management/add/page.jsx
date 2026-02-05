@@ -4,6 +4,7 @@ import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import TeamFormRedesign from "@/components/teams management/TeamFormRedesign";
+import { TeamAddWrapper } from "@/components/teams management/TeamFormWrapper";
 
 async function page() {
   const [countries, { data: gamesOptions }, tournamentsResult, playersResult] = await Promise.all([
@@ -34,16 +35,18 @@ async function page() {
   })) || [];
 
   return (
-    <TeamFormRedesign
-      submit={addTeam}
-      countries={countries.countries}
-      OptionsData={{
-        gamesOptions: gamesOptions || [],
-        tournamentsOptions,
-        playersOptions,
-      }}
-      formType="add"
-    />
+    <TeamAddWrapper>
+      <TeamFormRedesign
+        submit={addTeam}
+        countries={countries.countries}
+        OptionsData={{
+          gamesOptions: gamesOptions || [],
+          tournamentsOptions,
+          playersOptions,
+        }}
+        formType="add"
+      />
+    </TeamAddWrapper>
   );
 }
 

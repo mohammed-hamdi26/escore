@@ -35,11 +35,28 @@ import {
   CheckCircle,
   UserCog,
   Swords,
+  Lock,
+  Sparkles,
+  Zap,
+  Crown,
+  BookOpen,
+  RotateCcw,
+  Wand2,
 } from "lucide-react";
 
 const validationSchema = yup.object({
-  firstName: yup.string().required("Required"),
-  lastName: yup.string().required("Required"),
+  firstName: yup
+    .string()
+    .required("First name is required")
+    .min(2, "First name must be at least 2 characters")
+    .max(50, "First name must be at most 50 characters")
+    .matches(/^[a-zA-Z\u0600-\u06FF\s]+$/, "First name can only contain letters"),
+  lastName: yup
+    .string()
+    .required("Last name is required")
+    .min(2, "Last name must be at least 2 characters")
+    .max(50, "Last name must be at most 50 characters")
+    .matches(/^[a-zA-Z\u0600-\u06FF\s]+$/, "Last name can only contain letters"),
 });
 
 const roleOptions = [
@@ -101,6 +118,13 @@ function UserForm({
     return values;
   };
 
+  const [permissionError, setPermissionError] = useState("");
+
+  // Check if at least one permission is selected
+  const hasAnyPermission = (values) => {
+    return permissions.some((perm) => values[perm.value] === true);
+  };
+
   const formik = useFormik({
     initialValues: {
       firstName: user?.firstName || "",
@@ -113,6 +137,14 @@ function UserForm({
     enableReinitialize: true,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+      // Validate permissions for add mode
+      if (formType === "add" && !hasAnyPermission(values)) {
+        setPermissionError(t("At least one permission must be selected"));
+        toast.error(t("At least one permission must be selected"));
+        return;
+      }
+      setPermissionError("");
+
       try {
         let dataValues = user ? { ...user, ...values } : { ...values };
         let permissionsUser = [];
@@ -159,15 +191,30 @@ function UserForm({
 
   const handlePermissionToggle = (permValue, checked) => {
     formik.setFieldValue(permValue, checked);
-    if (!checked) {
+    if (checked) {
+      // Auto-enable "read" when permission is enabled
+      formik.setFieldValue("actions" + permValue, ["read"]);
+      // Clear permission error when user selects a permission
+      setPermissionError("");
+    } else {
       formik.setFieldValue("actions" + permValue, []);
     }
   };
 
   const handleActionToggle = (permValue, actionValue, checked) => {
+    // Prevent disabling "read" action - it's mandatory
+    if (actionValue === "read" && !checked) {
+      return;
+    }
+
     const currentActions = formik.values["actions" + permValue] || [];
     if (checked) {
-      formik.setFieldValue("actions" + permValue, [...currentActions, actionValue]);
+      // Always ensure "read" is included
+      const newActions = [...currentActions, actionValue];
+      if (!newActions.includes("read")) {
+        newActions.push("read");
+      }
+      formik.setFieldValue("actions" + permValue, newActions);
     } else {
       formik.setFieldValue(
         "actions" + permValue,
@@ -182,76 +229,201 @@ function UserForm({
   };
 
   const handleDeselectAllActions = (permValue) => {
-    formik.setFieldValue("actions" + permValue, []);
+    // Keep "read" as it's mandatory
+    formik.setFieldValue("actions" + permValue, ["read"]);
+  };
+
+  // Quick Actions handlers
+  const handleFullAccess = () => {
+    setPermissionError("");
+    permissions.forEach((perm) => {
+      formik.setFieldValue(perm.value, true);
+      formik.setFieldValue("actions" + perm.value, ["create", "read", "update", "delete"]);
+    });
+  };
+
+  const handleReadOnlyAccess = () => {
+    setPermissionError("");
+    permissions.forEach((perm) => {
+      formik.setFieldValue(perm.value, true);
+      formik.setFieldValue("actions" + perm.value, ["read"]);
+    });
+  };
+
+  const handleContentCreatorAccess = () => {
+    setPermissionError("");
+    // Content creator preset: News, Match, Player, Team, Tournament, Transfer, Game, Standing with create/read/update
+    const contentPerms = ["AddNewsPermission", "AddMatchPermission", "AddPlayerPermission", "AddTeamPermission", "AddTournamentPermission", "AddTransferPermission", "AddGamePermission", "AddStandingPermission"];
+    permissions.forEach((perm) => {
+      if (contentPerms.includes(perm.value)) {
+        formik.setFieldValue(perm.value, true);
+        formik.setFieldValue("actions" + perm.value, ["create", "read", "update"]);
+      } else {
+        formik.setFieldValue(perm.value, false);
+        formik.setFieldValue("actions" + perm.value, []);
+      }
+    });
+  };
+
+  const handleSupportAccess = () => {
+    setPermissionError("");
+    // Support preset: Settings and Support with all actions
+    const supportPerms = ["AddSettingsPermission", "AddSupportPermission"];
+    permissions.forEach((perm) => {
+      if (supportPerms.includes(perm.value)) {
+        formik.setFieldValue(perm.value, true);
+        formik.setFieldValue("actions" + perm.value, ["create", "read", "update", "delete"]);
+      } else {
+        formik.setFieldValue(perm.value, false);
+        formik.setFieldValue("actions" + perm.value, []);
+      }
+    });
+  };
+
+  const handleClearAllPermissions = () => {
+    permissions.forEach((perm) => {
+      formik.setFieldValue(perm.value, false);
+      formik.setFieldValue("actions" + perm.value, []);
+    });
   };
 
   return (
     <form className="space-y-6" onSubmit={formik.handleSubmit}>
       {/* User Info Section */}
-      <FormSection
-        title={t("User Information")}
-        icon={<User className="size-5" />}
-      >
-        <FormRow>
-          <InputApp
-            onChange={formik.handleChange}
-            label={t("First Name")}
-            name={"firstName"}
-            type={"text"}
-            placeholder={t("Enter first name")}
-            className="border-0 focus:outline-none"
-            backGroundColor={"bg-dashboard-box dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            icon={<UserCardIcon color={"text-[#677185]"} />}
-            error={
-              formik.touched.firstName &&
-              formik.errors.firstName &&
-              t("First name is required")
-            }
-            onBlur={formik.handleBlur}
-            value={formik.values.firstName}
-            required
-          />
+      <div className="bg-white dark:bg-[#0f1118] rounded-2xl border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none overflow-hidden">
+        {/* Header with gradient accent */}
+        <div className="relative px-6 py-5 border-b border-gray-200 dark:border-white/10">
+          <div className="absolute inset-0 bg-gradient-to-r from-green-primary/5 via-transparent to-transparent" />
+          <div className="relative flex items-center gap-4">
+            <div className="size-12 rounded-xl bg-gradient-to-br from-green-primary to-green-primary/70 flex items-center justify-center shadow-lg shadow-green-primary/20">
+              <User className="size-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t("User Information")}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("Basic details about the user")}
+              </p>
+            </div>
+          </div>
+        </div>
 
-          <InputApp
-            onChange={formik.handleChange}
-            label={t("Last Name")}
-            name={"lastName"}
-            type={"text"}
-            placeholder={t("Enter last name")}
-            className="border-0 focus:outline-none"
-            backGroundColor={"bg-dashboard-box dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            icon={<User className="size-5 text-[#677185]" />}
-            error={
-              formik.touched.lastName &&
-              formik.errors.lastName &&
-              t("Last name is required")
-            }
-            onBlur={formik.handleBlur}
-            value={formik.values.lastName}
-            required
-          />
-        </FormRow>
-        {formType === "edit" && (
-          <FormRow>
-            <InputApp
-              onChange={formik.handleChange}
-              label={t("Phone")}
-              name={"phone"}
-              type={"text"}
-              placeholder={t("Enter phone")}
-              className="border-0 focus:outline-none"
-              backGroundColor={"bg-dashboard-box dark:bg-[#0F1017]"}
-              textColor="text-[#677185]"
-              icon={<Phone className="size-5 text-[#677185]" />}
-              error={formik.touched.phone && formik.errors.phone}
-              onBlur={formik.handleBlur}
-              value={formik.values.phone}
-            />
-          </FormRow>
-        )}
-      </FormSection>
+        {/* Content */}
+        <div className="p-6">
+          {/* Avatar Preview */}
+          <div className="flex items-center gap-5 mb-6 pb-6 border-b border-gray-100 dark:border-white/5">
+            <div className="relative group">
+              <div className="size-20 rounded-2xl bg-gradient-to-br from-green-primary/20 to-green-primary/5 flex items-center justify-center ring-4 ring-gray-100 dark:ring-white/10 transition-all group-hover:ring-green-primary/30">
+                <span className="text-green-primary font-bold text-2xl uppercase">
+                  {formik.values.firstName?.[0] || formik.values.lastName?.[0] || "?"}
+                </span>
+              </div>
+              <div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-green-500 flex items-center justify-center ring-2 ring-white dark:ring-[#0f1118]">
+                <UserPlus className="size-3 text-white" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                {formik.values.firstName || formik.values.lastName
+                  ? `${formik.values.firstName} ${formik.values.lastName}`.trim()
+                  : t("New User")}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("Preview of user profile")}
+              </p>
+            </div>
+          </div>
+
+          {/* Form Fields */}
+          <div className="space-y-5">
+            {/* Name Fields Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* First Name */}
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t("First Name")}
+                  <span className="text-red-500">*</span>
+                </Label>
+                <div className={`relative rounded-xl transition-all duration-200 ${
+                  formik.touched.firstName && formik.errors.firstName
+                    ? "ring-2 ring-red-500/50"
+                    : "focus-within:ring-2 focus-within:ring-green-primary/50"
+                }`}>
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    value={formik.values.firstName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder={t("Enter first name")}
+                    className="w-full h-12 px-4 bg-gray-50 dark:bg-[#1a1d2e] border-0 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none transition-colors"
+                  />
+                </div>
+                {formik.touched.firstName && formik.errors.firstName && (
+                  <p className="flex items-center gap-1.5 text-sm text-red-500">
+                    <span className="size-1.5 rounded-full bg-red-500" />
+                    {t("First name is required")}
+                  </p>
+                )}
+              </div>
+
+              {/* Last Name */}
+              <div className="space-y-2">
+                <Label htmlFor="lastName" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t("Last Name")}
+                  <span className="text-red-500">*</span>
+                </Label>
+                <div className={`relative rounded-xl transition-all duration-200 ${
+                  formik.touched.lastName && formik.errors.lastName
+                    ? "ring-2 ring-red-500/50"
+                    : "focus-within:ring-2 focus-within:ring-green-primary/50"
+                }`}>
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    value={formik.values.lastName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder={t("Enter last name")}
+                    className="w-full h-12 px-4 bg-gray-50 dark:bg-[#1a1d2e] border-0 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none transition-colors"
+                  />
+                </div>
+                {formik.touched.lastName && formik.errors.lastName && (
+                  <p className="flex items-center gap-1.5 text-sm text-red-500">
+                    <span className="size-1.5 rounded-full bg-red-500" />
+                    {t("Last name is required")}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Phone Field - Only in edit mode */}
+            {formType === "edit" && (
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <Phone className="size-4 text-gray-400" />
+                  {t("Phone")}
+                </Label>
+                <div className="relative rounded-xl transition-all duration-200 focus-within:ring-2 focus-within:ring-green-primary/50">
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="text"
+                    value={formik.values.phone}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder={t("Enter phone")}
+                    className="w-full h-12 px-4 bg-gray-50 dark:bg-[#1a1d2e] border-0 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Role & Status Section - Only in edit mode */}
       {formType === "edit" && (
@@ -328,118 +500,257 @@ function UserForm({
       )}
 
       {/* Permissions Section */}
-      <FormSection
-        title={t("Permissions")}
-        icon={<Shield className="size-5" />}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {permissions.map((item) => {
-            const IconComponent = item.icon;
-            const isEnabled = formik.values[item.value] === true;
-            const selectedActions = formik.values["actions" + item.value] || [];
+      <div className="bg-white dark:bg-[#0f1118] rounded-2xl border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none overflow-hidden">
+        {/* Header with gradient accent */}
+        <div className="relative px-6 py-5 border-b border-gray-200 dark:border-white/10">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-transparent" />
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="size-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <Shield className="size-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {t("Permissions")}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t("Select modules and actions for this user")}
+                </p>
+              </div>
+            </div>
+            {/* Quick stats */}
+            <div className="hidden sm:flex items-center gap-2">
+              <div className="px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium">
+                {permissions.filter(p => formik.values[p.value]).length} / {permissions.length} {t("active")}
+              </div>
+            </div>
+          </div>
+        </div>
 
-            return (
-              <div
-                key={item.value}
-                className={`rounded-xl border-2 transition-all duration-200 ${
-                  isEnabled
-                    ? "border-green-500/50 bg-green-500/5"
-                    : "border-gray-200 dark:border-[#1a1f2e] bg-gray-50 dark:bg-[#0F1017]"
-                }`}
+        {/* Quick Actions Bar */}
+        <div className="px-6 py-4 bg-gray-50/50 dark:bg-white/[0.02] border-b border-gray-200 dark:border-white/5">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+              <Wand2 className="size-4" />
+              <span className="font-medium">{t("Quick Actions")}:</span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Full Access */}
+              <button
+                type="button"
+                onClick={handleFullAccess}
+                className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500/10 to-amber-600/10 hover:from-amber-500/20 hover:to-amber-600/20 border border-amber-500/20 hover:border-amber-500/40 text-amber-600 dark:text-amber-400 text-sm font-medium transition-all duration-200"
               >
-                {/* Permission Header */}
-                <div className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${item.bgColor}`}>
-                      <IconComponent className={`size-5 ${item.color}`} />
-                    </div>
-                    <div>
-                      <Label className="text-gray-900 dark:text-white font-medium cursor-pointer">
-                        {t(item.translationKey)}
-                      </Label>
-                      <p className="text-xs text-gray-500 dark:text-[#677185]">
-                        {isEnabled
-                          ? `${selectedActions.length} ${t("actions selected")}`
-                          : t("Disabled")}
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={isEnabled}
-                    onCheckedChange={(checked) =>
-                      handlePermissionToggle(item.value, checked)
-                    }
-                  />
-                </div>
+                <Crown className="size-4 group-hover:scale-110 transition-transform" />
+                {t("Full Access")}
+              </button>
 
-                {/* Actions */}
-                {isEnabled && (
-                  <div className="px-4 pb-4 border-t border-gray-200 dark:border-[#1a1f2e] pt-3">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs text-gray-500 dark:text-[#677185] uppercase tracking-wide">
-                        {t("Actions")}
-                      </span>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleSelectAllActions(item.value)}
-                          className="text-xs text-green-500 hover:text-green-400 transition-colors"
-                        >
-                          {t("All")}
-                        </button>
-                        <span className="text-gray-400 dark:text-[#677185]">|</span>
-                        <button
-                          type="button"
-                          onClick={() => handleDeselectAllActions(item.value)}
-                          className="text-xs text-red-500 hover:text-red-400 transition-colors"
-                        >
-                          {t("None")}
-                        </button>
+              {/* Read Only */}
+              <button
+                type="button"
+                onClick={handleReadOnlyAccess}
+                className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 hover:from-blue-500/20 hover:to-blue-600/20 border border-blue-500/20 hover:border-blue-500/40 text-blue-600 dark:text-blue-400 text-sm font-medium transition-all duration-200"
+              >
+                <BookOpen className="size-4 group-hover:scale-110 transition-transform" />
+                {t("Read Only")}
+              </button>
+
+              {/* Content Creator */}
+              <button
+                type="button"
+                onClick={handleContentCreatorAccess}
+                className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-500/10 to-purple-600/10 hover:from-purple-500/20 hover:to-purple-600/20 border border-purple-500/20 hover:border-purple-500/40 text-purple-600 dark:text-purple-400 text-sm font-medium transition-all duration-200"
+              >
+                <Newspaper className="size-4 group-hover:scale-110 transition-transform" />
+                {t("Content Creator")}
+              </button>
+
+              {/* Support */}
+              <button
+                type="button"
+                onClick={handleSupportAccess}
+                className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 hover:from-cyan-500/20 hover:to-cyan-600/20 border border-cyan-500/20 hover:border-cyan-500/40 text-cyan-600 dark:text-cyan-400 text-sm font-medium transition-all duration-200"
+              >
+                <HeadphonesIcon className="size-4 group-hover:scale-110 transition-transform" />
+                {t("Support")}
+              </button>
+
+              {/* Clear All */}
+              <button
+                type="button"
+                onClick={handleClearAllPermissions}
+                className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-gray-500/10 to-gray-600/10 hover:from-red-500/10 hover:to-red-600/10 border border-gray-500/20 hover:border-red-500/30 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 text-sm font-medium transition-all duration-200"
+              >
+                <RotateCcw className="size-4 group-hover:rotate-[-45deg] transition-transform" />
+                {t("Clear All")}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Permission Error Message */}
+        {permissionError && (
+          <div className="mx-6 mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+            <div className="flex items-center gap-3">
+              <div className="size-8 rounded-full bg-red-500/20 flex items-center justify-center">
+                <Shield className="size-4 text-red-500" />
+              </div>
+              <p className="text-red-600 dark:text-red-400 font-medium text-sm">
+                {permissionError}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Permissions Grid */}
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {permissions.map((item) => {
+              const IconComponent = item.icon;
+              const isEnabled = formik.values[item.value] === true;
+              const selectedActions = formik.values["actions" + item.value] || [];
+
+              return (
+                <div
+                  key={item.value}
+                  className={`group relative rounded-2xl border-2 transition-all duration-300 overflow-hidden ${
+                    isEnabled
+                      ? "border-green-500/50 bg-gradient-to-br from-green-500/5 to-transparent shadow-lg shadow-green-500/5"
+                      : "border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-[#0F1017] hover:border-gray-300 dark:hover:border-white/10"
+                  }`}
+                >
+                  {/* Glow effect when enabled */}
+                  {isEnabled && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent pointer-events-none" />
+                  )}
+
+                  {/* Permission Header */}
+                  <div className="relative p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`relative p-2.5 rounded-xl ${item.bgColor} transition-transform duration-300 group-hover:scale-110`}>
+                        <IconComponent className={`size-5 ${item.color}`} />
+                        {isEnabled && (
+                          <div className="absolute -top-1 -right-1 size-3 rounded-full bg-green-500 flex items-center justify-center ring-2 ring-white dark:ring-[#0f1118]">
+                            <CheckCircle className="size-2 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <Label className="text-gray-900 dark:text-white font-semibold cursor-pointer text-base">
+                          {t(item.translationKey)}
+                        </Label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {isEnabled ? (
+                            <span className="flex items-center gap-1">
+                              <Sparkles className="size-3 text-green-500" />
+                              <span className="text-green-600 dark:text-green-400 font-medium">
+                                {selectedActions.length} {t("actions")}
+                              </span>
+                            </span>
+                          ) : (
+                            t("Click to enable")
+                          )}
+                        </p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {actions.map((action) => {
-                        const ActionIcon = action.icon;
-                        const isChecked = selectedActions.includes(action.value);
-
-                        return (
-                          <label
-                            key={action.value}
-                            className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${
-                              isChecked
-                                ? "bg-gray-100 dark:bg-[#1a1f2e] border border-gray-200 dark:border-[#2a2f3e]"
-                                : "hover:bg-gray-100 dark:hover:bg-[#1a1f2e]/50"
-                            }`}
-                          >
-                            <Checkbox
-                              checked={isChecked}
-                              onCheckedChange={(checked) =>
-                                handleActionToggle(item.value, action.value, checked)
-                              }
-                              className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                            />
-                            <ActionIcon className={`size-3.5 ${action.color}`} />
-                            <span className="text-sm text-gray-900 dark:text-white capitalize">
-                              {t(action.label)}
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
+                    <Switch
+                      checked={isEnabled}
+                      onCheckedChange={(checked) =>
+                        handlePermissionToggle(item.value, checked)
+                      }
+                      className="data-[state=checked]:bg-green-500"
+                    />
                   </div>
-                )}
-              </div>
-            );
-          })}
+
+                  {/* Actions */}
+                  {isEnabled && (
+                    <div className="relative px-4 pb-4 pt-3 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-black/20">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          {t("Actions")}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleSelectAllActions(item.value)}
+                            className="px-2 py-1 text-xs font-medium text-green-600 dark:text-green-400 hover:bg-green-500/10 rounded-md transition-colors"
+                          >
+                            {t("All")}
+                          </button>
+                          <span className="text-gray-300 dark:text-gray-600">•</span>
+                          <button
+                            type="button"
+                            onClick={() => handleDeselectAllActions(item.value)}
+                            className="px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-500/10 rounded-md transition-colors"
+                          >
+                            {t("Reset")}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {actions.map((action) => {
+                          const ActionIcon = action.icon;
+                          const isChecked = selectedActions.includes(action.value);
+                          const isReadAction = action.value === "read";
+
+                          return (
+                            <label
+                              key={action.value}
+                              className={`relative flex items-center gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
+                                isReadAction
+                                  ? "bg-blue-500/10 border border-blue-500/30 cursor-not-allowed"
+                                  : isChecked
+                                    ? "bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm"
+                                    : "hover:bg-white dark:hover:bg-white/5 border border-transparent"
+                              }`}
+                            >
+                              <Checkbox
+                                checked={isChecked}
+                                onCheckedChange={(checked) =>
+                                  handleActionToggle(item.value, action.value, checked)
+                                }
+                                disabled={isReadAction}
+                                className={`${
+                                  isReadAction
+                                    ? "data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 opacity-70"
+                                    : "data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                                }`}
+                              />
+                              <ActionIcon className={`size-4 ${isReadAction ? "text-blue-500" : action.color}`} />
+                              <span className={`text-sm font-medium capitalize ${
+                                isReadAction
+                                  ? "text-blue-600 dark:text-blue-400"
+                                  : "text-gray-700 dark:text-gray-200"
+                              }`}>
+                                {t(action.label)}
+                              </span>
+                              {isReadAction && (
+                                <Lock className="size-3 text-blue-500 ml-auto" />
+                              )}
+                            </label>
+                          );
+                        })}
+                      </div>
+                      {/* Info hint */}
+                      <div className="mt-3 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+                        <Lock className="size-3" />
+                        <span>{t("Read permission is required and cannot be disabled")}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </FormSection>
+      </div>
 
       {/* Submit Button */}
-      <div className="flex justify-end pt-4">
+      <div className="flex flex-col items-end gap-2 pt-4">
         <Button
           type="submit"
-          disabled={formik.isSubmitting}
-          className="bg-green-primary hover:bg-green-primary/80 text-white min-w-[140px] disabled:opacity-50"
+          disabled={formik.isSubmitting || (formType === "add" && !hasAnyPermission(formik.values))}
+          className="bg-green-primary hover:bg-green-primary/80 text-white min-w-[140px] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {formik.isSubmitting ? (
             <Spinner />
@@ -455,6 +766,12 @@ function UserForm({
             </>
           )}
         </Button>
+        {formType === "add" && !hasAnyPermission(formik.values) && (
+          <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+            <Shield className="size-3.5" />
+            {t("At least one permission must be selected")}
+          </p>
+        )}
       </div>
     </form>
   );

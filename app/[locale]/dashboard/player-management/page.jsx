@@ -2,6 +2,7 @@ import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import PlayerListRedesign from "@/components/Player Management/PlayerListRedesign";
+import { PlayerListWrapper } from "@/components/Player Management/PlayerFormWrapper";
 
 async function PlayersPage({ searchParams }) {
   const { size, page, search, game, team, country, isFreeAgent, sortBy, sortOrder } = await searchParams;
@@ -27,12 +28,14 @@ async function PlayersPage({ searchParams }) {
   const teams = teamsResult?.data || teamsResult || [];
 
   return (
-    <PlayerListRedesign
-      players={players || []}
-      pagination={pagination}
-      games={games || []}
-      teams={teams}
-    />
+    <PlayerListWrapper>
+      <PlayerListRedesign
+        players={players || []}
+        pagination={pagination}
+        games={games || []}
+        teams={teams}
+      />
+    </PlayerListWrapper>
   );
 }
 

@@ -15,7 +15,18 @@ import {
   Key,
   Copy,
   Check,
+  MoreHorizontal,
+  Eye,
+  Heart,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "../ui/button";
 
 export default function UsersListTable({ users, meta }) {
   const [isLoading, setIsLoading] = useState(null);
@@ -25,10 +36,10 @@ export default function UsersListTable({ users, meta }) {
 
   const getRoleBadge = (role) => {
     const badges = {
-      admin: "bg-red-500/20 text-red-400 border-red-500/30",
-      content: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-      support: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-      user: "bg-gray-500/20 text-gray-400 border-gray-500/30",
+      admin: "bg-red-500/10 text-red-500 border-red-500/20",
+      content: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+      support: "bg-cyan-500/10 text-cyan-500 border-cyan-500/20",
+      user: "bg-gray-500/10 text-gray-500 border-gray-500/20",
     };
     return badges[role] || badges.user;
   };
@@ -76,168 +87,167 @@ export default function UsersListTable({ users, meta }) {
 
   if (!users || users.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800/50 rounded-xl p-8 border border-gray-200 dark:border-gray-700 text-center shadow-sm dark:shadow-none">
-        <UserX className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-        <p className="text-gray-500 dark:text-gray-400">{t("noUsers")}</p>
+      <div className="bg-white dark:bg-[#0f1118] rounded-xl p-12 border border-gray-200 dark:border-white/5 text-center">
+        <div className="size-16 rounded-full bg-gray-100 dark:bg-[#1a1d2e] flex items-center justify-center mx-auto mb-4">
+          <UserX className="size-8 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          {t("noUsersTitle") || "No users found"}
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400">
+          {t("noUsers") || "Try adjusting your filters"}
+        </p>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      {/* Table */}
-      <div className="bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-none">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-transparent">
-              <th className="text-left px-4 py-3 text-gray-600 dark:text-gray-400 font-medium">
-                {t("table.user")}
-              </th>
-              <th className="text-left px-4 py-3 text-gray-600 dark:text-gray-400 font-medium">
-                {t("table.email")}
-              </th>
-              <th className="text-left px-4 py-3 text-gray-600 dark:text-gray-400 font-medium">
-                {t("table.role")}
-              </th>
-              <th className="text-left px-4 py-3 text-gray-600 dark:text-gray-400 font-medium">
-                {t("table.status")}
-              </th>
-              <th className="text-left px-4 py-3 text-gray-600 dark:text-gray-400 font-medium">
-                {t("table.lastLogin")}
-              </th>
-              <th className="text-right px-4 py-3 text-gray-600 dark:text-gray-400 font-medium">
-                {t("table.actions")}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr
-                key={user.id}
-                className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
-              >
-                {/* User Info */}
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    {user.avatar?.light ? (
-                      <img
-                        src={user.avatar.light}
-                        alt=""
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                        <span className="text-gray-600 dark:text-gray-300 font-medium">
-                          {user.email?.[0]?.toUpperCase() || "U"}
-                        </span>
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-gray-900 dark:text-white font-medium">
-                        {user.firstName && user.lastName
-                          ? `${user.firstName} ${user.lastName}`
-                          : user.username || t("noName")}
-                      </p>
-                      {user.phone && (
-                        <p className="text-gray-500 text-sm">{user.phone}</p>
-                      )}
-                    </div>
+      {/* Users Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {users.map((user) => (
+          <div
+            key={user.id}
+            className="bg-white dark:bg-[#0f1118] rounded-xl border border-gray-200 dark:border-white/5 p-4 hover:border-green-primary/30 transition-all duration-200 group"
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                {user.avatar?.light ? (
+                  <img
+                    src={user.avatar.light}
+                    alt=""
+                    className="size-12 rounded-xl object-cover ring-2 ring-gray-100 dark:ring-white/10"
+                  />
+                ) : (
+                  <div className="size-12 rounded-xl bg-gradient-to-br from-green-primary/20 to-green-primary/5 flex items-center justify-center ring-2 ring-gray-100 dark:ring-white/10">
+                    <span className="text-green-primary font-bold text-lg">
+                      {user.email?.[0]?.toUpperCase() || "U"}
+                    </span>
                   </div>
-                </td>
-
-                {/* Email */}
-                <td className="px-4 py-3">
-                  <span className="text-gray-700 dark:text-gray-300">
+                )}
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                    {user.firstName && user.lastName
+                      ? `${user.firstName} ${user.lastName}`
+                      : user.username || t("noName")}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                     {user.email}
-                  </span>
-                </td>
+                  </p>
+                </div>
+              </div>
 
-                {/* Role */}
-                <td className="px-4 py-3">
-                  <span
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getRoleBadge(
-                      user.role
-                    )}`}
+              {/* Actions Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 text-gray-400 hover:text-gray-600 dark:hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <Shield className="w-3 h-3" />
-                    {t(`roles.${user.role}`)}
-                  </span>
-                </td>
-
-                {/* Status */}
-                <td className="px-4 py-3">
-                  <div className="flex flex-col gap-1">
-                    {user.isVerified ? (
-                      <span className="inline-flex items-center gap-1 text-green-400 text-sm">
-                        <UserCheck className="w-4 h-4" />
-                        {t("verified")}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-yellow-400 text-sm">
-                        <UserX className="w-4 h-4" />
-                        {t("unverified")}
-                      </span>
-                    )}
-                    {user.isDeleted && (
-                      <span className="inline-flex items-center gap-1 text-red-400 text-sm">
-                        <Trash2 className="w-4 h-4" />
-                        {t("deleted")}
-                      </span>
-                    )}
-                  </div>
-                </td>
-
-                {/* Last Login */}
-                <td className="px-4 py-3">
-                  <span className="text-gray-500 dark:text-gray-400 text-sm">
-                    {user.lastLogin
-                      ? new Date(user.lastLogin).toLocaleDateString()
-                      : t("never")}
-                  </span>
-                </td>
-
-                {/* Actions */}
-                <td className="px-4 py-3">
-                  <div className="flex items-center justify-end gap-2">
-                    <Link href={`/dashboard/users/${user.id}/edit`}>
-                      <button
-                        className="p-2 text-gray-400 hover:text-green-primary hover:bg-green-primary/10 rounded-lg transition-colors"
-                        title={t("edit")}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
+                    <MoreHorizontal className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={`/dashboard/users/${user.id}/edit`}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Edit className="size-4" />
+                      {t("edit")}
                     </Link>
-
-                    <button
-                      onClick={() => handleResetPassword(user.id, user.email)}
-                      disabled={
-                        isLoading === `reset-${user.id}` ||
-                        user.role === "admin"
-                      }
-                      className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-yellow-400/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={t("resetPassword")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={`/dashboard/users/${user.id}/following-teams`}
+                      className="flex items-center gap-2 cursor-pointer"
                     >
-                      <Key className="w-4 h-4" />
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(user.id)}
-                      disabled={isLoading === user.id || user.role === "admin"}
-                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={t("delete")}
+                      <Heart className="size-4" />
+                      {t("followingTeams") || "Following Teams"}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={`/dashboard/users/${user.id}/following-players`}
+                      className="flex items-center gap-2 cursor-pointer"
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                      <Heart className="size-4" />
+                      {t("followingPlayers") || "Following Players"}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => handleResetPassword(user.id, user.email)}
+                    disabled={isLoading === `reset-${user.id}` || user.role === "admin"}
+                    className="flex items-center gap-2 cursor-pointer text-yellow-600 dark:text-yellow-500 focus:text-yellow-600 dark:focus:text-yellow-500"
+                  >
+                    <Key className="size-4" />
+                    {t("resetPassword")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleDelete(user.id)}
+                    disabled={isLoading === user.id || user.role === "admin"}
+                    className="flex items-center gap-2 cursor-pointer text-red-600 dark:text-red-500 focus:text-red-600 dark:focus:text-red-500"
+                  >
+                    <Trash2 className="size-4" />
+                    {t("delete")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Info */}
+            <div className="space-y-3">
+              {/* Role & Status */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${getRoleBadge(
+                    user.role
+                  )}`}
+                >
+                  <Shield className="size-3" />
+                  {t(`roles.${user.role}`)}
+                </span>
+
+                {user.isVerified ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
+                    <UserCheck className="size-3" />
+                    {t("verified")}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                    <UserX className="size-3" />
+                    {t("unverified")}
+                  </span>
+                )}
+
+                {user.isDeleted && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">
+                    <Trash2 className="size-3" />
+                    {t("deleted")}
+                  </span>
+                )}
+              </div>
+
+              {/* Additional Info */}
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-white/5">
+                {user.phone && <span>{user.phone}</span>}
+                <span>
+                  {t("lastLogin")}:{" "}
+                  {user.lastLogin
+                    ? new Date(user.lastLogin).toLocaleDateString()
+                    : t("never")}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4">
         <p className="text-gray-500 dark:text-gray-400 text-sm">
           {t("showing", {
             from: (meta.page - 1) * meta.limit + 1,
@@ -250,11 +260,11 @@ export default function UsersListTable({ users, meta }) {
 
       {/* Reset Password Result Modal */}
       {resetResult && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0f1118] rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl border border-gray-200 dark:border-white/10">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 mx-auto mb-4 bg-green-500/10 rounded-full flex items-center justify-center">
-                <Key className="w-8 h-8 text-green-500" />
+              <div className="size-16 mx-auto mb-4 bg-green-500/10 rounded-2xl flex items-center justify-center">
+                <Key className="size-8 text-green-500" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                 {t("passwordResetSuccess")}
@@ -265,7 +275,7 @@ export default function UsersListTable({ users, meta }) {
             </div>
 
             <div className="space-y-4">
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+              <div className="bg-gray-50 dark:bg-[#1a1d2e] rounded-xl p-4">
                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">
                   {t("email")}
                 </p>
@@ -274,7 +284,7 @@ export default function UsersListTable({ users, meta }) {
                 </p>
               </div>
 
-              <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/30 rounded-xl p-4">
+              <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 rounded-xl p-4">
                 <p className="text-yellow-700 dark:text-yellow-400 text-sm mb-1">
                   {t("newPassword")}
                 </p>
@@ -288,9 +298,9 @@ export default function UsersListTable({ users, meta }) {
                     title={t("copy")}
                   >
                     {copied ? (
-                      <Check className="w-5 h-5 text-green-500" />
+                      <Check className="size-5 text-green-500" />
                     ) : (
-                      <Copy className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                      <Copy className="size-5 text-yellow-600 dark:text-yellow-400" />
                     )}
                   </button>
                 </div>
@@ -299,7 +309,7 @@ export default function UsersListTable({ users, meta }) {
 
             <button
               onClick={closeResetModal}
-              className="w-full mt-6 bg-green-primary hover:bg-green-primary/80 text-white font-medium py-3 rounded-xl transition-colors"
+              className="w-full mt-6 bg-green-primary hover:bg-green-primary/90 text-white font-medium py-3 rounded-xl transition-colors"
             >
               {t("close")}
             </button>

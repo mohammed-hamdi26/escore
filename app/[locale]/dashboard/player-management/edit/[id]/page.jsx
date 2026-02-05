@@ -5,6 +5,7 @@ import { getPlayer } from "@/app/[locale]/_Lib/palyerApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import PlayerFormRedesign from "@/components/Player Management/PlayerFormRedesign";
+import { PlayerEditWrapper } from "@/components/Player Management/PlayerFormWrapper";
 
 async function page({ params }) {
   const { id } = await params;
@@ -18,17 +19,19 @@ async function page({ params }) {
     ]);
 
   return (
-    <PlayerFormRedesign
-      OptionsData={{
-        teamsOptions: teamsOptions || [],
-        gamesOptions: gamesOptions || [],
-        tournamentsOptions: tournamentsOptions || [],
-      }}
-      submit={editPlayer}
-      countries={countries.countries || []}
-      player={player}
-      formType="edit"
-    />
+    <PlayerEditWrapper>
+      <PlayerFormRedesign
+        OptionsData={{
+          teamsOptions: teamsOptions || [],
+          gamesOptions: gamesOptions || [],
+          tournamentsOptions: tournamentsOptions || [],
+        }}
+        submit={editPlayer}
+        countries={countries.countries || []}
+        player={player}
+        formType="edit"
+      />
+    </PlayerEditWrapper>
   );
 }
 

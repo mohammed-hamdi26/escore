@@ -5,6 +5,7 @@ import { getTeam } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import TeamFormRedesign from "@/components/teams management/TeamFormRedesign";
+import { TeamEditWrapper } from "@/components/teams management/TeamFormWrapper";
 
 export default async function page({ params }) {
   const { id } = await params;
@@ -38,12 +39,14 @@ export default async function page({ params }) {
   })) || [];
 
   return (
-    <TeamFormRedesign
-      submit={updateTeam}
-      countries={countries.countries}
-      team={team}
-      OptionsData={{ gamesOptions: gamesOptions || [], tournamentsOptions, playersOptions }}
-      formType="edit"
-    />
+    <TeamEditWrapper>
+      <TeamFormRedesign
+        submit={updateTeam}
+        countries={countries.countries}
+        team={team}
+        OptionsData={{ gamesOptions: gamesOptions || [], tournamentsOptions, playersOptions }}
+        formType="edit"
+      />
+    </TeamEditWrapper>
   );
 }

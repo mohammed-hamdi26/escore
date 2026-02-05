@@ -4,6 +4,7 @@ import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTransfer } from "@/app/[locale]/_Lib/transferApi";
 import TransfersForm from "@/components/transfers-management/TransfersForm";
+import { TransferEditWrapper } from "@/components/transfers/TransferFormWrapper";
 import { notFound } from "next/navigation";
 
 async function EditTransferPage({ params }) {
@@ -27,14 +28,16 @@ async function EditTransferPage({ params }) {
   ]);
 
   return (
-    <TransfersForm
-      submit={editTransfer}
-      playersOptions={playersData?.data || []}
-      transfer={transfer}
-      formType="edit"
-      teamsOptions={teamsData?.data || []}
-      gamesOptions={gamesData?.data || []}
-    />
+    <TransferEditWrapper>
+      <TransfersForm
+        submit={editTransfer}
+        playersOptions={playersData?.data || []}
+        transfer={transfer}
+        formType="edit"
+        teamsOptions={teamsData?.data || []}
+        gamesOptions={gamesData?.data || []}
+      />
+    </TransferEditWrapper>
   );
 }
 

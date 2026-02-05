@@ -4,6 +4,7 @@ import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import PlayerFormRedesign from "@/components/Player Management/PlayerFormRedesign";
+import { PlayerAddWrapper } from "@/components/Player Management/PlayerFormWrapper";
 
 async function page() {
   const [
@@ -19,16 +20,18 @@ async function page() {
   ]);
 
   return (
-    <PlayerFormRedesign
-      OptionsData={{
-        teamsOptions: teamsOptions || [],
-        gamesOptions: gamesOptions || [],
-        tournamentsOptions: tournamentsOptions || [],
-      }}
-      submit={addPlayer}
-      countries={countries.countries || []}
-      formType="add"
-    />
+    <PlayerAddWrapper>
+      <PlayerFormRedesign
+        OptionsData={{
+          teamsOptions: teamsOptions || [],
+          gamesOptions: gamesOptions || [],
+          tournamentsOptions: tournamentsOptions || [],
+        }}
+        submit={addPlayer}
+        countries={countries.countries || []}
+        formType="add"
+      />
+    </PlayerAddWrapper>
   );
 }
 
