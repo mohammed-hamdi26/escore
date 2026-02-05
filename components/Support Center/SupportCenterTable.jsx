@@ -1,14 +1,141 @@
 "use client";
+
 import { useState } from "react";
 import { format } from "date-fns";
-import { Eye, Trash2, MessageSquare } from "lucide-react";
+import {
+  Eye,
+  Trash2,
+  MessageSquare,
+  MoreHorizontal,
+  Clock,
+  User,
+  Calendar,
+  AlertCircle,
+  Bug,
+  Lightbulb,
+  HelpCircle,
+  AlertTriangle,
+  MoreHorizontalIcon,
+  CheckCircle,
+  XCircle,
+  Flame,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import { useTranslations } from "next-intl";
-import { StatusBadge, PriorityBadge, CategoryBadge } from "./TicketBadges";
 import TicketDetailsModal from "./TicketDetailsModal";
 import Pagination from "../ui app/Pagination";
 import { deleteSupportTicket } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+// Badge components with icons
+const getStatusConfig = (status) => {
+  const configs = {
+    open: {
+      icon: AlertCircle,
+      bg: "bg-yellow-500/10",
+      text: "text-yellow-500",
+      border: "border-yellow-500/20",
+    },
+    in_progress: {
+      icon: Clock,
+      bg: "bg-purple-500/10",
+      text: "text-purple-500",
+      border: "border-purple-500/20",
+    },
+    waiting_reply: {
+      icon: MessageSquare,
+      bg: "bg-cyan-500/10",
+      text: "text-cyan-500",
+      border: "border-cyan-500/20",
+    },
+    resolved: {
+      icon: CheckCircle,
+      bg: "bg-green-500/10",
+      text: "text-green-500",
+      border: "border-green-500/20",
+    },
+    closed: {
+      icon: XCircle,
+      bg: "bg-gray-500/10",
+      text: "text-gray-500",
+      border: "border-gray-500/20",
+    },
+  };
+  return configs[status] || configs.open;
+};
+
+const getCategoryConfig = (category) => {
+  const configs = {
+    bug: {
+      icon: Bug,
+      bg: "bg-red-500/10",
+      text: "text-red-500",
+      border: "border-red-500/20",
+    },
+    feature: {
+      icon: Lightbulb,
+      bg: "bg-indigo-500/10",
+      text: "text-indigo-500",
+      border: "border-indigo-500/20",
+    },
+    question: {
+      icon: HelpCircle,
+      bg: "bg-blue-500/10",
+      text: "text-blue-500",
+      border: "border-blue-500/20",
+    },
+    complaint: {
+      icon: AlertTriangle,
+      bg: "bg-amber-500/10",
+      text: "text-amber-500",
+      border: "border-amber-500/20",
+    },
+    other: {
+      icon: MoreHorizontalIcon,
+      bg: "bg-gray-500/10",
+      text: "text-gray-500",
+      border: "border-gray-500/20",
+    },
+  };
+  return configs[category] || configs.other;
+};
+
+const getPriorityConfig = (priority) => {
+  const configs = {
+    low: {
+      icon: AlertCircle,
+      bg: "bg-gray-500/10",
+      text: "text-gray-500",
+      border: "border-gray-500/20",
+    },
+    medium: {
+      icon: AlertCircle,
+      bg: "bg-blue-500/10",
+      text: "text-blue-500",
+      border: "border-blue-500/20",
+    },
+    high: {
+      icon: AlertTriangle,
+      bg: "bg-orange-500/10",
+      text: "text-orange-500",
+      border: "border-orange-500/20",
+    },
+    urgent: {
+      icon: Flame,
+      bg: "bg-red-500/10",
+      text: "text-red-500",
+      border: "border-red-500/20",
+    },
+  };
+  return configs[priority] || configs.low;
+};
 
 export default function SupportTicketsTable({ tickets, pagination }) {
   const t = useTranslations("SupportCenter");
@@ -30,117 +157,174 @@ export default function SupportTicketsTable({ tickets, pagination }) {
     setDeletingId(null);
   };
 
+  // Status label mapping
+  const getStatusLabel = (status) => {
+    const labels = {
+      open: "Open",
+      in_progress: "In Progress",
+      waiting_reply: "Waiting Reply",
+      resolved: "Resolved",
+      closed: "Closed",
+    };
+    return t(labels[status] || status);
+  };
+
+  // Category label mapping
+  const getCategoryLabel = (category) => {
+    const labels = {
+      bug: "Bug",
+      feature: "Feature Request",
+      question: "Question",
+      complaint: "Complaint",
+      other: "Other",
+    };
+    return t(labels[category] || category);
+  };
+
+  // Priority label mapping
+  const getPriorityLabel = (priority) => {
+    const labels = {
+      low: "Low",
+      medium: "Medium",
+      high: "High",
+      urgent: "Urgent",
+    };
+    return t(labels[priority] || priority);
+  };
+
+  if (!tickets || tickets.length === 0) {
+    return (
+      <div className="bg-white dark:bg-[#0f1118] rounded-xl p-12 border border-gray-200 dark:border-white/5 text-center">
+        <div className="size-16 rounded-full bg-gray-100 dark:bg-[#1a1d2e] flex items-center justify-center mx-auto mb-4">
+          <MessageSquare className="size-8 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          {t("No tickets found") || "No tickets found"}
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400">
+          {t("noTicketsDescription") || "Try adjusting your filters"}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      {/* Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-900">
-              <tr>
-                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
-                  {t("Ticket")}
-                </th>
-                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
-                  {t("User")}
-                </th>
-                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
-                  {t("Category")}
-                </th>
-                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
-                  {t("Status")}
-                </th>
-                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
-                  {t("Priority")}
-                </th>
-                <th className="px-4 py-3 text-start text-sm font-medium text-gray-600 dark:text-gray-300">
-                  {t("Date")}
-                </th>
-                <th className="px-4 py-3 text-end text-sm font-medium text-gray-600 dark:text-gray-300">
-                  {t("Actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-              {tickets.length > 0 ? (
-                tickets.map((ticket) => (
-                  <tr
-                    key={ticket.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                  >
-                    <td className="px-4 py-3">
-                      <div className="space-y-1">
-                        <p className="font-medium text-gray-900 dark:text-white text-sm">
-                          {ticket.ticketNumber}
-                        </p>
-                        <p className="text-gray-600 dark:text-gray-400 text-xs line-clamp-1 max-w-[200px]">
-                          {ticket.subject}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="text-sm text-gray-900 dark:text-white">
-                        {ticket.user?.email || "-"}
-                      </p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <CategoryBadge category={ticket.category} t={t} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={ticket.status} t={t} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <PriorityBadge priority={ticket.priority} t={t} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {format(new Date(ticket.createdAt), "yyyy-MM-dd")}
-                        <div className="text-xs text-gray-500">
-                          {format(new Date(ticket.createdAt), "HH:mm")}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setSelectedTicketId(ticket.id)}
-                          className="flex text-black dark:text-white items-center gap-1"
-                        >
-                          <Eye className="w-4 h-4" />
-                          <span className="hidden md:inline">{t("View")}</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDelete(ticket.id)}
-                          disabled={deletingId === ticket.id}
-                          className="flex items-center gap-1"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center">
-                    <MessageSquare className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-                    <p className="text-gray-500 dark:text-gray-400">
-                      {t("No tickets found")}
-                    </p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      {/* Tickets Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {tickets.map((ticket) => {
+          const statusConfig = getStatusConfig(ticket.status);
+          const categoryConfig = getCategoryConfig(ticket.category);
+          const priorityConfig = getPriorityConfig(ticket.priority);
+          const StatusIcon = statusConfig.icon;
+          const CategoryIcon = categoryConfig.icon;
+          const PriorityIcon = priorityConfig.icon;
+
+          return (
+            <div
+              key={ticket.id}
+              className="bg-white dark:bg-[#0f1118] rounded-xl border border-gray-200 dark:border-white/5 p-4 hover:border-green-primary/30 transition-all duration-200 group"
+            >
+              {/* Header */}
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#1a1d2e] px-2 py-0.5 rounded">
+                      {ticket.ticketNumber}
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}
+                    >
+                      <StatusIcon className="size-3" />
+                      {getStatusLabel(ticket.status)}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1">
+                    {ticket.subject}
+                  </h3>
+                </div>
+
+                {/* Actions Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-gray-400 hover:text-gray-600 dark:hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <MoreHorizontal className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem
+                      onClick={() => setSelectedTicketId(ticket.id)}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Eye className="size-4" />
+                      {t("View")}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(ticket.id)}
+                      disabled={deletingId === ticket.id}
+                      className="flex items-center gap-2 cursor-pointer text-red-600 dark:text-red-500 focus:text-red-600 dark:focus:text-red-500"
+                    >
+                      <Trash2 className="size-4" />
+                      {t("Delete")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* Description Preview */}
+              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                {ticket.description}
+              </p>
+
+              {/* Tags */}
+              <div className="flex items-center gap-2 flex-wrap mb-3">
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium border ${categoryConfig.bg} ${categoryConfig.text} ${categoryConfig.border}`}
+                >
+                  <CategoryIcon className="size-3" />
+                  {getCategoryLabel(ticket.category)}
+                </span>
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium border ${priorityConfig.bg} ${priorityConfig.text} ${priorityConfig.border}`}
+                >
+                  <PriorityIcon className="size-3" />
+                  {getPriorityLabel(ticket.priority)}
+                </span>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-3 border-t border-gray-100 dark:border-white/5">
+                <div className="flex items-center gap-1">
+                  <User className="size-3" />
+                  <span className="truncate max-w-[120px]">
+                    {ticket.user?.email || t("Unknown User")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Calendar className="size-3" />
+                  <span>{format(new Date(ticket.createdAt), "MMM dd, yyyy")}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Pagination */}
-      {numPages > 1 && <Pagination numPages={numPages} />}
+      {numPages > 1 && (
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            {t("showing") || "Showing"} {tickets.length} {t("of") || "of"}{" "}
+            {pagination?.total || tickets.length} {t("tickets") || "tickets"}
+          </p>
+          <Pagination numPages={numPages} />
+        </div>
+      )}
 
       {/* Ticket Details Modal */}
       {selectedTicketId && (

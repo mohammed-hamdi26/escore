@@ -1,23 +1,26 @@
 "use client";
+
 import {
   Ticket,
   Clock,
   CheckCircle,
   AlertCircle,
   MessageSquare,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-function StatCard({ title, value, icon: Icon, color, bgColor }) {
+function StatCard({ title, value, icon: Icon, gradient, iconBg }) {
   return (
-    <div className={`${bgColor} rounded-xl p-4 flex items-center gap-4`}>
-      <div className={`${color} p-3 rounded-full bg-white/20`}>
-        <Icon className="w-6 h-6 text-white" />
-      </div>
-      <div>
-        <p className="text-white/80 text-sm">{title}</p>
-        <p className="text-white text-2xl font-bold">{value}</p>
+    <div className="bg-white dark:bg-[#0f1118] rounded-xl p-4 border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-200">
+      <div className="flex items-center gap-3">
+        <div className={`size-12 rounded-xl ${iconBg} flex items-center justify-center`}>
+          <Icon className={`size-6 ${gradient}`} />
+        </div>
+        <div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+        </div>
       </div>
     </div>
   );
@@ -26,49 +29,74 @@ function StatCard({ title, value, icon: Icon, color, bgColor }) {
 export default function SupportStatsCards({ stats }) {
   const t = useTranslations("SupportCenter");
 
-  if (!stats) return null;
+  if (!stats) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="bg-white dark:bg-[#0f1118] rounded-xl p-4 border border-gray-200 dark:border-white/5 animate-pulse"
+          >
+            <div className="flex items-center gap-3">
+              <div className="size-12 rounded-xl bg-gray-200 dark:bg-gray-700" />
+              <div className="space-y-2">
+                <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="h-6 w-10 bg-gray-200 dark:bg-gray-700 rounded" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   const cards = [
     {
       title: t("Total Tickets"),
       value: stats.total || 0,
       icon: Ticket,
-      bgColor: "bg-gradient-to-r from-blue-500 to-blue-600",
+      gradient: "text-blue-500",
+      iconBg: "bg-blue-500/10",
     },
     {
       title: t("Open"),
       value: stats.open || 0,
       icon: AlertCircle,
-      bgColor: "bg-gradient-to-r from-yellow-500 to-orange-500",
+      gradient: "text-yellow-500",
+      iconBg: "bg-yellow-500/10",
     },
     {
       title: t("In Progress"),
       value: stats.inProgress || 0,
       icon: Clock,
-      bgColor: "bg-gradient-to-r from-purple-500 to-purple-600",
+      gradient: "text-purple-500",
+      iconBg: "bg-purple-500/10",
     },
     {
       title: t("Waiting Reply"),
       value: stats.waitingReply || 0,
       icon: MessageSquare,
-      bgColor: "bg-gradient-to-r from-cyan-500 to-cyan-600",
+      gradient: "text-cyan-500",
+      iconBg: "bg-cyan-500/10",
     },
     {
       title: t("Resolved"),
       value: stats.resolved || 0,
       icon: CheckCircle,
-      bgColor: "bg-gradient-to-r from-green-500 to-green-600",
+      gradient: "text-green-500",
+      iconBg: "bg-green-500/10",
     },
     {
       title: t("Closed"),
       value: stats.closed || 0,
       icon: XCircle,
-      bgColor: "bg-gradient-to-r from-gray-500 to-gray-600",
+      gradient: "text-gray-500",
+      iconBg: "bg-gray-500/10",
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
       {cards.map((card, index) => (
         <StatCard key={index} {...card} />
       ))}
