@@ -495,7 +495,6 @@ function NewsFormRedesign({
               formik={formik}
               aspectRatio="news-cover"
               hint={t("coverImagePlaceholder") || "Recommended: 1200x630px"}
-              showUrlInput
             />
             <ImageUpload
               label={t("coverImageDark")}

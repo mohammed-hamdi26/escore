@@ -12,7 +12,6 @@ import {
   Shield,
   UserCheck,
   UserX,
-  Trash2,
   Check,
 } from "lucide-react";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
@@ -43,11 +42,6 @@ const STATUS_OPTIONS = [
   { value: "false", labelKey: "filters.unverified", icon: UserX, color: "text-yellow-500" },
 ];
 
-const DELETED_OPTIONS = [
-  { value: "false", labelKey: "filters.activeOnly", icon: UserCheck, color: "text-green-500" },
-  { value: "true", labelKey: "filters.deletedOnly", icon: Trash2, color: "text-red-500" },
-];
-
 export default function UsersFilters({ currentFilters }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -61,7 +55,6 @@ export default function UsersFilters({ currentFilters }) {
   // Popover states
   const [roleOpen, setRoleOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
-  const [deletedOpen, setDeletedOpen] = useState(false);
 
   // Sync search term with URL
   useEffect(() => {
@@ -72,7 +65,6 @@ export default function UsersFilters({ currentFilters }) {
   const activeFiltersCount = [
     currentFilters.role,
     currentFilters.isVerified,
-    currentFilters.isDeleted === "true" ? "true" : "",
   ].filter(Boolean).length;
 
   const updateParams = useCallback(
@@ -118,10 +110,6 @@ export default function UsersFilters({ currentFilters }) {
   const selectedStatus = useMemo(() => {
     return STATUS_OPTIONS.find((s) => s.value === currentFilters.isVerified) || STATUS_OPTIONS[0];
   }, [currentFilters.isVerified]);
-
-  const selectedDeleted = useMemo(() => {
-    return DELETED_OPTIONS.find((d) => d.value === currentFilters.isDeleted) || DELETED_OPTIONS[0];
-  }, [currentFilters.isDeleted]);
 
   // Helper to get translation
   const getLabel = (labelKey) => t(labelKey) || labelKey;
@@ -189,7 +177,7 @@ export default function UsersFilters({ currentFilters }) {
       {/* Expanded Filters */}
       {showFilters && (
         <div className="bg-gray-50 dark:bg-[#0f1118] rounded-xl p-4 border border-gray-200 dark:border-white/5 animate-in slide-in-from-top-2 duration-200">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Role Filter */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
@@ -316,68 +304,6 @@ export default function UsersFilters({ currentFilters }) {
               </Popover>
             </div>
 
-            {/* Deleted Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                <Trash2 className="size-4" />
-                {t("filters.showDeleted") || "Show Deleted"}
-              </label>
-              <Popover open={deletedOpen} onOpenChange={setDeletedOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={deletedOpen}
-                    className="w-full h-10 justify-between rounded-lg bg-white dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-gray-50 dark:hover:bg-[#252a3d]"
-                  >
-                    <span className="flex items-center gap-2 truncate">
-                      {(() => {
-                        const DeletedIcon = selectedDeleted.icon;
-                        return (
-                          <>
-                            <DeletedIcon className={`size-4 ${selectedDeleted.color}`} />
-                            <span className="text-gray-900 dark:text-white">
-                              {getLabel(selectedDeleted.labelKey)}
-                            </span>
-                          </>
-                        );
-                      })()}
-                    </span>
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[220px] p-0" align="start">
-                  <Command>
-                    <CommandList>
-                      <CommandGroup>
-                        {DELETED_OPTIONS.map((option) => {
-                          const OptionIcon = option.icon;
-                          return (
-                            <CommandItem
-                              key={option.value}
-                              value={option.value}
-                              onSelect={() => {
-                                updateParams("isDeleted", option.value);
-                                setDeletedOpen(false);
-                              }}
-                              className="flex items-center gap-2 cursor-pointer"
-                            >
-                              <Check
-                                className={`h-4 w-4 ${
-                                  currentFilters.isDeleted === option.value ? "opacity-100" : "opacity-0"
-                                }`}
-                              />
-                              <OptionIcon className={`size-4 ${option.color}`} />
-                              <span>{getLabel(option.labelKey)}</span>
-                            </CommandItem>
-                          );
-                        })}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
           </div>
         </div>
       )}
