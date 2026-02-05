@@ -3,10 +3,12 @@ import TopNav from "@/components/dashboard/TopNav";
 import { getLoginUser } from "../_Lib/usersApi";
 import { redirect } from "next/navigation";
 import { PermissionsProvider } from "@/contexts/PermissionsContext";
+import { cookies } from "next/headers";
 
-export default async function DashboardLayout({ children }) {
+export default async function DashboardLayout({ children, params }) {
   let user = null;
   let shouldRedirect = false;
+  const { locale } = await params;
 
   try {
     user = await getLoginUser();
@@ -15,7 +17,12 @@ export default async function DashboardLayout({ children }) {
   }
 
   if (shouldRedirect || !user) {
-    redirect("/api/auth/force-logout");
+    // Clear the session cookie directly
+    const cookieStore = await cookies();
+    cookieStore.delete("session");
+
+    // Redirect to login page
+    redirect(`/${locale || "en"}/login`);
   }
 
   return (
