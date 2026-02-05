@@ -531,11 +531,6 @@ export async function addLanguage(language_data) {
     const response = await apiClient.post(
       `/settings/languages`,
       language_data
-      // {
-      //   headers: {
-      //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
-      //   },
-      // }
     );
     console.log("Language added:", response.data);
     return response.data;
@@ -550,11 +545,6 @@ export async function updateLanguage(code, language_data) {
     const response = await apiClient.patch(
       `/settings/languages/${code}`,
       language_data
-      // {
-      //   headers: {
-      //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
-      //   },
-      // }
     );
     console.log("Language updated:", response.data);
     return response.data;
@@ -565,14 +555,7 @@ export async function updateLanguage(code, language_data) {
 }
 export async function deleteLanguage(code) {
   try {
-    const response = await apiClient.delete(
-      `/settings/languages/${code}`
-      // {
-      //   headers: {
-      //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
-      //   },
-      // }
-    );
+    const response = await apiClient.delete(`/settings/languages/${code}`);
 
     return response.data;
   } catch (error) {

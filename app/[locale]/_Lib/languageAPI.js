@@ -20,21 +20,3 @@ export async function getSpecificLanguage(code) {
     throw error;
   }
 }
-
-// export async function deleteLanguage(code) {
-//   try {
-//     const response = await axios.delete(
-//       `${process.env.NEXT_PUBLIC_BASE_URL}/languages/${code}`,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
-//         },
-//       }
-//     );
-
-//     return response.data;
-//   } catch (error) {
-//     console.error("Failed to delete language:", error);
-//     throw error;
-//   }
-// }
