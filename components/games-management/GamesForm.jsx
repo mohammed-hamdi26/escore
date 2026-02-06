@@ -29,6 +29,10 @@ const validationSchema = yup.object({
   name: yup.string().required("Game name is required").max(100, "Name must be at most 100 characters"),
   slug: yup.string().max(100, "Slug must be at most 100 characters"),
   description: yup.string().max(2000, "Description must be at most 2000 characters"),
+  logoLight: yup.string(),
+  logoDark: yup.string(),
+  coverImageLight: yup.string(),
+  coverImageDark: yup.string(),
   releaseDate: yup.date().nullable().typeError("Invalid date"),
   isActive: yup.boolean(),
 });
@@ -245,7 +249,7 @@ export default function GamesForm({
               name="logoLight"
               placeholder={t("uploadLogoLight") || "Upload"}
               compact={true}
-              aspectRatio="square"
+              imageType="gameLogo"
             />
           </div>
 
@@ -259,7 +263,7 @@ export default function GamesForm({
               name="logoDark"
               placeholder={t("uploadLogoDark") || "Upload"}
               compact={true}
-              aspectRatio="square"
+              imageType="gameLogo"
             />
           </div>
 
@@ -273,7 +277,7 @@ export default function GamesForm({
               name="coverImageLight"
               placeholder={t("uploadCoverLight") || "Upload"}
               compact={true}
-              aspectRatio="square"
+              imageType="gameCover"
             />
           </div>
 
@@ -287,7 +291,7 @@ export default function GamesForm({
               name="coverImageDark"
               placeholder={t("uploadCoverDark") || "Upload"}
               compact={true}
-              aspectRatio="square"
+              imageType="gameCover"
             />
           </div>
         </div>

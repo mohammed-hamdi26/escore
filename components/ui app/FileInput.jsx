@@ -30,6 +30,7 @@ function FileInput({
   error,
   inputAuth = false,
   enableCrop = true, // New prop to enable/disable cropping
+  imageType = null, // NEW: Image type from IMAGE_SPECS (locks aspect ratio)
   ...props
 }) {
   const [file, setFiles] = useState(null);
@@ -159,7 +160,8 @@ function FileInput({
                   }
                   const formData = new FormData();
                   formData.append("image", file);
-                  const url = await uploadPhoto(formData);
+                  // Pass imageType if provided for backend processing
+                  const url = await uploadPhoto(formData, imageType);
                   setUrl(`${url}`);
                   formik.setFieldValue(name, `${url}`);
                   toast.success(t("uploaded Photo"));
@@ -213,6 +215,7 @@ function FileInput({
         onClose={handleCropperClose}
         imageSrc={previewUrl}
         onCropComplete={handleCropComplete}
+        imageType={imageType}
       />
     </div>
   );

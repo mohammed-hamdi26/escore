@@ -122,26 +122,30 @@ function GamesDetails({ game }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Logo Section */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-muted-foreground">{t("logo") || "Logo"}</h4>
+                <h4 className="text-sm font-medium text-muted-foreground">{t("logo") || "Logo"} (1:1)</h4>
                 <div className="grid grid-cols-2 gap-4">
                   {game.logo?.light && (
                     <div className="space-y-2">
                       <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
-                      <img
-                        src={game.logo.light}
-                        alt="Logo Light"
-                        className="w-full h-24 object-contain rounded-xl bg-white p-2 ring-1 ring-gray-200"
-                      />
+                      <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
+                        <img
+                          src={game.logo.light}
+                          alt="Logo Light"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
                     </div>
                   )}
                   {game.logo?.dark && (
                     <div className="space-y-2">
                       <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
-                      <img
-                        src={game.logo.dark}
-                        alt="Logo Dark"
-                        className="w-full h-24 object-contain rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10"
-                      />
+                      <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
+                        <img
+                          src={game.logo.dark}
+                          alt="Logo Dark"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -150,26 +154,30 @@ function GamesDetails({ game }) {
               {/* Cover Image Section */}
               {(game.coverImage?.light || game.coverImage?.dark) && (
                 <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-muted-foreground">{t("coverImage") || "Cover Image"}</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground">{t("coverImage") || "Cover Image"} (16:9)</h4>
                   <div className="grid grid-cols-2 gap-4">
                     {game.coverImage?.light && (
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
-                        <img
-                          src={game.coverImage.light}
-                          alt="Cover Light"
-                          className="w-full h-24 object-cover rounded-xl ring-1 ring-gray-200"
-                        />
+                        <div className="aspect-video w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
+                          <img
+                            src={game.coverImage.light}
+                            alt="Cover Light"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
                       </div>
                     )}
                     {game.coverImage?.dark && (
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
-                        <img
-                          src={game.coverImage.dark}
-                          alt="Cover Dark"
-                          className="w-full h-24 object-cover rounded-xl ring-1 ring-white/10"
-                        />
+                        <div className="aspect-video w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
+                          <img
+                            src={game.coverImage.dark}
+                            alt="Cover Dark"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>

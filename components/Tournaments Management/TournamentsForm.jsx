@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { Button } from "../ui/button";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import FormSection from "../ui app/FormSection";
 import FormRow from "../ui app/FormRow";
@@ -84,6 +85,12 @@ const validateSchema = yup.object({
     .test("games", "At least one game is required", (value) => value && value.length > 0),
   streamUrl: yup.string().url("Must be a valid URL").nullable(),
   websiteUrl: yup.string().url("Must be a valid URL").nullable(),
+  logoLight: yup.string(),
+  logoDark: yup.string(),
+  coverImageLight: yup.string(),
+  coverImageDark: yup.string(),
+  knockoutImageLight: yup.string(),
+  knockoutImageDark: yup.string(),
 });
 
 export default function TournamentsForm({
@@ -94,6 +101,7 @@ export default function TournamentsForm({
   gameOptions = [],
 }) {
   const t = useTranslations("TournamentForm");
+  const router = useRouter();
 
   // Helper function to format date to YYYY-MM-DD using local timezone
   const formatDateToLocal = (dateInput) => {
@@ -119,6 +127,8 @@ export default function TournamentsForm({
       status: tournament?.status || "upcoming",
       logoLight: tournament?.logo?.light || "",
       logoDark: tournament?.logo?.dark || "",
+      coverImageLight: tournament?.coverImage?.light || "",
+      coverImageDark: tournament?.coverImage?.dark || "",
       country: tournament?.country?.name || "",
       gamesData: tournament?.games || [],
       knockoutImageLight: tournament?.bracketImage?.light || "",
@@ -162,6 +172,14 @@ export default function TournamentsForm({
             }
           : null;
 
+        // Build coverImage object
+        dataValues.coverImage = dataValues.coverImageLight
+          ? {
+              light: dataValues.coverImageLight,
+              dark: dataValues.coverImageDark || dataValues.coverImageLight,
+            }
+          : null;
+
         // Convert dates to ISO datetime format for backend (preserving local date)
         if (dataValues.startDate) {
           const [year, month, day] = dataValues.startDate.split('-').map(Number);
@@ -197,20 +215,30 @@ export default function TournamentsForm({
         // Clean up temporary fields
         delete dataValues.logoLight;
         delete dataValues.logoDark;
+        delete dataValues.coverImageLight;
+        delete dataValues.coverImageDark;
         delete dataValues.knockoutImageLight;
         delete dataValues.knockoutImageDark;
         delete dataValues.gamesData;
 
         await submit(dataValues);
-        formType === "add" && formik.resetForm();
         toast.success(
           formType === "add"
             ? t("The Tournament Added")
             : t("The Tournament Edited")
         );
+        // Navigate back to tournaments list after successful submission
+        router.push("/dashboard/tournaments-management");
       } catch (error) {
-        // Ignore NEXT_REDIRECT - it's expected behavior for successful form submission
-        if (!error.toString().includes("NEXT_REDIRECT")) {
+        // NEXT_REDIRECT means the action succeeded and called redirect()
+        if (error?.digest?.includes("NEXT_REDIRECT") || error.toString().includes("NEXT_REDIRECT")) {
+          toast.success(
+            formType === "add"
+              ? t("The Tournament Added")
+              : t("The Tournament Edited")
+          );
+          throw error; // Re-throw to let Next.js handle the redirect
+        } else {
           toast.error(error.message || "An error occurred");
         }
       }
@@ -457,17 +485,39 @@ export default function TournamentsForm({
                 label={t("Light Mode")}
                 name="logoLight"
                 formik={formik}
-                aspectRatio="square"
+                imageType="tournamentLogo"
               />
               <ImageUpload
                 label={t("Dark Mode")}
                 name="logoDark"
                 formik={formik}
-                aspectRatio="square"
+                imageType="tournamentLogo"
               />
             </div>
           </div>
 
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-foreground">{t("Cover Image")}</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <ImageUpload
+                label={t("Light Mode")}
+                name="coverImageLight"
+                formik={formik}
+                imageType="tournamentCover"
+                aspectRatio="3:2"
+              />
+              <ImageUpload
+                label={t("Dark Mode")}
+                name="coverImageDark"
+                formik={formik}
+                imageType="tournamentCover"
+                aspectRatio="3:2"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <h4 className="text-sm font-medium text-foreground">{t("Bracket Image")}</h4>
             <div className="grid grid-cols-2 gap-4">
@@ -475,13 +525,13 @@ export default function TournamentsForm({
                 label={t("Light Mode")}
                 name="knockoutImageLight"
                 formik={formik}
-                aspectRatio="landscape"
+                imageType="tournamentBracket"
               />
               <ImageUpload
                 label={t("Dark Mode")}
                 name="knockoutImageDark"
                 formik={formik}
-                aspectRatio="landscape"
+                imageType="tournamentBracket"
               />
             </div>
           </div>

@@ -28,6 +28,7 @@ async function page() {
     id: p.id || p._id,
     _id: p.id || p._id,
     nickname: p.nickname,
+    fullName: p.fullName,
     firstName: p.firstName,
     lastName: p.lastName,
     photo: p.photo,

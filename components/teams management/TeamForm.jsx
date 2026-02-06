@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import { TreePalm } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslations } from "use-intl";
+import { useRouter } from "@/i18n/navigation";
 import * as yup from "yup";
 import Date from "../icons/Date";
 import Description from "../icons/Description";
@@ -54,6 +55,7 @@ function TeamForm({
   },
 }) {
   const t = useTranslations("TeamForm");
+  const router = useRouter();
   const formik = useFormik({
     initialValues: {
       name: team?.name || "",
@@ -107,16 +109,16 @@ function TeamForm({
 
       try {
         const res = await submit(dataValues);
-
-        formType === "add" && formik.resetForm();
         toast.success(successMessage);
+        router.push("/dashboard/teams-management");
       } catch (error) {
-        if (!error.toString().includes("Error: NEXT_REDIRECT")) {
-          toast.error(error.message);
-        } else {
+        // NEXT_REDIRECT means the action succeeded and called redirect()
+        if (error?.digest?.includes("NEXT_REDIRECT") || error.toString().includes("NEXT_REDIRECT")) {
           toast.success(successMessage);
+          throw error; // Re-throw to let Next.js handle the redirect
+        } else {
+          toast.error(error.message);
         }
-        // toast.error(error.message);
       }
     },
   });

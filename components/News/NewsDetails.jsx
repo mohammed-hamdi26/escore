@@ -138,9 +138,9 @@ function NewsDetails({ news }) {
         <div className="lg:col-span-2 space-y-6">
           {/* News Header Card */}
           <div className="glass rounded-2xl overflow-hidden border border-gray-200 dark:border-white/5">
-            {/* Cover Image */}
+            {/* Cover Image - 2:1 aspect ratio (newsCover) */}
             {news.coverImage?.light && (
-              <div className="relative h-64 w-full">
+              <div className="relative aspect-[2/1] w-full">
                 <img
                   src={news.coverImage.light}
                   alt={news.title}
@@ -274,7 +274,7 @@ function NewsDetails({ news }) {
             </div>
           )}
 
-          {/* Cover Images */}
+          {/* Cover Images - 2:1 aspect ratio (newsCover) */}
           {(news.coverImage?.light || news.coverImage?.dark) && (
             <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-white/5">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -285,21 +285,25 @@ function NewsDetails({ news }) {
                 {news.coverImage?.light && (
                   <div className="space-y-2">
                     <p className="text-sm text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
-                    <img
-                      src={news.coverImage.light}
-                      alt="Cover Light"
-                      className="w-full h-40 object-cover rounded-xl ring-1 ring-gray-200"
-                    />
+                    <div className="aspect-[2/1] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
+                      <img
+                        src={news.coverImage.light}
+                        alt="Cover Light"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
                 )}
                 {news.coverImage?.dark && (
                   <div className="space-y-2">
                     <p className="text-sm text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
-                    <img
-                      src={news.coverImage.dark}
-                      alt="Cover Dark"
-                      className="w-full h-40 object-cover rounded-xl ring-1 ring-gray-200 dark:ring-white/10"
-                    />
+                    <div className="aspect-[2/1] w-full rounded-xl ring-1 ring-gray-200 dark:ring-white/10 overflow-hidden">
+                      <img
+                        src={news.coverImage.dark}
+                        alt="Cover Dark"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -407,7 +411,7 @@ function NewsDetails({ news }) {
                 {news.player.image?.light ? (
                   <img
                     src={news.player.image.light}
-                    alt={news.player.nickname}
+                    alt={news.player.nickname || news.player.fullName || 'Player'}
                     className="size-12 rounded-full object-cover"
                   />
                 ) : (
@@ -416,7 +420,7 @@ function NewsDetails({ news }) {
                   </div>
                 )}
                 <div>
-                  <p className="font-medium text-foreground">{news.player.nickname}</p>
+                  <p className="font-medium text-foreground">{news.player.nickname || news.player.fullName || `${news.player.firstName || ''} ${news.player.lastName || ''}`.trim() || 'Unknown'}</p>
                   {news.player.name && (
                     <p className="text-sm text-muted-foreground">{news.player.name}</p>
                   )}

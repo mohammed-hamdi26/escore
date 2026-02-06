@@ -403,11 +403,10 @@ function NewsForm({
             name={"player"}
             formik={formik}
             label={t("player")}
-            options={mappedArrayToSelectOptions(
-              playersOptions,
-              "nickname",
-              "id"
-            )}
+            options={(playersOptions || []).map(p => ({
+              label: p.nickname || p.fullName || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Unknown',
+              value: p.id
+            }))}
             placeholder={t("Select player")}
             onChange={(value) => formik.setFieldValue("player", value)}
           />

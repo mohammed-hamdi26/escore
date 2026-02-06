@@ -171,7 +171,7 @@ function MatchLineupSelector({
                 </div>
 
                 <div className="flex-1">
-                  <p className="font-medium text-sm text-gray-900 dark:text-white">{player.nickname}</p>
+                  <p className="font-medium text-sm text-gray-900 dark:text-white">{player.nickname || player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown'}</p>
                   {(player.firstName || player.lastName) && (
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       {player.firstName} {player.lastName}

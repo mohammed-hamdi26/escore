@@ -101,7 +101,9 @@ function PlayerDetails({ player }) {
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-2xl font-bold text-foreground truncate">{player.nickname}</h2>
+                  <h2 className="text-2xl font-bold text-foreground truncate">
+                    {player.nickname || player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim()}
+                  </h2>
                   {player.isFreeAgent && (
                     <span className="px-2 py-1 rounded-lg bg-orange-500/10 text-orange-500 text-xs font-medium">
                       {t("freeAgent") || "Free Agent"}
@@ -109,9 +111,10 @@ function PlayerDetails({ player }) {
                   )}
                 </div>
 
-                {(player.firstName || player.lastName) && (
+                {/* Show full name below nickname if both exist */}
+                {player.nickname && (player.fullName || player.firstName || player.lastName) && (
                   <p className="text-muted-foreground mb-3">
-                    {player.firstName} {player.lastName}
+                    {player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim()}
                   </p>
                 )}
 
@@ -154,6 +157,83 @@ function PlayerDetails({ player }) {
                 {t("bio") || "Biography"}
               </h3>
               <p className="text-muted-foreground whitespace-pre-wrap">{player.bio}</p>
+            </div>
+          )}
+
+          {/* Images */}
+          {(player.photo?.light || player.photo?.dark || player.coverImage?.light || player.coverImage?.dark) && (
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Eye className="size-5 text-green-primary" />
+                {t("images") || "Images"}
+              </h3>
+              <div className="space-y-6">
+                {/* Photo Section */}
+                {(player.photo?.light || player.photo?.dark) && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-muted-foreground">{t("photo") || "Photo"} (1:1)</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {player.photo?.light && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
+                          <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
+                            <img
+                              src={player.photo.light}
+                              alt="Photo Light"
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {player.photo?.dark && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
+                          <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
+                            <img
+                              src={player.photo.dark}
+                              alt="Photo Dark"
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Cover Image Section */}
+                {(player.coverImage?.light || player.coverImage?.dark) && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-muted-foreground">{t("coverImage") || "Cover Image"} (3:2)</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {player.coverImage?.light && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
+                          <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
+                            <img
+                              src={player.coverImage.light}
+                              alt="Cover Light"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {player.coverImage?.dark && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
+                          <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
+                            <img
+                              src={player.coverImage.dark}
+                              alt="Cover Dark"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

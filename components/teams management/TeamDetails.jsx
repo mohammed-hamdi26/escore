@@ -155,6 +155,83 @@ function TeamDetails({ team }) {
             </div>
           )}
 
+          {/* Images */}
+          {(team.logo?.light || team.logo?.dark || team.coverImage?.light || team.coverImage?.dark) && (
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Eye className="size-5 text-green-primary" />
+                {t("images") || "Images"}
+              </h3>
+              <div className="space-y-6">
+                {/* Logo Section */}
+                {(team.logo?.light || team.logo?.dark) && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-muted-foreground">{t("logo") || "Logo"} (1:1)</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {team.logo?.light && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
+                          <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
+                            <img
+                              src={team.logo.light}
+                              alt="Logo Light"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {team.logo?.dark && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
+                          <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
+                            <img
+                              src={team.logo.dark}
+                              alt="Logo Dark"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Cover Image Section */}
+                {(team.coverImage?.light || team.coverImage?.dark) && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-muted-foreground">{t("coverImage") || "Cover Image"} (3:2)</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {team.coverImage?.light && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
+                          <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
+                            <img
+                              src={team.coverImage.light}
+                              alt="Cover Light"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {team.coverImage?.dark && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
+                          <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
+                            <img
+                              src={team.coverImage.dark}
+                              alt="Cover Dark"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Team Info */}
           <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -207,14 +284,16 @@ function TeamDetails({ team }) {
                     className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] hover:bg-muted/50 dark:hover:bg-[#252a3d] transition-colors"
                   >
                     {player.photo?.light ? (
-                      <img src={player.photo.light} alt={player.nickname} className="size-10 rounded-lg object-cover" />
+                      <img src={player.photo.light} alt={player.nickname || player.fullName || 'Player'} className="size-10 rounded-lg object-cover" />
                     ) : (
                       <div className="size-10 rounded-lg bg-green-500/10 flex items-center justify-center">
                         <User className="size-5 text-green-500" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">{player.nickname}</p>
+                      <p className="font-medium text-foreground truncate">
+                        {player.nickname || player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown'}
+                      </p>
                       {player.role && (
                         <p className="text-xs text-muted-foreground">{player.role}</p>
                       )}

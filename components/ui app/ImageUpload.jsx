@@ -6,6 +6,7 @@ import { Upload, X, Loader2, ImageIcon, Check } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import ImageCropper from "./ImageCropper";
+import { getImageSpec, isValidImageType } from "@/app/[locale]/_Lib/imageSpecs";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -14,12 +15,15 @@ function ImageUpload({
   name,
   formik,
   placeholder = "Drop image here or click to upload",
-  aspectRatio = "square", // square, landscape, portrait, news-cover, wide
+  aspectRatio = "square", // square, landscape, portrait, news-cover, wide (legacy)
+  imageType = null, // NEW: Image type from IMAGE_SPECS (locks aspect ratio)
   enableCrop = true,
   showUrlInput = false,
   compact = false, // Smaller version for compact layouts
   hint,
 }) {
+  // Get spec if imageType is provided
+  const imageSpec = imageType && isValidImageType(imageType) ? getImageSpec(imageType) : null;
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showCropper, setShowCropper] = useState(false);
@@ -30,7 +34,7 @@ function ImageUpload({
   const hasImage = !!currentValue;
   const error = formik?.touched?.[name] && formik?.errors?.[name];
 
-  // Aspect ratio CSS classes
+  // Aspect ratio CSS classes (legacy)
   const aspectClasses = {
     square: "aspect-square",
     landscape: "aspect-video", // 16:9
@@ -39,6 +43,21 @@ function ImageUpload({
     wide: "aspect-[2/1]",
     "4:3": "aspect-[4/3]",
     "3:2": "aspect-[3/2]",
+  };
+
+  // Determine aspect class from imageSpec or legacy aspectRatio
+  const getAspectClass = () => {
+    if (imageSpec) {
+      const ratio = imageSpec.aspectRatio;
+      if (ratio === 1) return "aspect-square";
+      if (ratio === 16 / 9) return "aspect-video";
+      if (ratio === 3 / 4) return "aspect-[3/4]";
+      if (ratio === 3 / 2) return "aspect-[3/2]";
+      if (ratio === 2) return "aspect-[2/1]";
+      // For custom ratios, use the exact ratio
+      return `aspect-[${imageSpec.sizes.large.width}/${imageSpec.sizes.large.height}]`;
+    }
+    return aspectClasses[aspectRatio] || "aspect-square";
   };
 
   const handleDragOver = useCallback((e) => {
@@ -107,14 +126,22 @@ function ImageUpload({
     try {
       const formData = new FormData();
       formData.append("image", file);
-      const url = await uploadPhoto(formData);
+      // Pass imageType if provided for backend processing
+      const url = await uploadPhoto(formData, imageType);
       await formik?.setFieldValue(name, url);
       await formik?.setFieldTouched(name, true, true);
-      formik?.validateField(name);
+      // Wrap validateField in try-catch to prevent schema mismatch errors
+      try {
+        formik?.validateField(name);
+      } catch (validationError) {
+        console.warn("Field validation skipped:", validationError.message);
+      }
       toast.success(t?.("uploadSuccess") || "Image uploaded successfully");
     } catch (error) {
-      console.error(error);
-      toast.error(t?.("uploadError") || "Failed to upload image");
+      console.error("Upload error:", error);
+      // Show the actual error message if available
+      const errorMessage = error?.message || t?.("uploadError") || "Failed to upload image";
+      toast.error(errorMessage);
     } finally {
       setIsUploading(false);
     }
@@ -140,7 +167,7 @@ function ImageUpload({
       )}
 
       <div
-        className={`relative rounded-xl overflow-hidden transition-all ${aspectClasses[aspectRatio]} ${
+        className={`relative rounded-xl overflow-hidden transition-all ${getAspectClass()} ${
           isDragging
             ? "ring-2 ring-green-primary ring-offset-2 ring-offset-background"
             : error
@@ -260,6 +287,7 @@ function ImageUpload({
         imageSrc={previewUrl}
         onCropComplete={handleCropComplete}
         defaultAspect={aspectRatio}
+        imageType={imageType}
       />
     </div>
   );

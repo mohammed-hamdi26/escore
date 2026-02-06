@@ -542,13 +542,13 @@ function MatchDetails({ match }) {
                         <div key={player._id || player.id} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-white/5">
                           <div className="size-10 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                             {player.photo?.light ? (
-                              <img src={player.photo.light} alt={player.nickname} className="size-full object-cover" />
+                              <img src={player.photo.light} alt={player.nickname || player.fullName || 'Player'} className="size-full object-cover" />
                             ) : (
                               <Users className="size-5 text-gray-400 dark:text-gray-500" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate text-gray-900 dark:text-white">{player.nickname}</p>
+                            <p className="font-medium truncate text-gray-900 dark:text-white">{player.nickname || player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown'}</p>
                             {player.role && (
                               <p className="text-xs text-gray-500 dark:text-gray-400">{player.role}</p>
                             )}

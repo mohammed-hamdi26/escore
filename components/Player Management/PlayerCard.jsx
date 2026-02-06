@@ -108,7 +108,7 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
           {playerImage ? (
             <img
               src={playerImage}
-              alt={player.nickname}
+              alt={player.nickname || player.fullName || 'Player'}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
@@ -243,7 +243,7 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
           {/* Nickname & Country */}
           <div className="flex items-center gap-2 mb-1">
             <h3 className="text-lg font-bold text-foreground truncate">
-              {player.nickname}
+              {player.nickname || player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown'}
             </h3>
             {countryFlag && (
               <img
@@ -254,10 +254,10 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
             )}
           </div>
 
-          {/* Real Name */}
-          {(player.firstName || player.lastName) && (
+          {/* Real Name - only show if nickname exists and fullName/firstName/lastName also exist */}
+          {player.nickname && (player.fullName || player.firstName || player.lastName) && (
             <p className="text-sm text-muted-foreground mb-3">
-              {player.firstName} {player.lastName}
+              {player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim()}
             </p>
           )}
 
@@ -298,7 +298,7 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
           {playerImage ? (
             <img
               src={playerImage}
-              alt={player.nickname}
+              alt={player.nickname || player.fullName || 'Player'}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -312,7 +312,7 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <h3 className="font-bold text-foreground truncate">
-              {player.nickname}
+              {player.nickname || player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown'}
             </h3>
             {countryFlag && (
               <img
@@ -327,9 +327,9 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
               </Badge>
             )}
           </div>
-          {(player.firstName || player.lastName) && (
+          {player.nickname && (player.fullName || player.firstName || player.lastName) && (
             <p className="text-sm text-muted-foreground truncate">
-              {player.firstName} {player.lastName}
+              {player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim()}
             </p>
           )}
         </div>

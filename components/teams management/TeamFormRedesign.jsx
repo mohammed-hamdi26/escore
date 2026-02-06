@@ -42,6 +42,8 @@ const validationSchema = yup.object({
   name: yup.string().required("nameRequired").max(100, "nameTooLong"),
   shortName: yup.string().max(20, "shortNameTooLong"),
   games: yup.array().min(1, "gamesRequired"),
+  tournaments: yup.array(),
+  players: yup.array(),
   description: yup.string().max(2000, "descriptionTooLong"),
   country: yup.string(),
   region: yup.string(),
@@ -150,18 +152,15 @@ function TeamFormRedesign({
 
         await submit(dataValues);
 
-        if (formType === "add") {
-          formik.resetForm();
-        }
-
         toast.success(formType === "add" ? t("addSuccess") || "Team added successfully" : t("editSuccess") || "Team updated successfully");
+        router.push("/dashboard/teams-management");
       } catch (error) {
-        if (!error.toString().includes("NEXT_REDIRECT")) {
-          toast.error(error.message || t("error") || "An error occurred");
+        // NEXT_REDIRECT means the action succeeded and called redirect()
+        if (error?.digest?.includes("NEXT_REDIRECT") || error.toString().includes("NEXT_REDIRECT")) {
+          toast.success(formType === "add" ? t("addSuccess") || "Team added successfully" : t("editSuccess") || "Team updated successfully");
+          throw error; // Re-throw to let Next.js handle the redirect
         } else {
-          toast.success(
-            formType === "add" ? t("addSuccess") || "Team added successfully" : t("editSuccess") || "Team updated successfully"
-          );
+          toast.error(error.message || t("error") || "An error occurred");
         }
       }
     },
@@ -371,7 +370,7 @@ function TeamFormRedesign({
               label={t("logoLight") || "Logo (Light)"}
               name="logoLight"
               formik={formik}
-              aspectRatio="square"
+              imageType="teamLogo"
               hint={t("logoLightHint") || "Light mode logo"}
               compact
             />
@@ -379,7 +378,7 @@ function TeamFormRedesign({
               label={t("logoDark") || "Logo (Dark)"}
               name="logoDark"
               formik={formik}
-              aspectRatio="square"
+              imageType="teamLogo"
               hint={t("logoDarkHint") || "Dark mode logo"}
               compact
             />
@@ -582,13 +581,15 @@ function CountrySelectField({
             </div>
             <div className="flex items-center gap-1">
               {value && (
-                <button
-                  type="button"
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={handleClear}
-                  className="p-1 hover:bg-muted dark:hover:bg-[#252a3d] rounded-lg transition-colors"
+                  onKeyDown={(e) => e.key === 'Enter' && handleClear(e)}
+                  className="p-1 hover:bg-muted dark:hover:bg-[#252a3d] rounded-lg transition-colors cursor-pointer"
                 >
                   <X className="size-4 text-muted-foreground" />
-                </button>
+                </span>
               )}
               <ChevronDown className="size-4 text-muted-foreground" />
             </div>
@@ -694,13 +695,15 @@ function RegionSelectField({
             </div>
             <div className="flex items-center gap-1">
               {value && (
-                <button
-                  type="button"
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={handleClear}
-                  className="p-1 hover:bg-muted dark:hover:bg-[#252a3d] rounded-lg transition-colors"
+                  onKeyDown={(e) => e.key === 'Enter' && handleClear(e)}
+                  className="p-1 hover:bg-muted dark:hover:bg-[#252a3d] rounded-lg transition-colors cursor-pointer"
                 >
                   <X className="size-4 text-muted-foreground" />
-                </button>
+                </span>
               )}
               <ChevronDown className="size-4 text-muted-foreground" />
             </div>
@@ -811,13 +814,15 @@ function GameMultiSelectField({
                       />
                     )}
                     {game.name}
-                    <button
-                      type="button"
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={(e) => handleRemove(e, game.id || game._id)}
-                      className="hover:bg-green-primary/20 rounded-full p-0.5"
+                      onKeyDown={(e) => e.key === 'Enter' && handleRemove(e, game.id || game._id)}
+                      className="hover:bg-green-primary/20 rounded-full p-0.5 cursor-pointer"
                     >
                       <X className="size-3" />
-                    </button>
+                    </span>
                   </span>
                 ))
               ) : (
@@ -1240,11 +1245,17 @@ function PlayerMultiSelectField({
   const selectedIds = formik.values[name] || [];
   const t = useTranslations("teamForm");
 
-  const filteredPlayers = (players || []).filter((player) =>
-    player.nickname.toLowerCase().includes(search.toLowerCase()) ||
-    (player.firstName && player.firstName.toLowerCase().includes(search.toLowerCase())) ||
-    (player.lastName && player.lastName.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filteredPlayers = (players || []).filter((player) => {
+    const searchLower = search.toLowerCase();
+    const nickname = player.nickname || '';
+    const fullName = player.fullName || '';
+    const firstName = player.firstName || '';
+    const lastName = player.lastName || '';
+    return nickname.toLowerCase().includes(searchLower) ||
+      fullName.toLowerCase().includes(searchLower) ||
+      firstName.toLowerCase().includes(searchLower) ||
+      lastName.toLowerCase().includes(searchLower);
+  });
 
   const selectedPlayers = (players || []).filter((player) =>
     selectedIds.includes(player.id || player._id)
@@ -1302,7 +1313,7 @@ function PlayerMultiSelectField({
                         className="size-4 rounded-full"
                       />
                     )}
-                    {player.nickname}
+                    {player.nickname || player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown'}
                     <span
                       role="button"
                       tabIndex={0}
@@ -1362,8 +1373,8 @@ function PlayerMultiSelectField({
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <span className="text-foreground block truncate">{player.nickname}</span>
-                    {(player.firstName || player.lastName) && (
+                    <span className="text-foreground block truncate">{player.nickname || player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown'}</span>
+                    {player.nickname && (player.firstName || player.lastName) && (
                       <span className="text-xs text-muted-foreground">
                         {[player.firstName, player.lastName].filter(Boolean).join(' ')}
                       </span>

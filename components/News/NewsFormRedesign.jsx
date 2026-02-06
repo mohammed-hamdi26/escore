@@ -493,14 +493,14 @@ function NewsFormRedesign({
               label={t("coverImageLight")}
               name="coverImageLight"
               formik={formik}
-              aspectRatio="news-cover"
-              hint={t("coverImagePlaceholder") || "Recommended: 1200x630px"}
+              imageType="newsCover"
+              hint={t("coverImagePlaceholder") || "Recommended: 1200x600px"}
             />
             <ImageUpload
               label={t("coverImageDark")}
               name="coverImageDark"
               formik={formik}
-              aspectRatio="news-cover"
+              imageType="newsCover"
               hint={t("coverImageDarkPlaceholder") || "Optional dark mode version"}
             />
           </div>
@@ -546,7 +546,7 @@ function NewsFormRedesign({
                 label={t("authorPicture")}
                 name="authorPicture"
                 formik={formik}
-                aspectRatio="square"
+                imageType="authorAvatar"
                 hint={t("authorPicturePlaceholder") || "Author profile picture"}
                 compact
               />
@@ -621,7 +621,7 @@ function NewsFormRedesign({
               onChange={async (value) => { await formik.setFieldValue("player", value); formik.validateField("player"); }}
               options={playersOptions.map((p) => ({
                 value: p.id || p._id,
-                label: p.nickname || p.name,
+                label: p.nickname || p.fullName || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Unknown',
                 image: p.photo?.light || p.photo?.dark,
                 subtitle: p.team?.name,
               }))}

@@ -225,25 +225,103 @@ function TournamentDetails({ tournament }) {
               <Eye className="size-5 text-green-primary" />
               {t("images") || "Images"}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {tournament.coverImage?.light && (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">{t("coverImage") || "Cover Image"}</p>
-                  <img
-                    src={tournament.coverImage.light}
-                    alt="Cover"
-                    className="w-full h-40 object-cover rounded-xl ring-1 ring-white/10"
-                  />
+            <div className="space-y-6">
+              {/* Logo Section */}
+              {(tournament.logo?.light || tournament.logo?.dark) && (
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-muted-foreground">{t("logo") || "Logo"} (1:1)</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {tournament.logo?.light && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
+                        <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
+                          <img
+                            src={tournament.logo.light}
+                            alt="Logo Light"
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {tournament.logo?.dark && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
+                        <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
+                          <img
+                            src={tournament.logo.dark}
+                            alt="Logo Dark"
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
-              {tournament.bracketImage?.light && (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">{t("bracketImage") || "Bracket Image"}</p>
-                  <img
-                    src={tournament.bracketImage.light}
-                    alt="Bracket"
-                    className="w-full h-40 object-cover rounded-xl ring-1 ring-white/10"
-                  />
+
+              {/* Cover Image Section */}
+              {(tournament.coverImage?.light || tournament.coverImage?.dark) && (
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-muted-foreground">{t("coverImage") || "Cover Image"} (3:2)</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {tournament.coverImage?.light && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
+                        <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
+                          <img
+                            src={tournament.coverImage.light}
+                            alt="Cover Light"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {tournament.coverImage?.dark && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
+                        <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
+                          <img
+                            src={tournament.coverImage.dark}
+                            alt="Cover Dark"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Bracket Image Section */}
+              {(tournament.bracketImage?.light || tournament.bracketImage?.dark) && (
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-muted-foreground">{t("bracketImage") || "Bracket Image"} (16:9)</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {tournament.bracketImage?.light && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
+                        <div className="aspect-video w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
+                          <img
+                            src={tournament.bracketImage.light}
+                            alt="Bracket Light"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {tournament.bracketImage?.dark && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
+                        <div className="aspect-video w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
+                          <img
+                            src={tournament.bracketImage.dark}
+                            alt="Bracket Dark"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

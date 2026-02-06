@@ -185,14 +185,16 @@ function NewsDetails({ news }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Main Info */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Cover Image */}
+          {/* Cover Image - 2:1 aspect ratio (newsCover) */}
           {news.coverImage?.light && (
             <div className="glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5">
-              <img
-                src={news.coverImage.light}
-                alt={news.title}
-                className="w-full h-64 md:h-80 object-cover"
-              />
+              <div className="aspect-[2/1] w-full">
+                <img
+                  src={news.coverImage.light}
+                  alt={news.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
           )}
 

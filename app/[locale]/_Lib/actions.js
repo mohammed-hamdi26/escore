@@ -85,15 +85,17 @@ function cleanNullValues(data) {
 
 // player actions
 export async function addPlayer(playerData) {
+  const locale = await getLocale();
   try {
     const cleanData = cleanNullValues(playerData);
     const res = await apiClient.post("/players", cleanData);
     console.log("add player", res);
+    revalidatePath(`/${locale}/dashboard/player-management`);
   } catch (e) {
     console.log("Player creation error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in adding player");
   }
-  redirect("/dashboard/player-management");
+  redirect(`/${locale}/dashboard/player-management`);
 }
 export async function editPlayer(playerData) {
   const locale = await getLocale();
@@ -280,18 +282,33 @@ export async function deleteNew(id) {
   }
 }
 
-export async function uploadPhoto(formData) {
+export async function uploadPhoto(formData, imageType = null) {
   try {
-    const res = await apiClient.post("/upload/image", formData, {
+    // Build URL with optional imageType query param
+    const url = imageType
+      ? `/upload/image?imageType=${imageType}`
+      : "/upload/image";
+
+    const res = await apiClient.post(url, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
 
-    return res.data.data.url;
+    // Return the URL (large size if available, otherwise single url)
+    const uploadedUrl = res.data?.data?.url;
+    if (!uploadedUrl) {
+      console.error("Upload response missing URL:", res.data);
+      throw new Error("Upload succeeded but no URL returned");
+    }
+    return uploadedUrl;
   } catch (e) {
-    console.log(e.response);
-    throw new Error("error in upload");
+    console.error("Upload error details:", {
+      message: e.message,
+      response: e.response?.data,
+      status: e.response?.status,
+    });
+    throw new Error(e.response?.data?.message || e.message || "Error in upload");
   }
 }
 

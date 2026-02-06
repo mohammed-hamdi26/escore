@@ -138,18 +138,18 @@ function PlayerFormRedesign({
 
         await submit(dataValues);
 
-        if (formType === "add") {
-          formik.resetForm();
-        }
-
         toast.success(formType === "add" ? t("addSuccess") : t("editSuccess"));
+
+        // Navigate back to player list after successful submission
+        router.push("/dashboard/player-management");
       } catch (error) {
-        if (!error.toString().includes("NEXT_REDIRECT")) {
-          toast.error(error.message || t("error"));
+        // NEXT_REDIRECT means the action succeeded and called redirect()
+        // We must re-throw it so Next.js can handle the redirect
+        if (error?.digest?.includes("NEXT_REDIRECT") || error.toString().includes("NEXT_REDIRECT")) {
+          toast.success(formType === "add" ? t("addSuccess") : t("editSuccess"));
+          throw error; // Re-throw to let Next.js handle the redirect
         } else {
-          toast.success(
-            formType === "add" ? t("addSuccess") : t("editSuccess")
-          );
+          toast.error(error.message || t("error"));
         }
       }
     },
@@ -350,7 +350,7 @@ function PlayerFormRedesign({
             label={t("photoLight")}
             name="photoLight"
             formik={formik}
-            aspectRatio="square"
+            imageType="playerPhoto"
             hint={t("photoLightHint")}
             compact
           />
@@ -358,7 +358,7 @@ function PlayerFormRedesign({
             label={t("photoDark")}
             name="photoDark"
             formik={formik}
-            aspectRatio="square"
+            imageType="playerPhoto"
             hint={t("photoDarkHint")}
             compact
           />
