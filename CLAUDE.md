@@ -2,224 +2,90 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Important
-
-**بعد كدا متعملش كوميت ولا بوش الا لما تستأذن (Don't commit or push without asking first)**
-
 ## Commands
 
 ```bash
-npm run dev           # Dev server with Turbopack (port 3000)
-npm run build         # Production build with Turbopack
-npm run start         # Start production server
-npm run lint          # Run ESLint
-npm run test          # Run Jest tests
-npm run test:watch    # Run tests in watch mode
-npm run test:coverage # Run tests with coverage
-```
+# Development
+npm run dev        # Start dev server with Turbopack (http://localhost:3000)
 
-**Single test:**
-```bash
-npx jest __tests__/unit/FileInput.test.jsx
-npx jest --testNamePattern="should render"
+# Build & Production
+npm run build      # Build for production with Turbopack
+npm start          # Run production server
+
+# Linting
+npm run lint       # Run ESLint
+
+# Testing
+npm test                        # Run all tests
+npm run test:watch              # Run tests in watch mode
+npm run test:coverage           # Run tests with coverage report
+npx jest path/to/test.test.jsx  # Run a single test file
 ```
 
 ## Architecture
 
-Next.js 16 admin dashboard for the Escore esports platform. Connects to `escore-backend` API.
+### Overview
+Escore is a Next.js 16 admin dashboard (React 19) for managing esports content (players, teams, matches, tournaments, news, transfers). It uses the App Router with locale-based routing for internationalization (English/Arabic).
 
-**Tech Stack:** Next.js 16, React 19, Tailwind CSS 4, Radix UI + shadcn/ui, next-intl, Formik + Yup, Axios
+### Directory Structure
 
-### Project Structure
+- `app/[locale]/` - Locale-prefixed routes (en, ar)
+  - `_Lib/` - API clients and server actions
+    - `apiCLient.js` - Axios instance with auth interceptor (reads session from cookies)
+    - `actions.js` - Server actions for all CRUD operations (players, teams, matches, etc.)
+    - `session.js` - Session management with AES-256-GCM encryption (save/delete cookies)
+    - `helps.js` - Helper utilities (pagination, date/time, select option mapping)
+    - `*Api.js` - Data fetching functions per entity (e.g., `palyerApi.js`, `teamsApi.js`)
+  - `dashboard/` - Protected admin routes (requires session cookie)
+    - Entity management folders follow pattern: `add/`, `edit/`, `edit/[id]/`
+    - `settings/` - App settings (appearance/themes, language/dictionary, about, privacy-policy, links)
+  - Auth routes at locale root: `login/`, `register/`, `forget-password/`
 
-```
-app/
-  [locale]/                    # Localized routes (en, ar)
-    _Lib/                      # API layer
-      apiCLient.js             # Axios instance with auth interceptor
-      session.js               # AES-256-GCM encrypted cookie session
-      actions.js               # Server Actions (all mutations)
-      *Api.js                  # API service modules
-    dashboard/                 # Protected dashboard pages
-      [entity]-management/     # Entity pages (add/, edit/, edit/[id]/)
-      settings/                # App settings (themes, language, about, privacy, links)
-    login/, register/, etc.
-components/
-  ui/                          # shadcn/ui components
-  ui app/                      # Custom app components (InputApp, FileInput, ComboBoxInput)
-  dashboard/                   # Layout (SideNavBar, TopNav)
-  [feature]/                   # Feature components (Player Management, teams management, etc.)
-contexts/
-  PermissionsContext.jsx       # RBAC context
-i18n/
-  routing.js                   # Locales: en (default), ar
-messages/
-  en.json, ar.json             # Translations
-```
+- `components/` - Reusable React components
+  - `ui/` - shadcn/ui primitives (button, dialog, table, etc.)
+  - `ui app/` - Custom app-specific UI components (InputApp, FileInput, ComboBoxInput, etc.)
+  - Entity-specific folders (e.g., `Player Management/`, `teams management/`, `Matches Management/`)
 
-## Key Patterns
+- `contexts/` - React contexts (e.g., `PermissionsContext.jsx`)
 
-### API Client
+- `i18n/` - next-intl configuration
+  - `routing.js` - Locale routing config (en, ar, always prefix)
+  - `navigation.js` - Localized navigation helpers (Link, redirect, usePathname, useRouter)
 
-```javascript
-import apiClient from "@/app/[locale]/_Lib/apiCLient";
-const res = await apiClient.get("/games");
-// Token automatically added from encrypted session cookie
-```
+- `messages/` - Translation files (en.json, ar.json)
 
-### Server Actions
+- `__tests__/` - Test files (unit/ and integration/)
 
-All mutations in `actions.js` with `"use server"`:
-```javascript
-export async function addGame(gameData) {
-  const cleanData = cleanNullValues(gameData);  // Remove null/undefined
-  await apiClient.post("/games", cleanData);
-  redirect("/dashboard/games-management");
-}
-```
+### Key Patterns
 
-After mutations, revalidate paths:
-```javascript
-import { getLocale } from "next-intl/server";
-import { revalidatePath } from "next/cache";
+**Server Actions**: All mutations go through `app/[locale]/_Lib/actions.js` (marked `"use server"`). Pattern: build FormData/object → call apiClient → `revalidatePath` or `redirect`. The `cleanNullValues()` helper strips null/undefined/empty values before API calls.
 
-const locale = await getLocale();
-revalidatePath(`/${locale}/dashboard/games-management`);
-```
+**Authentication**: JWT token encrypted with AES-256-GCM and stored in httpOnly cookie named "session". `apiClient` automatically attaches Bearer token via request interceptor. The response interceptor sets `isAuthError` flag on 401/403 responses. `middleware.js` guards `/dashboard/*` routes and redirects unauthenticated users to login.
 
-### Session Management
+**Data Fetching**: API functions in `_Lib/*Api.js` build `URLSearchParams` for filtering/pagination and return `res.data.data`. Page components use `Promise.all()` for parallel data fetching. Search params in pages use `await searchParams` (Next.js 16 async pattern).
 
-JWT in AES-256-GCM encrypted httpOnly cookie (7 days):
-```javascript
-import { saveSession, getSession, deleteSession } from "@/app/[locale]/_Lib/session";
-```
+**Forms**: Formik + Yup validation. Custom inputs in `components/ui app/` accept `formik` prop and call `formik.setFieldValue(name, value)` internally. Standard controlled inputs use `formik.handleChange`/`formik.handleBlur`. Errors display when both `formik.touched[name]` and `formik.errors[name]` are truthy. Translation function `t` is passed to inputs for localizing error messages.
 
-### Permissions Context
+**Data Tables**: @tanstack/react-table with `DataTable` component wrapping `useReactTable` + `getCoreRowModel`. Column definitions use `accessorKey` for data columns and `id` for custom cells (actions).
 
-```javascript
-import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
+**Styling**: Tailwind CSS v4 with `cn()` utility from `lib/utils.js` (`twMerge(clsx(inputs))`). Theme uses CSS custom properties in `globals.css` with light/dark mode variants. RTL support via `rtl:` prefix classes.
 
-const { isAdmin, canCreate, canUpdate, canDelete, hasPermission } = usePermissions();
-if (canCreate(ENTITIES.GAME)) { /* show button */ }
-```
+**Notifications**: `react-hot-toast` for success/error toasts in form submissions.
 
-**Entities:** Game, Team, Player, Tournament, Match, News, Transfer, Standing, Settings, Support, User, Avatar
+### Environment Variables
+- `NEXT_PUBLIC_BASE_URL` - Backend API base URL (API path: `/api/v1`)
+- `SESSION_SECRET` or `NEXTAUTH_SECRET` - Used for AES-256-GCM encryption of session tokens
 
-### Dashboard Layout Protection
+### Internationalization
+Locales: `en` (default), `ar`. All routes are always prefixed with locale. Server components use `await getLocale()`. Client components use `useTranslations()` hook from `next-intl`. Use `Link` and `redirect` from `@/i18n/navigation` for locale-aware navigation.
 
-```javascript
-// app/[locale]/dashboard/layout.jsx
-const user = await getLoginUser();
-if (!user) {
-  cookieStore.delete("session");
-  redirect(`/${locale}/login`);
-}
-return <PermissionsProvider user={user}>{children}</PermissionsProvider>;
-```
+### Role-Based Permissions
+User roles: `user`, `admin`, `content`, `support`. Permission system in `contexts/PermissionsContext.jsx` with entities (Game, Team, Player, Tournament, Match, News, Transfer, Standing, Settings, Support, User, Avatar) and actions (create, read, update, delete). Admins have all permissions automatically.
 
-### Forms (Formik + Yup)
+Usage in client components:
+- `usePermissions()` hook → `hasPermission(entity, action)`, `canCreate(entity)`, `canRead(entity)`, `canUpdate(entity)`, `canDelete(entity)`, `isAdmin`
+- `<PermissionGate entity="..." action="..." fallback={...}>` for conditional rendering
+- Shorthand gates: `<CreateGate>`, `<ReadGate>`, `<UpdateGate>`, `<DeleteGate>`, `<AdminGate>`, `<EntityGate>`
 
-```javascript
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
-
-const schema = Yup.object({ name: Yup.string().required() });
-<Formik initialValues={...} validationSchema={schema} onSubmit={...}>
-```
-
-### Data Tables
-
-Uses @tanstack/react-table with custom column definitions.
-
-### Styling
-
-Tailwind CSS v4 with `cn()` utility from `lib/utils.js`:
-```javascript
-import { cn } from "@/lib/utils";
-<div className={cn("base-class", condition && "conditional-class")} />
-```
-
-### i18n
-
-Routes: `/en/dashboard`, `/ar/dashboard`
-
-```javascript
-// Client
-import { useTranslations } from "next-intl";
-const t = useTranslations("dashboard");
-
-// Server
-import { getLocale } from "next-intl/server";
-const locale = await getLocale();
-```
-
-### Image Upload
-
-```javascript
-import { uploadPhoto } from "@/app/[locale]/_Lib/actions";
-
-const formData = new FormData();
-formData.append("image", file);
-const imageUrl = await uploadPhoto(formData);
-```
-
-## API Services
-
-Each `*Api.js` exports fetch functions:
-```javascript
-// gamesApi.js
-export async function getGames(searchParams = {}) {
-  const res = await apiClient.get(`/games?${params}`);
-  return { data: res.data.data, pagination: res.data.meta };
-}
-```
-
-**Modules:** gamesApi, teamsApi, palyerApi, tournamentsApi, matchesApi, newsApi, transferApi, usersApi, themesApi, supportCenterApi, notificationsApi, lineupsApi, standingsApi, languageAPI, aboutAPI, PrivacyApi, countriesApi, linksApi, appLinksApi
-
-## Environment Variables
-
-```bash
-NEXT_PUBLIC_BASE_URL=http://localhost:5000  # Backend API URL
-SESSION_SECRET=your-secure-key-min-32-chars  # Session encryption (required for prod)
-```
-
-## Deployment
-
-```bash
-ssh user@server "cd ~/escore-frontend && git pull origin master && npm install && npm run build && pm2 restart escore-frontend"
-```
-
-## Quick Reference
-
-```javascript
-// API & Actions
-import apiClient from "@/app/[locale]/_Lib/apiCLient";
-import { getGames } from "@/app/[locale]/_Lib/gamesApi";
-import { addGame, updateGame, deleteGame, uploadPhoto } from "@/app/[locale]/_Lib/actions";
-
-// Session
-import { saveSession, getSession, deleteSession } from "@/app/[locale]/_Lib/session";
-
-// Permissions
-import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
-
-// i18n
-import { useTranslations } from "next-intl";
-import { getLocale } from "next-intl/server";
-
-// Next.js
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
-
-// UI
-import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
-```
-
-**Path Alias:** `@/` → project root
-
-## Related Projects
-
-- **Backend:** `escore-backend` (Express.js + TypeScript + MongoDB)
-- **Mobile:** React Native app (same backend)
+### Important
+- بعد كدا متعملش كوميت ولا بوش الا لما تستأذن (Don't commit or push without asking first)

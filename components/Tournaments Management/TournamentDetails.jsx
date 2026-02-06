@@ -29,6 +29,7 @@ import {
   Eye,
   CalendarRange,
 } from "lucide-react";
+import BracketView from "./BracketView";
 
 // Status badge colors
 const STATUS_CONFIG = {
@@ -326,6 +327,9 @@ function TournamentDetails({ tournament }) {
               )}
             </div>
           </div>
+
+          {/* Bracket */}
+          <BracketView tournament={tournament} />
 
         </div>
 

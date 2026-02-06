@@ -1258,6 +1258,59 @@ export async function deleteFavoriteCharacter(typeEdit, id, characterId) {
 }
 export async function addLinks(typeEdit, id, data) {}
 
+// brackets
+export async function getBracketAction(tournamentId) {
+  try {
+    const res = await apiClient.get(
+      `/tournaments/${tournamentId}/bracket`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    if (e.response?.status === 404) return { success: true, data: null };
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error fetching bracket",
+    };
+  }
+}
+
+export async function generateBracketAction(tournamentId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/generate`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Bracket generation error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error generating bracket",
+    };
+  }
+}
+
+export async function deleteBracketAction(tournamentId) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(`/tournaments/${tournamentId}/bracket`);
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true };
+  } catch (e) {
+    console.log("Bracket deletion error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error deleting bracket",
+    };
+  }
+}
+
 // notifications
 export async function sendNotificationAction(data) {
   try {
