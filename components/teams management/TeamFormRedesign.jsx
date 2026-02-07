@@ -50,6 +50,8 @@ const validationSchema = yup.object({
   foundedDate: yup.string(),
   logoLight: yup.string(),
   logoDark: yup.string(),
+  coverImageLight: yup.string(),
+  coverImageDark: yup.string(),
   worldRanking: yup.number().min(0, "rankingMin").integer("rankingInteger").nullable(),
 });
 
@@ -96,6 +98,8 @@ function TeamFormRedesign({
       foundedDate: formatDateToLocal(team?.foundedDate),
       logoLight: team?.logo?.light || "",
       logoDark: team?.logo?.dark || "",
+      coverImageLight: team?.coverImage?.light || "",
+      coverImageDark: team?.coverImage?.dark || "",
       games: team?.games?.map(g => g.id || g._id) || [],
       tournaments: team?.tournaments?.map(t => t.id || t._id) || [],
       players: team?.players?.map(p => p.id || p._id) || [],
@@ -142,6 +146,13 @@ function TeamFormRedesign({
           };
         }
 
+        if (values.coverImageLight) {
+          dataValues.coverImage = {
+            light: values.coverImageLight,
+            dark: values.coverImageDark || values.coverImageLight,
+          };
+        }
+
         if (selectedCountry) {
           dataValues.country = {
             name: selectedCountry.label,
@@ -153,7 +164,7 @@ function TeamFormRedesign({
         await submit(dataValues);
 
         toast.success(formType === "add" ? t("addSuccess") || "Team added successfully" : t("editSuccess") || "Team updated successfully");
-        router.push("/dashboard/teams-management");
+        router.replace("/dashboard/teams-management");
       } catch (error) {
         // NEXT_REDIRECT means the action succeeded and called redirect()
         if (error?.digest?.includes("NEXT_REDIRECT") || error.toString().includes("NEXT_REDIRECT")) {
@@ -381,6 +392,25 @@ function TeamFormRedesign({
               imageType="teamLogo"
               hint={t("logoDarkHint") || "Dark mode logo"}
               compact
+            />
+          </div>
+        </div>
+        <div className="space-y-4 mt-6">
+          <p className="text-sm text-muted-foreground">{t("coverImages") || "Cover Images"}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ImageUpload
+              label={t("coverImageLight") || "Cover Image (Light)"}
+              name="coverImageLight"
+              formik={formik}
+              imageType="teamCover"
+              hint={t("coverImageLightHint") || "Light mode cover image (3:2 ratio)"}
+            />
+            <ImageUpload
+              label={t("coverImageDark") || "Cover Image (Dark)"}
+              name="coverImageDark"
+              formik={formik}
+              imageType="teamCover"
+              hint={t("coverImageDarkHint") || "Dark mode cover image (3:2 ratio)"}
             />
           </div>
         </div>
