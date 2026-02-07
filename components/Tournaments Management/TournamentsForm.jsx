@@ -41,6 +41,7 @@ import {
   Wifi,
   WifiOff,
   Power,
+  Users,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -83,6 +84,7 @@ const validateSchema = yup.object({
   gamesData: yup
     .array()
     .test("games", "At least one game is required", (value) => value && value.length > 0),
+  teamsData: yup.array().optional(),
   streamUrl: yup.string().url("Must be a valid URL").nullable(),
   websiteUrl: yup.string().url("Must be a valid URL").nullable(),
   logoLight: yup.string(),
@@ -99,6 +101,7 @@ export default function TournamentsForm({
   formType = "add",
   countries = [],
   gameOptions = [],
+  teamOptions = [],
 }) {
   const t = useTranslations("TournamentForm");
   const router = useRouter();
@@ -131,6 +134,7 @@ export default function TournamentsForm({
       coverImageDark: tournament?.coverImage?.dark || "",
       country: tournament?.country?.name || "",
       gamesData: tournament?.games || [],
+      teamsData: tournament?.teams || [],
       knockoutImageLight: tournament?.bracketImage?.light || "",
       knockoutImageDark: tournament?.bracketImage?.dark || "",
       tier: tournament?.tier || "",
@@ -196,6 +200,7 @@ export default function TournamentsForm({
 
         dataValues.slug = dataValues?.name.replace(/\s+/g, "-").toLowerCase();
         dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value || g._id || g);
+        dataValues.teams = dataValues?.teamsData?.map((t) => t.id || t.value || t._id || t) || [];
 
         // Convert empty strings to null for optional number fields
         if (dataValues.prizePool === "" || dataValues.prizePool === null) {
@@ -220,6 +225,7 @@ export default function TournamentsForm({
         delete dataValues.knockoutImageLight;
         delete dataValues.knockoutImageDark;
         delete dataValues.gamesData;
+        delete dataValues.teamsData;
 
         await submit(dataValues);
         toast.success(
@@ -441,6 +447,17 @@ export default function TournamentsForm({
           options={gameOptions}
           formik={formik}
           required
+        />
+      </FormSection>
+
+      {/* Teams */}
+      <FormSection title={t("Teams")} icon={<Users className="size-5" />}>
+        <TeamSelectField
+          label={t("Select Teams")}
+          name="teamsData"
+          options={teamOptions}
+          formik={formik}
+          searchPlaceholder={t("Search teams")}
         />
       </FormSection>
 
@@ -1473,6 +1490,143 @@ function BooleanToggle({ label, name, formik, iconOn, iconOff, labelOn, labelOff
           />
         </div>
       </button>
+    </div>
+  );
+}
+
+// Team Select Field with search, logos, and names
+function TeamSelectField({ label, name, options = [], formik, searchPlaceholder }) {
+  const [search, setSearch] = useState("");
+  const safeOptions = Array.isArray(options) ? options : [];
+  const selectedIds = formik.values[name]?.map((t) => t.id || t.value || t._id || t) || [];
+  const error = formik.touched[name] && formik.errors[name];
+
+  const filteredOptions = safeOptions.filter((team) => {
+    if (!search) return true;
+    return (team.name || team.label || "").toLowerCase().includes(search.toLowerCase());
+  });
+
+  const toggleTeam = async (team) => {
+    const teamId = team.id || team.value;
+    const isSelected = selectedIds.includes(teamId);
+
+    let newValue;
+    if (isSelected) {
+      newValue = (formik.values[name] || []).filter((t) => (t.id || t.value || t._id || t) !== teamId);
+    } else {
+      newValue = [...(formik.values[name] || []), { id: teamId, name: team.name || team.label, logo: team.logo }];
+    }
+
+    await formik.setFieldValue(name, newValue);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
+  };
+
+  const getLogoUrl = (team) => {
+    if (team.logo?.light) return team.logo.light;
+    if (team.logo?.dark) return team.logo.dark;
+    return null;
+  };
+
+  return (
+    <div className="space-y-3">
+      <label className="text-sm font-medium text-muted-foreground">
+        {label}
+      </label>
+
+      {/* Selected teams pills */}
+      {selectedIds.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {(formik.values[name] || []).map((team) => {
+            const teamId = team.id || team.value || team._id || team;
+            const teamObj = safeOptions.find((t) => (t.id || t.value) === teamId) || team;
+            const logoUrl = getLogoUrl(teamObj);
+            return (
+              <div
+                key={teamId}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-primary/10 border border-green-primary/30 text-sm"
+              >
+                {logoUrl && (
+                  <img
+                    src={logoUrl}
+                    alt={teamObj.name || ""}
+                    width={20}
+                    height={20}
+                    className="size-5 rounded-full object-cover"
+                  />
+                )}
+                <span className="text-green-primary font-medium">{teamObj.name || teamObj.label}</span>
+                <button
+                  type="button"
+                  onClick={() => toggleTeam(teamObj)}
+                  className="size-4 rounded-full bg-green-primary/20 hover:bg-red-500/20 flex items-center justify-center transition-colors group"
+                >
+                  <X className="size-3 text-green-primary group-hover:text-red-500" />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Search input */}
+      <div className="relative">
+        <Search className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={searchPlaceholder}
+          className="w-full h-10 ltr:pl-10 rtl:pr-10 pr-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 placeholder:text-muted-foreground"
+        />
+      </div>
+
+      {/* Team list */}
+      <div className="max-h-64 overflow-y-auto rounded-xl border border-border/50 bg-muted/30 dark:bg-[#141625]">
+        {filteredOptions.length === 0 ? (
+          <div className="p-4 text-center text-sm text-muted-foreground">No teams found</div>
+        ) : (
+          filteredOptions.map((team) => {
+            const teamId = team.id || team.value;
+            const isSelected = selectedIds.includes(teamId);
+            const logoUrl = getLogoUrl(team);
+
+            return (
+              <button
+                key={teamId}
+                type="button"
+                onClick={() => toggleTeam(team)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all hover:bg-muted/50 dark:hover:bg-[#1a1d2e] border-b border-border/30 last:border-b-0 ${
+                  isSelected ? "bg-green-primary/5" : ""
+                }`}
+              >
+                <div className={`size-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                  isSelected ? "border-green-primary bg-green-primary" : "border-gray-400"
+                }`}>
+                  {isSelected && <Check className="size-3 text-white" />}
+                </div>
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt={team.name || ""}
+                    width={28}
+                    height={28}
+                    className="size-7 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="size-7 rounded-full bg-muted flex items-center justify-center">
+                    <Users className="size-4 text-muted-foreground" />
+                  </div>
+                )}
+                <span className={`font-medium ${isSelected ? "text-green-primary" : "text-foreground"}`}>
+                  {team.name || team.label}
+                </span>
+              </button>
+            );
+          })
+        )}
+      </div>
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   );
 }

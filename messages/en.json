@@ -762,7 +762,10 @@
     "Stream URL": "Stream URL",
     "Website URL": "Website URL",
     "Tournament Rules": "Tournament Rules",
-    "Enter tournament rules and regulations": "Enter tournament rules and regulations..."
+    "Enter tournament rules and regulations": "Enter tournament rules and regulations...",
+    "Teams": "Teams",
+    "Select Teams": "Select Teams",
+    "Search teams": "Search teams..."
   },
   "TournamentsManagement": {
     "title": "Tournaments Management",

@@ -758,7 +758,10 @@
     "Stream URL": "رابط البث",
     "Website URL": "رابط الموقع",
     "Tournament Rules": "قوانين البطولة",
-    "Enter tournament rules and regulations": "أدخل قوانين ولوائح البطولة..."
+    "Enter tournament rules and regulations": "أدخل قوانين ولوائح البطولة...",
+    "Teams": "الفرق",
+    "Select Teams": "اختر الفرق",
+    "Search teams": "ابحث عن الفرق..."
   },
   "TournamentsManagement": {
     "title": "إدارة البطولات",
