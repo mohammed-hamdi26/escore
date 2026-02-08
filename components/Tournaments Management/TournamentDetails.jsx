@@ -80,12 +80,20 @@ function TournamentDetails({ tournament }) {
           </Link>
           <h1 className="text-2xl font-bold text-foreground">{t("title") || "Tournament Details"}</h1>
         </div>
-        <Link href={`/dashboard/tournaments-management/edit/${tournament.id || tournament._id}`}>
-          <Button className="gap-2 bg-green-primary hover:bg-green-primary/90 text-white">
-            <Pencil className="size-4" />
-            {t("edit") || "Edit Tournament"}
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href={`/dashboard/tournaments-management/standings/${tournament.id || tournament._id}`}>
+            <Button variant="outline" className="gap-2 border-green-primary/30 text-green-primary hover:bg-green-primary/10">
+              <Trophy className="size-4" />
+              {t("manageStandings") || "Manage Standings"}
+            </Button>
+          </Link>
+          <Link href={`/dashboard/tournaments-management/edit/${tournament.id || tournament._id}`}>
+            <Button className="gap-2 bg-green-primary hover:bg-green-primary/90 text-white">
+              <Pencil className="size-4" />
+              {t("edit") || "Edit Tournament"}
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Main Content */}

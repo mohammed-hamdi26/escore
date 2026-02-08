@@ -9,8 +9,8 @@ function TournamentsHeader() {
   const t = useTranslations("TournamentsManagement");
   const pathname = usePathname();
 
-  // Hide header on view page
-  if (pathname.includes("/view/")) {
+  // Hide header on view and standings pages
+  if (pathname.includes("/view/") || pathname.includes("/standings/")) {
     return null;
   }
 

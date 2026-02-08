@@ -1510,3 +1510,108 @@ export async function deleteLink(typeEdit, id, linkId) {
     throw new Error("Error in deleting link");
   }
 }
+
+// ==================== STANDINGS ====================
+
+export async function initializeStandings(tournamentId, group) {
+  "use server";
+  const locale = await getLocale();
+  try {
+    const data = { tournament: tournamentId };
+    if (group) data.group = group;
+    const res = await apiClient.post("/standings/initialize", data);
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/standings/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Initialize standings error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Failed to initialize standings",
+    };
+  }
+}
+
+export async function updateStanding(standingId, data) {
+  "use server";
+  try {
+    const res = await apiClient.put(`/standings/${standingId}`, data);
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Update standing error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Failed to update standing",
+    };
+  }
+}
+
+export async function bulkUpdateStandings(standings) {
+  "use server";
+  try {
+    const res = await apiClient.put("/standings/bulk", { standings });
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Bulk update standings error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Failed to bulk update standings",
+    };
+  }
+}
+
+export async function recalculateStandings(tournamentId, group) {
+  "use server";
+  const locale = await getLocale();
+  try {
+    const url = group
+      ? `/standings/tournament/${tournamentId}/recalculate?group=${encodeURIComponent(group)}`
+      : `/standings/tournament/${tournamentId}/recalculate`;
+    await apiClient.post(url);
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/standings/${tournamentId}`
+    );
+    return { success: true };
+  } catch (e) {
+    console.log("Recalculate standings error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Failed to recalculate standings",
+    };
+  }
+}
+
+export async function deleteStanding(standingId) {
+  "use server";
+  try {
+    await apiClient.delete(`/standings/${standingId}`);
+    return { success: true };
+  } catch (e) {
+    console.log("Delete standing error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Failed to delete standing",
+    };
+  }
+}
+
+export async function deleteAllStandings(tournamentId) {
+  "use server";
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.delete(
+      `/standings/tournament/${tournamentId}`
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/standings/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Delete all standings error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Failed to delete all standings",
+    };
+  }
+}

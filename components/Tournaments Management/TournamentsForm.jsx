@@ -93,6 +93,9 @@ const validateSchema = yup.object({
   coverImageDark: yup.string(),
   knockoutImageLight: yup.string(),
   knockoutImageDark: yup.string(),
+  pointsPerWin: yup.number().min(0).max(100).nullable(),
+  pointsPerDraw: yup.number().min(0).max(100).nullable(),
+  pointsPerLoss: yup.number().min(0).max(100).nullable(),
 });
 
 export default function TournamentsForm({
@@ -145,6 +148,9 @@ export default function TournamentsForm({
       isOnline: tournament?.isOnline || false,
       isActive: tournament?.isActive !== undefined ? tournament.isActive : true,
       isFeatured: tournament?.isFeatured || false,
+      pointsPerWin: tournament?.standingConfig?.pointsPerWin ?? 3,
+      pointsPerDraw: tournament?.standingConfig?.pointsPerDraw ?? 1,
+      pointsPerLoss: tournament?.standingConfig?.pointsPerLoss ?? 0,
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
@@ -217,6 +223,13 @@ export default function TournamentsForm({
         if (!dataValues.organizer) dataValues.organizer = null;
         if (!dataValues.tier) dataValues.tier = null;
 
+        // Build standingConfig object
+        dataValues.standingConfig = {
+          pointsPerWin: parseInt(dataValues.pointsPerWin) || 3,
+          pointsPerDraw: parseInt(dataValues.pointsPerDraw) || 1,
+          pointsPerLoss: parseInt(dataValues.pointsPerLoss) || 0,
+        };
+
         // Clean up temporary fields
         delete dataValues.logoLight;
         delete dataValues.logoDark;
@@ -226,6 +239,9 @@ export default function TournamentsForm({
         delete dataValues.knockoutImageDark;
         delete dataValues.gamesData;
         delete dataValues.teamsData;
+        delete dataValues.pointsPerWin;
+        delete dataValues.pointsPerDraw;
+        delete dataValues.pointsPerLoss;
 
         await submit(dataValues);
         toast.success(
@@ -490,6 +506,33 @@ export default function TournamentsForm({
           formik={formik}
           rows={6}
         />
+      </FormSection>
+
+      {/* Standing Settings */}
+      <FormSection title={t("Standing Settings")} icon={<Trophy className="size-5" />}>
+        <FormRow cols={3}>
+          <InputField
+            label={t("Points Per Win")}
+            name="pointsPerWin"
+            type="number"
+            placeholder="3"
+            formik={formik}
+          />
+          <InputField
+            label={t("Points Per Draw")}
+            name="pointsPerDraw"
+            type="number"
+            placeholder="1"
+            formik={formik}
+          />
+          <InputField
+            label={t("Points Per Loss")}
+            name="pointsPerLoss"
+            type="number"
+            placeholder="0"
+            formik={formik}
+          />
+        </FormRow>
       </FormSection>
 
       {/* Images */}

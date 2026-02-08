@@ -340,6 +340,20 @@ function ActionsDropdown({ tournament, loadingId, onDelete, t }) {
               {t("edit") || "Edit"}
             </button>
 
+            {/* Standings */}
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                router.push(
+                  `/dashboard/tournaments-management/standings/${tournament.id}`
+                );
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted dark:hover:bg-[#1a1d2e] transition-colors text-left rtl:text-right"
+            >
+              <Trophy className="size-4 text-muted-foreground" />
+              {t("standings") || "Standings"}
+            </button>
+
             {/* Toggle Featured */}
             <button
               onClick={handleToggleFeatured}

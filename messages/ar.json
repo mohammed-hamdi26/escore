@@ -762,7 +762,11 @@
     "Enter tournament rules and regulations": "أدخل قوانين ولوائح البطولة...",
     "Teams": "الفرق",
     "Select Teams": "اختر الفرق",
-    "Search teams": "ابحث عن الفرق..."
+    "Search teams": "ابحث عن الفرق...",
+    "Standing Settings": "إعدادات الترتيب",
+    "Points Per Win": "نقاط الفوز",
+    "Points Per Draw": "نقاط التعادل",
+    "Points Per Loss": "نقاط الخسارة"
   },
   "TournamentsManagement": {
     "title": "إدارة البطولات",
@@ -808,6 +812,7 @@
     "socialLinks": "روابط التواصل",
     "manageSocialLinks": "إدارة روابط التواصل الاجتماعي لهذه البطولة",
     "manageLinks": "إدارة الروابط",
+    "manageStandings": "إدارة الترتيب",
     "standings": "ترتيب البطولة",
     "bracket": "القرعة",
     "generateBracket": "إنشاء القرعة",
@@ -865,7 +870,8 @@
     "upcoming": "قادمة",
     "ongoing": "جارية",
     "completed": "مكتملة",
-    "cancelled": "ملغية"
+    "cancelled": "ملغية",
+    "standings": "الترتيب"
   },
   "TournamentsFilter": {
     "searchPlaceholder": "البحث عن البطولات...",
@@ -2786,6 +2792,40 @@
     "qualified": "متأهل",
     "eliminated": "خارج المنافسة",
     "tournament": "البطولة"
+  },
+  "StandingsManagement": {
+    "title": "إدارة الترتيب",
+    "back": "رجوع",
+    "pointsSystem": "النقاط",
+    "initialize": "تهيئة الترتيب",
+    "initializeSuccess": "تم تهيئة الترتيب بنجاح",
+    "recalculate": "إعادة حساب المراكز",
+    "recalculateSuccess": "تم إعادة حساب المراكز بنجاح",
+    "deleteAll": "حذف الكل",
+    "confirmDeleteAll": "هل أنت متأكد من حذف جميع سجلات الترتيب لهذه البطولة؟",
+    "deleteAllSuccess": "تم حذف جميع سجلات الترتيب بنجاح",
+    "confirmDelete": "هل أنت متأكد من حذف هذا السجل؟",
+    "deleteSuccess": "تم حذف السجل بنجاح",
+    "updateSuccess": "تم تحديث السجل بنجاح",
+    "standings": "الترتيب",
+    "teams": "فرق",
+    "noStandings": "لا يوجد ترتيب بعد",
+    "initializeDescription": "قم بتهيئة الترتيب لإنشاء سجلات لجميع فرق البطولة",
+    "team": "الفريق",
+    "played": "ل",
+    "wins": "ف",
+    "draws": "ت",
+    "losses": "خ",
+    "pf": "له",
+    "pa": "عليه",
+    "diff": "+/-",
+    "points": "نقاط",
+    "form": "الشكل",
+    "actions": "الإجراءات",
+    "qualified": "متأهل",
+    "eliminated": "خارج المنافسة",
+    "defaultLabel": "افتراضي",
+    "defaultNote": "ترتيب افتراضي - اضغط تهيئة لحفظه في قاعدة البيانات"
   },
   "teamForm": {
     "basicInfo": "المعلومات الأساسية",
