@@ -31,9 +31,7 @@ export default async function DashboardLayout({ children, params }) {
     user.role === "content" && user.contentStatus === "approved";
 
   if (!allowedRoles.includes(user.role) && !isApprovedContent) {
-    const cookieStore = await cookies();
-    cookieStore.delete("session");
-    redirect(`/${locale || "en"}/login`);
+    redirect("/api/auth/force-logout");
   }
 
   return (
