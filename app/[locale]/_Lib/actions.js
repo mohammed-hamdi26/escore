@@ -105,11 +105,11 @@ export async function editPlayer(playerData) {
     revalidatePath(
       `${locale}/dashboard/player-management/edit/${cleanData.id}`
     );
-    return res.data;
   } catch (e) {
     console.log("Player update error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in updating player");
   }
+  redirect(`/${locale}/dashboard/player-management`);
 }
 
 export async function fetchPlayersByTeam(teamId) {
@@ -138,6 +138,7 @@ export async function deletePlayer(id) {
 }
 // games actions
 export async function addGame(gameData) {
+  const locale = await getLocale();
   try {
     const cleanData = cleanNullValues(gameData);
     const res = await apiClient.post("/games", cleanData);
@@ -145,7 +146,7 @@ export async function addGame(gameData) {
     console.log("Game creation error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in adding game");
   }
-  redirect("/dashboard/games-management");
+  redirect(`/${locale}/dashboard/games-management`);
 }
 
 export async function updateGame(gameData) {
@@ -154,11 +155,11 @@ export async function updateGame(gameData) {
     const cleanData = cleanNullValues(gameData);
     const res = await apiClient.put(`/games/${cleanData.id}`, cleanData);
     revalidatePath(`/${locale}/dashboard/games-management/edit/${cleanData.id}`);
-    return res.data;
   } catch (e) {
     console.log("Game update error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in updating game");
   }
+  redirect(`/${locale}/dashboard/games-management`);
 }
 export async function deleteGame(id) {
   const locale = await getLocale();
@@ -186,6 +187,7 @@ export async function toggleGameActive(id) {
 
 // Teams Actions
 export async function addTeam(teamData) {
+  const locale = await getLocale();
   try {
     const cleanData = cleanNullValues(teamData);
     const res = await apiClient.post("/teams", cleanData);
@@ -193,7 +195,7 @@ export async function addTeam(teamData) {
     console.log("Team creation error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in adding team");
   }
-  redirect("/dashboard/teams-management/edit");
+  redirect(`/${locale}/dashboard/teams-management`);
 }
 
 export async function updateTeam(teamData) {
@@ -203,12 +205,11 @@ export async function updateTeam(teamData) {
     const cleanData = cleanNullValues(teamData);
     const res = await apiClient.put(`/teams/${cleanData.id}`, cleanData);
     revalidatePath(`/${locale}/dashboard/teams-management/edit/${cleanData.id}`);
-
-    return res.data;
   } catch (e) {
     console.log("Team update error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in updating team");
   }
+  redirect(`/${locale}/dashboard/teams-management`);
 }
 export async function deleteTeam(id) {
   const locale = await getLocale();
@@ -255,7 +256,7 @@ export async function addNews(newsData) {
     console.log("News creation error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in adding news");
   }
-  redirect(`/${locale}/dashboard/news/edit`);
+  redirect(`/${locale}/dashboard/news-management`);
 }
 
 export async function editNews(newsData) {
@@ -264,11 +265,11 @@ export async function editNews(newsData) {
     const cleanData = cleanNullValues(newsData);
     const res = await apiClient.put(`/news/${cleanData.id}`, cleanData);
     revalidatePath(`/${locale}/dashboard/news/edit/${cleanData.id}`);
-    return res.data;
   } catch (e) {
     console.log("News update error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in updating news");
   }
+  redirect(`/${locale}/dashboard/news-management`);
 }
 export async function deleteNew(id) {
   const locale = await getLocale();
@@ -315,6 +316,7 @@ export async function uploadPhoto(formData, imageType = null) {
 // tournaments
 
 export async function addTournament(tournamentData) {
+  const locale = await getLocale();
   try {
     const cleanData = cleanNullValues(tournamentData);
     // Remove status field for create (only allowed in update)
@@ -325,7 +327,7 @@ export async function addTournament(tournamentData) {
     console.log("Tournament creation error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in adding tournament");
   }
-  redirect("/dashboard/tournaments-management");
+  redirect(`/${locale}/dashboard/tournaments-management`);
 }
 
 export async function editTournament(tournamentData) {
@@ -339,11 +341,11 @@ export async function editTournament(tournamentData) {
     revalidatePath(
       `/${locale}/dashboard/tournaments/edit/${cleanData.id}`
     );
-    return res.data;
   } catch (e) {
     console.log("Tournament update error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in updating tournaments");
   }
+  redirect(`/${locale}/dashboard/tournaments-management`);
 }
 export async function deleteTournament(id) {
   const locale = await getLocale();
@@ -1077,6 +1079,7 @@ export async function editUser(data) {
     console.log("Failed to edit user", error);
     throw error;
   }
+  redirect(`/${locale}/dashboard/users/list`);
 }
 export async function deleteUser(id) {
   const locale = await getLocale();

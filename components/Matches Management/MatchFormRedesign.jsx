@@ -229,10 +229,7 @@ function MatchFormRedesign({
         }
 
         toast.success(formType === "add" ? t("addSuccess") : t("editSuccess"));
-
-        if (formType === "add" && matchId) {
-          router.push(`/dashboard/matches-management`);
-        }
+        router.push(`/dashboard/matches-management`);
       } catch (error) {
         console.error("Match submit error:", error);
         toast.error(error.message || t("error"));

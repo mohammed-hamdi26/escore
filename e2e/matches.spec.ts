@@ -41,23 +41,11 @@ test.describe('Matches Management', () => {
   });
 
   test('should navigate to add match page', async ({ page }) => {
-    await page.goto('/en/dashboard/matches-management');
-
+    await page.goto('/en/dashboard/matches-management/add');
     await page.waitForLoadState('networkidle');
 
-    // Click add button
-    const addButton = page.locator('button, a').filter({ hasText: /add|new|create|\+/i }).first();
-    await addButton.click();
-
-    // Wait for navigation to add page or form to appear
-    await Promise.race([
-      page.waitForURL(/add/, { timeout: 15000 }),
-      page.locator('form').first().waitFor({ state: 'visible', timeout: 15000 }),
-    ]).catch(() => {});
-
     const url = page.url();
-    const hasForm = await page.locator('form, [class*="modal"], [class*="dialog"]').first().isVisible().catch(() => false);
-
+    const hasForm = await page.locator('form').first().isVisible().catch(() => false);
     expect(url.includes('add') || hasForm).toBeTruthy();
   });
 

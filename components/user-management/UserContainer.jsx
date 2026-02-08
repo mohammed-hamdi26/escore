@@ -19,12 +19,14 @@ import {
   PartyPopper,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useRouter } from "@/i18n/navigation";
 
 function UserContainer() {
   const [open, setOpen] = useState(false);
   const [res, setRes] = useState(null);
   const [copied, setCopied] = useState({ email: false, password: false });
   const t = useTranslations("UserForm");
+  const router = useRouter();
 
   const copyToClipboard = (text, field) => {
     navigator.clipboard.writeText(text);
@@ -37,6 +39,7 @@ function UserContainer() {
     setOpen(false);
     setRes(null);
     setCopied({ email: false, password: false });
+    router.push("/dashboard/users/list");
   };
 
   return (

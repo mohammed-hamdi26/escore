@@ -128,8 +128,8 @@ function TransfersForm({
           );
           if (formType === "add") {
             formik.resetForm();
-            router.push("/dashboard/transfers-management");
           }
+          router.push("/dashboard/transfers-management");
         } else {
           toast.error(result?.error || t("An error occurred"));
         }
