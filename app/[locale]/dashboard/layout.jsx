@@ -25,15 +25,6 @@ export default async function DashboardLayout({ children, params }) {
     redirect(`/${locale || "en"}/login`);
   }
 
-  // Block regular users from accessing the dashboard
-  const allowedRoles = ["admin", "support"];
-  const isApprovedContent =
-    user.role === "content" && user.contentStatus === "approved";
-
-  if (!allowedRoles.includes(user.role) && !isApprovedContent) {
-    redirect("/api/auth/force-logout");
-  }
-
   return (
     <PermissionsProvider user={user}>
       <div className="min-h-screen bg-gray-50 dark:bg-[#05060e]">
