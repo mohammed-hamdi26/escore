@@ -8,7 +8,7 @@ async function PlayersPage({ searchParams }) {
   const { size, page, search, game, team, country, isFreeAgent, sortBy, sortOrder } = await searchParams;
 
   // Fetch players, games, and teams in parallel
-  const [playersResult, games, teamsResult] = await Promise.all([
+  const [playersResult, gamesResult, teamsResult] = await Promise.all([
     getPlayers({
       size,
       page,
@@ -21,11 +21,12 @@ async function PlayersPage({ searchParams }) {
       sortOrder,
     }),
     getGames({ limit: 100 }),
-    getTeams({ limit: 100 }),
+    getTeams({ limit: 100 }).catch(() => ({ data: [], pagination: {} })),
   ]);
 
   const { data: players, pagination } = playersResult;
-  const teams = teamsResult?.data || teamsResult || [];
+  const games = Array.isArray(gamesResult?.data) ? gamesResult.data : Array.isArray(gamesResult) ? gamesResult : [];
+  const teams = Array.isArray(teamsResult?.data) ? teamsResult.data : Array.isArray(teamsResult) ? teamsResult : [];
 
   return (
     <PlayerListWrapper>

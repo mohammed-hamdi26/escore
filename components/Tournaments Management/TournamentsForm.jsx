@@ -68,14 +68,22 @@ const validateSchema = yup.object({
   organizer: yup.string(),
   description: yup.string(),
   startDate: yup
-    .date()
-    .typeError("Invalid start date")
-    .required("Start date is required"),
+    .string()
+    .required("Start date is required")
+    .test("valid-date", "Invalid start date", (value) => {
+      if (!value) return true; // required() handles empty
+      const date = new Date(value);
+      return !isNaN(date.getTime());
+    }),
   endDate: yup
-    .date()
-    .typeError("Invalid end date")
-    .required("End date is required"),
-  location: yup.string(),
+    .string()
+    .required("End date is required")
+    .test("valid-date", "Invalid end date", (value) => {
+      if (!value) return true;
+      const date = new Date(value);
+      return !isNaN(date.getTime());
+    }),
+  location: yup.string().nullable(),
   prizePool: yup
     .number()
     .min(0, "Prize pool must be positive")
@@ -214,14 +222,14 @@ export default function TournamentsForm({
         }
 
         // Convert empty strings to null for optional fields
-        if (!dataValues.streamUrl) dataValues.streamUrl = null;
-        if (!dataValues.websiteUrl) dataValues.websiteUrl = null;
-        if (!dataValues.format) dataValues.format = null;
-        if (!dataValues.rules) dataValues.rules = null;
-        if (!dataValues.description) dataValues.description = null;
-        if (!dataValues.location) dataValues.location = null;
-        if (!dataValues.organizer) dataValues.organizer = null;
-        if (!dataValues.tier) dataValues.tier = null;
+        if (!dataValues.streamUrl) delete dataValues.streamUrl;
+        if (!dataValues.websiteUrl) delete dataValues.websiteUrl;
+        if (!dataValues.format) delete dataValues.format;
+        if (!dataValues.rules) delete dataValues.rules;
+        if (!dataValues.description) delete dataValues.description;
+        if (!dataValues.location) delete dataValues.location;
+        if (!dataValues.organizer) delete dataValues.organizer;
+        if (!dataValues.tier) delete dataValues.tier;
 
         // Build standingConfig object
         dataValues.standingConfig = {

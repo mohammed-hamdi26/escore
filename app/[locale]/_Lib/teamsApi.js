@@ -29,15 +29,20 @@ export async function getTeams(searchParams = {}) {
     const res = await apiClient.get(url);
 
     return {
-      data: res.data?.data,
+      data: res.data?.data || [],
       pagination: res.data?.meta || {
         totalPages: 1,
         total: res.data?.data?.length || 0,
+        page: 1,
+        limit: 10,
       },
     };
   } catch (e) {
-    console.log(e.response);
-    throw new Error("Failed to get teams");
+    console.error("Error fetching teams:", e);
+    return {
+      data: [],
+      pagination: { totalPages: 1, total: 0, page: 1, limit: 10 },
+    };
   }
 }
 

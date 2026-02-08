@@ -557,7 +557,8 @@
     "addGame": "Add Game",
     "saveChanges": "Save Changes",
     "gameAdded": "Game added successfully",
-    "gameEdited": "Game updated successfully"
+    "gameEdited": "Game updated successfully",
+    "reset": "Reset"
   },
   "GamesManagement": {
     "title": "Games Management",

@@ -539,7 +539,8 @@
     "addGame": "إضافة لعبة",
     "saveChanges": "حفظ التغييرات",
     "gameAdded": "تمت إضافة اللعبة بنجاح",
-    "gameEdited": "تم تحديث اللعبة بنجاح"
+    "gameEdited": "تم تحديث اللعبة بنجاح",
+    "reset": "إعادة تعيين"
   },
   "GamesManagement": {
     "title": "إدارة الألعاب",
