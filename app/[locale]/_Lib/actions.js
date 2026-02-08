@@ -8,13 +8,28 @@ import { redirect } from "next/navigation";
 import { getPlayersLinks } from "./palyerApi";
 import { getAwardsTeam, getTeamsLinks } from "./teamsApi";
 import { getTournamentLinks } from "./tournamentsApi";
+import { cookies } from "next/headers";
 
 // login
 export async function login(userData) {
   try {
     const res = await apiClient.post("/auth/login", userData);
+    const token = res?.data?.data?.tokens?.accessToken;
 
-    await saveSession(res?.data?.data?.tokens?.accessToken);
+    await saveSession(token);
+
+    // Save user role in a separate cookie for middleware access
+    const user = res?.data?.data?.user;
+    if (user?.role) {
+      const cookieStore = await cookies();
+      cookieStore.set("user_role", user.role, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+      });
+    }
   } catch (e) {
     console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in login");
@@ -62,6 +77,8 @@ export async function verifyAccount(email, otp) {
 }
 export async function logout() {
   await deleteSession();
+  const cookieStore = await cookies();
+  cookieStore.delete("user_role");
   redirect("/login");
 }
 
