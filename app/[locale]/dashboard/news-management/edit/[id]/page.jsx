@@ -9,7 +9,7 @@ import NewsForm from "@/components/News Management/NewsForm";
 async function EditNewsPage({ params }) {
   const { id } = await params;
 
-  const [news, games, tournamentsResult, teamsResult, playersResult] = await Promise.all([
+  const [news, gamesResult, tournamentsResult, teamsResult, playersResult] = await Promise.all([
     getNew(id),
     getGames({ limit: 100 }),
     getTournaments({ size: 100 }),
@@ -22,7 +22,7 @@ async function EditNewsPage({ params }) {
       news={news}
       formType="edit"
       submit={editNews}
-      games={games || []}
+      games={gamesResult?.data || []}
       tournaments={tournamentsResult?.data || []}
       teams={teamsResult?.data || []}
       players={playersResult?.data || []}

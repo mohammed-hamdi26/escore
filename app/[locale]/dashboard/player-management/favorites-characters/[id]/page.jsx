@@ -8,7 +8,7 @@ import FavoriteCharacterPageContainer from "@/components/favorite characters/Fav
 
 async function page({ params }) {
   const { id } = await params;
-  const [player, players, games, characters] = await Promise.all([
+  const [player, playersResult, gamesResult, characters] = await Promise.all([
     getPlayer(id),
     getPlayers(),
     getGames(),
@@ -17,9 +17,9 @@ async function page({ params }) {
   return (
     <FavoriteCharacterPageContainer
       favoriteCharacterFor="players"
-      games={games}
+      games={gamesResult?.data || []}
       id={id}
-      players={players}
+      players={playersResult?.data || []}
       characters={characters}
       playerName={player?.nickname || player?.firstName}
     />

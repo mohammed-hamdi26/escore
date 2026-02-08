@@ -6,7 +6,7 @@ import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
 import NewsForm from "@/components/News Management/NewsForm";
 
 export default async function AddNewsPage() {
-  const [games, tournamentsResult, teamsResult, playersResult] = await Promise.all([
+  const [gamesResult, tournamentsResult, teamsResult, playersResult] = await Promise.all([
     getGames({ limit: 100 }),
     getTournaments({ size: 100 }),
     getTeams({ limit: 100 }),
@@ -17,7 +17,7 @@ export default async function AddNewsPage() {
     <div>
       <NewsForm
         submit={addNews}
-        games={games || []}
+        games={gamesResult?.data || []}
         tournaments={tournamentsResult?.data || []}
         teams={teamsResult?.data || []}
         players={playersResult?.data || []}

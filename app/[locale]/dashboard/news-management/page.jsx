@@ -17,7 +17,7 @@ async function NewsPage({ searchParams }) {
   } = await searchParams;
 
   // Fetch news and games in parallel
-  const [newsResult, games] = await Promise.all([
+  const [newsResult, gamesResult] = await Promise.all([
     getNews({
       limit: size || 10,
       page: page || 1,
@@ -34,12 +34,13 @@ async function NewsPage({ searchParams }) {
   ]);
 
   const { data: news, pagination } = newsResult;
+  const games = gamesResult?.data || [];
 
   return (
     <NewsTable
       news={news || []}
       pagination={pagination}
-      games={games || []}
+      games={games}
     />
   );
 }

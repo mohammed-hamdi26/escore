@@ -7,7 +7,7 @@ async function TournamentsPage({ searchParams }) {
   const { size, page, search, game, status, tier, isFeatured, sortBy, sortOrder } = await searchParams;
 
   // Fetch tournaments and games in parallel
-  const [tournamentsResult, games] = await Promise.all([
+  const [tournamentsResult, gamesResult] = await Promise.all([
     getTournaments({
       size,
       page,
@@ -29,7 +29,7 @@ async function TournamentsPage({ searchParams }) {
       <TournamentsTable
         tournaments={tournaments || []}
         pagination={pagination}
-        games={games || []}
+        games={gamesResult?.data || []}
       />
     </TournamentListWrapper>
   );
