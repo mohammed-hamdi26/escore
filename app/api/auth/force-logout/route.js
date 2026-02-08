@@ -12,10 +12,12 @@ export async function GET(request) {
   // Delete the session cookie
   cookieStore.delete("session");
 
-  // Get the locale from the referer or default to 'en'
+  // Get the locale from query param, referer, or default to 'en'
+  const { searchParams } = new URL(request.url);
+  const localeParam = searchParams.get("locale");
   const referer = request.headers.get("referer") || "";
   const localeMatch = referer.match(/\/(en|ar)\//);
-  const locale = localeMatch ? localeMatch[1] : "en";
+  const locale = localeParam || (localeMatch ? localeMatch[1] : "en");
 
   // Redirect to login page
   const loginUrl = new URL(`/${locale}/login`, request.url);

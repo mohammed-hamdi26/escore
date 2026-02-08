@@ -3,7 +3,6 @@ import TopNav from "@/components/dashboard/TopNav";
 import { getLoginUser } from "../_Lib/usersApi";
 import { redirect } from "next/navigation";
 import { PermissionsProvider } from "@/contexts/PermissionsContext";
-import { cookies } from "next/headers";
 
 export default async function DashboardLayout({ children, params }) {
   let user = null;
@@ -17,12 +16,8 @@ export default async function DashboardLayout({ children, params }) {
   }
 
   if (shouldRedirect || !user) {
-    // Clear the session cookie directly
-    const cookieStore = await cookies();
-    cookieStore.delete("session");
-
-    // Redirect to login page
-    redirect(`/${locale || "en"}/login`);
+    // Redirect to force-logout route handler which can safely clear cookies
+    redirect(`/api/auth/force-logout?locale=${locale || "en"}`);
   }
 
   return (
