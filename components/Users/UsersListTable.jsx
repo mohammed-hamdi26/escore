@@ -64,10 +64,14 @@ export default function UsersListTable({ users, meta }) {
     try {
       setIsLoading(`reset-${userId}`);
       const result = await resetUserPassword(userId);
-      setResetResult(result);
+      if (!result.success) {
+        toast.error(result.error || t("resetPasswordError"));
+        return;
+      }
+      setResetResult(result.data);
       toast.success(t("passwordReset"));
     } catch (e) {
-      toast.error(e.message || t("resetPasswordError"));
+      toast.error(t("resetPasswordError"));
     } finally {
       setIsLoading(null);
     }

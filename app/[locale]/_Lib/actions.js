@@ -1095,12 +1095,13 @@ export async function resetUserPassword(userId) {
   try {
     const res = await apiClient.post(`/admin/users/${userId}/reset-password`);
     revalidatePath(`/${locale}/dashboard/users`);
-    return res.data.data;
+    return { success: true, data: res.data.data };
   } catch (error) {
     console.log("Failed to reset password", error);
-    throw new Error(
-      error.response?.data?.message || "Failed to reset password"
-    );
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to reset password",
+    };
   }
 }
 
