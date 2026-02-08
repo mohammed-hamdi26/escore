@@ -27,25 +27,13 @@ export default async function middleware(req) {
     pathnameWithoutLocale.startsWith(route)
   );
 
-  // Get session token and user role
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value;
-  const userRole = cookieStore.get("user_role")?.value;
+  // Get session token
+  const session = (await cookies()).get("session")?.value;
 
   // Redirect to login if accessing protected route without session
   if (isProtectedRoute && !session) {
     const locale = pathname.match(/^\/(en|ar)/)?.[1] || "en";
     return NextResponse.redirect(new URL(`/${locale}/login`, req.nextUrl));
-  }
-
-  // Block regular users from accessing the dashboard
-  if (isProtectedRoute && session && userRole === "user") {
-    const locale = pathname.match(/^\/(en|ar)/)?.[1] || "en";
-    // Clear cookies and redirect to login
-    const response = NextResponse.redirect(new URL(`/${locale}/login`, req.nextUrl));
-    response.cookies.delete("session");
-    response.cookies.delete("user_role");
-    return response;
   }
 
   // Redirect to dashboard if accessing auth routes with valid session

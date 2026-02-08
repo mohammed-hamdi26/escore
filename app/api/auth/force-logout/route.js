@@ -9,9 +9,8 @@ import { NextResponse } from "next/server";
 export async function GET(request) {
   const cookieStore = await cookies();
 
-  // Delete the session and role cookies
+  // Delete the session cookie
   cookieStore.delete("session");
-  cookieStore.delete("user_role");
 
   // Get the locale from the referer or default to 'en'
   const referer = request.headers.get("referer") || "";
