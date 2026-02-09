@@ -502,6 +502,19 @@ export async function setMatchLineup(matchId, teamId, players) {
   }
 }
 
+export async function removeMatchLineup(matchId, teamId) {
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.delete(`/matches/${matchId}/lineup/${teamId}`);
+    revalidatePath(`/${locale}/dashboard/matches-management/edit`);
+    return res.data;
+  } catch (e) {
+    console.log("Error removing lineup:", e.response?.data);
+    throw new Error(e.response?.data?.message || "Error removing match lineup");
+  }
+}
+
 export async function addLink(linkData) {
   const locale = await getLocale();
   try {

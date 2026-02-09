@@ -41,7 +41,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import FormSection from "@/components/ui app/FormSection";
 import FormRow from "@/components/ui app/FormRow";
-import { setMatchLineup } from "@/app/[locale]/_Lib/actions";
+import { setMatchLineup, removeMatchLineup } from "@/app/[locale]/_Lib/actions";
 import { combineDateAndTime } from "@/app/[locale]/_Lib/helps";
 import MatchLineupSelector from "./MatchLineupSelector";
 
@@ -212,11 +212,17 @@ function MatchFormRedesign({
 
         if (matchId) {
           try {
+            // Team 1 lineup
             if (team1Lineup && team1Lineup.length > 0 && values.team1) {
               await setMatchLineup(matchId, values.team1, team1Lineup);
+            } else if (team1Lineup && team1Lineup.length === 0 && values.team1 && formType === "edit") {
+              await removeMatchLineup(matchId, values.team1);
             }
+            // Team 2 lineup
             if (team2Lineup && team2Lineup.length > 0 && values.team2) {
               await setMatchLineup(matchId, values.team2, team2Lineup);
+            } else if (team2Lineup && team2Lineup.length === 0 && values.team2 && formType === "edit") {
+              await removeMatchLineup(matchId, values.team2);
             }
           } catch (lineupError) {
             console.error("Error saving lineups:", lineupError);
