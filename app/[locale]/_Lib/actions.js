@@ -3,7 +3,7 @@ import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import apiClient from "./apiCLient";
 
-import { deleteSession, saveSession } from "./session";
+import { deleteSession, saveSession, saveRefreshToken } from "./session";
 import { redirect } from "next/navigation";
 import { getPlayersLinks } from "./palyerApi";
 import { getAwardsTeam, getTeamsLinks } from "./teamsApi";
@@ -14,7 +14,9 @@ export async function login(userData) {
   try {
     const res = await apiClient.post("/auth/login", userData);
 
-    await saveSession(res?.data?.data?.tokens?.accessToken);
+    const tokens = res?.data?.data?.tokens;
+    await saveSession(tokens?.accessToken);
+    await saveRefreshToken(tokens?.refreshToken);
   } catch (e) {
     console.log(e.response.data.errors || e.response.data || e.response || e);
     throw new Error("Error in login");

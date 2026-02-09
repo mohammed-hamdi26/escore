@@ -120,11 +120,49 @@ export async function getSession() {
 }
 
 /**
- * Delete session cookie
+ * Save refresh token securely with encryption
+ * @param {string} token - The refresh JWT token to save
+ */
+export async function saveRefreshToken(token) {
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+  const cookieStore = await cookies();
+
+  const isProduction = process.env.NODE_ENV === "production";
+  const isHttps = process.env.NEXT_PUBLIC_BASE_URL?.startsWith("https://");
+
+  const encryptedToken = encryptToken(token);
+
+  cookieStore.set("refresh_token", encryptedToken, {
+    httpOnly: true,
+    secure: isProduction && isHttps,
+    expires: expiresAt,
+    sameSite: "lax",
+    path: "/",
+  });
+}
+
+/**
+ * Get the decrypted refresh token
+ * @returns {Promise<string|null>} - Decrypted refresh token or null
+ */
+export async function getRefreshToken() {
+  const cookieStore = await cookies();
+  const encryptedToken = cookieStore.get("refresh_token")?.value;
+
+  if (!encryptedToken) {
+    return null;
+  }
+
+  return decryptToken(encryptedToken);
+}
+
+/**
+ * Delete all session cookies (access + refresh)
  */
 export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.delete("session");
+  cookieStore.delete("refresh_token");
 }
 
 /**
@@ -137,11 +175,30 @@ export async function hasValidSession() {
 }
 
 /**
- * Refresh session expiry (extends cookie lifetime)
+ * Refresh session by calling the backend refresh-token endpoint
+ * @returns {Promise<string|null>} - New access token or null if refresh failed
  */
 export async function refreshSession() {
-  const token = await getSession();
-  if (token) {
-    await saveSession(token);
+  const refreshToken = await getRefreshToken();
+  if (!refreshToken) return null;
+
+  try {
+    const axios = (await import("axios")).default;
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/refresh-token`,
+      { refreshToken }
+    );
+
+    const tokens = res?.data?.data?.tokens;
+    if (tokens?.accessToken && tokens?.refreshToken) {
+      await saveSession(tokens.accessToken);
+      await saveRefreshToken(tokens.refreshToken);
+      return tokens.accessToken;
+    }
+
+    return null;
+  } catch {
+    // Refresh token is invalid or expired — user must login again
+    return null;
   }
 }
