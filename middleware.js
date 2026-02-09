@@ -41,6 +41,31 @@ export default async function middleware(req) {
     return NextResponse.redirect(new URL(`/${locale}/login`, baseUrl));
   }
 
+  // Proactive token refresh: if access token is expired, redirect to
+  // the refresh-session Route Handler BEFORE Server Components run.
+  // This avoids the "Cookies can only be modified in Server Action" error.
+  if (isProtectedRoute && session) {
+    const tokenExp = (await cookies()).get("token_exp")?.value;
+    if (tokenExp) {
+      const expiry = parseInt(tokenExp, 10);
+      const now = Math.floor(Date.now() / 1000);
+      if (now >= expiry) {
+        const refreshToken = (await cookies()).get("refresh_token")?.value;
+        const locale = pathname.match(/^\/(en|ar)/)?.[1] || "en";
+        if (refreshToken) {
+          // Redirect to refresh handler which can write cookies
+          const refreshUrl = new URL("/api/auth/refresh-session", baseUrl);
+          refreshUrl.searchParams.set("redirect", pathname);
+          refreshUrl.searchParams.set("locale", locale);
+          return NextResponse.redirect(refreshUrl);
+        } else {
+          // No refresh token available, redirect to login
+          return NextResponse.redirect(new URL(`/${locale}/login`, baseUrl));
+        }
+      }
+    }
+  }
+
   // Redirect to dashboard if accessing auth routes with valid session
   if (isAuthRoute && session) {
     const locale = pathname.match(/^\/(en|ar)/)?.[1] || "en";

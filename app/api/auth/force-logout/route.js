@@ -9,9 +9,10 @@ import { NextResponse } from "next/server";
 export async function GET(request) {
   const cookieStore = await cookies();
 
-  // Delete session and refresh token cookies
+  // Delete all auth cookies
   cookieStore.delete("session");
   cookieStore.delete("refresh_token");
+  cookieStore.delete("token_exp");
 
   // Get the locale from query param, referer, or default to 'en'
   const { searchParams } = new URL(request.url);

@@ -102,6 +102,24 @@ export async function saveSession(token) {
     sameSite: "lax", // CSRF protection
     path: "/",
   });
+
+  // Save JWT expiry as a plain cookie so middleware can check it
+  try {
+    const payload = JSON.parse(
+      Buffer.from(token.split(".")[1], "base64url").toString()
+    );
+    if (payload.exp) {
+      cookieStore.set("token_exp", String(payload.exp), {
+        httpOnly: true,
+        secure: isProduction && isHttps,
+        expires: expiresAt,
+        sameSite: "lax",
+        path: "/",
+      });
+    }
+  } catch {
+    // If token isn't a valid JWT, skip expiry cookie
+  }
 }
 
 /**
@@ -163,6 +181,7 @@ export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.delete("session");
   cookieStore.delete("refresh_token");
+  cookieStore.delete("token_exp");
 }
 
 /**
@@ -191,8 +210,15 @@ export async function refreshSession() {
 
     const tokens = res?.data?.data?.tokens;
     if (tokens?.accessToken && tokens?.refreshToken) {
-      await saveSession(tokens.accessToken);
-      await saveRefreshToken(tokens.refreshToken);
+      // Try to save cookies — only works in Server Actions & Route Handlers.
+      // In Server Components this will throw, but we still return the token
+      // so the interceptor can retry the current request.
+      try {
+        await saveSession(tokens.accessToken);
+        await saveRefreshToken(tokens.refreshToken);
+      } catch {
+        // Cookie writes fail in Server Components — that's expected.
+      }
       return tokens.accessToken;
     }
 
