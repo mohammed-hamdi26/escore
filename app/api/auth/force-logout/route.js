@@ -9,8 +9,9 @@ import { NextResponse } from "next/server";
 export async function GET(request) {
   const cookieStore = await cookies();
 
-  // Delete the session cookie
+  // Delete session and refresh token cookies
   cookieStore.delete("session");
+  cookieStore.delete("refresh_token");
 
   // Get the locale from query param, referer, or default to 'en'
   const { searchParams } = new URL(request.url);
@@ -19,7 +20,9 @@ export async function GET(request) {
   const localeMatch = referer.match(/\/(en|ar)\//);
   const locale = localeParam || (localeMatch ? localeMatch[1] : "en");
 
-  // Redirect to login page
-  const loginUrl = new URL(`/${locale}/login`, request.url);
+  // Build URL from forwarded headers (handles reverse proxy correctly)
+  const proto = request.headers.get("x-forwarded-proto") || "https";
+  const host = request.headers.get("host");
+  const loginUrl = new URL(`/${locale}/login`, `${proto}://${host}`);
   return NextResponse.redirect(loginUrl);
 }

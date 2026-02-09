@@ -30,16 +30,21 @@ export default async function middleware(req) {
   // Get session token
   const session = (await cookies()).get("session")?.value;
 
+  // Build base URL from forwarded headers (handles reverse proxy correctly)
+  const proto = req.headers.get("x-forwarded-proto") || "https";
+  const host = req.headers.get("host");
+  const baseUrl = `${proto}://${host}`;
+
   // Redirect to login if accessing protected route without session
   if (isProtectedRoute && !session) {
     const locale = pathname.match(/^\/(en|ar)/)?.[1] || "en";
-    return NextResponse.redirect(new URL(`/${locale}/login`, req.nextUrl));
+    return NextResponse.redirect(new URL(`/${locale}/login`, baseUrl));
   }
 
   // Redirect to dashboard if accessing auth routes with valid session
   if (isAuthRoute && session) {
     const locale = pathname.match(/^\/(en|ar)/)?.[1] || "en";
-    return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.nextUrl));
+    return NextResponse.redirect(new URL(`/${locale}/dashboard`, baseUrl));
   }
 
   // Continue with internationalization middleware
