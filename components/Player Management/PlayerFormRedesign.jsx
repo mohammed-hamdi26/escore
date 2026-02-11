@@ -80,6 +80,22 @@ function PlayerFormRedesign({
   const t = useTranslations("playerForm");
   const router = useRouter();
 
+  // Track selected team objects per roster index (for passing to GameSelectField)
+  const [selectedTeamObjects, setSelectedTeamObjects] = useState(() => {
+    const initial = {};
+    const rosters = player?.gameRosters?.length > 0
+      ? player.gameRosters
+      : (player?.game ? [{ game: player.game, team: player.team }] : []);
+    rosters.forEach((r, i) => {
+      if (r.team) {
+        const teamId = r.team?.id || r.team?._id || r.team;
+        const teamObj = teamsOptions.find(t => (t.id || t._id) === teamId);
+        if (teamObj) initial[i] = teamObj;
+      }
+    });
+    return initial;
+  });
+
   // Helper function to format date to YYYY-MM-DD using local timezone
   const formatDateToLocal = (dateInput) => {
     if (!dateInput) return "";
@@ -265,18 +281,26 @@ function PlayerFormRedesign({
                   placeholder={t("teamPlaceholder")}
                   searchPlaceholder={t("searchTeams") || "Search teams..."}
                   value={roster.team}
-                  onChange={async (teamId) => {
+                  onChange={async (teamId, teamObj) => {
                     await formik.setFieldValue(`gameRosters[${index}].team`, teamId);
                     // Clear game when team changes (game options depend on team)
                     await formik.setFieldValue(`gameRosters[${index}].game`, "");
+                    setSelectedTeamObjects(prev => {
+                      const next = { ...prev };
+                      if (teamObj) {
+                        next[index] = teamObj;
+                      } else {
+                        delete next[index];
+                      }
+                      return next;
+                    });
                   }}
                 />
                 <GameSelectField
                   label={t("mainGame")}
                   name={`gameRosters[${index}].game`}
                   initialGames={gamesOptions}
-                  selectedTeamId={roster.team}
-                  allTeams={teamsOptions}
+                  selectedTeam={selectedTeamObjects[index] || null}
                   usedGames={formik.values.gameRosters
                     .filter((r, i) => i !== index && r.game)
                     .map(r => r.game)}
@@ -812,8 +836,7 @@ function GameSelectField({
   label,
   name,
   initialGames = [],
-  selectedTeamId,
-  allTeams = [],
+  selectedTeam = null,
   usedGames = [],
   formik,
   placeholder,
@@ -850,34 +873,49 @@ function GameSelectField({
 
   const getGameId = (game) => game?.id || game?._id;
 
-  // If a team is selected, show only that team's games (small list, no server pagination needed)
-  const selectedTeam = selectedTeamId
-    ? allTeams.find(t => (t.id || t._id) === selectedTeamId)
-    : null;
-
-  const teamGameIds = selectedTeam?.games?.map(g => g.id || g._id || g) || [];
+  // If a team is selected, show only that team's games
+  const teamGames = selectedTeam?.games || [];
+  const hasTeamFilter = selectedTeam && teamGames.length > 0;
 
   // Determine the display list
-  const displayGames = selectedTeamId && teamGameIds.length > 0
-    ? initialGames.filter(g => teamGameIds.includes(getGameId(g)))
-    : games;
+  let displayGames;
+  if (hasTeamFilter) {
+    // Check if team's games are full objects (have name) or just IDs
+    if (teamGames[0]?.name) {
+      // Full game objects from team - use directly
+      displayGames = teamGames;
+    } else {
+      // Just IDs - resolve from all known games
+      const teamGameIds = teamGames.map(g => g?.id || g?._id || g);
+      const allKnownGames = [...initialGames, ...games];
+      const seen = new Set();
+      displayGames = allKnownGames.filter(g => {
+        const gId = getGameId(g);
+        if (seen.has(gId)) return false;
+        seen.add(gId);
+        return teamGameIds.includes(gId);
+      });
+    }
+  } else {
+    displayGames = games;
+  }
 
   // Filter out already-used games and apply client search when team is selected
   const filteredGames = displayGames?.filter(g => {
     const gId = getGameId(g);
     if (usedGames.includes(gId) && gId !== value) return false;
-    if (selectedTeamId && search) {
+    if (hasTeamFilter && search) {
       return g.name?.toLowerCase().includes(search.toLowerCase()) ||
              g.slug?.toLowerCase().includes(search.toLowerCase());
     }
     return true;
   });
 
-  const selectedGame = [...initialGames, ...games].find((g) => getGameId(g) === value);
+  const selectedGame = [...initialGames, ...games, ...(teamGames[0]?.name ? teamGames : [])].find((g) => getGameId(g) === value);
 
   // Fetch games from server (only when no team is selected)
   const fetchGames = useCallback(async (searchTerm, pageNum, reset = false) => {
-    if (selectedTeamId) return; // Don't fetch from server when team is selected
+    if (selectedTeam) return; // Don't fetch from server when team is selected
     setIsLoading(true);
     try {
       const { data, pagination } = await searchGames({ search: searchTerm, page: pageNum, limit: 15 });
@@ -897,36 +935,36 @@ function GameSelectField({
     } finally {
       setIsLoading(false);
     }
-  }, [selectedTeamId]);
+  }, [selectedTeam]);
 
   // Load first page when popover opens (only if no team selected)
   useEffect(() => {
-    if (isOpen && !selectedTeamId) {
+    if (isOpen && !selectedTeam) {
       fetchGames("", 1, true);
     }
     if (!isOpen) {
       setSearch("");
     }
-  }, [isOpen, selectedTeamId]);
+  }, [isOpen, selectedTeam]);
 
   // Debounced search
   useEffect(() => {
-    if (!isOpen || selectedTeamId) return;
+    if (!isOpen || selectedTeam) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       fetchGames(search, 1, true);
     }, 300);
     return () => clearTimeout(debounceRef.current);
-  }, [search, isOpen, selectedTeamId]);
+  }, [search, isOpen, selectedTeam]);
 
   // Infinite scroll
   const handleScroll = useCallback((e) => {
-    if (selectedTeamId) return;
+    if (selectedTeam) return;
     const { scrollTop, scrollHeight, clientHeight } = e.target;
     if (scrollHeight - scrollTop - clientHeight < 50 && hasMore && !isLoading) {
       fetchGames(search, page + 1);
     }
-  }, [hasMore, isLoading, page, search, selectedTeamId, fetchGames]);
+  }, [hasMore, isLoading, page, search, selectedTeam, fetchGames]);
 
   const handleSelect = async (game) => {
     if (externalOnChange) {
@@ -1178,7 +1216,7 @@ function TeamSelectField({
 
   const handleSelect = async (team) => {
     if (externalOnChange) {
-      externalOnChange(getTeamId(team));
+      externalOnChange(getTeamId(team), team);
     } else {
       await formik.setFieldValue(name, getTeamId(team));
       await formik.setFieldTouched(name, true, true);
@@ -1191,7 +1229,7 @@ function TeamSelectField({
   const handleClear = async (e) => {
     e.stopPropagation();
     if (externalOnChange) {
-      externalOnChange("");
+      externalOnChange("", null);
     } else {
       await formik.setFieldValue(name, "");
       await formik.setFieldTouched(name, true, true);
