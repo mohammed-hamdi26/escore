@@ -1113,29 +1113,25 @@ function EventForm({ event, submit, formType = "add", countries = [] }) {
           <FormRow>
             <ImageUpload
               label={t("logoLight") || "Logo (Light)"}
-              value={formik.values.logoLight}
-              onChange={(url) => formik.setFieldValue("logoLight", url)}
+              name="logoLight"
+              formik={formik}
             />
             <ImageUpload
               label={t("logoDark") || "Logo (Dark)"}
-              value={formik.values.logoDark}
-              onChange={(url) => formik.setFieldValue("logoDark", url)}
+              name="logoDark"
+              formik={formik}
             />
           </FormRow>
           <FormRow>
             <ImageUpload
               label={t("coverLight") || "Cover (Light)"}
-              value={formik.values.coverImageLight}
-              onChange={(url) =>
-                formik.setFieldValue("coverImageLight", url)
-              }
+              name="coverImageLight"
+              formik={formik}
             />
             <ImageUpload
               label={t("coverDark") || "Cover (Dark)"}
-              value={formik.values.coverImageDark}
-              onChange={(url) =>
-                formik.setFieldValue("coverImageDark", url)
-              }
+              name="coverImageDark"
+              formik={formik}
             />
           </FormRow>
         </FormSection>
