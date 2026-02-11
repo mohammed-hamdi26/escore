@@ -10,6 +10,7 @@ import {
   Users,
   UsersRound,
   ArrowRightLeft,
+  Building2,
   Gamepad2,
   Newspaper,
   UserCog,
@@ -64,6 +65,12 @@ function NavItems({ user, t }) {
       title: "Teams",
       href: "/dashboard/teams-management",
       isShowed: hasPermission(user, "Team"),
+    },
+    {
+      icon: <Building2 />,
+      title: "Clubs",
+      href: "/dashboard/clubs-management",
+      isShowed: hasPermission(user, "Club"),
     },
     {
       icon: <ArrowRightLeft />,

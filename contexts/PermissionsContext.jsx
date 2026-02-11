@@ -8,6 +8,7 @@ import { createContext, useContext, useMemo } from "react";
 export const ENTITIES = {
   GAME: "Game",
   TEAM: "Team",
+  CLUB: "Club",
   PLAYER: "Player",
   TOURNAMENT: "Tournament",
   MATCH: "Match",

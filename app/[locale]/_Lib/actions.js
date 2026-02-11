@@ -1725,3 +1725,91 @@ export async function deleteAllStandings(tournamentId) {
     };
   }
 }
+
+// ==================== CLUBS ====================
+
+export async function addClub(clubData) {
+  const locale = await getLocale();
+  try {
+    const cleanData = cleanNullValues(clubData);
+    await apiClient.post("/clubs", cleanData);
+  } catch (e) {
+    console.log("Club creation error:", e.response?.data || e.message);
+    throw new Error(e.response?.data?.message || "Error in adding club");
+  }
+  redirect(`/${locale}/dashboard/clubs-management`);
+}
+
+export async function editClub(clubData) {
+  const locale = await getLocale();
+  try {
+    const cleanData = cleanNullValues(clubData);
+    await apiClient.put(`/clubs/${cleanData.id}`, cleanData);
+    revalidatePath(`/${locale}/dashboard/clubs-management`);
+  } catch (e) {
+    console.log("Club update error:", e.response?.data || e.message);
+    throw new Error(e.response?.data?.message || "Error in updating club");
+  }
+  redirect(`/${locale}/dashboard/clubs-management`);
+}
+
+export async function deleteClub(id) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(`/clubs/${id}`);
+    revalidatePath(`/${locale}/dashboard/clubs-management`);
+    return { success: true };
+  } catch (e) {
+    throw new Error("Error in deleting club");
+  }
+}
+
+export async function addTeamToClub(clubId, teamData) {
+  const locale = await getLocale();
+  try {
+    await apiClient.post(`/clubs/${clubId}/teams`, teamData);
+    revalidatePath(`/${locale}/dashboard/clubs-management/view/${clubId}`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Error adding team to club");
+  }
+}
+
+export async function removeTeamFromClub(clubId, teamId) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(`/clubs/${clubId}/teams/${teamId}`);
+    revalidatePath(`/${locale}/dashboard/clubs-management/view/${clubId}`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(
+      e.response?.data?.message || "Error removing team from club"
+    );
+  }
+}
+
+export async function addPlayerToClub(clubId, playerData) {
+  const locale = await getLocale();
+  try {
+    await apiClient.post(`/clubs/${clubId}/players`, playerData);
+    revalidatePath(`/${locale}/dashboard/clubs-management/view/${clubId}`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(
+      e.response?.data?.message || "Error adding player to club"
+    );
+  }
+}
+
+export async function removePlayerFromClub(clubId, playerId) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(`/clubs/${clubId}/players/${playerId}`);
+    revalidatePath(`/${locale}/dashboard/clubs-management/view/${clubId}`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(
+      e.response?.data?.message || "Error removing player from club"
+    );
+  }
+}
