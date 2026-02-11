@@ -7,6 +7,7 @@ export async function getEvents(searchParams = {}) {
     if (searchParams.size) params.set("limit", searchParams.size);
     if (searchParams.search) params.set("search", searchParams.search);
     if (searchParams.status) params.set("status", searchParams.status);
+    if (searchParams.isFeatured) params.set("isFeatured", searchParams.isFeatured);
     if (searchParams.sortBy) params.set("sortBy", searchParams.sortBy);
     if (searchParams.sortOrder) params.set("sortOrder", searchParams.sortOrder);
 

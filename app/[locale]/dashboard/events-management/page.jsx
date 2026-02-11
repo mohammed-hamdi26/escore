@@ -3,13 +3,14 @@ import EventList from "@/components/Events Management/EventList";
 import { EventListWrapper } from "@/components/Events Management/EventFormWrapper";
 
 async function EventsPage({ searchParams }) {
-  const { size, page, search, status, sortBy, sortOrder } =
+  const { size, page, search, status, isFeatured, sortBy, sortOrder } =
     await searchParams;
   const { data: events, pagination } = await getEvents({
     size,
     page,
     search,
     status,
+    isFeatured,
     sortBy,
     sortOrder,
   });

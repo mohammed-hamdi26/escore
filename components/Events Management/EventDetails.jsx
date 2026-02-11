@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import {
@@ -9,7 +9,7 @@ import {
   Trophy,
   Building2,
   Settings,
-  Eye,
+  Eye as EyeIcon,
   MapPin,
   Globe,
   DollarSign,
@@ -22,11 +22,23 @@ import {
   ChevronUp,
   Medal,
   CheckCircle,
+  CheckCircle2,
   XCircle,
   Gamepad2,
   Hash,
   Loader2,
   Search,
+  Star,
+  Clock,
+  Play,
+  ArrowLeft,
+  Pencil,
+  Tv,
+  Wifi,
+  WifiOff,
+  Power,
+  CalendarRange,
+  FileText,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -39,6 +51,15 @@ import {
   removeClubResult,
 } from "@/app/[locale]/_Lib/actions";
 
+// Status config with icons (for header badges)
+const STATUS_CONFIG = {
+  upcoming: { color: "bg-blue-500/10 text-blue-500 border-blue-500/30", icon: Clock },
+  ongoing: { color: "bg-green-500/10 text-green-500 border-green-500/30", icon: Play },
+  completed: { color: "bg-purple-500/10 text-purple-500 border-purple-500/30", icon: CheckCircle2 },
+  cancelled: { color: "bg-red-500/10 text-red-500 border-red-500/30", icon: XCircle },
+};
+
+// Kept for tournament tab badges
 const STATUS_COLORS = {
   upcoming: "bg-blue-500/10 text-blue-500 border-blue-500/20",
   ongoing: "bg-green-500/10 text-green-500 border-green-500/20",
@@ -100,8 +121,11 @@ function EventDetails({
 
   const eventLogo = event.logo?.light || event.logo?.dark;
 
+  const statusConfig = STATUS_CONFIG[event.status] || STATUS_CONFIG.upcoming;
+  const StatusIcon = statusConfig.icon;
+
   const tabs = [
-    { id: "overview", label: t("overview") || "Overview", icon: Eye },
+    { id: "overview", label: t("overview") || "Overview", icon: EyeIcon },
     {
       id: "tournaments",
       label: t("tournaments") || "Tournaments",
@@ -239,55 +263,107 @@ function EventDetails({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        {eventLogo ? (
-          <img
-            src={eventLogo}
-            alt={event.name}
-            className="size-14 rounded-xl object-contain bg-white/5 p-1"
-          />
-        ) : (
-          <div className="size-14 rounded-xl bg-white/5 flex items-center justify-center">
-            <CalendarDays className="size-7 text-muted-foreground" />
-          </div>
-        )}
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-foreground">{event.name}</h1>
-            <Badge
-              variant="outline"
-              className={STATUS_COLORS[event.status] || STATUS_COLORS.upcoming}
-            >
-              {t(event.status) || event.status}
-            </Badge>
-            {event.clubChampionship?.enabled && (
-              <Badge
-                variant="outline"
-                className="bg-purple-500/10 text-purple-500 border-purple-500/20"
-              >
-                <Trophy className="size-3 mr-1" />
-                CC
-              </Badge>
+      {/* Header - Top Bar */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard/events-management">
+            <Button variant="outline" size="sm" className="gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+              <ArrowLeft className="size-4" />
+              {t("back") || "Back"}
+            </Button>
+          </Link>
+        </div>
+        <Link href={`/dashboard/events-management/edit/${event.id}`}>
+          <Button className="gap-2 bg-green-primary hover:bg-green-primary/90 text-white">
+            <Pencil className="size-4" />
+            {t("edit") || "Edit Event"}
+          </Button>
+        </Link>
+      </div>
+
+      {/* Header - Event Identity */}
+      <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+        <div className="flex items-start gap-6">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            {eventLogo ? (
+              <img
+                src={eventLogo}
+                alt={event.name}
+                className="size-24 rounded-2xl object-cover ring-2 ring-white/10"
+              />
+            ) : (
+              <div className="size-24 rounded-2xl bg-green-primary/10 flex items-center justify-center ring-2 ring-green-primary/20">
+                <CalendarDays className="size-10 text-green-primary" />
+              </div>
             )}
           </div>
-          <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <CalendarDays className="size-3.5" />
-              {formatDate(event.startDate)} - {formatDate(event.endDate)}
-            </span>
-            {event.location && (
-              <span className="flex items-center gap-1">
-                <MapPin className="size-3.5" />
-                {event.location}
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 mb-2">
+              <h2 className="text-2xl font-bold text-foreground truncate">{event.name}</h2>
+              {event.isFeatured && (
+                <Star className="size-5 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+              )}
+            </div>
+
+            {/* Badge Row */}
+            <div className="flex flex-wrap items-center gap-3 mb-3">
+              {/* Status Badge */}
+              <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${statusConfig.color}`}>
+                <StatusIcon className="size-4" />
+                {t(event.status) || event.status}
               </span>
-            )}
-            {event.prizePool > 0 && (
-              <span className="flex items-center gap-1">
-                <DollarSign className="size-3.5" />
-                {formatCurrency(event.prizePool, event.currency)}
+
+              {/* Online/Offline */}
+              <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${
+                event.isOnline
+                  ? "bg-cyan-500/10 text-cyan-500 border-cyan-500/30"
+                  : "bg-gray-500/10 text-gray-400 border-gray-500/30"
+              }`}>
+                {event.isOnline ? <Wifi className="size-4" /> : <WifiOff className="size-4" />}
+                {event.isOnline ? t("online") || "Online" : t("offline") || "Offline"}
               </span>
-            )}
+
+              {/* Active Status */}
+              <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${
+                event.isActive
+                  ? "bg-green-500/10 text-green-500 border-green-500/30"
+                  : "bg-red-500/10 text-red-500 border-red-500/30"
+              }`}>
+                <Power className="size-4" />
+                {event.isActive ? t("active") || "Active" : t("inactive") || "Inactive"}
+              </span>
+
+              {/* Club Championship Badge */}
+              {event.clubChampionship?.enabled && (
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border bg-purple-500/10 text-purple-500 border-purple-500/30">
+                  <Trophy className="size-4" />
+                  CC
+                </span>
+              )}
+            </div>
+
+            {/* Subtitle Row */}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <CalendarRange className="size-4" />
+                {formatDate(event.startDate)} - {formatDate(event.endDate)}
+              </span>
+              {event.location && (
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="size-4" />
+                  {event.location}
+                </span>
+              )}
+              {event.prizePool > 0 && (
+                <span className="flex items-center gap-1.5">
+                  <DollarSign className="size-4" />
+                  {formatCurrency(event.prizePool, event.currency)}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -314,108 +390,78 @@ function EventDetails({
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white dark:bg-[#1a1d2e] rounded-2xl border border-gray-200 dark:border-white/5 p-6">
-        {/* OVERVIEW TAB */}
-        {activeTab === "overview" && (
-          <div className="space-y-6">
-            {event.description && (
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">
-                  {t("description") || "Description"}
-                </h3>
-                <p className="text-foreground">{event.description}</p>
-              </div>
-            )}
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-white/5">
-                <p className="text-xs text-muted-foreground mb-1">
-                  {t("tournaments") || "Tournaments"}
-                </p>
-                <p className="text-2xl font-bold text-foreground">
-                  {event.tournamentsCount || tournaments.length || 0}
-                </p>
-              </div>
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-white/5">
-                <p className="text-xs text-muted-foreground mb-1">
-                  {t("clubs") || "Clubs"}
-                </p>
-                <p className="text-2xl font-bold text-foreground">
-                  {event.clubsCount || clubs.length || 0}
-                </p>
-              </div>
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-white/5">
-                <p className="text-xs text-muted-foreground mb-1">
-                  {t("prizePool") || "Prize Pool"}
-                </p>
-                <p className="text-2xl font-bold text-foreground">
-                  {formatCurrency(event.prizePool, event.currency)}
-                </p>
-              </div>
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-white/5">
-                <p className="text-xs text-muted-foreground mb-1">
-                  {t("followers") || "Followers"}
-                </p>
-                <p className="text-2xl font-bold text-foreground">
-                  {event.followersCount || 0}
-                </p>
-              </div>
+      {/* OVERVIEW TAB - 3-column layout */}
+      {activeTab === "overview" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Description */}
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <FileText className="size-5 text-green-primary" />
+                {t("description") || "Description"}
+              </h3>
+              {event.description ? (
+                <p className="text-muted-foreground whitespace-pre-wrap">{event.description}</p>
+              ) : (
+                <p className="text-muted-foreground italic">{t("noDescription") || "No description provided"}</p>
+              )}
             </div>
 
-            {/* Links */}
-            <div className="flex items-center gap-4">
-              {event.websiteUrl && (
-                <a
-                  href={event.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-sm text-green-primary hover:underline"
-                >
-                  <Globe className="size-4" />
-                  {t("website") || "Website"}
-                  <ExternalLink className="size-3" />
-                </a>
-              )}
-              {event.streamUrl && (
-                <a
-                  href={event.streamUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-sm text-green-primary hover:underline"
-                >
-                  <LinkIcon className="size-4" />
-                  {t("stream") || "Stream"}
-                  <ExternalLink className="size-3" />
-                </a>
-              )}
+            {/* Schedule */}
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <CalendarDays className="size-5 text-green-primary" />
+                {t("schedule") || "Schedule"}
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <InfoItem
+                  label={t("startDate") || "Start Date"}
+                  value={formatDate(event.startDate) || "-"}
+                  icon={<CalendarRange className="size-4" />}
+                />
+                <InfoItem
+                  label={t("endDate") || "End Date"}
+                  value={formatDate(event.endDate) || "-"}
+                  icon={<CalendarRange className="size-4" />}
+                />
+                {event.rosterLockDate && (
+                  <InfoItem
+                    label={t("rosterLockDate") || "Roster Lock Date"}
+                    value={formatDate(event.rosterLockDate)}
+                    icon={<CalendarRange className="size-4" />}
+                  />
+                )}
+              </div>
             </div>
 
             {/* Club Championship Summary */}
             {event.clubChampionship?.enabled && (
-              <div className="p-4 rounded-xl border border-purple-500/20 bg-purple-500/5">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="glass rounded-2xl p-6 border border-purple-500/20">
+                <div className="flex items-center gap-2 mb-4">
                   <Trophy className="size-5 text-purple-500" />
-                  <h3 className="font-semibold text-foreground">
+                  <h3 className="text-lg font-semibold text-foreground">
                     {t("clubChampionship") || "Club Championship"}
                   </h3>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   {event.clubChampionship.prizePool > 0 && (
-                    <div>
-                      <p className="text-muted-foreground text-xs">{tForm("championshipPrizePool") || "Prize Pool"}</p>
+                    <div className="p-4 rounded-xl bg-purple-500/5">
+                      <p className="text-muted-foreground text-xs mb-1">{tForm("championshipPrizePool") || "Prize Pool"}</p>
                       <p className="font-semibold text-foreground">
                         {formatCurrency(event.clubChampionship.prizePool, event.currency)}
                       </p>
                     </div>
                   )}
-                  <div>
-                    <p className="text-muted-foreground text-xs">{tForm("minTop8") || "Min Top 8"}</p>
+                  <div className="p-4 rounded-xl bg-purple-500/5">
+                    <p className="text-muted-foreground text-xs mb-1">{tForm("minTop8") || "Min Top 8"}</p>
                     <p className="font-semibold text-foreground">
                       {event.clubChampionship.eligibility?.minTop8 || 2}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs">{tForm("mustWinOne") || "Must Win One"}</p>
+                  <div className="p-4 rounded-xl bg-purple-500/5">
+                    <p className="text-muted-foreground text-xs mb-1">{tForm("mustWinOne") || "Must Win One"}</p>
                     <p className="font-semibold text-foreground">
                       {event.clubChampionship.eligibility?.mustWinOne
                         ? (t("yes") || "Yes")
@@ -425,11 +471,190 @@ function EventDetails({
                 </div>
               </div>
             )}
-          </div>
-        )}
 
-        {/* TOURNAMENTS TAB */}
-        {activeTab === "tournaments" && (
+            {/* Images */}
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <EyeIcon className="size-5 text-green-primary" />
+                {t("images") || "Images"}
+              </h3>
+              <div className="space-y-6">
+                {/* Logo Section */}
+                {(event.logo?.light || event.logo?.dark) && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-muted-foreground">{t("logo") || "Logo"} (1:1)</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {event.logo?.light && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
+                          <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
+                            <img
+                              src={event.logo.light}
+                              alt="Logo Light"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {event.logo?.dark && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
+                          <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
+                            <img
+                              src={event.logo.dark}
+                              alt="Logo Dark"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Cover Image Section */}
+                {(event.coverImage?.light || event.coverImage?.dark) && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-muted-foreground">{t("coverImage") || "Cover Image"} (3:2)</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {event.coverImage?.light && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
+                          <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
+                            <img
+                              src={event.coverImage.light}
+                              alt="Cover Light"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {event.coverImage?.dark && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
+                          <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
+                            <img
+                              src={event.coverImage.dark}
+                              alt="Cover Dark"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+            {/* Prize Pool */}
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <DollarSign className="size-5 text-green-primary" />
+                {t("prizePool") || "Prize Pool"}
+              </h3>
+              <p className="text-3xl font-bold text-green-primary">
+                {formatCurrency(event.prizePool, event.currency)}
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <EyeIcon className="size-5 text-green-primary" />
+                {t("stats") || "Statistics"}
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t("tournamentCount") || "Tournaments"}</span>
+                  <span className="font-medium text-foreground">{event.tournamentsCount || tournaments.length || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t("clubCount") || "Clubs"}</span>
+                  <span className="font-medium text-foreground">{event.clubsCount || clubs.length || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t("followers") || "Followers"}</span>
+                  <span className="font-medium text-foreground">{event.followersCount || 0}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Location */}
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <MapPin className="size-5 text-green-primary" />
+                {t("location") || "Location"}
+              </h3>
+              {event.country && (
+                <div className="flex items-center gap-3 mb-2">
+                  {event.country.flag && (
+                    <img
+                      src={event.country.flag}
+                      alt={event.country.name}
+                      className="size-6 rounded"
+                    />
+                  )}
+                  <span className="text-foreground font-medium">{event.country.name}</span>
+                  {event.country.code && (
+                    <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                      {event.country.code}
+                    </span>
+                  )}
+                </div>
+              )}
+              {event.location && (
+                <p className="text-muted-foreground">{event.location}</p>
+              )}
+            </div>
+
+            {/* Links */}
+            {(event.streamUrl || event.websiteUrl) && (
+              <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <LinkIcon className="size-5 text-green-primary" />
+                  {t("links") || "Links"}
+                </h3>
+                <div className="space-y-3">
+                  {event.streamUrl && (
+                    <a
+                      href={event.streamUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 transition-colors group"
+                    >
+                      <Tv className="size-5 text-purple-500" />
+                      <span className="text-sm font-medium text-purple-500 truncate flex-1">
+                        {t("watchStream") || "Watch Stream"}
+                      </span>
+                    </a>
+                  )}
+                  {event.websiteUrl && (
+                    <a
+                      href={event.websiteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 transition-colors group"
+                    >
+                      <Globe className="size-5 text-blue-500" />
+                      <span className="text-sm font-medium text-blue-500 truncate flex-1">
+                        {t("visitWebsite") || "Visit Website"}
+                      </span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TOURNAMENTS TAB - full width */}
+      {activeTab === "tournaments" && (
+        <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-foreground">
@@ -673,10 +898,12 @@ function EventDetails({
               </div>
             )}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* CLUB CHAMPIONSHIP TAB */}
-        {activeTab === "championship" && (
+      {/* CLUB CHAMPIONSHIP TAB - full width */}
+      {activeTab === "championship" && (
+        <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
           <div className="space-y-4">
             {event.clubChampionship?.enabled ? (
               <>
@@ -984,10 +1211,12 @@ function EventDetails({
               </div>
             )}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* SETTINGS TAB */}
-        {activeTab === "settings" && (
+      {/* SETTINGS TAB - full width */}
+      {activeTab === "settings" && (
+        <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">
               {t("eventInfo") || "Event Information"}
@@ -1045,8 +1274,21 @@ function EventDetails({
                 </div>
               )}
           </div>
-        )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Info Item Component
+function InfoItem({ label, value, icon }) {
+  return (
+    <div className="p-4 rounded-xl bg-muted/30 dark:bg-[#1a1d2e]">
+      <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
+        {icon}
+        {label}
       </div>
+      <p className="font-medium text-foreground">{value}</p>
     </div>
   );
 }

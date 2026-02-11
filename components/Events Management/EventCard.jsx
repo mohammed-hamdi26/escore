@@ -12,6 +12,7 @@ import {
   Building2,
   Globe,
   DollarSign,
+  Star,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import {
@@ -107,12 +108,22 @@ function EventCard({ event, viewMode = "grid", onDelete, t }) {
           )}
         </div>
 
+        {event.isFeatured && (
+          <Star className="size-4 text-yellow-500 fill-yellow-500 shrink-0" />
+        )}
+
         <Badge
           variant="outline"
           className={`text-[10px] shrink-0 ${STATUS_COLORS[event.status] || STATUS_COLORS.upcoming}`}
         >
           {t(event.status) || event.status}
         </Badge>
+
+        {event.isActive === false && (
+          <Badge variant="outline" className="text-[9px] shrink-0 bg-red-500/10 text-red-400 border-red-500/20">
+            Inactive
+          </Badge>
+        )}
 
         <DropdownMenu>
           <DropdownMenuTrigger className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors opacity-0 group-hover:opacity-100">
@@ -175,6 +186,11 @@ function EventCard({ event, viewMode = "grid", onDelete, t }) {
             {t(event.status) || event.status}
           </Badge>
         </div>
+
+        {/* Featured star */}
+        {event.isFeatured && (
+          <Star className="absolute top-3.5 right-12 rtl:right-auto rtl:left-12 size-4 text-yellow-500 fill-yellow-500" />
+        )}
 
         {/* Actions */}
         <div className="absolute top-3 right-3 rtl:right-auto rtl:left-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -273,6 +289,11 @@ function EventCard({ event, viewMode = "grid", onDelete, t }) {
               className="text-[9px] bg-purple-500/10 text-purple-500 border-purple-500/20"
             >
               CC
+            </Badge>
+          )}
+          {event.isActive === false && (
+            <Badge variant="outline" className="text-[9px] bg-red-500/10 text-red-400 border-red-500/20">
+              Inactive
             </Badge>
           )}
         </div>
