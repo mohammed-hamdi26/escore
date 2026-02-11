@@ -41,6 +41,20 @@ export async function deleteBracket(tournamentId) {
   }
 }
 
+export async function advanceSwissRound(tournamentId) {
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/advance-round`
+    );
+    return res.data?.data;
+  } catch (e) {
+    console.error("Error advancing swiss round:", e.response?.data || e.message);
+    throw new Error(
+      e.response?.data?.message || "Error advancing swiss round"
+    );
+  }
+}
+
 export async function updateBracketSeeds(tournamentId, data) {
   try {
     const res = await apiClient.put(

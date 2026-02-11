@@ -1344,6 +1344,25 @@ export async function deleteBracketAction(tournamentId) {
   }
 }
 
+export async function advanceSwissRoundAction(tournamentId) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/advance-round`
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Swiss round advance error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error advancing swiss round",
+    };
+  }
+}
+
 // notifications
 export async function sendNotificationAction(data) {
   try {

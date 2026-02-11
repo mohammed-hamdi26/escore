@@ -85,7 +85,11 @@ function BracketMatchCard({ match }) {
       {/* Match header */}
       <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-white/5">
         <span className="text-[10px] text-muted-foreground font-medium">
-          {match.roundName || `R${match.bracketRound}`}
+          {match.isResetMatch
+            ? "GF Reset"
+            : match.group
+            ? `${match.group}`
+            : match.round || match.roundName || `R${match.bracketRound}`}
         </span>
         {match.status === "live" && (
           <span className="text-[10px] text-green-500 font-bold uppercase animate-pulse">
