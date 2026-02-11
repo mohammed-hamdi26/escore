@@ -69,3 +69,47 @@ export async function updateBracketSeeds(tournamentId, data) {
     );
   }
 }
+
+export async function calculateStageAdvancement(tournamentId) {
+  try {
+    const res = await apiClient.get(
+      `/tournaments/${tournamentId}/bracket/stage-advancement`
+    );
+    return res.data?.data;
+  } catch (e) {
+    console.error("Error calculating advancement:", e.response?.data || e.message);
+    throw new Error(
+      e.response?.data?.message || "Error calculating stage advancement"
+    );
+  }
+}
+
+export async function confirmStageAdvancement(tournamentId, data) {
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/stage-advancement/confirm`,
+      data
+    );
+    return res.data?.data;
+  } catch (e) {
+    console.error("Error confirming advancement:", e.response?.data || e.message);
+    throw new Error(
+      e.response?.data?.message || "Error confirming stage advancement"
+    );
+  }
+}
+
+export async function updateStageVisibility(tournamentId, stageOrder, data) {
+  try {
+    const res = await apiClient.patch(
+      `/tournaments/${tournamentId}/bracket/stages/${stageOrder}/visibility`,
+      data
+    );
+    return res.data?.data;
+  } catch (e) {
+    console.error("Error updating visibility:", e.response?.data || e.message);
+    throw new Error(
+      e.response?.data?.message || "Error updating stage visibility"
+    );
+  }
+}

@@ -1368,6 +1368,63 @@ export async function advanceSwissRoundAction(tournamentId) {
   }
 }
 
+export async function calculateStageAdvancementAction(tournamentId) {
+  try {
+    const res = await apiClient.get(
+      `/tournaments/${tournamentId}/bracket/stage-advancement`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Stage advancement error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error calculating stage advancement",
+    };
+  }
+}
+
+export async function confirmStageAdvancementAction(tournamentId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/stage-advancement/confirm`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Stage advancement confirm error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error confirming stage advancement";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function updateStageVisibilityAction(tournamentId, stageOrder, isVisibleInApp) {
+  const locale = await getLocale();
+  try {
+    await apiClient.patch(
+      `/tournaments/${tournamentId}/bracket/stages/${stageOrder}/visibility`,
+      { isVisibleInApp }
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true };
+  } catch (e) {
+    console.log("Stage visibility error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error updating stage visibility",
+    };
+  }
+}
+
 // notifications
 export async function sendNotificationAction(data) {
   try {
