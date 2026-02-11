@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "@/i18n/navigation";
-import { Link } from "@/i18n/navigation";
+import { useRouter, Link } from "@/i18n/navigation";
 import {
   ArrowLeft,
   Building2,
@@ -13,10 +12,15 @@ import {
   Gamepad2,
   Plus,
   Trash2,
-  Edit,
+  Pencil,
   ExternalLink,
   Loader2,
   User,
+  Power,
+  FileText,
+  Eye,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -34,6 +38,15 @@ import {
   ACTIONS,
 } from "@/contexts/PermissionsContext";
 
+function formatDate(date) {
+  if (!date) return "—";
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 function ClubDetails({ club, games = [], teams = [] }) {
   const t = useTranslations("clubForm");
   const router = useRouter();
@@ -46,18 +59,10 @@ function ClubDetails({ club, games = [], teams = [] }) {
   const canUpdate = hasPermission(ENTITIES.CLUB, ACTIONS.UPDATE);
 
   const clubLogo = club?.logo?.light || club?.logo?.dark;
+  const clubCover = club?.coverImage?.light || club?.coverImage?.dark;
   const countryFlag = club?.country?.code
-    ? `https://flagcdn.com/24x18/${club.country.code.toLowerCase()}.png`
+    ? `https://flagcdn.com/w40/${club.country.code.toLowerCase()}.png`
     : null;
-
-  const formatDate = (date) => {
-    if (!date) return "—";
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
 
   const handleAddTeam = async () => {
     if (!selectedTeam || !selectedGame) {
@@ -83,102 +88,149 @@ function ClubDetails({ club, games = [], teams = [] }) {
   };
 
   const handleRemoveTeam = async (teamId) => {
-    if (!confirm(t("confirmRemoveTeam") || "Remove this team from the club?")) return;
+    if (!confirm(t("confirmRemoveTeam") || "Remove this team from the club?"))
+      return;
     setIsLoading(true);
     try {
       await removeTeamFromClub(club.id, teamId);
       toast.success(t("teamRemoved") || "Team removed");
       router.refresh();
     } catch (error) {
-      toast.error(error.message || t("teamRemoveError") || "Failed to remove team");
+      toast.error(
+        error.message || t("teamRemoveError") || "Failed to remove team"
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleRemovePlayer = async (playerId) => {
-    if (!confirm(t("confirmRemovePlayer") || "Remove this player from the club?")) return;
+    if (
+      !confirm(
+        t("confirmRemovePlayer") || "Remove this player from the club?"
+      )
+    )
+      return;
     setIsLoading(true);
     try {
       await removePlayerFromClub(club.id, playerId);
       toast.success(t("playerRemoved") || "Player removed");
       router.refresh();
     } catch (error) {
-      toast.error(error.message || t("playerRemoveError") || "Failed to remove player");
+      toast.error(
+        error.message || t("playerRemoveError") || "Failed to remove player"
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const tabs = [
-    { id: "info", label: t("infoTab") || "Info", icon: Building2 },
+    { id: "info", label: t("overview") || "Overview", icon: Eye },
     { id: "teams", label: t("teamsTab") || "Teams", icon: Users },
     { id: "players", label: t("playersTab") || "Players", icon: User },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Top Bar */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.back()}
-            className="size-10 rounded-xl"
-          >
-            <ArrowLeft className="size-5 rtl:rotate-180" />
+        <Link href="/dashboard/clubs-management">
+          <Button variant="outline" size="sm" className="gap-2">
+            <ArrowLeft className="size-4 rtl:rotate-180" />
+            {t("back") || "Back"}
           </Button>
-          <div className="flex items-center gap-4">
-            {clubLogo ? (
-              <img
-                src={clubLogo}
-                alt={club.name}
-                className="size-12 rounded-xl object-contain bg-white/5 p-1"
-              />
-            ) : (
-              <div className="size-12 rounded-xl bg-white/5 flex items-center justify-center">
-                <Building2 className="size-6 text-muted-foreground" />
-              </div>
-            )}
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-foreground">
-                  {club.name}
-                </h1>
-                {club.shortName && (
-                  <Badge variant="secondary">{club.shortName}</Badge>
-                )}
-                {countryFlag && (
-                  <img
-                    src={countryFlag}
-                    alt={club.country?.name}
-                    className="size-5 rounded-sm"
-                  />
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {club.region && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="size-3" />
-                    {club.region}
-                  </span>
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
+        </Link>
         {canUpdate && (
           <Link href={`/dashboard/clubs-management/edit/${club.id}`}>
-            <Button
-              variant="outline"
-              className="gap-2"
-            >
-              <Edit className="size-4" />
+            <Button className="gap-2 bg-green-primary hover:bg-green-primary/90 text-white">
+              <Pencil className="size-4" />
               {t("edit") || "Edit"}
             </Button>
           </Link>
         )}
+      </div>
+
+      {/* Header Card */}
+      <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+        <div className="flex items-start gap-6">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            {clubLogo ? (
+              <img
+                src={clubLogo}
+                alt={club.name}
+                className="size-24 rounded-2xl object-contain ring-2 ring-white/10 bg-white/5 p-1"
+              />
+            ) : (
+              <div className="size-24 rounded-2xl bg-green-primary/10 flex items-center justify-center ring-2 ring-green-primary/20">
+                <Building2 className="size-10 text-green-primary" />
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 mb-2">
+              <h2 className="text-2xl font-bold text-foreground truncate">
+                {club.name}
+              </h2>
+              {club.shortName && (
+                <Badge variant="secondary" className="text-xs">
+                  {club.shortName}
+                </Badge>
+              )}
+              {countryFlag && (
+                <img
+                  src={countryFlag}
+                  alt={club.country?.name}
+                  className="size-6 rounded-sm object-cover ring-1 ring-white/10"
+                />
+              )}
+            </div>
+
+            {/* Badge Row */}
+            <div className="flex flex-wrap items-center gap-3 mt-3">
+              {/* Active/Inactive */}
+              <span
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${
+                  club.isActive !== false
+                    ? "bg-green-500/10 text-green-500 border-green-500/30"
+                    : "bg-red-500/10 text-red-500 border-red-500/30"
+                }`}
+              >
+                <Power className="size-4" />
+                {club.isActive !== false
+                  ? t("active") || "Active"
+                  : t("inactive") || "Inactive"}
+              </span>
+
+              {/* Region */}
+              {club.region && (
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border bg-amber-500/10 text-amber-500 border-amber-500/30">
+                  <MapPin className="size-4" />
+                  {club.region}
+                </span>
+              )}
+            </div>
+
+            {/* Subtitle */}
+            <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground">
+              {club.founded && (
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="size-4" />
+                  {t("founded") || "Founded"} {formatDate(club.founded)}
+                </span>
+              )}
+              {club.country?.name && (
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="size-4" />
+                  {club.country.name}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -204,78 +256,304 @@ function ClubDetails({ club, games = [], teams = [] }) {
 
       {/* Tab Content */}
       {activeTab === "info" && (
-        <div className="glass rounded-2xl p-6 border border-white/5 space-y-6">
-          {club.description && (
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Description */}
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <FileText className="size-5 text-green-primary" />
                 {t("description") || "Description"}
               </h3>
-              <p className="text-foreground">{club.description}</p>
-            </div>
-          )}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {club.country?.name && (
-              <div>
-                <h4 className="text-xs text-muted-foreground mb-1">
-                  {t("country") || "Country"}
-                </h4>
-                <p className="text-sm text-foreground flex items-center gap-1.5">
-                  {countryFlag && (
-                    <img src={countryFlag} alt="" className="size-4" />
-                  )}
-                  {club.country.name}
+              {club.description ? (
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                  {club.description}
                 </p>
+              ) : (
+                <p className="text-muted-foreground italic">
+                  {t("noDescription") || "No description available"}
+                </p>
+              )}
+            </div>
+
+            {/* Teams Summary */}
+            {club.teams?.length > 0 && (
+              <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Users className="size-5 text-green-primary" />
+                  {t("teamsTab") || "Teams"}
+                  <span className="text-xs bg-green-primary/10 text-green-primary px-2 py-0.5 rounded-full ml-auto">
+                    {club.teams.length}
+                  </span>
+                </h3>
+                <div className="space-y-2">
+                  {club.teams.slice(0, 5).map((entry, index) => {
+                    const team = entry.team || {};
+                    const game = entry.game || {};
+                    const teamLogo = team.logo?.light || team.logo?.dark;
+                    const gameLogo = game.logo?.light || game.logo?.dark;
+                    return (
+                      <div
+                        key={index}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        {teamLogo ? (
+                          <img
+                            src={teamLogo}
+                            alt={team.name}
+                            className="size-8 rounded-lg object-contain bg-white/5 p-0.5"
+                          />
+                        ) : (
+                          <div className="size-8 rounded-lg bg-white/5 flex items-center justify-center">
+                            <Users className="size-4 text-muted-foreground" />
+                          </div>
+                        )}
+                        <span className="text-sm font-medium text-foreground truncate flex-1">
+                          {team.name || "Unknown Team"}
+                        </span>
+                        {gameLogo && (
+                          <img
+                            src={gameLogo}
+                            alt={game.name}
+                            className="size-5 rounded"
+                          />
+                        )}
+                        <Badge
+                          className={
+                            entry.isActive !== false
+                              ? "bg-green-500/20 text-green-400 border-green-500/30 text-xs"
+                              : "bg-red-500/20 text-red-400 border-red-500/30 text-xs"
+                          }
+                        >
+                          {entry.isActive !== false
+                            ? t("active") || "Active"
+                            : t("inactive") || "Inactive"}
+                        </Badge>
+                      </div>
+                    );
+                  })}
+                  {club.teams.length > 5 && (
+                    <button
+                      onClick={() => setActiveTab("teams")}
+                      className="text-sm text-green-primary hover:underline mt-2"
+                    >
+                      +{club.teams.length - 5} more...
+                    </button>
+                  )}
+                </div>
               </div>
             )}
-            {club.region && (
-              <div>
-                <h4 className="text-xs text-muted-foreground mb-1">
-                  {t("region") || "Region"}
-                </h4>
-                <p className="text-sm text-foreground">{club.region}</p>
+
+            {/* Images Section */}
+            {(club.logo?.light ||
+              club.logo?.dark ||
+              club.coverImage?.light ||
+              club.coverImage?.dark) && (
+              <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Eye className="size-5 text-green-primary" />
+                  {t("images") || "Images"}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Logo */}
+                  {(club.logo?.light || club.logo?.dark) && (
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-3">
+                        {t("logoLabel") || "Logo"}
+                      </h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        {club.logo?.light && (
+                          <div className="space-y-1.5">
+                            <div className="aspect-square rounded-xl bg-white border border-gray-200 flex items-center justify-center p-4 overflow-hidden">
+                              <img
+                                src={club.logo.light}
+                                alt="Logo Light"
+                                className="max-w-full max-h-full object-contain"
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
+                              <Sun className="size-3" />
+                              {t("lightMode") || "Light"}
+                            </p>
+                          </div>
+                        )}
+                        {club.logo?.dark && (
+                          <div className="space-y-1.5">
+                            <div className="aspect-square rounded-xl bg-[#1a1d2e] border border-white/10 flex items-center justify-center p-4 overflow-hidden">
+                              <img
+                                src={club.logo.dark}
+                                alt="Logo Dark"
+                                className="max-w-full max-h-full object-contain"
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
+                              <Moon className="size-3" />
+                              {t("darkMode") || "Dark"}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Cover Image */}
+                  {(club.coverImage?.light || club.coverImage?.dark) && (
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-3">
+                        {t("coverImageLabel") || "Cover Image"}
+                      </h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        {club.coverImage?.light && (
+                          <div className="space-y-1.5">
+                            <div className="aspect-video rounded-xl bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
+                              <img
+                                src={club.coverImage.light}
+                                alt="Cover Light"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
+                              <Sun className="size-3" />
+                              {t("lightMode") || "Light"}
+                            </p>
+                          </div>
+                        )}
+                        {club.coverImage?.dark && (
+                          <div className="space-y-1.5">
+                            <div className="aspect-video rounded-xl bg-[#1a1d2e] border border-white/10 flex items-center justify-center overflow-hidden">
+                              <img
+                                src={club.coverImage.dark}
+                                alt="Cover Dark"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
+                              <Moon className="size-3" />
+                              {t("darkMode") || "Dark"}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+            {/* Stats */}
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Building2 className="size-5 text-green-primary" />
+                {t("stats") || "Statistics"}
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Users className="size-4" />
+                    {t("teamCount") || "Teams"}
+                  </span>
+                  <span className="text-lg font-bold text-foreground">
+                    {club.teams?.length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground flex items-center gap-2">
+                    <User className="size-4" />
+                    {t("playerCount") || "Players"}
+                  </span>
+                  <span className="text-lg font-bold text-foreground">
+                    {club.players?.length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Heart className="size-4 text-pink-500" />
+                    {t("followerCount") || "Followers"}
+                  </span>
+                  <span className="text-lg font-bold text-foreground">
+                    {club.followersCount?.toLocaleString() || 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Location */}
+            {(club.country?.name || club.region) && (
+              <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <MapPin className="size-5 text-green-primary" />
+                  {t("location") || "Location"}
+                </h3>
+                {club.country?.name && (
+                  <div className="flex items-center gap-3 mb-3">
+                    {countryFlag && (
+                      <img
+                        src={countryFlag}
+                        alt={club.country.name}
+                        className="size-8 rounded object-cover ring-1 ring-white/10"
+                      />
+                    )}
+                    <div>
+                      <span className="text-foreground font-medium">
+                        {club.country.name}
+                      </span>
+                      {club.country.code && (
+                        <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded ml-2">
+                          {club.country.code}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {club.region && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Globe className="size-4" />
+                    {club.region}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Founded */}
             {club.founded && (
-              <div>
-                <h4 className="text-xs text-muted-foreground mb-1">
+              <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Calendar className="size-5 text-green-primary" />
                   {t("founded") || "Founded"}
-                </h4>
-                <p className="text-sm text-foreground">
+                </h3>
+                <p className="text-xl font-bold text-foreground">
                   {formatDate(club.founded)}
                 </p>
               </div>
             )}
-            <div>
-              <h4 className="text-xs text-muted-foreground mb-1">
-                {t("followers") || "Followers"}
-              </h4>
-              <p className="text-sm text-foreground flex items-center gap-1.5">
-                <Heart className="size-3.5 text-pink-500" />
-                {club.followersCount?.toLocaleString() || 0}
-              </p>
-            </div>
+
+            {/* Website */}
+            {club.websiteUrl && (
+              <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Globe className="size-5 text-green-primary" />
+                  {t("websiteLabel") || "Website"}
+                </h3>
+                <a
+                  href={club.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 transition-colors text-sm font-medium w-full justify-center"
+                >
+                  <ExternalLink className="size-4" />
+                  {t("visitWebsite") || "Visit Website"}
+                </a>
+              </div>
+            )}
           </div>
-          {club.websiteUrl && (
-            <div>
-              <h4 className="text-xs text-muted-foreground mb-1">
-                {t("websiteUrl") || "Website"}
-              </h4>
-              <a
-                href={club.websiteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-green-primary hover:underline flex items-center gap-1"
-              >
-                {club.websiteUrl}
-                <ExternalLink className="size-3" />
-              </a>
-            </div>
-          )}
         </div>
       )}
 
       {activeTab === "teams" && (
-        <div className="space-y-4">
+        <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5 space-y-4">
           {/* Add Team Button */}
           {canUpdate && (
             <div className="flex justify-end">
@@ -300,9 +578,11 @@ function ClubDetails({ club, games = [], teams = [] }) {
                   <select
                     value={selectedGame}
                     onChange={(e) => setSelectedGame(e.target.value)}
-                    className="w-full h-10 px-3 rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1a1d2e] text-foreground text-sm"
+                    className="w-full h-10 px-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50"
                   >
-                    <option value="">{t("selectGame") || "Select Game"}</option>
+                    <option value="">
+                      {t("selectGame") || "Select Game"}
+                    </option>
                     {games.map((game) => (
                       <option key={game.id} value={game.id}>
                         {game.name}
@@ -317,9 +597,11 @@ function ClubDetails({ club, games = [], teams = [] }) {
                   <select
                     value={selectedTeam}
                     onChange={(e) => setSelectedTeam(e.target.value)}
-                    className="w-full h-10 px-3 rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1a1d2e] text-foreground text-sm"
+                    className="w-full h-10 px-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50"
                   >
-                    <option value="">{t("selectTeam") || "Select Team"}</option>
+                    <option value="">
+                      {t("selectTeam") || "Select Team"}
+                    </option>
                     {teams
                       .filter(
                         (team) =>
@@ -435,7 +717,7 @@ function ClubDetails({ club, games = [], teams = [] }) {
               })}
             </div>
           ) : (
-            <div className="glass rounded-2xl p-8 text-center border border-white/5">
+            <div className="py-8 text-center">
               <Users className="size-12 mx-auto mb-3 text-muted-foreground opacity-50" />
               <p className="text-muted-foreground">
                 {t("noTeams") || "No teams assigned to this club"}
@@ -446,7 +728,7 @@ function ClubDetails({ club, games = [], teams = [] }) {
       )}
 
       {activeTab === "players" && (
-        <div className="space-y-4">
+        <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5 space-y-4">
           {club.players?.length > 0 ? (
             <div className="space-y-2">
               {club.players.map((entry, index) => {
@@ -497,7 +779,7 @@ function ClubDetails({ club, games = [], teams = [] }) {
               })}
             </div>
           ) : (
-            <div className="glass rounded-2xl p-8 text-center border border-white/5">
+            <div className="py-8 text-center">
               <User className="size-12 mx-auto mb-3 text-muted-foreground opacity-50" />
               <p className="text-muted-foreground">
                 {t("noPlayers") || "No players assigned to this club"}

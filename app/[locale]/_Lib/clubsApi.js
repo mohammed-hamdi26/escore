@@ -11,6 +11,7 @@ export async function getClubs(searchParams = {}) {
     if (searchParams.isActive !== undefined && searchParams.isActive !== "") {
       params.set("isActive", searchParams.isActive);
     }
+    if (searchParams.region) params.set("region", searchParams.region);
 
     const queryString = params.toString();
     const url = queryString ? `/clubs?${queryString}` : "/clubs";

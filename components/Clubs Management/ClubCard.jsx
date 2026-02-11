@@ -174,6 +174,16 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
               </Badge>
             </div>
           )}
+
+          {/* Followers Badge */}
+          {club.followersCount > 0 && (
+            <div className="absolute bottom-3 right-3 rtl:right-auto rtl:left-3">
+              <Badge className="bg-black/60 backdrop-blur-md text-pink-400 border border-white/10 gap-1.5">
+                <Heart className="size-3 fill-current" />
+                {formatFollowers(club.followersCount)}
+              </Badge>
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -283,6 +293,24 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
           )}
         </div>
       </div>
+
+      {/* Region Badge */}
+      {club.region && (
+        <div className="shrink-0">
+          <Badge className="bg-muted/50 text-muted-foreground border border-white/10 gap-1">
+            <MapPin className="size-3" />
+            {club.region}
+          </Badge>
+        </div>
+      )}
+
+      {/* Followers */}
+      {club.followersCount > 0 && (
+        <div className="shrink-0 flex items-center gap-1.5 text-pink-500 text-xs">
+          <Heart className="size-3.5 fill-current" />
+          <span className="font-medium">{formatFollowers(club.followersCount)}</span>
+        </div>
+      )}
 
       {/* Status */}
       <div className="shrink-0">
