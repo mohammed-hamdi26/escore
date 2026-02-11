@@ -9,6 +9,7 @@ export const ENTITIES = {
   GAME: "Game",
   TEAM: "Team",
   CLUB: "Club",
+  EVENT: "Event",
   PLAYER: "Player",
   TOURNAMENT: "Tournament",
   MATCH: "Match",

@@ -11,6 +11,7 @@ import {
   UsersRound,
   ArrowRightLeft,
   Building2,
+  CalendarDays,
   Gamepad2,
   Newspaper,
   UserCog,
@@ -71,6 +72,12 @@ function NavItems({ user, t }) {
       title: "Clubs",
       href: "/dashboard/clubs-management",
       isShowed: hasPermission(user, "Club"),
+    },
+    {
+      icon: <CalendarDays />,
+      title: "Events",
+      href: "/dashboard/events-management",
+      isShowed: hasPermission(user, "Event"),
     },
     {
       icon: <ArrowRightLeft />,

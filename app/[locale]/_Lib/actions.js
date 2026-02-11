@@ -1813,3 +1813,117 @@ export async function removePlayerFromClub(clubId, playerId) {
     );
   }
 }
+
+// ====== EVENTS ======
+export async function addEvent(eventData) {
+  const locale = await getLocale();
+  try {
+    const cleanData = cleanNullValues(eventData);
+    await apiClient.post("/events", cleanData);
+  } catch (e) {
+    const msg = e.response?.data?.message || "Error creating event";
+    const errors = e.response?.data?.errors;
+    const details = errors?.map((err) => `${err.field}: ${err.message}`).join(", ");
+    throw new Error(details ? `${msg} — ${details}` : msg);
+  }
+  redirect(`/${locale}/dashboard/events-management`);
+}
+
+export async function editEvent(eventData) {
+  const locale = await getLocale();
+  try {
+    const cleanData = cleanNullValues(eventData);
+    await apiClient.put(`/events/${cleanData.id}`, cleanData);
+    revalidatePath(`/${locale}/dashboard/events-management`);
+  } catch (e) {
+    const msg = e.response?.data?.message || "Error updating event";
+    const errors = e.response?.data?.errors;
+    const details = errors?.map((err) => `${err.field}: ${err.message}`).join(", ");
+    throw new Error(details ? `${msg} — ${details}` : msg);
+  }
+  redirect(`/${locale}/dashboard/events-management`);
+}
+
+export async function deleteEvent(id) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(`/events/${id}`);
+    revalidatePath(`/${locale}/dashboard/events-management`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Error deleting event");
+  }
+}
+
+export async function addTournamentToEvent(eventId, tournamentId) {
+  const locale = await getLocale();
+  try {
+    await apiClient.post(`/events/${eventId}/tournaments/${tournamentId}`);
+    revalidatePath(`/${locale}/dashboard/events-management/view/${eventId}`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Error adding tournament");
+  }
+}
+
+export async function removeTournamentFromEvent(eventId, tournamentId) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(`/events/${eventId}/tournaments/${tournamentId}`);
+    revalidatePath(`/${locale}/dashboard/events-management/view/${eventId}`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Error removing tournament");
+  }
+}
+
+export async function assignClubToTournament(eventId, tournamentId, data) {
+  const locale = await getLocale();
+  try {
+    await apiClient.post(
+      `/events/${eventId}/tournaments/${tournamentId}/assign-club`,
+      data
+    );
+    revalidatePath(`/${locale}/dashboard/events-management/view/${eventId}`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Error assigning club");
+  }
+}
+
+export async function removeClubFromTournament(eventId, tournamentId, clubId) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(
+      `/events/${eventId}/tournaments/${tournamentId}/assign-club/${clubId}`
+    );
+    revalidatePath(`/${locale}/dashboard/events-management/view/${eventId}`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Error removing club");
+  }
+}
+
+export async function recordClubResult(eventId, data) {
+  const locale = await getLocale();
+  try {
+    await apiClient.post(`/events/${eventId}/standings/record`, data);
+    revalidatePath(`/${locale}/dashboard/events-management/view/${eventId}`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Error recording result");
+  }
+}
+
+export async function removeClubResult(eventId, clubId, tournamentId) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(
+      `/events/${eventId}/standings/${clubId}/results/${tournamentId}`
+    );
+    revalidatePath(`/${locale}/dashboard/events-management/view/${eventId}`);
+    return { success: true };
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Error removing result");
+  }
+}
