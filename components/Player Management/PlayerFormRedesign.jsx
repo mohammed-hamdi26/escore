@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
+import { searchTeams, searchGames, searchTournaments } from "@/app/[locale]/_Lib/actions";
 import { useFormik } from "formik";
 import {
   User,
@@ -256,14 +257,29 @@ function PlayerFormRedesign({
                 )}
               </div>
               <FormRow cols={3}>
+                <TeamSelectField
+                  label={t("team")}
+                  name={`gameRosters[${index}].team`}
+                  initialTeams={teamsOptions}
+                  formik={formik}
+                  placeholder={t("teamPlaceholder")}
+                  searchPlaceholder={t("searchTeams") || "Search teams..."}
+                  value={roster.team}
+                  onChange={async (teamId) => {
+                    await formik.setFieldValue(`gameRosters[${index}].team`, teamId);
+                    // Clear game when team changes (game options depend on team)
+                    await formik.setFieldValue(`gameRosters[${index}].game`, "");
+                  }}
+                />
                 <GameSelectField
                   label={t("mainGame")}
                   name={`gameRosters[${index}].game`}
-                  games={gamesOptions.filter(g => {
-                    const gId = g.id || g._id;
-                    // Allow the current game or games not already used by other entries
-                    return gId === roster.game || !formik.values.gameRosters.some((r, i) => i !== index && r.game === gId);
-                  })}
+                  initialGames={gamesOptions}
+                  selectedTeamId={roster.team}
+                  allTeams={teamsOptions}
+                  usedGames={formik.values.gameRosters
+                    .filter((r, i) => i !== index && r.game)
+                    .map(r => r.game)}
                   formik={formik}
                   placeholder={t("mainGamePlaceholder")}
                   searchPlaceholder={t("searchGames") || "Search games..."}
@@ -271,26 +287,6 @@ function PlayerFormRedesign({
                   value={roster.game}
                   onChange={async (gameId) => {
                     await formik.setFieldValue(`gameRosters[${index}].game`, gameId);
-                    // Clear team when game changes (team may not play this game)
-                    await formik.setFieldValue(`gameRosters[${index}].team`, "");
-                  }}
-                />
-                <TeamSelectField
-                  label={t("team")}
-                  name={`gameRosters[${index}].team`}
-                  teams={roster.game
-                    ? teamsOptions.filter(team => team.games?.some(g => {
-                        const teamGameId = g.id || g._id || g;
-                        return teamGameId === roster.game;
-                      }))
-                    : teamsOptions
-                  }
-                  formik={formik}
-                  placeholder={t("teamPlaceholder")}
-                  searchPlaceholder={t("searchTeams") || "Search teams..."}
-                  value={roster.team}
-                  onChange={async (teamId) => {
-                    await formik.setFieldValue(`gameRosters[${index}].team`, teamId);
                   }}
                 />
                 <RoleSelectField
@@ -811,11 +807,14 @@ function TextAreaField({
   );
 }
 
-// Game Select Field
+// Game Select Field (with pagination + team filtering)
 function GameSelectField({
   label,
   name,
-  games,
+  initialGames = [],
+  selectedTeamId,
+  allTeams = [],
+  usedGames = [],
   formik,
   placeholder,
   searchPlaceholder,
@@ -825,15 +824,19 @@ function GameSelectField({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [games, setGames] = useState(initialGames);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const listRef = useRef(null);
+  const debounceRef = useRef(null);
 
-  // Support both direct value prop and formik-derived value
   const value = externalValue !== undefined ? externalValue : formik.values[name];
+  const t = useTranslations("playerForm");
 
-  // For nested paths, check errors differently
   const getNestedError = () => {
     const error = formik.touched[name] && formik.errors[name];
     if (error) return error;
-    // Check nested path: gameRosters[0].game -> gameRosters.0.game
     const parts = name.replace(/\[(\d+)\]/g, '.$1').split('.');
     let touchedVal = formik.touched;
     let errorVal = formik.errors;
@@ -844,18 +847,86 @@ function GameSelectField({
     return touchedVal && errorVal ? errorVal : null;
   };
   const nestedError = getNestedError();
-  const t = useTranslations("playerForm");
 
-  // Helper to get game ID (handles both id and _id from different sources)
   const getGameId = (game) => game?.id || game?._id;
 
-  const selectedGame = games?.find((g) => getGameId(g) === value);
+  // If a team is selected, show only that team's games (small list, no server pagination needed)
+  const selectedTeam = selectedTeamId
+    ? allTeams.find(t => (t.id || t._id) === selectedTeamId)
+    : null;
 
-  const filteredGames = games?.filter(
-    (game) =>
-      game.name?.toLowerCase().includes(search.toLowerCase()) ||
-      game.slug?.toLowerCase().includes(search.toLowerCase())
-  );
+  const teamGameIds = selectedTeam?.games?.map(g => g.id || g._id || g) || [];
+
+  // Determine the display list
+  const displayGames = selectedTeamId && teamGameIds.length > 0
+    ? initialGames.filter(g => teamGameIds.includes(getGameId(g)))
+    : games;
+
+  // Filter out already-used games and apply client search when team is selected
+  const filteredGames = displayGames?.filter(g => {
+    const gId = getGameId(g);
+    if (usedGames.includes(gId) && gId !== value) return false;
+    if (selectedTeamId && search) {
+      return g.name?.toLowerCase().includes(search.toLowerCase()) ||
+             g.slug?.toLowerCase().includes(search.toLowerCase());
+    }
+    return true;
+  });
+
+  const selectedGame = [...initialGames, ...games].find((g) => getGameId(g) === value);
+
+  // Fetch games from server (only when no team is selected)
+  const fetchGames = useCallback(async (searchTerm, pageNum, reset = false) => {
+    if (selectedTeamId) return; // Don't fetch from server when team is selected
+    setIsLoading(true);
+    try {
+      const { data, pagination } = await searchGames({ search: searchTerm, page: pageNum, limit: 15 });
+      if (reset) {
+        setGames(data || []);
+      } else {
+        setGames(prev => {
+          const existingIds = new Set(prev.map(g => getGameId(g)));
+          const newItems = (data || []).filter(g => !existingIds.has(getGameId(g)));
+          return [...prev, ...newItems];
+        });
+      }
+      setHasMore(pageNum < (pagination?.totalPages || 1));
+      setPage(pageNum);
+    } catch (e) {
+      console.error("Error fetching games:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedTeamId]);
+
+  // Load first page when popover opens (only if no team selected)
+  useEffect(() => {
+    if (isOpen && !selectedTeamId) {
+      fetchGames("", 1, true);
+    }
+    if (!isOpen) {
+      setSearch("");
+    }
+  }, [isOpen, selectedTeamId]);
+
+  // Debounced search
+  useEffect(() => {
+    if (!isOpen || selectedTeamId) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchGames(search, 1, true);
+    }, 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [search, isOpen, selectedTeamId]);
+
+  // Infinite scroll
+  const handleScroll = useCallback((e) => {
+    if (selectedTeamId) return;
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollHeight - scrollTop - clientHeight < 50 && hasMore && !isLoading) {
+      fetchGames(search, page + 1);
+    }
+  }, [hasMore, isLoading, page, search, selectedTeamId, fetchGames]);
 
   const handleSelect = async (game) => {
     if (externalOnChange) {
@@ -946,7 +1017,6 @@ function GameSelectField({
           className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border"
           align="start"
         >
-          {/* Search Input */}
           <div className="p-3 border-b border-border">
             <div className="relative">
               <Search className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
@@ -961,53 +1031,50 @@ function GameSelectField({
             </div>
           </div>
 
-          {/* Games List */}
-          <div className="max-h-64 overflow-y-auto p-2">
-            {filteredGames?.length === 0 ? (
+          <div ref={listRef} className="max-h-64 overflow-y-auto p-2" onScroll={handleScroll}>
+            {filteredGames?.length === 0 && !isLoading ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
-                No games found
+                {t("noGamesFound")}
               </div>
             ) : (
-              filteredGames?.map((game) => {
-                const gameId = getGameId(game);
-                const isSelected = value === gameId;
-                return (
-                  <button
-                    key={gameId}
-                    type="button"
-                    onClick={() => handleSelect(game)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
-                      isSelected
-                        ? "bg-green-primary/10 text-green-primary"
-                        : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
-                    }`}
-                  >
-                    <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
-                      {game.logo?.light ? (
-                        <img
-                          src={game.logo.light}
-                          alt={game.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Gamepad2 className="size-4 text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    <span
-                      className={`flex-1 text-sm font-medium ${
-                        isSelected ? "text-green-primary" : "text-foreground"
+              <>
+                {filteredGames?.map((game) => {
+                  const gameId = getGameId(game);
+                  const isSelected = value === gameId;
+                  return (
+                    <button
+                      key={gameId}
+                      type="button"
+                      onClick={() => handleSelect(game)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                        isSelected
+                          ? "bg-green-primary/10 text-green-primary"
+                          : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
                       }`}
                     >
-                      {game.name}
-                    </span>
-                    {isSelected && (
-                      <Check className="size-4 text-green-primary flex-shrink-0" />
-                    )}
-                  </button>
-                );
-              })
+                      <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
+                        {game.logo?.light ? (
+                          <img src={game.logo.light} alt={game.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Gamepad2 className="size-4 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                      <span className={`flex-1 text-sm font-medium ${isSelected ? "text-green-primary" : "text-foreground"}`}>
+                        {game.name}
+                      </span>
+                      {isSelected && <Check className="size-4 text-green-primary flex-shrink-0" />}
+                    </button>
+                  );
+                })}
+                {isLoading && (
+                  <div className="py-3 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
+                    <Loader2 className="size-4 animate-spin" />
+                    {t("loadingMore")}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </PopoverContent>
@@ -1017,29 +1084,32 @@ function GameSelectField({
   );
 }
 
-// Team Select Field
+// Team Select Field (with pagination)
 function TeamSelectField({
   label,
   name,
-  teams,
+  initialTeams = [],
   formik,
   placeholder,
   searchPlaceholder,
-  onTeamChange,
   value: externalValue,
   onChange: externalOnChange,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [teams, setTeams] = useState(initialTeams);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const listRef = useRef(null);
+  const debounceRef = useRef(null);
 
-  // Support both direct value prop and formik-derived value
   const value = externalValue !== undefined ? externalValue : formik.values[name];
+  const t = useTranslations("playerForm");
 
-  // For nested paths, check errors differently
   const getNestedError = () => {
     const error = formik.touched[name] && formik.errors[name];
     if (error) return error;
-    // Check nested path: gameRosters[0].team -> gameRosters.0.team
     const parts = name.replace(/\[(\d+)\]/g, '.$1').split('.');
     let touchedVal = formik.touched;
     let errorVal = formik.errors;
@@ -1051,16 +1121,60 @@ function TeamSelectField({
   };
   const nestedError = getNestedError();
 
-  // Helper to get team ID (handles both id and _id)
   const getTeamId = (team) => team?.id || team?._id;
 
-  const selectedTeam = teams?.find((t) => getTeamId(t) === value);
+  const selectedTeam = [...initialTeams, ...teams].find((t) => getTeamId(t) === value);
 
-  const filteredTeams = teams?.filter(
-    (team) =>
-      team.name?.toLowerCase().includes(search.toLowerCase()) ||
-      team.slug?.toLowerCase().includes(search.toLowerCase())
-  );
+  // Fetch teams from server
+  const fetchTeams = useCallback(async (searchTerm, pageNum, reset = false) => {
+    setIsLoading(true);
+    try {
+      const { data, pagination } = await searchTeams({ search: searchTerm, page: pageNum, limit: 15 });
+      if (reset) {
+        setTeams(data || []);
+      } else {
+        setTeams(prev => {
+          const existingIds = new Set(prev.map(t => getTeamId(t)));
+          const newItems = (data || []).filter(t => !existingIds.has(getTeamId(t)));
+          return [...prev, ...newItems];
+        });
+      }
+      setHasMore(pageNum < (pagination?.totalPages || 1));
+      setPage(pageNum);
+    } catch (e) {
+      console.error("Error fetching teams:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Load first page when popover opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchTeams("", 1, true);
+    }
+    if (!isOpen) {
+      setSearch("");
+    }
+  }, [isOpen]);
+
+  // Debounced search
+  useEffect(() => {
+    if (!isOpen) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchTeams(search, 1, true);
+    }, 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [search, isOpen]);
+
+  // Infinite scroll
+  const handleScroll = useCallback((e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollHeight - scrollTop - clientHeight < 50 && hasMore && !isLoading) {
+      fetchTeams(search, page + 1);
+    }
+  }, [hasMore, isLoading, page, search, fetchTeams]);
 
   const handleSelect = async (team) => {
     if (externalOnChange) {
@@ -1069,7 +1183,6 @@ function TeamSelectField({
       await formik.setFieldValue(name, getTeamId(team));
       await formik.setFieldTouched(name, true, true);
       formik.validateField(name);
-      if (onTeamChange) onTeamChange();
     }
     setIsOpen(false);
     setSearch("");
@@ -1083,7 +1196,6 @@ function TeamSelectField({
       await formik.setFieldValue(name, "");
       await formik.setFieldTouched(name, true, true);
       formik.validateField(name);
-      if (onTeamChange) onTeamChange();
     }
   };
 
@@ -1159,7 +1271,6 @@ function TeamSelectField({
           className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border"
           align="start"
         >
-          {/* Search Input */}
           <div className="p-3 border-b border-border">
             <div className="relative">
               <Search className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
@@ -1174,60 +1285,67 @@ function TeamSelectField({
             </div>
           </div>
 
-          {/* Teams List */}
-          <div className="max-h-64 overflow-y-auto p-2">
-            {filteredTeams?.length === 0 ? (
+          <div ref={listRef} className="max-h-64 overflow-y-auto p-2" onScroll={handleScroll}>
+            {teams?.length === 0 && !isLoading ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
-                No teams found
+                {t("noTeamsFound")}
               </div>
             ) : (
-              filteredTeams?.map((team) => {
-                const teamId = getTeamId(team);
-                const isSelected = value === teamId;
-                return (
-                  <button
-                    key={teamId}
-                    type="button"
-                    onClick={() => handleSelect(team)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
-                      isSelected
-                        ? "bg-blue-500/10 text-blue-500"
-                        : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
-                    }`}
-                  >
-                    <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
-                      {team.logo?.light ? (
-                        <img
-                          src={team.logo.light}
-                          alt={team.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Users className="size-4 text-muted-foreground" />
-                        </div>
+              <>
+                {teams?.map((team) => {
+                  const teamId = getTeamId(team);
+                  const isSelected = value === teamId;
+                  return (
+                    <button
+                      key={teamId}
+                      type="button"
+                      onClick={() => handleSelect(team)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                        isSelected
+                          ? "bg-blue-500/10 text-blue-500"
+                          : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
+                      }`}
+                    >
+                      <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
+                        {team.logo?.light ? (
+                          <img
+                            src={team.logo.light}
+                            alt={team.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Users className="size-4 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span
+                          className={`text-sm font-medium ${
+                            isSelected ? "text-blue-500" : "text-foreground"
+                          }`}
+                        >
+                          {team.name}
+                        </span>
+                      </div>
+                      {team.games?.length > 0 && (
+                        <span className="text-xs text-muted-foreground bg-muted dark:bg-[#252a3d] px-2 py-0.5 rounded">
+                          {team.games.length}
+                        </span>
                       )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span
-                        className={`text-sm font-medium ${
-                          isSelected ? "text-blue-500" : "text-foreground"
-                        }`}
-                      >
-                        {team.name}
-                      </span>
-                    </div>
-                    {team.games?.length > 0 && (
-                      <span className="text-xs text-muted-foreground bg-muted dark:bg-[#252a3d] px-2 py-0.5 rounded">
-                        {team.games.length}
-                      </span>
-                    )}
-                    {isSelected && (
-                      <Check className="size-4 text-blue-500 flex-shrink-0" />
-                    )}
-                  </button>
-                );
-              })
+                      {isSelected && (
+                        <Check className="size-4 text-blue-500 flex-shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
+                {isLoading && (
+                  <div className="py-3 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
+                    <Loader2 className="size-4 animate-spin" />
+                    {t("loadingMore")}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </PopoverContent>
@@ -1236,32 +1354,98 @@ function TeamSelectField({
   );
 }
 
-// Tournament Multi-Select Field
+// Tournament Multi-Select Field (with pagination)
 function TournamentMultiSelectField({
   label,
   name,
-  tournaments,
+  tournaments: initialTournaments = [],
   formik,
   placeholder,
   searchPlaceholder,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [tournaments, setTournaments] = useState(initialTournaments);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const listRef = useRef(null);
+  const debounceRef = useRef(null);
+
   const error = formik.touched[name] && formik.errors[name];
   const value = formik.values[name] || [];
+  const t = useTranslations("playerForm");
 
-  // Helper to get tournament ID
   const getTournamentId = (tournament) => tournament?.id || tournament?._id;
 
-  const selectedTournaments = tournaments?.filter((t) =>
+  // Keep track of selected tournaments (may not be in current paginated list)
+  const [selectedCache, setSelectedCache] = useState(() => {
+    // Initialize cache with initially selected tournaments
+    return initialTournaments.filter(t => value.includes(getTournamentId(t)));
+  });
+
+  const selectedTournaments = selectedCache.filter((t) =>
     value.includes(getTournamentId(t))
   );
 
-  const filteredTournaments = tournaments?.filter(
-    (tournament) =>
-      tournament.name?.toLowerCase().includes(search.toLowerCase()) ||
-      tournament.slug?.toLowerCase().includes(search.toLowerCase())
-  );
+  // Fetch tournaments from server
+  const fetchTournaments = useCallback(async (searchTerm, pageNum, reset = false) => {
+    setIsLoading(true);
+    try {
+      const { data, pagination } = await searchTournaments({ search: searchTerm, page: pageNum, limit: 15 });
+      if (reset) {
+        setTournaments(data || []);
+      } else {
+        setTournaments(prev => {
+          const existingIds = new Set(prev.map(t => getTournamentId(t)));
+          const newItems = (data || []).filter(t => !existingIds.has(getTournamentId(t)));
+          return [...prev, ...newItems];
+        });
+      }
+      // Update selected cache with any new data
+      if (data) {
+        setSelectedCache(prev => {
+          const existingIds = new Set(prev.map(t => getTournamentId(t)));
+          const newSelected = data.filter(t => value.includes(getTournamentId(t)) && !existingIds.has(getTournamentId(t)));
+          return newSelected.length > 0 ? [...prev, ...newSelected] : prev;
+        });
+      }
+      setHasMore(pageNum < (pagination?.totalPages || 1));
+      setPage(pageNum);
+    } catch (e) {
+      console.error("Error fetching tournaments:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [value]);
+
+  // Load first page when popover opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchTournaments("", 1, true);
+    }
+    if (!isOpen) {
+      setSearch("");
+    }
+  }, [isOpen]);
+
+  // Debounced search
+  useEffect(() => {
+    if (!isOpen) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchTournaments(search, 1, true);
+    }, 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [search, isOpen]);
+
+  // Infinite scroll
+  const handleScroll = useCallback((e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollHeight - scrollTop - clientHeight < 50 && hasMore && !isLoading) {
+      fetchTournaments(search, page + 1);
+    }
+  }, [hasMore, isLoading, page, search, fetchTournaments]);
 
   const handleToggle = async (tournament) => {
     const tournamentId = getTournamentId(tournament);
@@ -1270,6 +1454,11 @@ function TournamentMultiSelectField({
 
     if (index === -1) {
       currentValue.push(tournamentId);
+      // Add to selected cache
+      setSelectedCache(prev => {
+        if (prev.some(t => getTournamentId(t) === tournamentId)) return prev;
+        return [...prev, tournament];
+      });
     } else {
       currentValue.splice(index, 1);
     }
@@ -1367,7 +1556,6 @@ function TournamentMultiSelectField({
           className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border"
           align="start"
         >
-          {/* Search Input */}
           <div className="p-3 border-b border-border">
             <div className="relative">
               <Search className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
@@ -1387,70 +1575,77 @@ function TournamentMultiSelectField({
             )}
           </div>
 
-          {/* Tournaments List */}
-          <div className="max-h-64 overflow-y-auto p-2">
-            {filteredTournaments?.length === 0 ? (
+          <div ref={listRef} className="max-h-64 overflow-y-auto p-2" onScroll={handleScroll}>
+            {tournaments?.length === 0 && !isLoading ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
-                No tournaments found
+                {t("noTournamentsFound")}
               </div>
             ) : (
-              filteredTournaments?.map((tournament) => {
-                const tournamentId = getTournamentId(tournament);
-                const isSelected = value.includes(tournamentId);
-                return (
-                  <button
-                    key={tournamentId}
-                    type="button"
-                    onClick={() => handleToggle(tournament)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
-                      isSelected
-                        ? "bg-amber-500/10 text-amber-500"
-                        : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
-                    }`}
-                  >
-                    <div
-                      className={`size-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+              <>
+                {tournaments?.map((tournament) => {
+                  const tournamentId = getTournamentId(tournament);
+                  const isSelected = value.includes(tournamentId);
+                  return (
+                    <button
+                      key={tournamentId}
+                      type="button"
+                      onClick={() => handleToggle(tournament)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
                         isSelected
-                          ? "border-amber-500 bg-amber-500"
-                          : "border-muted-foreground/30"
+                          ? "bg-amber-500/10 text-amber-500"
+                          : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
                       }`}
                     >
-                      {isSelected && <Check className="size-3 text-white" />}
-                    </div>
-                    <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
-                      {tournament.logo?.light ? (
-                        <img
-                          src={tournament.logo.light}
-                          alt={tournament.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Trophy className="size-4 text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span
-                        className={`text-sm font-medium ${
-                          isSelected ? "text-amber-500" : "text-foreground"
+                      <div
+                        className={`size-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                          isSelected
+                            ? "border-amber-500 bg-amber-500"
+                            : "border-muted-foreground/30"
                         }`}
                       >
-                        {tournament.name}
-                      </span>
-                      {tournament.status && (
-                        <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
-                          tournament.status === 'ongoing' ? 'bg-green-500/20 text-green-500' :
-                          tournament.status === 'upcoming' ? 'bg-blue-500/20 text-blue-500' :
-                          'bg-gray-500/20 text-gray-500'
-                        }`}>
-                          {tournament.status}
+                        {isSelected && <Check className="size-3 text-white" />}
+                      </div>
+                      <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
+                        {tournament.logo?.light ? (
+                          <img
+                            src={tournament.logo.light}
+                            alt={tournament.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Trophy className="size-4 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span
+                          className={`text-sm font-medium ${
+                            isSelected ? "text-amber-500" : "text-foreground"
+                          }`}
+                        >
+                          {tournament.name}
                         </span>
-                      )}
-                    </div>
-                  </button>
-                );
-              })
+                        {tournament.status && (
+                          <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
+                            tournament.status === 'ongoing' ? 'bg-green-500/20 text-green-500' :
+                            tournament.status === 'upcoming' ? 'bg-blue-500/20 text-blue-500' :
+                            'bg-gray-500/20 text-gray-500'
+                          }`}>
+                            {tournament.status}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+                {isLoading && (
+                  <div className="py-3 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
+                    <Loader2 className="size-4 animate-spin" />
+                    {t("loadingMore")}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </PopoverContent>

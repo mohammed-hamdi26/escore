@@ -6,8 +6,9 @@ import apiClient from "./apiCLient";
 import { deleteSession, saveSession, saveRefreshToken } from "./session";
 import { redirect } from "next/navigation";
 import { getPlayersLinks } from "./palyerApi";
-import { getAwardsTeam, getTeamsLinks } from "./teamsApi";
-import { getTournamentLinks } from "./tournamentsApi";
+import { getAwardsTeam, getTeamsLinks, getTeams } from "./teamsApi";
+import { getGames } from "./gamesApi";
+import { getTournamentLinks, getTournaments } from "./tournamentsApi";
 
 // login
 export async function login(userData) {
@@ -76,6 +77,19 @@ export async function forceLogout() {
     console.error("Force logout error:", e);
     return { success: false };
   }
+}
+
+// Search actions for paginated select fields (called from client components)
+export async function searchTeams({ search = "", page = 1, limit = 15 } = {}) {
+  return getTeams({ search, page, size: limit });
+}
+
+export async function searchGames({ search = "", page = 1, limit = 15 } = {}) {
+  return getGames({ search, page, size: limit });
+}
+
+export async function searchTournaments({ search = "", page = 1, limit = 15 } = {}) {
+  return getTournaments({ search, page, size: limit });
 }
 
 // Helper function to clean null/undefined values from data
