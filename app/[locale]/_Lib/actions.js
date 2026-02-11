@@ -1320,9 +1320,14 @@ export async function generateBracketAction(tournamentId, data) {
     return { success: true, data: res.data?.data };
   } catch (e) {
     console.log("Bracket generation error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error generating bracket";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
     return {
       success: false,
-      error: e.response?.data?.message || "Error generating bracket",
+      error: detail,
     };
   }
 }
