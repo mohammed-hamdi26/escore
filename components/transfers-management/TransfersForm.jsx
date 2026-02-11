@@ -73,7 +73,7 @@ function TransfersForm({
 
   const validationSchema = Yup.object({
     player: Yup.string().required("Player is required"),
-    game: Yup.string().nullable(),
+    game: Yup.string().required("Game is required"),
     fromTeam: Yup.string().nullable(),
     toTeam: Yup.string().nullable(),
     fee: Yup.number().min(0, "Fee must be positive").nullable(),
@@ -109,7 +109,7 @@ function TransfersForm({
           fee: values.fee ? Number(values.fee) : undefined,
           fromTeam: values.fromTeam || undefined,
           toTeam: values.toTeam || undefined,
-          game: values.game || undefined,
+          game: values.game,
           transferDate: values.transferDate || undefined,
           content: values.content || undefined,
         };
@@ -149,26 +149,84 @@ function TransfersForm({
     );
 
     if (player) {
-      // Auto-set game from player's game
-      if (player.game) {
-        const gameId = typeof player.game === 'string'
-          ? player.game
-          : (player.game._id || player.game.id);
-        if (gameId) {
-          await formik.setFieldValue("game", gameId);
-        }
-      }
-
-      // Auto-set fromTeam from player's current team
-      if (player.team) {
-        const teamId = typeof player.team === 'string'
-          ? player.team
-          : (player.team._id || player.team.id);
-        if (teamId) {
-          await formik.setFieldValue("fromTeam", teamId);
+      // Check if player has gameRosters (new format)
+      if (player.gameRosters && player.gameRosters.length > 0) {
+        if (player.gameRosters.length === 1) {
+          // Single game: auto-set game and fromTeam
+          const roster = player.gameRosters[0];
+          const gameId = typeof roster.game === 'string'
+            ? roster.game
+            : (roster.game?._id || roster.game?.id);
+          if (gameId) {
+            await formik.setFieldValue("game", gameId);
+          }
+          const teamId = typeof roster.team === 'string'
+            ? roster.team
+            : (roster.team?._id || roster.team?.id);
+          if (teamId) {
+            await formik.setFieldValue("fromTeam", teamId);
+          } else {
+            await formik.setFieldValue("fromTeam", "");
+          }
+        } else {
+          // Multiple games: clear game and fromTeam, let user choose
+          await formik.setFieldValue("game", "");
+          await formik.setFieldValue("fromTeam", "");
         }
       } else {
-        // Player is free agent, clear fromTeam
+        // Legacy format: single game/team
+        if (player.game) {
+          const gameId = typeof player.game === 'string'
+            ? player.game
+            : (player.game._id || player.game.id);
+          if (gameId) {
+            await formik.setFieldValue("game", gameId);
+          }
+        }
+
+        if (player.team) {
+          const teamId = typeof player.team === 'string'
+            ? player.team
+            : (player.team._id || player.team.id);
+          if (teamId) {
+            await formik.setFieldValue("fromTeam", teamId);
+          }
+        } else {
+          await formik.setFieldValue("fromTeam", "");
+        }
+      }
+    }
+  };
+
+  // Auto-set fromTeam when game is selected (look up player's roster for that game)
+  const handleGameChange = async (gameId) => {
+    await formik.setFieldValue("game", gameId);
+    formik.validateField("game");
+
+    if (!gameId || !formik.values.player) return;
+
+    const player = playersOptions.find(
+      (p) => (p.id || p._id) === formik.values.player
+    );
+
+    if (player?.gameRosters) {
+      const roster = player.gameRosters.find(r => {
+        const rGameId = typeof r.game === 'string'
+          ? r.game
+          : (r.game?._id || r.game?.id);
+        return rGameId === gameId;
+      });
+
+      if (roster?.team) {
+        const teamId = typeof roster.team === 'string'
+          ? roster.team
+          : (roster.team?._id || roster.team?.id);
+        if (teamId) {
+          await formik.setFieldValue("fromTeam", teamId);
+        } else {
+          await formik.setFieldValue("fromTeam", "");
+        }
+      } else {
         await formik.setFieldValue("fromTeam", "");
       }
     }
@@ -324,7 +382,7 @@ function TransfersForm({
           <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
               <Gamepad2 className="size-4" />
-              {t("Game")}
+              {t("Game")} <span className="text-red-500">*</span>
             </Label>
             <Popover open={gameOpen} onOpenChange={setGameOpen}>
               <PopoverTrigger asChild>
@@ -332,7 +390,9 @@ function TransfersForm({
                   variant="outline"
                   role="combobox"
                   aria-expanded={gameOpen}
-                  className="w-full h-12 justify-between rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-muted dark:hover:bg-[#252a3d]"
+                  className={`w-full h-12 justify-between rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-muted dark:hover:bg-[#252a3d] ${
+                    formik.touched.game && formik.errors.game ? "border-red-500" : ""
+                  }`}
                 >
                   <span className="flex items-center gap-2 truncate">
                     {selectedGame ? (
@@ -363,19 +423,6 @@ function TransfersForm({
                   <CommandList>
                     <CommandEmpty>{t("noGameFound")}</CommandEmpty>
                     <CommandGroup>
-                      <CommandItem
-                        value="no-game"
-                        onSelect={() => {
-                          formik.setFieldValue("game", "");
-                          setGameOpen(false);
-                          setGameSearch("");
-                        }}
-                      >
-                        <Check
-                          className={`mr-2 h-4 w-4 ${!formik.values.game ? "opacity-100" : "opacity-0"}`}
-                        />
-                        <span className="text-muted-foreground">{t("noGame")}</span>
-                      </CommandItem>
                       {filteredGames.map((game) => {
                         const gameId = game.id || game._id;
                         return (
@@ -383,8 +430,7 @@ function TransfersForm({
                             key={gameId}
                             value={game.name}
                             onSelect={() => {
-                              formik.setFieldValue("game", gameId);
-                              formik.validateField("game");
+                              handleGameChange(gameId);
                               setGameOpen(false);
                               setGameSearch("");
                             }}
@@ -410,6 +456,9 @@ function TransfersForm({
                 </Command>
               </PopoverContent>
             </Popover>
+            {formik.touched.game && formik.errors.game && (
+              <p className="text-red-500 text-sm">{formik.errors.game}</p>
+            )}
           </div>
         </div>
       </div>

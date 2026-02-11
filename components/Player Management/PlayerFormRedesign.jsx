@@ -40,18 +40,30 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar as CalendarComponent } from "../ui/calendar";
 import Image from "next/image";
 
-// Validation schema - fullName and game are required
+// Validation schema - fullName and gameRosters are required
 const validationSchema = yup.object({
   fullName: yup.string().required("fullNameRequired").max(100, "fullNameTooLong"),
   nickname: yup.string().max(50, "nicknameTooLong"),
-  mainGame: yup.string().required("gameRequired"),
+  gameRosters: yup.array().of(
+    yup.object({
+      game: yup.string().required("gameRequired"),
+      team: yup.string().nullable(),
+      role: yup.string().max(50, "roleTooLong"),
+    })
+  ).min(1, "atLeastOneGame").test(
+    'unique-games',
+    'duplicateGames',
+    function(rosters) {
+      if (!rosters) return true;
+      const games = rosters.map(r => r.game).filter(Boolean);
+      return new Set(games).size === games.length;
+    }
+  ),
   dateOfBirth: yup.string(),
   country: yup.string(),
   photoLight: yup.string(),
   photoDark: yup.string(),
-  team: yup.string().nullable(),
   tournaments: yup.array().of(yup.string()),
-  role: yup.string().max(50, "roleTooLong"),
   bio: yup.string().max(2000, "bioTooLong"),
   ranking: yup.number().min(0, "rankingMin").integer("rankingInteger").nullable(),
   marketValue: yup.number().min(0, "marketValueMin").nullable(),
@@ -88,10 +100,16 @@ function PlayerFormRedesign({
       country: player?.country?.name || "",
       photoLight: player?.photo?.light || "",
       photoDark: player?.photo?.dark || "",
-      team: player?.team?.id || "",
       tournaments: player?.tournaments?.map(t => t.id || t._id) || [],
-      mainGame: player?.game?.id || "",
-      role: player?.role || "",
+      gameRosters: player?.gameRosters?.length > 0
+        ? player.gameRosters.map(r => ({
+            game: r.game?.id || r.game?._id || r.game || "",
+            team: r.team?.id || r.team?._id || r.team || "",
+            role: r.role || "",
+          }))
+        : (player?.game
+          ? [{ game: player.game.id || player.game._id || "", team: player.team?.id || player.team?._id || "", role: player.role || "" }]
+          : [{ game: "", team: "", role: "" }]),
       bio: player?.bio || "",
       ranking: player?.ranking ?? "",
       marketValue: player?.marketValue ?? "",
@@ -105,13 +123,30 @@ function PlayerFormRedesign({
           (c) => c.label === values.country
         );
 
-        // Build data object - fullName and game are required
+        // Build data object - fullName and gameRosters are required
         const dataValues = {
           ...(player ? { id: player.id } : {}),
           fullName: values.fullName,
           slug: `${values.fullName}`.replace(/\s+/g, "-").toLowerCase(),
-          game: values.mainGame,
+          gameRosters: values.gameRosters
+            .filter(r => r.game) // only include entries with a game
+            .map(r => ({
+              game: r.game,
+              ...(r.team ? { team: r.team } : {}),
+              ...(r.role ? { role: r.role } : {}),
+            })),
         };
+
+        // Keep game, team, role fields for backward compatibility
+        if (dataValues.gameRosters.length > 0) {
+          dataValues.game = dataValues.gameRosters[0].game;
+          if (dataValues.gameRosters[0].team) {
+            dataValues.team = dataValues.gameRosters[0].team;
+          }
+          if (dataValues.gameRosters[0].role) {
+            dataValues.role = dataValues.gameRosters[0].role;
+          }
+        }
 
         // Only add optional fields if they have values
         if (values.nickname) dataValues.nickname = values.nickname;
@@ -122,7 +157,6 @@ function PlayerFormRedesign({
             dark: values.photoDark || values.photoLight,
           };
         }
-        if (values.team) dataValues.team = values.team;
         if (values.tournaments && values.tournaments.length > 0) dataValues.tournaments = values.tournaments;
         if (selectedCountry) {
           dataValues.country = {
@@ -131,7 +165,6 @@ function PlayerFormRedesign({
             flag: `https://flagcdn.com/w80/${selectedCountry.value.toLowerCase()}.png`,
           };
         }
-        if (values.role) dataValues.role = values.role;
         if (values.bio) dataValues.bio = values.bio;
         if (values.ranking !== "" && values.ranking !== null) dataValues.ranking = Number(values.ranking);
         if (values.marketValue !== "" && values.marketValue !== null) dataValues.marketValue = Number(values.marketValue);
@@ -178,7 +211,7 @@ function PlayerFormRedesign({
           hint={t("fullNameHint")}
         />
 
-        <FormRow cols={2}>
+        <FormRow cols={1}>
           {/* Nickname - Optional */}
           <InputField
             label={t("nickname")}
@@ -188,18 +221,10 @@ function PlayerFormRedesign({
             icon={<Sparkles className="size-5 text-muted-foreground" />}
             hint={t("nicknameHint")}
           />
-          {/* Role */}
-          <RoleSelectField
-            label={t("role")}
-            name="role"
-            placeholder={t("rolePlaceholder")}
-            formik={formik}
-            hint={t("roleHint")}
-          />
         </FormRow>
       </FormSection>
 
-      {/* Game & Team */}
+      {/* Game Rosters */}
       <FormSection
         title={t("teamAndGame")}
         icon={<Gamepad2 className="size-5" />}
@@ -209,29 +234,100 @@ function PlayerFormRedesign({
           </span>
         }
       >
-        <FormRow cols={2}>
-          <TeamSelectField
-            label={t("team")}
-            name="team"
-            teams={teamsOptions}
-            formik={formik}
-            placeholder={t("teamPlaceholder")}
-            searchPlaceholder={t("searchTeams") || "Search teams..."}
-            onTeamChange={() => formik.setFieldValue("mainGame", "")}
-          />
-          <GameSelectField
-            label={t("mainGame")}
-            name="mainGame"
-            games={
-              teamsOptions.find((team) => team.id === formik.values.team)
-                ?.games || gamesOptions
-            }
-            formik={formik}
-            placeholder={t("mainGamePlaceholder")}
-            searchPlaceholder={t("searchGames") || "Search games..."}
-            required
-          />
-        </FormRow>
+        <div className="space-y-4">
+          {formik.values.gameRosters.map((roster, index) => (
+            <div key={index} className="p-4 rounded-xl bg-muted/30 dark:bg-[#151828] border border-border space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t("gameEntry") || "Game"} #{index + 1}
+                </span>
+                {formik.values.gameRosters.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newRosters = [...formik.values.gameRosters];
+                      newRosters.splice(index, 1);
+                      formik.setFieldValue("gameRosters", newRosters);
+                    }}
+                    className="p-1.5 rounded-lg hover:bg-red-500/20 transition-colors group"
+                  >
+                    <X className="size-4 text-muted-foreground group-hover:text-red-500" />
+                  </button>
+                )}
+              </div>
+              <FormRow cols={3}>
+                <GameSelectField
+                  label={t("mainGame")}
+                  name={`gameRosters[${index}].game`}
+                  games={gamesOptions.filter(g => {
+                    const gId = g.id || g._id;
+                    // Allow the current game or games not already used by other entries
+                    return gId === roster.game || !formik.values.gameRosters.some((r, i) => i !== index && r.game === gId);
+                  })}
+                  formik={formik}
+                  placeholder={t("mainGamePlaceholder")}
+                  searchPlaceholder={t("searchGames") || "Search games..."}
+                  required
+                  value={roster.game}
+                  onChange={async (gameId) => {
+                    await formik.setFieldValue(`gameRosters[${index}].game`, gameId);
+                    // Clear team when game changes (team may not play this game)
+                    await formik.setFieldValue(`gameRosters[${index}].team`, "");
+                  }}
+                />
+                <TeamSelectField
+                  label={t("team")}
+                  name={`gameRosters[${index}].team`}
+                  teams={roster.game
+                    ? teamsOptions.filter(team => team.games?.some(g => {
+                        const teamGameId = g.id || g._id || g;
+                        return teamGameId === roster.game;
+                      }))
+                    : teamsOptions
+                  }
+                  formik={formik}
+                  placeholder={t("teamPlaceholder")}
+                  searchPlaceholder={t("searchTeams") || "Search teams..."}
+                  value={roster.team}
+                  onChange={async (teamId) => {
+                    await formik.setFieldValue(`gameRosters[${index}].team`, teamId);
+                  }}
+                />
+                <RoleSelectField
+                  label={t("role")}
+                  name={`gameRosters[${index}].role`}
+                  placeholder={t("rolePlaceholder")}
+                  formik={formik}
+                  hint={t("roleHint")}
+                  value={roster.role}
+                  onChange={async (role) => {
+                    await formik.setFieldValue(`gameRosters[${index}].role`, role);
+                  }}
+                />
+              </FormRow>
+            </div>
+          ))}
+
+          {/* Add Game button */}
+          <button
+            type="button"
+            onClick={() => {
+              formik.setFieldValue("gameRosters", [
+                ...formik.values.gameRosters,
+                { game: "", team: "", role: "" },
+              ]);
+            }}
+            className="w-full py-3 rounded-xl border-2 border-dashed border-muted-foreground/20 hover:border-green-primary/50 hover:bg-green-primary/5 transition-all flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-green-primary"
+          >
+            <Plus className="size-4" />
+            {t("addGame") || "Add Game"}
+          </button>
+
+          {/* Validation error for the array */}
+          {typeof formik.errors.gameRosters === 'string' && formik.touched.gameRosters && (
+            <p className="text-xs text-red-500">{t(formik.errors.gameRosters)}</p>
+          )}
+        </div>
       </FormSection>
 
       {/* Tournaments */}
@@ -485,11 +581,30 @@ function RoleSelectField({
   formik,
   placeholder,
   hint,
+  value: externalValue,
+  onChange: externalOnChange,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const error = formik.touched[name] && formik.errors[name];
-  const value = formik.values[name];
+
+  // Support both direct value prop and formik-derived value
+  const value = externalValue !== undefined ? externalValue : formik.values[name];
+
+  // For nested paths, check errors differently
+  const getNestedError = () => {
+    const error = formik.touched[name] && formik.errors[name];
+    if (error) return error;
+    // Check nested path: gameRosters[0].role -> gameRosters.0.role
+    const parts = name.replace(/\[(\d+)\]/g, '.$1').split('.');
+    let touchedVal = formik.touched;
+    let errorVal = formik.errors;
+    for (const part of parts) {
+      touchedVal = touchedVal?.[part];
+      errorVal = errorVal?.[part];
+    }
+    return touchedVal && errorVal ? errorVal : null;
+  };
+  const nestedError = getNestedError();
   const t = useTranslations("playerForm");
 
   const filteredRoles = ESPORTS_ROLES.filter(
@@ -504,18 +619,26 @@ function RoleSelectField({
   }, {});
 
   const handleSelect = async (role) => {
-    await formik.setFieldValue(name, role);
-    await formik.setFieldTouched(name, true, true);
-    formik.validateField(name);
+    if (externalOnChange) {
+      externalOnChange(role);
+    } else {
+      await formik.setFieldValue(name, role);
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
+    }
     setIsOpen(false);
     setSearch("");
   };
 
   const handleCustomInput = async () => {
     if (search.trim()) {
-      await formik.setFieldValue(name, search.trim());
-      await formik.setFieldTouched(name, true, true);
-      formik.validateField(name);
+      if (externalOnChange) {
+        externalOnChange(search.trim());
+      } else {
+        await formik.setFieldValue(name, search.trim());
+        await formik.setFieldTouched(name, true, true);
+        formik.validateField(name);
+      }
       setIsOpen(false);
       setSearch("");
     }
@@ -523,9 +646,13 @@ function RoleSelectField({
 
   const handleClear = async (e) => {
     e.stopPropagation();
-    await formik.setFieldValue(name, "");
-    await formik.setFieldTouched(name, true, true);
-    formik.validateField(name);
+    if (externalOnChange) {
+      externalOnChange("");
+    } else {
+      await formik.setFieldValue(name, "");
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
+    }
   };
 
   return (
@@ -539,7 +666,7 @@ function RoleSelectField({
             role="button"
             tabIndex={0}
             className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
-              error ? "ring-2 ring-red-500 border-red-500" : ""
+              nestedError ? "ring-2 ring-red-500 border-red-500" : ""
             }`}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -640,10 +767,10 @@ function RoleSelectField({
           </div>
         </PopoverContent>
       </Popover>
-      {hint && !error && (
+      {hint && !nestedError && (
         <p className="text-xs text-muted-foreground">{hint}</p>
       )}
-      {error && <p className="text-xs text-red-500">{t(error)}</p>}
+      {nestedError && <p className="text-xs text-red-500">{t(nestedError)}</p>}
     </div>
   );
 }
@@ -693,11 +820,30 @@ function GameSelectField({
   placeholder,
   searchPlaceholder,
   required,
+  value: externalValue,
+  onChange: externalOnChange,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const error = formik.touched[name] && formik.errors[name];
-  const value = formik.values[name];
+
+  // Support both direct value prop and formik-derived value
+  const value = externalValue !== undefined ? externalValue : formik.values[name];
+
+  // For nested paths, check errors differently
+  const getNestedError = () => {
+    const error = formik.touched[name] && formik.errors[name];
+    if (error) return error;
+    // Check nested path: gameRosters[0].game -> gameRosters.0.game
+    const parts = name.replace(/\[(\d+)\]/g, '.$1').split('.');
+    let touchedVal = formik.touched;
+    let errorVal = formik.errors;
+    for (const part of parts) {
+      touchedVal = touchedVal?.[part];
+      errorVal = errorVal?.[part];
+    }
+    return touchedVal && errorVal ? errorVal : null;
+  };
+  const nestedError = getNestedError();
   const t = useTranslations("playerForm");
 
   // Helper to get game ID (handles both id and _id from different sources)
@@ -712,18 +858,26 @@ function GameSelectField({
   );
 
   const handleSelect = async (game) => {
-    await formik.setFieldValue(name, getGameId(game));
-    await formik.setFieldTouched(name, true, true);
-    formik.validateField(name);
+    if (externalOnChange) {
+      externalOnChange(getGameId(game));
+    } else {
+      await formik.setFieldValue(name, getGameId(game));
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
+    }
     setIsOpen(false);
     setSearch("");
   };
 
   const handleClear = async (e) => {
     e.stopPropagation();
-    await formik.setFieldValue(name, "");
-    await formik.setFieldTouched(name, true, true);
-    formik.validateField(name);
+    if (externalOnChange) {
+      externalOnChange("");
+    } else {
+      await formik.setFieldValue(name, "");
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
+    }
   };
 
   return (
@@ -738,7 +892,7 @@ function GameSelectField({
             role="button"
             tabIndex={0}
             className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
-              error ? "ring-2 ring-red-500 border-red-500" : ""
+              nestedError ? "ring-2 ring-red-500 border-red-500" : ""
             }`}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -858,7 +1012,7 @@ function GameSelectField({
           </div>
         </PopoverContent>
       </Popover>
-      {error && <p className="text-xs text-red-500">{t(error)}</p>}
+      {nestedError && <p className="text-xs text-red-500">{t(nestedError)}</p>}
     </div>
   );
 }
@@ -872,11 +1026,30 @@ function TeamSelectField({
   placeholder,
   searchPlaceholder,
   onTeamChange,
+  value: externalValue,
+  onChange: externalOnChange,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const error = formik.touched[name] && formik.errors[name];
-  const value = formik.values[name];
+
+  // Support both direct value prop and formik-derived value
+  const value = externalValue !== undefined ? externalValue : formik.values[name];
+
+  // For nested paths, check errors differently
+  const getNestedError = () => {
+    const error = formik.touched[name] && formik.errors[name];
+    if (error) return error;
+    // Check nested path: gameRosters[0].team -> gameRosters.0.team
+    const parts = name.replace(/\[(\d+)\]/g, '.$1').split('.');
+    let touchedVal = formik.touched;
+    let errorVal = formik.errors;
+    for (const part of parts) {
+      touchedVal = touchedVal?.[part];
+      errorVal = errorVal?.[part];
+    }
+    return touchedVal && errorVal ? errorVal : null;
+  };
+  const nestedError = getNestedError();
 
   // Helper to get team ID (handles both id and _id)
   const getTeamId = (team) => team?.id || team?._id;
@@ -890,20 +1063,28 @@ function TeamSelectField({
   );
 
   const handleSelect = async (team) => {
-    await formik.setFieldValue(name, getTeamId(team));
-    await formik.setFieldTouched(name, true, true);
-    formik.validateField(name);
-    if (onTeamChange) onTeamChange();
+    if (externalOnChange) {
+      externalOnChange(getTeamId(team));
+    } else {
+      await formik.setFieldValue(name, getTeamId(team));
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
+      if (onTeamChange) onTeamChange();
+    }
     setIsOpen(false);
     setSearch("");
   };
 
   const handleClear = async (e) => {
     e.stopPropagation();
-    await formik.setFieldValue(name, "");
-    await formik.setFieldTouched(name, true, true);
-    formik.validateField(name);
-    if (onTeamChange) onTeamChange();
+    if (externalOnChange) {
+      externalOnChange("");
+    } else {
+      await formik.setFieldValue(name, "");
+      await formik.setFieldTouched(name, true, true);
+      formik.validateField(name);
+      if (onTeamChange) onTeamChange();
+    }
   };
 
   return (
@@ -917,7 +1098,7 @@ function TeamSelectField({
             role="button"
             tabIndex={0}
             className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
-              error ? "ring-2 ring-red-500 border-red-500" : ""
+              nestedError ? "ring-2 ring-red-500 border-red-500" : ""
             }`}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
