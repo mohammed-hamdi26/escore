@@ -473,6 +473,8 @@
     "noTeam": "No team (Free Agent)",
     "game": "Main Game",
     "noGame": "No game assigned",
+    "gameRosters": "Game Rosters",
+    "unknownGame": "Unknown Game",
     "stats": "Statistics",
     "followers": "Followers",
     "awardsCount": "Awards",

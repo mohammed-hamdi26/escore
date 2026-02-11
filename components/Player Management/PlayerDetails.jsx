@@ -129,13 +129,20 @@ function PlayerDetails({ player }) {
                     {player.isActive ? t("active") || "Active" : t("inactive") || "Inactive"}
                   </span>
 
-                  {/* Role */}
-                  {player.role && (
+                  {/* Roles */}
+                  {player.gameRosters?.length > 0 ? (
+                    [...new Set(player.gameRosters.map(r => r.role).filter(Boolean))].map((role, i) => (
+                      <span key={i} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border bg-purple-500/10 text-purple-500 border-purple-500/30">
+                        <Star className="size-4" />
+                        {role}
+                      </span>
+                    ))
+                  ) : player.role ? (
                     <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border bg-purple-500/10 text-purple-500 border-purple-500/30">
                       <Star className="size-4" />
                       {player.role}
                     </span>
-                  )}
+                  ) : null}
 
                   {/* Age */}
                   {age && (
@@ -394,62 +401,117 @@ function PlayerDetails({ player }) {
 
         {/* Right Column - Sidebar */}
         <div className="space-y-6">
-          {/* Team */}
-          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
-            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Users className="size-5 text-green-primary" />
-              {t("team") || "Team"}
-            </h3>
-            {player.team ? (
-              <div className="flex items-center gap-3">
-                {player.team.logo?.light ? (
-                  <img
-                    src={player.team.logo.light}
-                    alt={player.team.name}
-                    className="size-12 rounded-xl object-cover"
-                  />
-                ) : (
-                  <div className="size-12 rounded-xl bg-muted flex items-center justify-center">
-                    <Users className="size-6 text-muted-foreground" />
-                  </div>
-                )}
-                <div>
-                  <p className="font-semibold text-foreground">{player.team.name}</p>
-                  {player.team.slug && (
-                    <p className="text-sm text-muted-foreground">@{player.team.slug}</p>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <p className="text-muted-foreground">{t("noTeam") || "No team (Free Agent)"}</p>
-            )}
-          </div>
-
-          {/* Game */}
+          {/* Game Rosters */}
           <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Gamepad2 className="size-5 text-green-primary" />
-              {t("game") || "Main Game"}
+              {t("gameRosters") || "Game Rosters"}
+              {((player.gameRosters && player.gameRosters.length > 0) || player.game) && (
+                <span className="text-xs bg-green-primary/10 text-green-primary px-2 py-0.5 rounded-full font-normal">
+                  {player.gameRosters?.length || 1}
+                </span>
+              )}
             </h3>
-            {player.game ? (
-              <div className="flex items-center gap-3">
-                {player.game.logo?.light ? (
-                  <img
-                    src={player.game.logo.light}
-                    alt={player.game.name}
-                    className="size-12 rounded-xl object-cover"
-                  />
+            {player.gameRosters && player.gameRosters.length > 0 ? (
+              <div className="space-y-3">
+                {player.gameRosters.map((roster, index) => (
+                  <div key={index} className="p-4 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] space-y-3">
+                    {/* Game */}
+                    <div className="flex items-center gap-3">
+                      {roster.game?.logo?.light ? (
+                        <img
+                          src={roster.game.logo.light}
+                          alt={roster.game.name}
+                          className="size-10 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="size-10 rounded-lg bg-green-primary/10 flex items-center justify-center">
+                          <Gamepad2 className="size-5 text-green-primary" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground truncate">
+                          {roster.game?.name || t("unknownGame") || "Unknown Game"}
+                        </p>
+                        {roster.role && (
+                          <span className="text-xs text-purple-500 bg-purple-500/10 px-2 py-0.5 rounded-full">
+                            {roster.role}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {/* Team */}
+                    {roster.team ? (
+                      <div className="flex items-center gap-3 pl-2 border-l-2 border-blue-500/30 ml-1">
+                        {roster.team.logo?.light ? (
+                          <img
+                            src={roster.team.logo.light}
+                            alt={roster.team.name}
+                            className="size-8 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                            <Users className="size-4 text-blue-500" />
+                          </div>
+                        )}
+                        <p className="text-sm font-medium text-foreground truncate">{roster.team.name}</p>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 pl-2 border-l-2 border-orange-500/30 ml-1">
+                        <span className="text-xs text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full">
+                          {t("freeAgent") || "Free Agent"}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : player.game ? (
+              /* Fallback to legacy single game/team */
+              <div className="p-4 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] space-y-3">
+                <div className="flex items-center gap-3">
+                  {player.game.logo?.light ? (
+                    <img
+                      src={player.game.logo.light}
+                      alt={player.game.name}
+                      className="size-10 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="size-10 rounded-lg bg-green-primary/10 flex items-center justify-center">
+                      <Gamepad2 className="size-5 text-green-primary" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-foreground truncate">{player.game.name}</p>
+                    {player.role && (
+                      <span className="text-xs text-purple-500 bg-purple-500/10 px-2 py-0.5 rounded-full">
+                        {player.role}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {player.team ? (
+                  <div className="flex items-center gap-3 pl-2 border-l-2 border-blue-500/30 ml-1">
+                    {player.team.logo?.light ? (
+                      <img
+                        src={player.team.logo.light}
+                        alt={player.team.name}
+                        className="size-8 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                        <Users className="size-4 text-blue-500" />
+                      </div>
+                    )}
+                    <p className="text-sm font-medium text-foreground truncate">{player.team.name}</p>
+                  </div>
                 ) : (
-                  <div className="size-12 rounded-xl bg-muted flex items-center justify-center">
-                    <Gamepad2 className="size-6 text-muted-foreground" />
+                  <div className="flex items-center gap-2 pl-2 border-l-2 border-orange-500/30 ml-1">
+                    <span className="text-xs text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full">
+                      {t("freeAgent") || "Free Agent"}
+                    </span>
                   </div>
                 )}
-                <div>
-                  <p className="font-semibold text-foreground">{player.game.name}</p>
-                  {player.game.slug && (
-                    <p className="text-sm text-muted-foreground">@{player.game.slug}</p>
-                  )}
-                </div>
               </div>
             ) : (
               <p className="text-muted-foreground">{t("noGame") || "No game assigned"}</p>
