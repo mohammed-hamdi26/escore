@@ -21,7 +21,7 @@ async function page() {
     getPlayers(),
     getTeams(),
     getTournaments(),
-    getGames(),
+    getGames({ limit: 100 }),
     getMatches(),
   ]);
 

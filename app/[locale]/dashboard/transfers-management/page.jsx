@@ -19,7 +19,7 @@ async function TransfersListPage({ searchParams }) {
         data: [],
         pagination: { totalPages: 1, total: 0 },
       })),
-      getGames().catch(() => ({ data: [] })),
+      getGames({ limit: 100 }).catch(() => ({ data: [] })),
       getTeams({ size: 500 }).catch(() => ({ data: [] })),
     ]);
   } catch (error) {

@@ -8,7 +8,7 @@ async function page({ params }) {
   const { id } = await params;
   const [teamsResult, gamesResult, tournamentsResult, playersResult, awards] = await Promise.all([
     getTeams(),
-    getGames(),
+    getGames({ limit: 100 }),
     getTournaments(),
     getPlayers(),
     getAwardsTeam(id),

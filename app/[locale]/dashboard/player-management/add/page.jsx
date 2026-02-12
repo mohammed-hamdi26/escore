@@ -15,7 +15,7 @@ async function page() {
   ] = await Promise.all([
     getCountries(),
     getTeams(),
-    getGames(),
+    getGames({ limit: 100 }),
     getTournaments({ size: 100 }),
   ]);
 

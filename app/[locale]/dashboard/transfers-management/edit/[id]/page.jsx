@@ -22,7 +22,7 @@ async function EditTransferPage({ params }) {
   }
 
   const [gamesData, playersData, teamsData] = await Promise.all([
-    getGames().catch(() => ({ data: [] })),
+    getGames({ limit: 100 }).catch(() => ({ data: [] })),
     getPlayers().catch(() => ({ data: [] })),
     getTeams().catch(() => ({ data: [] })),
   ]);

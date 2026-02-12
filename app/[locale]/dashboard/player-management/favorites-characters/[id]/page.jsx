@@ -11,7 +11,7 @@ async function page({ params }) {
   const [player, playersResult, gamesResult, characters] = await Promise.all([
     getPlayer(id),
     getPlayers(),
-    getGames(),
+    getGames({ limit: 100 }),
     getPlayersFavoriteCharacters(id),
   ]);
   return (

@@ -1,6 +1,5 @@
-import { editTournament } from "@/app/[locale]/_Lib/actions";
+import { editTournament, searchGames } from "@/app/[locale]/_Lib/actions";
 import { getCountries } from "@/app/[locale]/_Lib/countriesApi";
-import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournament } from "@/app/[locale]/_Lib/tournamentsApi";
 import TournamentsForm from "@/components/Tournaments Management/TournamentsForm";
@@ -8,10 +7,9 @@ import { TournamentEditWrapper } from "@/components/tournaments/TournamentFormWr
 
 async function page({ params }) {
   const { id } = await params;
-  const [tournament, countries, gamesResponse, teamsResponse] = await Promise.all([
+  const [tournament, countries, teamsResponse] = await Promise.all([
     getTournament(id),
     getCountries(),
-    getGames(),
     getTeams({ size: 100 }),
   ]);
 
@@ -20,7 +18,7 @@ async function page({ params }) {
       <TournamentsForm
         countries={countries.countries}
         formType="edit"
-        gameOptions={gamesResponse.data || []}
+        searchGames={searchGames}
         teamOptions={teamsResponse.data || []}
         submit={editTournament}
         tournament={tournament}

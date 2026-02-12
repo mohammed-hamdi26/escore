@@ -14,7 +14,7 @@ async function page({ params }) {
       getCountries(),
       getPlayer(id),
       getTeams(),
-      getGames(),
+      getGames({ limit: 100 }),
       getTournaments({ size: 100 }),
     ]);
 

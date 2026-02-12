@@ -9,7 +9,7 @@ import { TeamAddWrapper } from "@/components/teams management/TeamFormWrapper";
 async function page() {
   const [countries, { data: gamesOptions }, tournamentsResult, playersResult] = await Promise.all([
     getCountries(),
-    getGames(),
+    getGames({ limit: 100 }),
     getTournaments({ size: 200 }),
     getPlayers({ size: 200 }),
   ]);

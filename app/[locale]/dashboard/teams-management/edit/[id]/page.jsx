@@ -12,7 +12,7 @@ export default async function page({ params }) {
 
   const [countries, { data: gamesOptions }, team, tournamentsResult, playersResult] = await Promise.all([
     getCountries(),
-    getGames(),
+    getGames({ limit: 100 }),
     getTeam(id),
     getTournaments({ size: 200 }),
     getPlayers({ size: 200 }),
