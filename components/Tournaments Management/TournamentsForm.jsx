@@ -43,7 +43,6 @@ import {
   Power,
   Users,
 } from "lucide-react";
-import Image from "next/image";
 
 // Currency options
 const CURRENCY_OPTIONS = [
@@ -1020,11 +1019,9 @@ function MultiSelectField({ label, name, formik, searchAction, required }) {
                     }`}
                   >
                     {game.logo?.light ? (
-                      <Image
+                      <img
                         src={game.logo.light}
                         alt={game.name}
-                        width={24}
-                        height={24}
                         className="size-6 rounded object-cover"
                       />
                     ) : (
