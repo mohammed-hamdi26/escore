@@ -142,7 +142,7 @@ function EventList({ events, pagination }) {
             size="sm"
             onClick={handleRefresh}
             disabled={isPending}
-            className="h-8 px-2"
+            className="h-8 px-2 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
           >
             <RefreshCw
               className={`size-3.5 ${isPending ? "animate-spin" : ""}`}

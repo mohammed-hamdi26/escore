@@ -44,10 +44,28 @@ function NavItems({ user, t }) {
       isShowed: true,
     },
     {
+      icon: <CalendarDays />,
+      title: "Events",
+      href: "/dashboard/events-management",
+      isShowed: hasPermission(user, "Event"),
+    },
+    {
       icon: <Trophy />,
       title: "Tournaments",
       href: "/dashboard/tournaments-management",
       isShowed: hasPermission(user, "Tournament"),
+    },
+    {
+      icon: <Building2 />,
+      title: "Clubs",
+      href: "/dashboard/clubs-management",
+      isShowed: hasPermission(user, "Club"),
+    },
+    {
+      icon: <UsersRound />,
+      title: "Teams",
+      href: "/dashboard/teams-management",
+      isShowed: hasPermission(user, "Team"),
     },
     {
       icon: <Swords />,
@@ -62,30 +80,6 @@ function NavItems({ user, t }) {
       isShowed: hasPermission(user, "Player"),
     },
     {
-      icon: <UsersRound />,
-      title: "Teams",
-      href: "/dashboard/teams-management",
-      isShowed: hasPermission(user, "Team"),
-    },
-    {
-      icon: <Building2 />,
-      title: "Clubs",
-      href: "/dashboard/clubs-management",
-      isShowed: hasPermission(user, "Club"),
-    },
-    {
-      icon: <CalendarDays />,
-      title: "Events",
-      href: "/dashboard/events-management",
-      isShowed: hasPermission(user, "Event"),
-    },
-    {
-      icon: <ArrowRightLeft />,
-      title: "Transfers",
-      href: "/dashboard/transfers-management",
-      isShowed: hasPermission(user, "Transfer"),
-    },
-    {
       icon: <Gamepad2 />,
       title: "Games",
       href: "/dashboard/games-management",
@@ -96,6 +90,12 @@ function NavItems({ user, t }) {
       title: "News",
       href: "/dashboard/news",
       isShowed: hasPermission(user, "News"),
+    },
+    {
+      icon: <ArrowRightLeft />,
+      title: "Transfers",
+      href: "/dashboard/transfers-management",
+      isShowed: hasPermission(user, "Transfer"),
     },
     {
       icon: <UserCog />,

@@ -39,9 +39,12 @@ import {
   Power,
   CalendarRange,
   FileText,
+  Check,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Command, CommandGroup, CommandItem, CommandList } from "../ui/command";
 import {
   addTournamentToEvent,
   removeTournamentFromEvent,
@@ -107,6 +110,10 @@ function EventDetails({
   const [assignTournamentId, setAssignTournamentId] = useState(null);
   const [selectedClub, setSelectedClub] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
+  const [clubPopoverOpen, setClubPopoverOpen] = useState(false);
+  const [teamPopoverOpen, setTeamPopoverOpen] = useState(false);
+  const [clubSearch, setClubSearch] = useState("");
+  const [teamSearch, setTeamSearch] = useState("");
 
   // Record result state
   const [showRecordModal, setShowRecordModal] = useState(false);
@@ -696,21 +703,23 @@ function EventDetails({
                 </div>
                 <div className="max-h-60 overflow-y-auto space-y-1">
                   {availableTournaments.length > 0 ? (
-                    availableTournaments.map((t) => (
+                    availableTournaments.map((tr) => (
                       <button
-                        key={t.id}
-                        onClick={() => handleLinkTournament(t.id)}
+                        key={tr.id}
+                        onClick={() => handleLinkTournament(tr.id)}
                         disabled={isLoading}
                         className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-green-primary/10 transition-colors text-left cursor-pointer"
                       >
-                        {t.game?.logo?.light ? (
-                          <img src={t.game.logo.light} alt="" className="size-6 object-contain" />
+                        {tr.logo?.light ? (
+                          <img src={tr.logo.light} alt="" className="size-8 rounded-lg object-contain bg-muted/50 p-0.5" />
                         ) : (
-                          <Gamepad2 className="size-6 text-muted-foreground" />
+                          <div className="size-8 rounded-lg bg-muted/50 flex items-center justify-center">
+                            <Trophy className="size-4 text-muted-foreground" />
+                          </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{t.name}</p>
-                          <p className="text-xs text-muted-foreground">{t.game?.name || ""}</p>
+                          <p className="text-sm font-medium text-foreground truncate">{tr.name}</p>
+                          <p className="text-xs text-muted-foreground">{tr.game?.name || ""}</p>
                         </div>
                       </button>
                     ))
@@ -725,56 +734,87 @@ function EventDetails({
 
             {/* Tournament List */}
             {tournaments.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {tournaments.map((tournament) => (
                   <div
                     key={tournament.id}
-                    className="p-4 rounded-xl border border-gray-200 dark:border-white/5 space-y-3"
+                    className="rounded-2xl border border-gray-200 dark:border-white/5 bg-white dark:bg-white/[0.02] overflow-hidden"
                   >
-                    <div className="flex items-center gap-3">
-                      {tournament.game?.logo?.light ? (
+                    {/* Tournament Header */}
+                    <div className="p-4 flex items-center gap-4">
+                      {tournament.logo?.light ? (
                         <img
-                          src={tournament.game.logo.light}
+                          src={tournament.logo.light}
                           alt=""
-                          className="size-8 object-contain"
+                          className="size-14 rounded-xl object-contain bg-muted/30 ring-1 ring-gray-200 dark:ring-white/10 p-1"
                         />
                       ) : (
-                        <Gamepad2 className="size-8 text-muted-foreground" />
+                        <div className="size-14 rounded-xl bg-gradient-to-br from-green-primary/10 to-green-primary/5 ring-1 ring-green-primary/20 flex items-center justify-center">
+                          <Trophy className="size-6 text-green-primary" />
+                        </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground truncate">
+                        <p className="font-semibold text-foreground truncate text-base">
                           {tournament.name}
                         </p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>{tournament.game?.name}</span>
+                        <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                          {tournament.game?.name && (
+                            <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                              <Gamepad2 className="size-3" />
+                              {tournament.game.name}
+                            </span>
+                          )}
                           {tournament.prizePool > 0 && (
-                            <span>
+                            <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                              <DollarSign className="size-3" />
                               {formatCurrency(tournament.prizePool, tournament.currency)}
                             </span>
                           )}
-                          <span>
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                            <Users className="size-3" />
                             {tournament.teams?.length || 0} {t("teams") || "teams"}
                           </span>
+                          {tournament.status && (
+                            <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${
+                              tournament.status === "ongoing" ? "bg-green-500/10 text-green-600 dark:text-green-400" :
+                              tournament.status === "completed" ? "bg-gray-500/10 text-gray-600 dark:text-gray-400" :
+                              tournament.status === "upcoming" ? "bg-sky-500/10 text-sky-600 dark:text-sky-400" :
+                              "bg-muted text-muted-foreground"
+                            }`}>
+                              {tournament.status === "ongoing" ? <Play className="size-3" /> :
+                               tournament.status === "completed" ? <CheckCircle2 className="size-3" /> :
+                               <Clock className="size-3" />}
+                              {tournament.status}
+                            </span>
+                          )}
                         </div>
                       </div>
                       <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-red-500 border-red-500/20 hover:bg-red-500/10"
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500 hover:bg-red-500/10 hover:text-red-600 shrink-0"
                         onClick={() => handleUnlinkTournament(tournament.id)}
                         disabled={isLoading}
+                        title={t("unlinkTournament") || "Unlink"}
                       >
-                        <Trash2 className="size-3.5 mr-1" />
-                        {t("unlinkTournament") || "Unlink"}
+                        <Trash2 className="size-4" />
                       </Button>
                     </div>
 
-                    {/* Club Assignments */}
-                    <div className="pl-11 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-muted-foreground">
-                          {t("clubAssignments") || "Club Assignments"}
-                        </span>
+                    {/* Club Assignments Section */}
+                    <div className="border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.01] p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Building2 className="size-4 text-muted-foreground" />
+                          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            {t("clubAssignments") || "Club Assignments"}
+                          </span>
+                          {tournament.clubAssignments?.length > 0 && (
+                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-green-primary/10 text-green-primary">
+                              {tournament.clubAssignments.length}
+                            </span>
+                          )}
+                        </div>
                         <button
                           onClick={() =>
                             setAssignTournamentId(
@@ -783,88 +823,236 @@ function EventDetails({
                                 : tournament.id
                             )
                           }
-                          className="text-xs text-green-primary hover:underline cursor-pointer"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-green-primary hover:text-green-600 transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-green-primary/10"
                         >
-                          <Plus className="size-3 inline mr-0.5" />
+                          <Plus className="size-3.5" />
                           {t("assignClub") || "Assign Club"}
                         </button>
                       </div>
 
                       {/* Assign Club Form */}
-                      {assignTournamentId === tournament.id && (
-                        <div className="flex items-end gap-2 p-3 rounded-lg bg-gray-50 dark:bg-white/5">
-                          <div className="flex-1 space-y-1">
-                            <label className="text-xs text-muted-foreground">
-                              {t("club") || "Club"}
-                            </label>
-                            <select
-                              value={selectedClub}
-                              onChange={(e) => {
-                                setSelectedClub(e.target.value);
-                                setSelectedTeam("");
-                              }}
-                              className={inputClass}
-                            >
-                              <option value="">{t("selectClub") || "Select Club"}</option>
-                              {allClubs.map((c) => (
-                                <option key={c.id} value={c.id}>
-                                  {c.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          {selectedClub && (
-                            <div className="flex-1 space-y-1">
-                              <label className="text-xs text-muted-foreground">
-                                {t("team") || "Team"}
+                      {assignTournamentId === tournament.id && (() => {
+                        const selectedClubObj = allClubs.find((c) => c.id === selectedClub);
+                        const clubTeams = selectedClub ? getClubTeams(selectedClub) : [];
+                        const selectedTeamObj = clubTeams.find((ct) => (ct.team?.id || ct.team) === selectedTeam);
+                        const filteredClubs = allClubs.filter((c) =>
+                          c.name?.toLowerCase().includes(clubSearch.toLowerCase())
+                        );
+                        const filteredTeams = clubTeams.filter((ct) =>
+                          (ct.team?.name || "").toLowerCase().includes(teamSearch.toLowerCase())
+                        );
+                        return (
+                        <div className="mb-3 p-3 rounded-xl border border-green-primary/20 bg-green-primary/5 dark:bg-green-primary/5 space-y-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {/* Club Popover */}
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-medium text-muted-foreground">
+                                {t("club") || "Club"}
                               </label>
-                              <select
-                                value={selectedTeam}
-                                onChange={(e) => setSelectedTeam(e.target.value)}
-                                className={inputClass}
-                              >
-                                <option value="">{t("selectTeam") || "Select Team"}</option>
-                                {getClubTeams(selectedClub).map((ct) => (
-                                  <option key={ct.team?.id || ct.team} value={ct.team?.id || ct.team}>
-                                    {ct.team?.name || ct.team}
-                                  </option>
-                                ))}
-                              </select>
+                              <Popover open={clubPopoverOpen} onOpenChange={setClubPopoverOpen}>
+                                <PopoverTrigger asChild>
+                                  <button
+                                    type="button"
+                                    className={`${inputClass} flex items-center justify-between gap-2 cursor-pointer`}
+                                  >
+                                    {selectedClubObj ? (
+                                      <span className="flex items-center gap-2 truncate">
+                                        {selectedClubObj.logo?.light ? (
+                                          <img src={selectedClubObj.logo.light} alt="" className="size-5 rounded object-contain" />
+                                        ) : (
+                                          <Building2 className="size-4 text-muted-foreground shrink-0" />
+                                        )}
+                                        <span className="truncate">{selectedClubObj.name}</span>
+                                      </span>
+                                    ) : (
+                                      <span className="text-muted-foreground">{t("selectClub") || "Select Club"}</span>
+                                    )}
+                                    <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[280px] p-0" align="start">
+                                  <Command>
+                                    <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                                      <Search className="size-4 text-muted-foreground shrink-0" />
+                                      <input
+                                        value={clubSearch}
+                                        onChange={(e) => setClubSearch(e.target.value)}
+                                        placeholder={t("searchClubs") || "Search clubs..."}
+                                        className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                                      />
+                                    </div>
+                                    <CommandList className="max-h-[200px]">
+                                      <CommandGroup>
+                                        {filteredClubs.length > 0 ? (
+                                          filteredClubs.map((c) => (
+                                            <CommandItem
+                                              key={c.id}
+                                              value={c.name}
+                                              onSelect={() => {
+                                                setSelectedClub(c.id);
+                                                setSelectedTeam("");
+                                                setClubPopoverOpen(false);
+                                                setClubSearch("");
+                                              }}
+                                              className="flex items-center gap-2 cursor-pointer"
+                                            >
+                                              {c.logo?.light ? (
+                                                <img src={c.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                              ) : (
+                                                <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
+                                                  <Building2 className="size-3.5 text-muted-foreground" />
+                                                </div>
+                                              )}
+                                              <span className="flex-1 truncate">{c.name}</span>
+                                              {selectedClub === c.id && (
+                                                <Check className="size-4 text-green-primary shrink-0" />
+                                              )}
+                                            </CommandItem>
+                                          ))
+                                        ) : (
+                                          <p className="text-sm text-muted-foreground text-center py-4">
+                                            {t("noClubsFound") || "No clubs found"}
+                                          </p>
+                                        )}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
                             </div>
-                          )}
-                          <Button
-                            size="sm"
-                            onClick={() => handleAssignClub(tournament.id)}
-                            disabled={isLoading}
-                            className="bg-green-primary hover:bg-green-600 text-white"
-                          >
-                            {isLoading ? (
-                              <Loader2 className="size-4 animate-spin" />
-                            ) : (
-                              t("assign") || "Assign"
+
+                            {/* Team Popover */}
+                            {selectedClub && (
+                              <div className="space-y-1.5">
+                                <label className="text-xs font-medium text-muted-foreground">
+                                  {t("team") || "Team"}
+                                </label>
+                                <Popover open={teamPopoverOpen} onOpenChange={setTeamPopoverOpen}>
+                                  <PopoverTrigger asChild>
+                                    <button
+                                      type="button"
+                                      className={`${inputClass} flex items-center justify-between gap-2 cursor-pointer`}
+                                    >
+                                      {selectedTeamObj ? (
+                                        <span className="flex items-center gap-2 truncate">
+                                          {selectedTeamObj.team?.logo?.light ? (
+                                            <img src={selectedTeamObj.team.logo.light} alt="" className="size-5 rounded object-contain" />
+                                          ) : (
+                                            <Users className="size-4 text-muted-foreground shrink-0" />
+                                          )}
+                                          <span className="truncate">{selectedTeamObj.team?.name || selectedTeamObj.team}</span>
+                                        </span>
+                                      ) : (
+                                        <span className="text-muted-foreground">{t("selectTeam") || "Select Team"}</span>
+                                      )}
+                                      <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-[280px] p-0" align="start">
+                                    <Command>
+                                      <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                                        <Search className="size-4 text-muted-foreground shrink-0" />
+                                        <input
+                                          value={teamSearch}
+                                          onChange={(e) => setTeamSearch(e.target.value)}
+                                          placeholder={t("searchTeams") || "Search teams..."}
+                                          className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                                        />
+                                      </div>
+                                      <CommandList className="max-h-[200px]">
+                                        <CommandGroup>
+                                          {filteredTeams.length > 0 ? (
+                                            filteredTeams.map((ct) => {
+                                              const teamId = ct.team?.id || ct.team;
+                                              const teamName = ct.team?.name || ct.team;
+                                              return (
+                                                <CommandItem
+                                                  key={teamId}
+                                                  value={teamName}
+                                                  onSelect={() => {
+                                                    setSelectedTeam(teamId);
+                                                    setTeamPopoverOpen(false);
+                                                    setTeamSearch("");
+                                                  }}
+                                                  className="flex items-center gap-2 cursor-pointer"
+                                                >
+                                                  {ct.team?.logo?.light ? (
+                                                    <img src={ct.team.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                                  ) : (
+                                                    <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
+                                                      <Users className="size-3.5 text-muted-foreground" />
+                                                    </div>
+                                                  )}
+                                                  <span className="flex-1 truncate">{teamName}</span>
+                                                  {selectedTeam === teamId && (
+                                                    <Check className="size-4 text-green-primary shrink-0" />
+                                                  )}
+                                                </CommandItem>
+                                              );
+                                            })
+                                          ) : (
+                                            <p className="text-sm text-muted-foreground text-center py-4">
+                                              {t("noTeamsFound") || "No teams found"}
+                                            </p>
+                                          )}
+                                        </CommandGroup>
+                                      </CommandList>
+                                    </Command>
+                                  </PopoverContent>
+                                </Popover>
+                              </div>
                             )}
-                          </Button>
+                          </div>
+                          <div className="flex justify-end">
+                            <Button
+                              size="sm"
+                              onClick={() => handleAssignClub(tournament.id)}
+                              disabled={isLoading}
+                              className="bg-green-primary hover:bg-green-600 text-white"
+                            >
+                              {isLoading ? (
+                                <Loader2 className="size-4 animate-spin mr-1.5" />
+                              ) : (
+                                <Plus className="size-4 mr-1.5" />
+                              )}
+                              {t("assign") || "Assign"}
+                            </Button>
+                          </div>
                         </div>
-                      )}
+                        );
+                      })()}
 
                       {/* Existing Assignments */}
                       {tournament.clubAssignments?.length > 0 ? (
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                           {tournament.clubAssignments.map((assignment, idx) => (
                             <div
                               key={idx}
-                              className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-white/5"
+                              className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5"
                             >
-                              <div className="flex items-center gap-2">
-                                <Building2 className="size-4 text-muted-foreground" />
-                                <span className="text-sm text-foreground">
-                                  {assignment.club?.name || "Club"}
-                                </span>
-                                {assignment.team?.name && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    {assignment.team.name}
-                                  </Badge>
+                              <div className="flex items-center gap-3">
+                                {assignment.club?.logo?.light ? (
+                                  <img
+                                    src={assignment.club.logo.light}
+                                    alt=""
+                                    className="size-8 rounded-lg object-contain bg-muted/30 p-0.5"
+                                  />
+                                ) : (
+                                  <div className="size-8 rounded-lg bg-muted/30 flex items-center justify-center">
+                                    <Building2 className="size-4 text-muted-foreground" />
+                                  </div>
                                 )}
+                                <div>
+                                  <span className="text-sm font-medium text-foreground">
+                                    {assignment.club?.name || "Club"}
+                                  </span>
+                                  {assignment.team?.name && (
+                                    <div className="flex items-center gap-1 mt-0.5">
+                                      <Users className="size-3 text-muted-foreground" />
+                                      <span className="text-xs text-muted-foreground">{assignment.team.name}</span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                               <button
                                 onClick={() =>
@@ -873,7 +1061,7 @@ function EventDetails({
                                     assignment.club?.id || assignment.club
                                   )
                                 }
-                                className="p-1 text-red-500 hover:bg-red-500/10 rounded cursor-pointer"
+                                className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg cursor-pointer transition-colors"
                               >
                                 <Trash2 className="size-3.5" />
                               </button>
@@ -881,9 +1069,11 @@ function EventDetails({
                           ))}
                         </div>
                       ) : (
-                        <p className="text-xs text-muted-foreground italic">
-                          {t("noAssignments") || "No clubs assigned"}
-                        </p>
+                        <div className="flex items-center justify-center py-4 text-center">
+                          <p className="text-xs text-muted-foreground/60">
+                            {t("noAssignments") || "No clubs assigned"}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -891,9 +1081,14 @@ function EventDetails({
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Trophy className="size-10 text-muted-foreground/30 mb-3" />
-                <p className="text-sm text-muted-foreground">
+                <div className="size-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-3">
+                  <Trophy className="size-7 text-muted-foreground/30" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">
                   {t("noTournaments") || "No tournaments linked"}
+                </p>
+                <p className="text-xs text-muted-foreground/60 mt-1">
+                  {t("linkTournamentHint") || "Link tournaments to this event to get started"}
                 </p>
               </div>
             )}

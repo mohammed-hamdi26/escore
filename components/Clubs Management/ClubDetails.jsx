@@ -21,9 +21,14 @@ import {
   Eye,
   Sun,
   Moon,
+  ChevronDown,
+  Search,
+  Check,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Command, CommandGroup, CommandItem, CommandList } from "../ui/command";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import {
@@ -47,7 +52,7 @@ function formatDate(date) {
   });
 }
 
-function ClubDetails({ club, games = [], teams = [] }) {
+function ClubDetails({ club, games = [], teams = [], players = [] }) {
   const t = useTranslations("clubForm");
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("info");
@@ -55,6 +60,18 @@ function ClubDetails({ club, games = [], teams = [] }) {
   const [showAddTeam, setShowAddTeam] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState("");
   const [selectedGame, setSelectedGame] = useState("");
+  const [gamePopoverOpen, setGamePopoverOpen] = useState(false);
+  const [teamPopoverOpen, setTeamPopoverOpen] = useState(false);
+  const [gameSearch, setGameSearch] = useState("");
+  const [teamSearch, setTeamSearch] = useState("");
+  // Add Player state
+  const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState("");
+  const [selectedPlayerGame, setSelectedPlayerGame] = useState("");
+  const [playerPopoverOpen, setPlayerPopoverOpen] = useState(false);
+  const [playerGamePopoverOpen, setPlayerGamePopoverOpen] = useState(false);
+  const [playerSearch, setPlayerSearch] = useState("");
+  const [playerGameSearch, setPlayerGameSearch] = useState("");
   const { hasPermission } = usePermissions();
   const canUpdate = hasPermission(ENTITIES.CLUB, ACTIONS.UPDATE);
 
@@ -104,6 +121,29 @@ function ClubDetails({ club, games = [], teams = [] }) {
     }
   };
 
+  const handleAddPlayer = async () => {
+    if (!selectedPlayer || !selectedPlayerGame) {
+      toast.error(t("selectPlayerAndGame") || "Please select both player and game");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await addPlayerToClub(club.id, {
+        player: selectedPlayer,
+        game: selectedPlayerGame,
+      });
+      toast.success(t("playerAdded") || "Player added successfully");
+      setShowAddPlayer(false);
+      setSelectedPlayer("");
+      setSelectedPlayerGame("");
+      router.refresh();
+    } catch (error) {
+      toast.error(error.message || t("playerAddError") || "Failed to add player");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleRemovePlayer = async (playerId) => {
     if (
       !confirm(
@@ -136,7 +176,7 @@ function ClubDetails({ club, games = [], teams = [] }) {
       {/* Top Bar */}
       <div className="flex items-center justify-between">
         <Link href="/dashboard/clubs-management">
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5">
             <ArrowLeft className="size-4 rtl:rotate-180" />
             {t("back") || "Back"}
           </Button>
@@ -568,54 +608,174 @@ function ClubDetails({ club, games = [], teams = [] }) {
           )}
 
           {/* Add Team Form */}
-          {showAddTeam && (
-            <div className="glass rounded-xl p-4 border border-green-primary/20 space-y-3">
+          {showAddTeam && (() => {
+            const selectedGameObj = games.find((g) => g.id === selectedGame);
+            const filteredGames = games.filter((g) =>
+              g.name?.toLowerCase().includes(gameSearch.toLowerCase())
+            );
+            const availableTeams = teams.filter(
+              (team) =>
+                !selectedGame ||
+                team.games?.some((g) => (g.id || g._id || g) === selectedGame)
+            );
+            const filteredTeams = availableTeams.filter((team) =>
+              team.name?.toLowerCase().includes(teamSearch.toLowerCase())
+            );
+            const selectedTeamObj = teams.find((t) => t.id === selectedTeam);
+            return (
+            <div className="rounded-xl p-4 border border-green-primary/20 bg-green-primary/5 dark:bg-green-primary/5 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">
+                {/* Game Popover */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">
                     {t("selectGame") || "Select Game"}
                   </label>
-                  <select
-                    value={selectedGame}
-                    onChange={(e) => setSelectedGame(e.target.value)}
-                    className="w-full h-10 px-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50"
-                  >
-                    <option value="">
-                      {t("selectGame") || "Select Game"}
-                    </option>
-                    {games.map((game) => (
-                      <option key={game.id} value={game.id}>
-                        {game.name}
-                      </option>
-                    ))}
-                  </select>
+                  <Popover open={gamePopoverOpen} onOpenChange={setGamePopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="w-full h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 flex items-center justify-between gap-2 cursor-pointer"
+                      >
+                        {selectedGameObj ? (
+                          <span className="flex items-center gap-2 truncate">
+                            {selectedGameObj.logo?.light ? (
+                              <img src={selectedGameObj.logo.light} alt="" className="size-5 rounded object-contain" />
+                            ) : (
+                              <Gamepad2 className="size-4 text-muted-foreground shrink-0" />
+                            )}
+                            <span className="truncate">{selectedGameObj.name}</span>
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">{t("selectGame") || "Select Game"}</span>
+                        )}
+                        <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[280px] p-0" align="start">
+                      <Command>
+                        <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                          <Search className="size-4 text-muted-foreground shrink-0" />
+                          <input
+                            value={gameSearch}
+                            onChange={(e) => setGameSearch(e.target.value)}
+                            placeholder={t("searchGames") || "Search games..."}
+                            className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                          />
+                        </div>
+                        <CommandList className="max-h-[200px]">
+                          <CommandGroup>
+                            {filteredGames.length > 0 ? (
+                              filteredGames.map((game) => (
+                                <CommandItem
+                                  key={game.id}
+                                  value={game.name}
+                                  onSelect={() => {
+                                    setSelectedGame(game.id);
+                                    setSelectedTeam("");
+                                    setGamePopoverOpen(false);
+                                    setGameSearch("");
+                                  }}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  {game.logo?.light ? (
+                                    <img src={game.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                  ) : (
+                                    <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
+                                      <Gamepad2 className="size-3.5 text-muted-foreground" />
+                                    </div>
+                                  )}
+                                  <span className="flex-1 truncate">{game.name}</span>
+                                  {selectedGame === game.id && (
+                                    <Check className="size-4 text-green-primary shrink-0" />
+                                  )}
+                                </CommandItem>
+                              ))
+                            ) : (
+                              <p className="text-sm text-muted-foreground text-center py-4">
+                                {t("noGamesFound") || "No games found"}
+                              </p>
+                            )}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">
+
+                {/* Team Popover */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">
                     {t("selectTeam") || "Select Team"}
                   </label>
-                  <select
-                    value={selectedTeam}
-                    onChange={(e) => setSelectedTeam(e.target.value)}
-                    className="w-full h-10 px-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50"
-                  >
-                    <option value="">
-                      {t("selectTeam") || "Select Team"}
-                    </option>
-                    {teams
-                      .filter(
-                        (team) =>
-                          !selectedGame ||
-                          team.games?.some(
-                            (g) => (g.id || g._id || g) === selectedGame
-                          )
-                      )
-                      .map((team) => (
-                        <option key={team.id} value={team.id}>
-                          {team.name}
-                        </option>
-                      ))}
-                  </select>
+                  <Popover open={teamPopoverOpen} onOpenChange={setTeamPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="w-full h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 flex items-center justify-between gap-2 cursor-pointer"
+                      >
+                        {selectedTeamObj ? (
+                          <span className="flex items-center gap-2 truncate">
+                            {selectedTeamObj.logo?.light ? (
+                              <img src={selectedTeamObj.logo.light} alt="" className="size-5 rounded object-contain" />
+                            ) : (
+                              <Users className="size-4 text-muted-foreground shrink-0" />
+                            )}
+                            <span className="truncate">{selectedTeamObj.name}</span>
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">{t("selectTeam") || "Select Team"}</span>
+                        )}
+                        <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[280px] p-0" align="start">
+                      <Command>
+                        <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                          <Search className="size-4 text-muted-foreground shrink-0" />
+                          <input
+                            value={teamSearch}
+                            onChange={(e) => setTeamSearch(e.target.value)}
+                            placeholder={t("searchTeams") || "Search teams..."}
+                            className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                          />
+                        </div>
+                        <CommandList className="max-h-[200px]">
+                          <CommandGroup>
+                            {filteredTeams.length > 0 ? (
+                              filteredTeams.map((team) => (
+                                <CommandItem
+                                  key={team.id}
+                                  value={team.name}
+                                  onSelect={() => {
+                                    setSelectedTeam(team.id);
+                                    setTeamPopoverOpen(false);
+                                    setTeamSearch("");
+                                  }}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  {team.logo?.light ? (
+                                    <img src={team.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                  ) : (
+                                    <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
+                                      <Users className="size-3.5 text-muted-foreground" />
+                                    </div>
+                                  )}
+                                  <span className="flex-1 truncate">{team.name}</span>
+                                  {selectedTeam === team.id && (
+                                    <Check className="size-4 text-green-primary shrink-0" />
+                                  )}
+                                </CommandItem>
+                              ))
+                            ) : (
+                              <p className="text-sm text-muted-foreground text-center py-4">
+                                {t("noTeamsFound") || "No teams found"}
+                              </p>
+                            )}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
               <div className="flex justify-end gap-2">
@@ -632,12 +792,13 @@ function ClubDetails({ club, games = [], teams = [] }) {
                   disabled={isLoading || !selectedTeam || !selectedGame}
                   className="bg-green-primary hover:bg-green-primary/80 gap-1"
                 >
-                  {isLoading && <Loader2 className="size-3 animate-spin" />}
+                  {isLoading ? <Loader2 className="size-4 animate-spin mr-1" /> : <Plus className="size-4 mr-1" />}
                   {t("add") || "Add"}
                 </Button>
               </div>
             </div>
-          )}
+            );
+          })()}
 
           {/* Teams List */}
           {club.teams?.length > 0 ? (
@@ -729,6 +890,212 @@ function ClubDetails({ club, games = [], teams = [] }) {
 
       {activeTab === "players" && (
         <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5 space-y-4">
+          {/* Add Player Button */}
+          {canUpdate && (
+            <div className="flex justify-end">
+              <Button
+                className="bg-green-primary hover:bg-green-primary/80 gap-2"
+                onClick={() => setShowAddPlayer(!showAddPlayer)}
+              >
+                <Plus className="size-4" />
+                {t("addPlayer") || "Add Player"}
+              </Button>
+            </div>
+          )}
+
+          {/* Add Player Form */}
+          {showAddPlayer && (() => {
+            const selectedPlayerGameObj = games.find((g) => g.id === selectedPlayerGame);
+            const filteredPlayerGames = games.filter((g) =>
+              g.name?.toLowerCase().includes(playerGameSearch.toLowerCase())
+            );
+            const availablePlayers = players.filter(
+              (p) =>
+                !selectedPlayerGame ||
+                p.game?.id === selectedPlayerGame || p.game?._id === selectedPlayerGame || p.game === selectedPlayerGame
+            );
+            const filteredPlayers = availablePlayers.filter((p) =>
+              (p.nickname || p.name || "").toLowerCase().includes(playerSearch.toLowerCase())
+            );
+            const selectedPlayerObj = players.find((p) => p.id === selectedPlayer);
+            return (
+            <div className="rounded-xl p-4 border border-green-primary/20 bg-green-primary/5 dark:bg-green-primary/5 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Game Popover */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    {t("selectGame") || "Select Game"}
+                  </label>
+                  <Popover open={playerGamePopoverOpen} onOpenChange={setPlayerGamePopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="w-full h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 flex items-center justify-between gap-2 cursor-pointer"
+                      >
+                        {selectedPlayerGameObj ? (
+                          <span className="flex items-center gap-2 truncate">
+                            {selectedPlayerGameObj.logo?.light ? (
+                              <img src={selectedPlayerGameObj.logo.light} alt="" className="size-5 rounded object-contain" />
+                            ) : (
+                              <Gamepad2 className="size-4 text-muted-foreground shrink-0" />
+                            )}
+                            <span className="truncate">{selectedPlayerGameObj.name}</span>
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">{t("selectGame") || "Select Game"}</span>
+                        )}
+                        <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[280px] p-0" align="start">
+                      <Command>
+                        <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                          <Search className="size-4 text-muted-foreground shrink-0" />
+                          <input
+                            value={playerGameSearch}
+                            onChange={(e) => setPlayerGameSearch(e.target.value)}
+                            placeholder={t("searchGames") || "Search games..."}
+                            className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                          />
+                        </div>
+                        <CommandList className="max-h-[200px]">
+                          <CommandGroup>
+                            {filteredPlayerGames.length > 0 ? (
+                              filteredPlayerGames.map((game) => (
+                                <CommandItem
+                                  key={game.id}
+                                  value={game.name}
+                                  onSelect={() => {
+                                    setSelectedPlayerGame(game.id);
+                                    setSelectedPlayer("");
+                                    setPlayerGamePopoverOpen(false);
+                                    setPlayerGameSearch("");
+                                  }}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  {game.logo?.light ? (
+                                    <img src={game.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                  ) : (
+                                    <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
+                                      <Gamepad2 className="size-3.5 text-muted-foreground" />
+                                    </div>
+                                  )}
+                                  <span className="flex-1 truncate">{game.name}</span>
+                                  {selectedPlayerGame === game.id && (
+                                    <Check className="size-4 text-green-primary shrink-0" />
+                                  )}
+                                </CommandItem>
+                              ))
+                            ) : (
+                              <p className="text-sm text-muted-foreground text-center py-4">
+                                {t("noGamesFound") || "No games found"}
+                              </p>
+                            )}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {/* Player Popover */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    {t("selectPlayer") || "Select Player"}
+                  </label>
+                  <Popover open={playerPopoverOpen} onOpenChange={setPlayerPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="w-full h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 flex items-center justify-between gap-2 cursor-pointer"
+                      >
+                        {selectedPlayerObj ? (
+                          <span className="flex items-center gap-2 truncate">
+                            {(selectedPlayerObj.photo?.light || selectedPlayerObj.photo?.dark) ? (
+                              <img src={selectedPlayerObj.photo.light || selectedPlayerObj.photo.dark} alt="" className="size-5 rounded-full object-cover" />
+                            ) : (
+                              <User className="size-4 text-muted-foreground shrink-0" />
+                            )}
+                            <span className="truncate">{selectedPlayerObj.nickname || selectedPlayerObj.name}</span>
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">{t("selectPlayer") || "Select Player"}</span>
+                        )}
+                        <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[280px] p-0" align="start">
+                      <Command>
+                        <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                          <Search className="size-4 text-muted-foreground shrink-0" />
+                          <input
+                            value={playerSearch}
+                            onChange={(e) => setPlayerSearch(e.target.value)}
+                            placeholder={t("searchPlayers") || "Search players..."}
+                            className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                          />
+                        </div>
+                        <CommandList className="max-h-[200px]">
+                          <CommandGroup>
+                            {filteredPlayers.length > 0 ? (
+                              filteredPlayers.map((p) => (
+                                <CommandItem
+                                  key={p.id}
+                                  value={p.nickname || p.name}
+                                  onSelect={() => {
+                                    setSelectedPlayer(p.id);
+                                    setPlayerPopoverOpen(false);
+                                    setPlayerSearch("");
+                                  }}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  {(p.photo?.light || p.photo?.dark) ? (
+                                    <img src={p.photo.light || p.photo.dark} alt="" className="size-6 rounded-full object-cover" />
+                                  ) : (
+                                    <div className="size-6 rounded-full bg-muted/30 flex items-center justify-center">
+                                      <User className="size-3.5 text-muted-foreground" />
+                                    </div>
+                                  )}
+                                  <span className="flex-1 truncate">{p.nickname || p.name}</span>
+                                  {selectedPlayer === p.id && (
+                                    <Check className="size-4 text-green-primary shrink-0" />
+                                  )}
+                                </CommandItem>
+                              ))
+                            ) : (
+                              <p className="text-sm text-muted-foreground text-center py-4">
+                                {t("noPlayersFound") || "No players found"}
+                              </p>
+                            )}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAddPlayer(false)}
+                >
+                  {t("cancel") || "Cancel"}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleAddPlayer}
+                  disabled={isLoading || !selectedPlayer || !selectedPlayerGame}
+                  className="bg-green-primary hover:bg-green-primary/80 gap-1"
+                >
+                  {isLoading ? <Loader2 className="size-4 animate-spin mr-1" /> : <Plus className="size-4 mr-1" />}
+                  {t("add") || "Add"}
+                </Button>
+              </div>
+            </div>
+            );
+          })()}
+
           {club.players?.length > 0 ? (
             <div className="space-y-2">
               {club.players.map((entry, index) => {

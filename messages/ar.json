@@ -29,7 +29,7 @@
     "subtitle": "إدارة منصة الرياضات الإلكترونية",
     "modules": "وحدات متاحة",
     "Matches Management": {
-      "title": "إدارة المباريات",
+      "title": "المباريات",
       "description": "اذهب إلى قسم المباريات لإضافة مباراة: التاريخ، الوقت، الفرق، اللعبة، البطولة، روابط البث"
     },
     "Tournaments Management": {
@@ -41,11 +41,11 @@
       "description": "اذهب إلى قسم اللاعبين لإضافة لاعب: الاسم، العمر، الدولة، الفريق، اللعبة، الصور"
     },
     "Teams Management": {
-      "title": "إدارة الفرق",
+      "title": "الفرق",
       "description": "أضف فريقًا: الاسم، الدولة، اللاعبون المرتبطون، الشعار/الصور"
     },
     "Games Management": {
-      "title": "إدارة الألعاب",
+      "title": "الألعاب",
       "description": "اذهب إلى قسم الألعاب لإضافة لعبة: الاسم + الأيقونة"
     },
     "Transfers Management": {
@@ -53,7 +53,7 @@
       "description": "إدارة انتقالات اللاعبين والمعاملات بين الفرق"
     },
     "News & Updates": {
-      "title": "الأخبار والتحديثات",
+      "title": "الأخبار",
       "description": "اذهب إلى قسم الأخبار لإضافة خبر: العنوان، الوصف، الصورة/الفيديو، الكاتب"
     },
     "Users": {
@@ -91,6 +91,14 @@
     "transfers Management": {
       "title": "إدارة التحويلات",
       "description": "اذهب إلى قسم الانتقالات لإضافة انتقال: اللاعب، من الفريق، إلى الفريق، تاريخ الانتقال، رسوم الانتقال"
+    },
+    "Events Management": {
+      "title": "الفعاليات",
+      "description": "إدارة فعاليات الرياضات الإلكترونية والدوريات والبطولات مع الجداول والجوائز"
+    },
+    "Clubs Management": {
+      "title": "الأندية",
+      "description": "إدارة الأندية وفرقها ولاعبيها ومعلوماتها الإقليمية"
     },
     "Notifications": {
       "title": "الإشعارات",
@@ -2894,7 +2902,17 @@
     "southAmerica": "أمريكا الجنوبية",
     "asia": "آسيا",
     "cis": "رابطة الدول المستقلة",
-    "oceania": "أوقيانوسيا"
+    "oceania": "أوقيانوسيا",
+    "searchGames": "بحث عن الألعاب...",
+    "searchTeams": "بحث عن الفرق...",
+    "noGamesFound": "لم يتم العثور على ألعاب",
+    "noTeamsFound": "لم يتم العثور على فرق",
+    "selectPlayer": "اختر لاعب",
+    "searchPlayers": "بحث عن اللاعبين...",
+    "noPlayersFound": "لم يتم العثور على لاعبين",
+    "selectPlayerAndGame": "يرجى اختيار اللاعب واللعبة",
+    "playerAdded": "تم إضافة اللاعب بنجاح",
+    "playerAddError": "فشل في إضافة اللاعب"
   },
   "eventList": {
     "title": "إدارة الأحداث",
@@ -2966,7 +2984,8 @@
     "prizePool": "إجمالي الجوائز",
     "currency": "العملة",
     "clubChampionship": "بطولة الأندية",
-    "enabled": "تفعيل بطولة الأندية",
+    "enabled": "مفعّل",
+    "disabled": "معطّل",
     "championshipPrizePool": "جوائز بطولة الأندية",
     "pointsDistribution": "توزيع النقاط",
     "place": "المركز",
@@ -3082,9 +3101,17 @@
     "tournamentCount": "البطولات",
     "clubCount": "الأندية",
     "noTournaments": "لا توجد بطولات مرتبطة",
-    "noDescription": "لا يوجد وصف"
+    "linkTournamentHint": "اربط البطولات بهذه الفعالية للبدء",
+    "noDescription": "لا يوجد وصف",
+    "searchClubs": "بحث عن الأندية...",
+    "searchTeams": "بحث عن الفرق...",
+    "noClubsFound": "لم يتم العثور على أندية",
+    "noTeamsFound": "لم يتم العثور على فرق"
   },
   "EventsFilter": {
+    "title": "إدارة الفعاليات",
+    "subtitle": "إدارة جميع الفعاليات في النظام",
+    "addEvent": "إضافة فعالية",
     "searchPlaceholder": "بحث عن الأحداث...",
     "filters": "فلاتر",
     "clearAll": "مسح الكل",

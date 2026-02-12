@@ -47,7 +47,7 @@
     "subtitle": "Manage your esports platform",
     "modules": "modules available",
     "Matches Management": {
-      "title": "Matches Management",
+      "title": "Matches",
       "description": "Go to Matches Section to Add Match: Date, Time, Teams, Game, Tournament, Stream Links"
     },
     "Tournaments Management": {
@@ -59,11 +59,11 @@
       "description": "Go to players Section to Add Player: Name, Age, Country, Team, Game, Photos"
     },
     "Teams Management": {
-      "title": "Teams Management",
+      "title": "Teams",
       "description": "Add Team: Name, Country, Linked Players, Logo/Images"
     },
     "Games Management": {
-      "title": "Games Management",
+      "title": "Games",
       "description": "go to Games Section to Add Game: Name + Icon"
     },
     "Transfers Management": {
@@ -71,7 +71,7 @@
       "description": "Manage player transfers and transactions between teams"
     },
     "News & Updates": {
-      "title": "News & Updates",
+      "title": "News",
       "description": "Go to news Section to Add News: Title, Description, Image/Video, Author"
     },
     "Users": {
@@ -109,6 +109,14 @@
     "transfers Management": {
       "title": "Transfers Management",
       "description": "Go to Transfers Section to Add Transfer: Player, From Team, To Team, Transfer Date, Transfer Fee"
+    },
+    "Events Management": {
+      "title": "Events",
+      "description": "Manage esports events, leagues, and championships with schedules and prize pools"
+    },
+    "Clubs Management": {
+      "title": "Clubs",
+      "description": "Manage clubs, their teams, players, and regional information"
     },
     "Notifications": {
       "title": "Notifications",
@@ -2974,7 +2982,17 @@
     "southAmerica": "South America",
     "asia": "Asia",
     "cis": "CIS",
-    "oceania": "Oceania"
+    "oceania": "Oceania",
+    "searchGames": "Search games...",
+    "searchTeams": "Search teams...",
+    "noGamesFound": "No games found",
+    "noTeamsFound": "No teams found",
+    "selectPlayer": "Select Player",
+    "searchPlayers": "Search players...",
+    "noPlayersFound": "No players found",
+    "selectPlayerAndGame": "Please select both player and game",
+    "playerAdded": "Player added successfully",
+    "playerAddError": "Failed to add player"
   },
   "eventList": {
     "title": "Events Management",
@@ -3046,7 +3064,8 @@
     "prizePool": "Total Prize Pool",
     "currency": "Currency",
     "clubChampionship": "Club Championship",
-    "enabled": "Enable Club Championship",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
     "championshipPrizePool": "Championship Prize Pool",
     "pointsDistribution": "Points Distribution",
     "place": "Place",
@@ -3162,9 +3181,17 @@
     "tournamentCount": "Tournaments",
     "clubCount": "Clubs",
     "noTournaments": "No tournaments linked",
-    "noDescription": "No description provided"
+    "linkTournamentHint": "Link tournaments to this event to get started",
+    "noDescription": "No description provided",
+    "searchClubs": "Search clubs...",
+    "searchTeams": "Search teams...",
+    "noClubsFound": "No clubs found",
+    "noTeamsFound": "No teams found"
   },
   "EventsFilter": {
+    "title": "Events Management",
+    "subtitle": "Manage all events in the system",
+    "addEvent": "Add Event",
     "searchPlaceholder": "Search events...",
     "filters": "Filters",
     "clearAll": "Clear All",

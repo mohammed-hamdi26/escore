@@ -82,10 +82,10 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
     return (
       <div
         onClick={handleCardClick}
-        className="group relative glass rounded-2xl overflow-hidden border border-white/5 hover:border-green-primary/40 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-green-primary/5"
+        className="group relative rounded-2xl overflow-hidden bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-green-primary/5"
       >
         {/* Logo Area */}
-        <div className="relative aspect-[4/3] bg-gradient-to-b from-[#1a1d2e] to-[#12141c] flex items-center justify-center p-4">
+        <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-50 dark:from-[#1a1d2e] dark:to-[#12141c] flex items-center justify-center p-4">
           {clubLogo ? (
             <img
               src={clubLogo}
@@ -93,7 +93,7 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
               className="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-300"
             />
           ) : (
-            <div className="size-20 rounded-xl bg-white/5 flex items-center justify-center">
+            <div className="size-20 rounded-xl bg-gray-200/50 dark:bg-white/5 flex items-center justify-center">
               <Building2 className="size-10 text-muted-foreground/40" />
             </div>
           )}
@@ -101,12 +101,12 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
           {/* Status Badge */}
           <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3">
             {club.isActive !== false ? (
-              <Badge className="bg-green-500/20 text-green-400 border border-green-500/30 gap-1.5 backdrop-blur-sm">
+              <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 gap-1.5 backdrop-blur-sm">
                 <CheckCircle className="size-3" />
                 {t("active") || "Active"}
               </Badge>
             ) : (
-              <Badge className="bg-red-500/20 text-red-400 border border-red-500/30 gap-1.5 backdrop-blur-sm">
+              <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 gap-1.5 backdrop-blur-sm">
                 <XCircle className="size-3" />
                 {t("inactive") || "Inactive"}
               </Badge>
@@ -123,7 +123,7 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="bg-black/60 backdrop-blur-md hover:bg-black/80 text-white size-8 border border-white/10"
+                  className="bg-black/30 dark:bg-black/60 backdrop-blur-md hover:bg-black/50 dark:hover:bg-black/80 text-white size-8 border border-white/20 dark:border-white/10"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -168,7 +168,7 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
           {/* Region Badge */}
           {club.region && (
             <div className="absolute bottom-3 left-3 rtl:left-auto rtl:right-3">
-              <Badge className="bg-black/60 backdrop-blur-md text-white border border-white/10 gap-1.5">
+              <Badge className="bg-white/80 dark:bg-black/60 backdrop-blur-md text-gray-700 dark:text-white border border-gray-200/50 dark:border-white/10 gap-1.5">
                 <MapPin className="size-3" />
                 {club.region}
               </Badge>
@@ -178,7 +178,7 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
           {/* Followers Badge */}
           {club.followersCount > 0 && (
             <div className="absolute bottom-3 right-3 rtl:right-auto rtl:left-3">
-              <Badge className="bg-black/60 backdrop-blur-md text-pink-400 border border-white/10 gap-1.5">
+              <Badge className="bg-white/80 dark:bg-black/60 backdrop-blur-md text-pink-500 dark:text-pink-400 border border-gray-200/50 dark:border-white/10 gap-1.5">
                 <Heart className="size-3 fill-current" />
                 {formatFollowers(club.followersCount)}
               </Badge>
@@ -198,7 +198,7 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
                   <img
                     src={countryFlag}
                     alt={club.country?.name || club.country?.code}
-                    className="size-5 rounded-sm object-cover ring-1 ring-white/10"
+                    className="size-5 rounded-sm object-cover ring-1 ring-gray-200 dark:ring-white/10"
                   />
                 )}
               </div>
@@ -211,7 +211,7 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
           </div>
 
           {/* Stats Row */}
-          <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-4 pt-3 border-t border-gray-100 dark:border-white/5 text-xs">
             {club.founded && (
               <div className="flex items-center gap-1.5 text-muted-foreground">
                 <Calendar className="size-3.5" />
@@ -227,7 +227,7 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
               </div>
             )}
             {club.teams?.length > 0 && (
-              <div className="flex items-center gap-1.5 text-blue-400">
+              <div className="flex items-center gap-1.5 text-blue-500 dark:text-blue-400">
                 <Users className="size-3.5" />
                 <span>
                   {club.teams.length} {t("teams") || "teams"}
@@ -244,10 +244,10 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
   return (
     <div
       onClick={handleCardClick}
-      className="group glass rounded-xl p-4 border border-white/5 hover:border-green-primary/40 transition-all duration-300 cursor-pointer flex items-center gap-4"
+      className="group rounded-xl p-4 bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-200 cursor-pointer flex items-center gap-4"
     >
       {/* Logo */}
-      <div className="size-12 rounded-lg bg-white/5 flex items-center justify-center overflow-hidden shrink-0">
+      <div className="size-12 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden shrink-0">
         {clubLogo ? (
           <img
             src={clubLogo}
@@ -297,7 +297,7 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
       {/* Region Badge */}
       {club.region && (
         <div className="shrink-0">
-          <Badge className="bg-muted/50 text-muted-foreground border border-white/10 gap-1">
+          <Badge variant="outline" className="bg-gray-50 dark:bg-muted/50 text-muted-foreground border-gray-200 dark:border-white/10 gap-1">
             <MapPin className="size-3" />
             {club.region}
           </Badge>
@@ -315,12 +315,12 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
       {/* Status */}
       <div className="shrink-0">
         {club.isActive !== false ? (
-          <Badge className="bg-green-500/20 text-green-400 border border-green-500/30 gap-1">
+          <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 gap-1">
             <CheckCircle className="size-3" />
             {t("active") || "Active"}
           </Badge>
         ) : (
-          <Badge className="bg-red-500/20 text-red-400 border border-red-500/30 gap-1">
+          <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 gap-1">
             <XCircle className="size-3" />
             {t("inactive") || "Inactive"}
           </Badge>

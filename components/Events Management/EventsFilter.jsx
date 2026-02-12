@@ -155,7 +155,7 @@ function EventsFilter() {
             value={searchTerm}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder={t("searchPlaceholder") || "Search events..."}
-            className="w-full h-10 pl-10 rtl:pl-4 rtl:pr-10 pr-10 rounded-xl bg-gray-100 dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
+            className="w-full h-10 px-10 rounded-xl bg-gray-100 dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
           />
           {searchTerm && (
             <button
@@ -234,7 +234,7 @@ function EventsFilter() {
                         );
                       })()}
                     </span>
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                    <ChevronDown className="ml-2 rtl:ml-0 rtl:mr-2 h-4 w-4 shrink-0 text-gray-400" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[220px] p-0" align="start">
@@ -297,7 +297,7 @@ function EventsFilter() {
                         );
                       })()}
                     </span>
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                    <ChevronDown className="ml-2 rtl:ml-0 rtl:mr-2 h-4 w-4 shrink-0 text-gray-400" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0" align="start">

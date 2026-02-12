@@ -7,7 +7,7 @@ import Player from "@/components/icons/Player";
 import SupportCenter from "@/components/icons/SuppotCenter";
 import TeamsManagement from "@/components/icons/TeamsManagement";
 import User from "@/components/icons/User";
-import { ArrowRightLeft, Bell, Newspaper, Settings } from "lucide-react";
+import { ArrowRightLeft, Bell, Calendar, Building2, Newspaper, Settings } from "lucide-react";
 import { getLoginUser } from "../_Lib/usersApi";
 
 /**
@@ -24,6 +24,14 @@ export default async function page() {
 
   const links = [
     {
+      title: "Events Management",
+      href: "/events-management",
+      icon: (
+        <Calendar className="icon-transition" width="57" height="56" />
+      ),
+      isShowed: isAdmin,
+    },
+    {
       title: "Tournaments Management",
       href: "/tournaments-management",
       icon: (
@@ -34,6 +42,20 @@ export default async function page() {
         />
       ),
       isShowed: hasPermission(user, "Tournament"),
+    },
+    {
+      title: "Clubs Management",
+      href: "/clubs-management",
+      icon: (
+        <Building2 className="icon-transition" width="57" height="56" />
+      ),
+      isShowed: isAdmin,
+    },
+    {
+      title: "Teams Management",
+      href: "/teams-management",
+      icon: <TeamsManagement width="57" height="56" />,
+      isShowed: hasPermission(user, "Team"),
     },
     {
       title: "Matches Management",
@@ -48,20 +70,6 @@ export default async function page() {
       isShowed: hasPermission(user, "Player"),
     },
     {
-      title: "Teams Management",
-      href: "/teams-management",
-      icon: <TeamsManagement width="57" height="56" />,
-      isShowed: hasPermission(user, "Team"),
-    },
-    {
-      title: "Transfers Management",
-      href: "/transfers-management",
-      icon: (
-        <ArrowRightLeft className="icon-transition" width="57" height="56" />
-      ),
-      isShowed: hasPermission(user, "Transfer"),
-    },
-    {
       title: "Games Management",
       href: "/games-management",
       icon: <GamesManagement width="57" height="56" />,
@@ -72,6 +80,14 @@ export default async function page() {
       href: "/news/edit",
       icon: <News width="57" height="56" />,
       isShowed: hasPermission(user, "News"),
+    },
+    {
+      title: "Transfers Management",
+      href: "/transfers-management",
+      icon: (
+        <ArrowRightLeft className="icon-transition" width="57" height="56" />
+      ),
+      isShowed: hasPermission(user, "Transfer"),
     },
     {
       title: "Users",
