@@ -3186,7 +3186,13 @@
     "searchClubs": "Search clubs...",
     "searchTeams": "Search teams...",
     "noClubsFound": "No clubs found",
-    "noTeamsFound": "No teams found"
+    "noTeamsFound": "No teams found",
+    "selectTeamOrPlayer": "Select Team or Player",
+    "selectClubFirst": "Select a club first",
+    "searchTeamsPlayers": "Search teams or players...",
+    "players": "Players",
+    "noTeamsOrPlayers": "No teams or players in this club",
+    "cancel": "Cancel"
   },
   "EventsFilter": {
     "title": "Events Management",

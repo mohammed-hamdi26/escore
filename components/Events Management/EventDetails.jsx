@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
@@ -40,6 +40,7 @@ import {
   CalendarRange,
   FileText,
   Check,
+  User,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -122,6 +123,12 @@ function EventDetails({
   const [resultPlacement, setResultPlacement] = useState("");
   const [resultTeamOrPlayer, setResultTeamOrPlayer] = useState("");
   const [resultModel, setResultModel] = useState("Team");
+  const [resultTournamentOpen, setResultTournamentOpen] = useState(false);
+  const [resultClubOpen, setResultClubOpen] = useState(false);
+  const [resultEntityOpen, setResultEntityOpen] = useState(false);
+  const [resultTournamentSearch, setResultTournamentSearch] = useState("");
+  const [resultClubSearch, setResultClubSearch] = useState("");
+  const [resultEntitySearch, setResultEntitySearch] = useState("");
 
   // Expanded standings
   const [expandedStanding, setExpandedStanding] = useState(null);
@@ -1117,10 +1124,45 @@ function EventDetails({
                 </div>
 
                 {/* Record Result Modal */}
-                {showRecordModal && (
+                {showRecordModal && (() => {
+                  const selectedResultTournament = tournaments.find((tr) => tr.id === resultTournament);
+                  const selectedResultClub = allClubs.find((c) => c.id === resultClub);
+                  const clubTeamsForResult = selectedResultClub?.teams?.filter((t) => t.isActive !== false) || [];
+                  const clubPlayersForResult = selectedResultClub?.players?.filter((p) => p.isActive !== false) || [];
+                  // Build combined entities list (teams + players)
+                  const entityOptions = [
+                    ...clubTeamsForResult.map((ct) => ({
+                      id: ct.team?.id || ct.team,
+                      name: ct.team?.name || "Team",
+                      logo: ct.team?.logo?.light,
+                      type: "Team",
+                      gameLabel: ct.game?.name || "",
+                      icon: Users,
+                    })),
+                    ...clubPlayersForResult.map((cp) => ({
+                      id: cp.player?.id || cp.player,
+                      name: cp.player?.name || cp.player?.nickname || "Player",
+                      logo: cp.player?.logo?.light,
+                      type: "Player",
+                      gameLabel: cp.game?.name || "",
+                      icon: User,
+                    })),
+                  ];
+                  const selectedEntity = entityOptions.find((e) => e.id === resultTeamOrPlayer);
+                  const filteredTournaments = tournaments.filter((tr) =>
+                    tr.name?.toLowerCase().includes(resultTournamentSearch.toLowerCase())
+                  );
+                  const filteredClubs = allClubs.filter((c) =>
+                    c.name?.toLowerCase().includes(resultClubSearch.toLowerCase())
+                  );
+                  const filteredEntities = entityOptions.filter((e) =>
+                    e.name?.toLowerCase().includes(resultEntitySearch.toLowerCase())
+                  );
+                  return (
                   <div className="p-4 rounded-xl border border-green-primary/20 bg-green-primary/5 space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-foreground">
+                      <h4 className="font-medium text-foreground flex items-center gap-2">
+                        <Medal className="size-4 text-green-primary" />
                         {t("recordResult") || "Record Result"}
                       </h4>
                       <button
@@ -1131,100 +1173,344 @@ function EventDetails({
                       </button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-xs text-muted-foreground">
+                      {/* Tournament Popover */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-muted-foreground">
                           {t("selectTournament") || "Tournament"}
                         </label>
-                        <select
-                          value={resultTournament}
-                          onChange={(e) => setResultTournament(e.target.value)}
-                          className={inputClass}
-                        >
-                          <option value="">
-                            {t("selectTournament") || "Select Tournament"}
-                          </option>
-                          {tournaments.map((t) => (
-                            <option key={t.id} value={t.id}>
-                              {t.name}
-                            </option>
-                          ))}
-                        </select>
+                        <Popover open={resultTournamentOpen} onOpenChange={setResultTournamentOpen}>
+                          <PopoverTrigger asChild>
+                            <button type="button" className={`${inputClass} flex items-center justify-between gap-2 cursor-pointer`}>
+                              {selectedResultTournament ? (
+                                <span className="flex items-center gap-2 truncate">
+                                  {selectedResultTournament.logo?.light ? (
+                                    <img src={selectedResultTournament.logo.light} alt="" className="size-5 rounded object-contain" />
+                                  ) : (
+                                    <Trophy className="size-4 text-muted-foreground shrink-0" />
+                                  )}
+                                  <span className="truncate">{selectedResultTournament.name}</span>
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">{t("selectTournament") || "Select Tournament"}</span>
+                              )}
+                              <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[280px] p-0" align="start">
+                            <Command>
+                              <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                                <Search className="size-4 text-muted-foreground shrink-0" />
+                                <input
+                                  value={resultTournamentSearch}
+                                  onChange={(e) => setResultTournamentSearch(e.target.value)}
+                                  placeholder={t("searchTournaments") || "Search tournaments..."}
+                                  className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                                />
+                              </div>
+                              <CommandList className="max-h-[200px]">
+                                <CommandGroup>
+                                  {filteredTournaments.length > 0 ? filteredTournaments.map((tr) => (
+                                    <CommandItem
+                                      key={tr.id}
+                                      value={tr.name}
+                                      onSelect={() => {
+                                        setResultTournament(tr.id);
+                                        setResultTournamentOpen(false);
+                                        setResultTournamentSearch("");
+                                      }}
+                                      className="flex items-center gap-2 cursor-pointer"
+                                    >
+                                      {tr.logo?.light ? (
+                                        <img src={tr.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                      ) : (
+                                        <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
+                                          <Trophy className="size-3.5 text-muted-foreground" />
+                                        </div>
+                                      )}
+                                      <div className="flex-1 min-w-0">
+                                        <span className="truncate text-sm">{tr.name}</span>
+                                        {tr.game?.name && (
+                                          <p className="text-[10px] text-muted-foreground">{tr.game.name}</p>
+                                        )}
+                                      </div>
+                                      {resultTournament === tr.id && (
+                                        <Check className="size-4 text-green-primary shrink-0" />
+                                      )}
+                                    </CommandItem>
+                                  )) : (
+                                    <p className="text-sm text-muted-foreground text-center py-4">
+                                      {t("noTournaments") || "No tournaments"}
+                                    </p>
+                                  )}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-xs text-muted-foreground">
+
+                      {/* Club Popover */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-muted-foreground">
                           {t("selectClub") || "Club"}
                         </label>
-                        <select
-                          value={resultClub}
-                          onChange={(e) => setResultClub(e.target.value)}
-                          className={inputClass}
-                        >
-                          <option value="">
-                            {t("selectClub") || "Select Club"}
-                          </option>
-                          {allClubs.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.name}
-                            </option>
-                          ))}
-                        </select>
+                        <Popover open={resultClubOpen} onOpenChange={setResultClubOpen}>
+                          <PopoverTrigger asChild>
+                            <button type="button" className={`${inputClass} flex items-center justify-between gap-2 cursor-pointer`}>
+                              {selectedResultClub ? (
+                                <span className="flex items-center gap-2 truncate">
+                                  {selectedResultClub.logo?.light ? (
+                                    <img src={selectedResultClub.logo.light} alt="" className="size-5 rounded object-contain" />
+                                  ) : (
+                                    <Building2 className="size-4 text-muted-foreground shrink-0" />
+                                  )}
+                                  <span className="truncate">{selectedResultClub.name}</span>
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">{t("selectClub") || "Select Club"}</span>
+                              )}
+                              <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[280px] p-0" align="start">
+                            <Command>
+                              <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                                <Search className="size-4 text-muted-foreground shrink-0" />
+                                <input
+                                  value={resultClubSearch}
+                                  onChange={(e) => setResultClubSearch(e.target.value)}
+                                  placeholder={t("searchClubs") || "Search clubs..."}
+                                  className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                                />
+                              </div>
+                              <CommandList className="max-h-[200px]">
+                                <CommandGroup>
+                                  {filteredClubs.length > 0 ? filteredClubs.map((c) => (
+                                    <CommandItem
+                                      key={c.id}
+                                      value={c.name}
+                                      onSelect={() => {
+                                        setResultClub(c.id);
+                                        setResultTeamOrPlayer("");
+                                        setResultModel("Team");
+                                        setResultClubOpen(false);
+                                        setResultClubSearch("");
+                                      }}
+                                      className="flex items-center gap-2 cursor-pointer"
+                                    >
+                                      {c.logo?.light ? (
+                                        <img src={c.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                      ) : (
+                                        <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
+                                          <Building2 className="size-3.5 text-muted-foreground" />
+                                        </div>
+                                      )}
+                                      <span className="flex-1 truncate">{c.name}</span>
+                                      {resultClub === c.id && (
+                                        <Check className="size-4 text-green-primary shrink-0" />
+                                      )}
+                                    </CommandItem>
+                                  )) : (
+                                    <p className="text-sm text-muted-foreground text-center py-4">
+                                      {t("noClubsFound") || "No clubs found"}
+                                    </p>
+                                  )}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-xs text-muted-foreground">
+
+                      {/* Team/Player Popover */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-muted-foreground">
+                          {t("teamOrPlayer") || "Team / Player"}
+                        </label>
+                        <Popover open={resultEntityOpen} onOpenChange={setResultEntityOpen}>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              className={`${inputClass} flex items-center justify-between gap-2 cursor-pointer ${!resultClub ? "opacity-50 cursor-not-allowed" : ""}`}
+                              disabled={!resultClub}
+                            >
+                              {selectedEntity ? (
+                                <span className="flex items-center gap-2 truncate">
+                                  {selectedEntity.logo ? (
+                                    <img src={selectedEntity.logo} alt="" className="size-5 rounded object-contain" />
+                                  ) : (
+                                    <selectedEntity.icon className="size-4 text-muted-foreground shrink-0" />
+                                  )}
+                                  <span className="truncate">{selectedEntity.name}</span>
+                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                                    selectedEntity.type === "Team"
+                                      ? "bg-blue-500/10 text-blue-500"
+                                      : "bg-purple-500/10 text-purple-500"
+                                  }`}>
+                                    {selectedEntity.type}
+                                  </span>
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">
+                                  {resultClub ? (t("selectTeamOrPlayer") || "Select Team or Player") : (t("selectClubFirst") || "Select a club first")}
+                                </span>
+                              )}
+                              <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[300px] p-0" align="start">
+                            <Command>
+                              <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                                <Search className="size-4 text-muted-foreground shrink-0" />
+                                <input
+                                  value={resultEntitySearch}
+                                  onChange={(e) => setResultEntitySearch(e.target.value)}
+                                  placeholder={t("searchTeamsPlayers") || "Search teams or players..."}
+                                  className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                                />
+                              </div>
+                              <CommandList className="max-h-[250px]">
+                                {/* Teams section */}
+                                {filteredEntities.filter((e) => e.type === "Team").length > 0 && (
+                                  <CommandGroup heading={
+                                    <span className="flex items-center gap-1.5 text-xs font-semibold text-blue-500 uppercase tracking-wider">
+                                      <Users className="size-3" />
+                                      {t("teams") || "Teams"}
+                                    </span>
+                                  }>
+                                    {filteredEntities.filter((e) => e.type === "Team").map((entity) => (
+                                      <CommandItem
+                                        key={`team-${entity.id}`}
+                                        value={`team-${entity.name}`}
+                                        onSelect={() => {
+                                          setResultTeamOrPlayer(entity.id);
+                                          setResultModel("Team");
+                                          setResultEntityOpen(false);
+                                          setResultEntitySearch("");
+                                        }}
+                                        className="flex items-center gap-2 cursor-pointer"
+                                      >
+                                        {entity.logo ? (
+                                          <img src={entity.logo} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                        ) : (
+                                          <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
+                                            <Users className="size-3.5 text-muted-foreground" />
+                                          </div>
+                                        )}
+                                        <div className="flex-1 min-w-0">
+                                          <span className="truncate text-sm">{entity.name}</span>
+                                          {entity.gameLabel && (
+                                            <p className="text-[10px] text-muted-foreground">{entity.gameLabel}</p>
+                                          )}
+                                        </div>
+                                        {resultTeamOrPlayer === entity.id && (
+                                          <Check className="size-4 text-green-primary shrink-0" />
+                                        )}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                )}
+                                {/* Players section */}
+                                {filteredEntities.filter((e) => e.type === "Player").length > 0 && (
+                                  <CommandGroup heading={
+                                    <span className="flex items-center gap-1.5 text-xs font-semibold text-purple-500 uppercase tracking-wider">
+                                      <User className="size-3" />
+                                      {t("players") || "Players"}
+                                    </span>
+                                  }>
+                                    {filteredEntities.filter((e) => e.type === "Player").map((entity) => (
+                                      <CommandItem
+                                        key={`player-${entity.id}`}
+                                        value={`player-${entity.name}`}
+                                        onSelect={() => {
+                                          setResultTeamOrPlayer(entity.id);
+                                          setResultModel("Player");
+                                          setResultEntityOpen(false);
+                                          setResultEntitySearch("");
+                                        }}
+                                        className="flex items-center gap-2 cursor-pointer"
+                                      >
+                                        {entity.logo ? (
+                                          <img src={entity.logo} alt="" className="size-6 rounded-full object-contain bg-muted/30 p-0.5" />
+                                        ) : (
+                                          <div className="size-6 rounded-full bg-muted/30 flex items-center justify-center">
+                                            <User className="size-3.5 text-muted-foreground" />
+                                          </div>
+                                        )}
+                                        <div className="flex-1 min-w-0">
+                                          <span className="truncate text-sm">{entity.name}</span>
+                                          {entity.gameLabel && (
+                                            <p className="text-[10px] text-muted-foreground">{entity.gameLabel}</p>
+                                          )}
+                                        </div>
+                                        {resultTeamOrPlayer === entity.id && (
+                                          <Check className="size-4 text-green-primary shrink-0" />
+                                        )}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                )}
+                                {filteredEntities.length === 0 && (
+                                  <p className="text-sm text-muted-foreground text-center py-4">
+                                    {t("noTeamsOrPlayers") || "No teams or players in this club"}
+                                  </p>
+                                )}
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {/* Placement */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-muted-foreground">
                           {t("placement") || "Placement"}
                         </label>
-                        <input
-                          type="number"
-                          value={resultPlacement}
-                          onChange={(e) => setResultPlacement(e.target.value)}
-                          min="1"
-                          placeholder="1"
-                          className={inputClass}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-xs text-muted-foreground">
-                          {t("teamOrPlayer") || "Team/Player ID"}
-                        </label>
-                        <input
-                          type="text"
-                          value={resultTeamOrPlayer}
-                          onChange={(e) => setResultTeamOrPlayer(e.target.value)}
-                          placeholder="Team or Player ID"
-                          className={inputClass}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-xs text-muted-foreground">
-                          {t("model") || "Type"}
-                        </label>
-                        <select
-                          value={resultModel}
-                          onChange={(e) => setResultModel(e.target.value)}
-                          className={inputClass}
-                        >
-                          <option value="Team">{t("team") || "Team"}</option>
-                          <option value="Player">{t("player") || "Player"}</option>
-                        </select>
+                        <div className="relative">
+                          <Hash className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                          <input
+                            type="number"
+                            value={resultPlacement}
+                            onChange={(e) => setResultPlacement(e.target.value)}
+                            min="1"
+                            max="64"
+                            placeholder="1"
+                            className={`${inputClass} pl-10 rtl:pl-3 rtl:pr-10`}
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div className="flex justify-end">
+                    <div className="flex items-center justify-between pt-1">
+                      <button
+                        onClick={() => {
+                          setShowRecordModal(false);
+                          setResultTournament("");
+                          setResultClub("");
+                          setResultPlacement("");
+                          setResultTeamOrPlayer("");
+                          setResultModel("Team");
+                        }}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      >
+                        {t("cancel") || "Cancel"}
+                      </button>
                       <Button
                         size="sm"
                         onClick={handleRecordResult}
-                        disabled={isLoading}
+                        disabled={isLoading || !resultTournament || !resultClub || !resultTeamOrPlayer || !resultPlacement}
                         className="bg-green-primary hover:bg-green-600 text-white"
                       >
                         {isLoading ? (
-                          <Loader2 className="size-4 animate-spin mr-1" />
+                          <Loader2 className="size-4 animate-spin mr-1.5" />
                         ) : (
-                          <CheckCircle className="size-4 mr-1" />
+                          <CheckCircle className="size-4 mr-1.5" />
                         )}
                         {t("confirmRecord") || "Confirm & Record"}
                       </Button>
                     </div>
                   </div>
-                )}
+                  );
+                })()}
 
                 {/* Standings Table */}
                 {standings.length > 0 ? (
@@ -1262,9 +1548,8 @@ function EventDetails({
                             standing.club?.logo?.light || standing.club?.logo?.dark;
                           const isExpanded = expandedStanding === standing.id;
                           return (
-                            <>
+                            <React.Fragment key={standing.id}>
                               <tr
-                                key={standing.id}
                                 className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.02]"
                               >
                                 <td className="py-3 px-2 font-bold text-foreground">
@@ -1381,7 +1666,7 @@ function EventDetails({
                                   </td>
                                 </tr>
                               )}
-                            </>
+                            </React.Fragment>
                           );
                         })}
                       </tbody>

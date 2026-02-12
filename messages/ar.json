@@ -3106,7 +3106,13 @@
     "searchClubs": "بحث عن الأندية...",
     "searchTeams": "بحث عن الفرق...",
     "noClubsFound": "لم يتم العثور على أندية",
-    "noTeamsFound": "لم يتم العثور على فرق"
+    "noTeamsFound": "لم يتم العثور على فرق",
+    "selectTeamOrPlayer": "اختر فريق أو لاعب",
+    "selectClubFirst": "اختر نادي أولاً",
+    "searchTeamsPlayers": "بحث عن فرق أو لاعبين...",
+    "players": "اللاعبين",
+    "noTeamsOrPlayers": "لا يوجد فرق أو لاعبين في هذا النادي",
+    "cancel": "إلغاء"
   },
   "EventsFilter": {
     "title": "إدارة الفعاليات",
