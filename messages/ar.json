@@ -3266,7 +3266,9 @@
     "qualified": "متأهل",
     "eliminated": "خارج المنافسة",
     "defaultLabel": "افتراضي",
-    "defaultNote": "ترتيب افتراضي - اضغط تهيئة لحفظه في قاعدة البيانات"
+    "defaultNote": "ترتيب افتراضي - اضغط تهيئة لحفظه في قاعدة البيانات",
+    "recalculateFromMatches": "إعادة حساب من المباريات",
+    "recalculateFromMatchesSuccess": "تم إعادة حساب الترتيب من نتائج المباريات بنجاح"
   },
   "teamForm": {
     "basicInfo": "المعلومات الأساسية",

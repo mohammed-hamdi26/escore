@@ -3346,7 +3346,9 @@
     "qualified": "Qualified",
     "eliminated": "Eliminated",
     "defaultLabel": "Default",
-    "defaultNote": "Default standings - click Initialize to save to database"
+    "defaultNote": "Default standings - click Initialize to save to database",
+    "recalculateFromMatches": "Recalculate from Matches",
+    "recalculateFromMatchesSuccess": "Standings recalculated from match results successfully"
   },
   "teamForm": {
     "basicInfo": "Basic Information",

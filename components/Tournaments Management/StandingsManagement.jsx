@@ -24,6 +24,7 @@ import {
   initializeStandings,
   updateStanding,
   recalculateStandings,
+  recalculateStandingsFromMatches,
   deleteStanding,
   deleteAllStandings,
 } from "@/app/[locale]/_Lib/actions";
@@ -114,6 +115,26 @@ export default function StandingsManagement({ tournament, initialStandings }) {
       }
     } catch {
       toast.error("Failed to recalculate");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleRecalculateFromMatches = async () => {
+    setLoading("recalculateMatches");
+    try {
+      const result = await recalculateStandingsFromMatches(tournamentId);
+      if (result.success) {
+        toast.success(
+          t("recalculateFromMatchesSuccess") ||
+            "Standings recalculated from matches"
+        );
+        router.refresh();
+      } else {
+        toast.error(result.error || "Failed to recalculate from matches");
+      }
+    } catch {
+      toast.error("Failed to recalculate from matches");
     } finally {
       setLoading(null);
     }
@@ -301,6 +322,20 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                 <RefreshCw className="size-4" />
               )}
               {t("recalculate") || "Recalculate Positions"}
+            </Button>
+
+            <Button
+              onClick={handleRecalculateFromMatches}
+              disabled={loading === "recalculateMatches"}
+              variant="outline"
+              className="gap-2"
+            >
+              {loading === "recalculateMatches" ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Trophy className="size-4" />
+              )}
+              {t("recalculateFromMatches") || "Recalculate from Matches"}
             </Button>
 
             <Button

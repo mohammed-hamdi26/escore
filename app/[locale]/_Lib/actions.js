@@ -1692,6 +1692,30 @@ export async function recalculateStandings(tournamentId, group) {
   }
 }
 
+export async function recalculateStandingsFromMatches(tournamentId) {
+  "use server";
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(
+      `/standings/tournament/${tournamentId}/recalculate-from-matches`
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/standings/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log(
+      "Recalculate from matches error:",
+      e.response?.data || e.message
+    );
+    return {
+      success: false,
+      error:
+        e.response?.data?.message || "Failed to recalculate from matches",
+    };
+  }
+}
+
 export async function deleteStanding(standingId) {
   "use server";
   try {
