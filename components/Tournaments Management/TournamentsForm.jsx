@@ -160,6 +160,10 @@ export default function TournamentsForm({
       pointsPerWin: tournament?.standingConfig?.pointsPerWin ?? 3,
       pointsPerDraw: tournament?.standingConfig?.pointsPerDraw ?? 1,
       pointsPerLoss: tournament?.standingConfig?.pointsPerLoss ?? 0,
+      prizeDistribution: tournament?.prizeDistribution?.map((p) => ({
+        place: p.place,
+        amount: p.amount,
+      })) || [],
     },
     validationSchema: validateSchema,
     onSubmit: async (values) => {
@@ -243,6 +247,15 @@ export default function TournamentsForm({
           pointsPerDraw: parseInt(dataValues.pointsPerDraw) || 1,
           pointsPerLoss: parseInt(dataValues.pointsPerLoss) || 0,
         };
+
+        // Build prizeDistribution array (filter out empty entries)
+        if (dataValues.prizeDistribution?.length > 0) {
+          dataValues.prizeDistribution = dataValues.prizeDistribution
+            .filter((p) => p.place && p.amount !== "" && p.amount !== null && p.amount !== undefined)
+            .map((p) => ({ place: parseInt(p.place), amount: parseFloat(p.amount) }));
+        } else {
+          delete dataValues.prizeDistribution;
+        }
 
         // Clean up temporary fields
         delete dataValues.logoLight;
@@ -546,6 +559,14 @@ export default function TournamentsForm({
             formik={formik}
           />
         </FormRow>
+      </FormSection>
+
+      {/* Prize Distribution */}
+      <FormSection title={t("Prize Distribution")} icon={<Award className="size-5" />}>
+        <PrizeDistributionField
+          formik={formik}
+          currency={CURRENCY_OPTIONS.find((c) => c.value === formik.values.currency)?.symbol || "$"}
+        />
       </FormSection>
 
       {/* Images */}
@@ -862,6 +883,114 @@ function TierSelectField({ label, name, options, formik, placeholder }) {
         </PopoverContent>
       </Popover>
       {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// Prize Distribution Field - dynamic list of place/amount pairs
+function PrizeDistributionField({ formik, currency }) {
+  const prizes = formik.values.prizeDistribution || [];
+
+  const addPrize = () => {
+    const nextPlace = prizes.length > 0 ? Math.max(...prizes.map((p) => p.place || 0)) + 1 : 1;
+    formik.setFieldValue("prizeDistribution", [...prizes, { place: nextPlace, amount: "" }]);
+  };
+
+  const removePrize = (index) => {
+    formik.setFieldValue(
+      "prizeDistribution",
+      prizes.filter((_, i) => i !== index)
+    );
+  };
+
+  const updatePrize = (index, field, value) => {
+    const updated = [...prizes];
+    updated[index] = { ...updated[index], [field]: value };
+    formik.setFieldValue("prizeDistribution", updated);
+  };
+
+  const getPlaceLabel = (place) => {
+    if (place === 1) return "1st";
+    if (place === 2) return "2nd";
+    if (place === 3) return "3rd";
+    return `${place}th`;
+  };
+
+  return (
+    <div className="space-y-3">
+      {prizes.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4">
+          No prize distribution configured. Add placements below.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {prizes.map((prize, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#141625] border border-border/50"
+            >
+              {/* Place badge */}
+              <div className={`flex items-center justify-center size-10 rounded-lg font-bold text-sm shrink-0 ${
+                prize.place === 1
+                  ? "bg-yellow-500/15 text-yellow-500"
+                  : prize.place === 2
+                  ? "bg-gray-400/15 text-gray-400"
+                  : prize.place === 3
+                  ? "bg-orange-500/15 text-orange-500"
+                  : "bg-muted text-muted-foreground"
+              }`}>
+                {getPlaceLabel(prize.place)}
+              </div>
+
+              {/* Place number input */}
+              <div className="w-20">
+                <input
+                  type="number"
+                  min="1"
+                  value={prize.place}
+                  onChange={(e) => updatePrize(index, "place", parseInt(e.target.value) || "")}
+                  className="w-full h-10 px-3 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border border-border/50 text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-primary/50 text-foreground"
+                  placeholder="#"
+                />
+              </div>
+
+              {/* Amount input */}
+              <div className="flex-1 relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                  {currency}
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={prize.amount}
+                  onChange={(e) => updatePrize(index, "amount", e.target.value)}
+                  className="w-full h-10 pl-10 pr-4 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 text-foreground placeholder:text-muted-foreground"
+                  placeholder="Amount"
+                />
+              </div>
+
+              {/* Remove button */}
+              <button
+                type="button"
+                onClick={() => removePrize(index)}
+                className="size-10 rounded-lg flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors shrink-0"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={addPrize}
+        className="w-full h-10 rounded-xl border-2 border-dashed border-border/50 hover:border-green-primary/50 text-sm text-muted-foreground hover:text-green-primary flex items-center justify-center gap-2 transition-colors"
+      >
+        <Coins className="size-4" />
+        Add Placement Prize
+      </button>
     </div>
   );
 }
