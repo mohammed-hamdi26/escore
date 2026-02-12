@@ -113,6 +113,7 @@ export default function TournamentsForm({
   gameOptions = [],
   teamOptions = [],
   searchGames,
+  searchTeams,
 }) {
   const t = useTranslations("TournamentForm");
   const router = useRouter();
@@ -484,9 +485,8 @@ export default function TournamentsForm({
         <TeamSelectField
           label={t("Select Teams")}
           name="teamsData"
-          options={teamOptions}
           formik={formik}
-          searchPlaceholder={t("Search teams")}
+          searchAction={searchTeams}
         />
       </FormSection>
 
@@ -1697,38 +1697,67 @@ function BooleanToggle({ label, name, formik, iconOn, iconOff, labelOn, labelOff
 }
 
 // Team Select Field with search, logos, and names
-function TeamSelectField({ label, name, options = [], formik, searchPlaceholder }) {
+function TeamSelectField({ label, name, formik, searchAction }) {
+  const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const safeOptions = Array.isArray(options) ? options : [];
+  const [teams, setTeams] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const searchTimeoutRef = useRef(null);
   const selectedIds = formik.values[name]?.map((t) => t.id || t.value || t._id || t) || [];
   const error = formik.touched[name] && formik.errors[name];
 
-  const filteredOptions = safeOptions.filter((team) => {
-    if (!search) return true;
-    return (team.name || team.label || "").toLowerCase().includes(search.toLowerCase());
-  });
+  const fetchTeams = useCallback(async (searchQuery, pageNum) => {
+    if (!searchAction) return;
+    setLoading(true);
+    try {
+      const result = await searchAction({ search: searchQuery, page: pageNum, limit: 20 });
+      setTeams(result.data || []);
+      setTotalPages(result.pagination?.totalPages || 1);
+    } catch {
+      setTeams([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchAction]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchTeams(search, page);
+    }
+  }, [isOpen, page]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => {
+      setPage(1);
+      fetchTeams(search, 1);
+    }, 400);
+    return () => clearTimeout(searchTimeoutRef.current);
+  }, [search]);
 
   const toggleTeam = async (team) => {
     const teamId = team.id || team.value;
     const isSelected = selectedIds.includes(teamId);
-
     let newValue;
     if (isSelected) {
       newValue = (formik.values[name] || []).filter((t) => (t.id || t.value || t._id || t) !== teamId);
     } else {
       newValue = [...(formik.values[name] || []), { id: teamId, name: team.name || team.label, logo: team.logo }];
     }
-
     await formik.setFieldValue(name, newValue);
     await formik.setFieldTouched(name, true, true);
     formik.validateField(name);
   };
 
-  const getLogoUrl = (team) => {
-    if (team.logo?.light) return team.logo.light;
-    if (team.logo?.dark) return team.logo.dark;
-    return null;
+  const removeTeam = async (teamId) => {
+    const newValue = (formik.values[name] || []).filter((t) => (t.id || t.value || t._id || t) !== teamId);
+    await formik.setFieldValue(name, newValue);
   };
+
+  const getLogoUrl = (team) => team.logo?.light || team.logo?.dark || null;
 
   return (
     <div className="space-y-3">
@@ -1736,98 +1765,137 @@ function TeamSelectField({ label, name, options = [], formik, searchPlaceholder 
         {label}
       </label>
 
-      {/* Selected teams pills */}
+      {/* Selected teams as pills */}
       {selectedIds.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-2">
+        <div className="flex flex-wrap gap-2">
           {(formik.values[name] || []).map((team) => {
             const teamId = team.id || team.value || team._id || team;
-            const teamObj = safeOptions.find((t) => (t.id || t.value) === teamId) || team;
-            const logoUrl = getLogoUrl(teamObj);
+            const teamName = team.name || team.label || teamId;
+            const logoUrl = getLogoUrl(team);
             return (
-              <div
+              <span
                 key={teamId}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-primary/10 border border-green-primary/30 text-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-primary/10 text-green-primary text-sm font-medium"
               >
-                {logoUrl && (
-                  <img
-                    src={logoUrl}
-                    alt={teamObj.name || ""}
-                    width={20}
-                    height={20}
-                    className="size-5 rounded-full object-cover"
-                  />
+                {logoUrl ? (
+                  <img src={logoUrl} alt={teamName} className="size-4 rounded-full object-cover" />
+                ) : (
+                  <Users className="size-3.5" />
                 )}
-                <span className="text-green-primary font-medium">{teamObj.name || teamObj.label}</span>
+                {teamName}
                 <button
                   type="button"
-                  onClick={() => toggleTeam(teamObj)}
-                  className="size-4 rounded-full bg-green-primary/20 hover:bg-red-500/20 flex items-center justify-center transition-colors group"
+                  onClick={() => removeTeam(teamId)}
+                  className="ml-0.5 hover:text-red-500 transition-colors"
                 >
-                  <X className="size-3 text-green-primary group-hover:text-red-500" />
+                  <X className="size-3.5" />
                 </button>
-              </div>
+              </span>
             );
           })}
         </div>
       )}
 
-      {/* Search input */}
-      <div className="relative">
-        <Search className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={searchPlaceholder}
-          className="w-full h-10 ltr:pl-10 rtl:pr-10 pr-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 placeholder:text-muted-foreground"
-        />
-      </div>
+      {/* Popover trigger */}
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="w-full flex items-center justify-between h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-border/50 text-sm text-muted-foreground hover:bg-muted dark:hover:bg-[#252a3d] transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <Search className="size-4" />
+              {selectedIds.length > 0
+                ? `${selectedIds.length} team${selectedIds.length > 1 ? "s" : ""} selected`
+                : "Search and select teams..."}
+            </span>
+            <ChevronDown className={`size-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border"
+          align="start"
+        >
+          {/* Search input */}
+          <div className="p-3 border-b border-border/50">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search teams..."
+                className="w-full h-10 pl-10 pr-4 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm focus:ring-2 focus:ring-green-primary/50 focus:outline-none text-foreground placeholder:text-muted-foreground"
+                autoFocus
+              />
+            </div>
+          </div>
 
-      {/* Team list */}
-      <div className="max-h-64 overflow-y-auto rounded-xl border border-border/50 bg-muted/30 dark:bg-[#141625]">
-        {filteredOptions.length === 0 ? (
-          <div className="p-4 text-center text-sm text-muted-foreground">No teams found</div>
-        ) : (
-          filteredOptions.map((team) => {
-            const teamId = team.id || team.value;
-            const isSelected = selectedIds.includes(teamId);
-            const logoUrl = getLogoUrl(team);
+          {/* Teams list */}
+          <div className="max-h-[280px] overflow-y-auto p-2">
+            {loading ? (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : teams.length === 0 ? (
+              <p className="text-center text-sm text-muted-foreground py-6">No teams found</p>
+            ) : (
+              teams.map((team) => {
+                const teamId = team.id || team.value;
+                const isSelected = selectedIds.includes(teamId);
+                const logoUrl = getLogoUrl(team);
+                return (
+                  <button
+                    key={teamId}
+                    type="button"
+                    onClick={() => toggleTeam(team)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                      isSelected
+                        ? "bg-green-primary/10 text-green-primary"
+                        : "text-foreground hover:bg-muted/50 dark:hover:bg-[#1a1d2e]"
+                    }`}
+                  >
+                    {logoUrl ? (
+                      <img src={logoUrl} alt={team.name} className="size-6 rounded-full object-cover" />
+                    ) : (
+                      <div className="size-6 rounded-full bg-muted flex items-center justify-center">
+                        <Users className="size-3.5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <span className="flex-1 text-start">{team.name || team.label}</span>
+                    {isSelected && <Check className="size-4 text-green-primary" />}
+                  </button>
+                );
+              })
+            )}
+          </div>
 
-            return (
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between p-3 border-t border-border/50">
               <button
-                key={teamId}
                 type="button"
-                onClick={() => toggleTeam(team)}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all hover:bg-muted/50 dark:hover:bg-[#1a1d2e] border-b border-border/30 last:border-b-0 ${
-                  isSelected ? "bg-green-primary/5" : ""
-                }`}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-muted/50 dark:bg-[#1a1d2e] disabled:opacity-40 hover:bg-muted dark:hover:bg-[#252a3d] transition-colors"
               >
-                <div className={`size-5 rounded-md border-2 flex items-center justify-center transition-all ${
-                  isSelected ? "border-green-primary bg-green-primary" : "border-gray-400"
-                }`}>
-                  {isSelected && <Check className="size-3 text-white" />}
-                </div>
-                {logoUrl ? (
-                  <img
-                    src={logoUrl}
-                    alt={team.name || ""}
-                    width={28}
-                    height={28}
-                    className="size-7 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="size-7 rounded-full bg-muted flex items-center justify-center">
-                    <Users className="size-4 text-muted-foreground" />
-                  </div>
-                )}
-                <span className={`font-medium ${isSelected ? "text-green-primary" : "text-foreground"}`}>
-                  {team.name || team.label}
-                </span>
+                <ChevronLeft className="size-4" />
               </button>
-            );
-          })
-        )}
-      </div>
+              <span className="text-xs text-muted-foreground">
+                {page} / {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-muted/50 dark:bg-[#1a1d2e] disabled:opacity-40 hover:bg-muted dark:hover:bg-[#252a3d] transition-colors"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          )}
+        </PopoverContent>
+      </Popover>
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   );
