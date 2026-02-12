@@ -789,7 +789,8 @@
     "Standing Settings": "إعدادات الترتيب",
     "Points Per Win": "نقاط الفوز",
     "Points Per Draw": "نقاط التعادل",
-    "Points Per Loss": "نقاط الخسارة"
+    "Points Per Loss": "نقاط الخسارة",
+    "Prize Distribution": "توزيع الجوائز"
   },
   "TournamentsManagement": {
     "title": "إدارة البطولات",
