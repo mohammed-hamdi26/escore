@@ -125,6 +125,10 @@
     "Become Content Creator": {
       "title": "Become Content Creator",
       "description": "Apply to become a content creator and publish news and articles"
+    },
+    "Avatars": {
+      "title": "Avatars",
+      "description": "Manage profile avatars and avatar collections for users"
     }
   },
   "nav": {
