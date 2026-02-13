@@ -2,7 +2,6 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   UserCircle,
   Plus,
@@ -75,10 +74,8 @@ function AvatarCard({ avatar, onDelete, onEdit, t, isDark }) {
           {/* Avatar Image */}
           <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-green-primary/20 to-green-primary/5 dark:from-green-primary/20 dark:to-green-primary/5 flex items-center justify-center flex-shrink-0">
             {imageUrl ? (
-              <Image
+              <img
                 src={imageUrl}
-                width={64}
-                height={64}
                 alt={avatar.name || "Avatar"}
                 className="object-cover w-full h-full"
               />
