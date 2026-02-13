@@ -3,7 +3,7 @@ import SettingsIcon from "@/components/dashboard/SettingsIcon";
 import News from "@/components/icons/News";
 import SupportCenter from "@/components/icons/SuppotCenter";
 import User from "@/components/icons/User";
-import { Link2 } from "lucide-react";
+import { Link2, UserCircle } from "lucide-react";
 const links = [
   {
     title: "Languages",
@@ -31,6 +31,13 @@ const links = [
     href: "/settings/about",
     description: "update and modify about page",
     icon: <SupportCenter />,
+    isShowed: true,
+  },
+  {
+    title: "Avatars",
+    href: "/settings/avatars",
+    description: "Manage user profile avatars",
+    icon: <UserCircle className="icon-transition" width={"41"} height={"49"} />,
     isShowed: true,
   },
   {

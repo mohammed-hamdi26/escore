@@ -983,6 +983,55 @@ export async function deleteAppSocialLink(id) {
   }
 }
 
+// avatars
+
+export async function addAvatar(data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(`/avatars`, data);
+    revalidatePath(`/${locale}/dashboard/settings/avatars`);
+    return res.data;
+  } catch (error) {
+    console.log(error.response?.data?.errors || error.response?.data || error);
+    throw error;
+  }
+}
+
+export async function updateAvatar(data) {
+  const locale = await getLocale();
+  try {
+    const { id, ...updateData } = data;
+    const res = await apiClient.put(`/avatars/${id}`, updateData);
+    revalidatePath(`/${locale}/dashboard/settings/avatars`);
+    return res.data;
+  } catch (error) {
+    console.log(error.response?.data?.errors || error.response?.data || error);
+    throw error;
+  }
+}
+
+export async function deleteAvatar(id) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.delete(`/avatars/${id}`);
+    revalidatePath(`/${locale}/dashboard/settings/avatars`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function toggleAvatarStatus(id) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.patch(`/avatars/${id}/toggle-status`);
+    revalidatePath(`/${locale}/dashboard/settings/avatars`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 // transfers
 
 export async function addTransfer(data) {
