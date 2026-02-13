@@ -2153,11 +2153,19 @@
       "high": "عالية",
       "normal": "عادية",
       "sendNotification": "إرسال الإشعار",
+      "scheduleNotification": "جدولة الإشعار",
       "sending": "جاري الإرسال...",
+      "scheduling_btn": "جاري الجدولة...",
       "sendSuccess": "تم إرسال الإشعار بنجاح!",
+      "scheduleSuccess": "تمت جدولة الإشعار بنجاح!",
+      "scheduledFor": "مجدول في",
       "sendError": "فشل في إرسال الإشعار",
       "success": "نجح",
-      "failed": "فشل"
+      "failed": "فشل",
+      "scheduling": "الجدولة",
+      "sendNow": "إرسال الآن",
+      "scheduleLater": "جدولة لاحقاً",
+      "scheduleRequired": "يرجى اختيار التاريخ والوقت"
     },
     "topics": {
       "breakingNews": "أخبار عاجلة",

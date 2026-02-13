@@ -2386,11 +2386,19 @@
       "high": "High",
       "normal": "Normal",
       "sendNotification": "Send Notification",
+      "scheduleNotification": "Schedule Notification",
       "sending": "Sending...",
+      "scheduling_btn": "Scheduling...",
       "sendSuccess": "Notification sent successfully!",
+      "scheduleSuccess": "Notification scheduled successfully!",
+      "scheduledFor": "Scheduled for",
       "sendError": "Failed to send notification",
       "success": "Success",
-      "failed": "Failed"
+      "failed": "Failed",
+      "scheduling": "Scheduling",
+      "sendNow": "Send Now",
+      "scheduleLater": "Schedule Later",
+      "scheduleRequired": "Please select a date and time"
     },
     "topics": {
       "breakingNews": "Breaking News",

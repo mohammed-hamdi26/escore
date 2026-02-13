@@ -24,6 +24,8 @@ import {
   X,
   Newspaper,
   Bell,
+  Clock,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { sendNotificationAction } from "@/app/[locale]/_Lib/actions";
@@ -187,6 +189,8 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
     body: "",
     imageUrl: "",
     priority: "high",
+    sendType: "now",
+    scheduledAt: "",
   };
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
@@ -238,6 +242,9 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
         options: {
           priority: values.priority,
         },
+        ...(values.sendType === "schedule" && values.scheduledAt && {
+          scheduledAt: new Date(values.scheduledAt).toISOString(),
+        }),
       };
 
       const response = await sendNotificationAction(data);
@@ -1123,19 +1130,99 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
                     ))}
                   </div>
                 </div>
+
+                {/* Schedule */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    <Clock className="size-4 text-indigo-500" />
+                    {t("form.scheduling") || "Scheduling"}
+                  </label>
+                  <div className="flex gap-3 mb-3">
+                    <label
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-lg cursor-pointer transition-all ${
+                        values.sendType === "now"
+                          ? "bg-green-primary/10 border-2 border-green-primary text-green-primary"
+                          : "bg-gray-100 dark:bg-[#1a1d2e] border-2 border-transparent text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-white/20"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        checked={values.sendType === "now"}
+                        onChange={() => {
+                          setFieldValue("sendType", "now");
+                          setFieldValue("scheduledAt", "");
+                        }}
+                        className="hidden"
+                      />
+                      <Send className="size-4" />
+                      <span className="text-sm font-medium">{t("form.sendNow") || "Send Now"}</span>
+                    </label>
+                    <label
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-lg cursor-pointer transition-all ${
+                        values.sendType === "schedule"
+                          ? "bg-indigo-500/10 border-2 border-indigo-500 text-indigo-500"
+                          : "bg-gray-100 dark:bg-[#1a1d2e] border-2 border-transparent text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-white/20"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        checked={values.sendType === "schedule"}
+                        onChange={() => setFieldValue("sendType", "schedule")}
+                        className="hidden"
+                      />
+                      <Calendar className="size-4" />
+                      <span className="text-sm font-medium">{t("form.scheduleLater") || "Schedule Later"}</span>
+                    </label>
+                  </div>
+
+                  {values.sendType === "schedule" && (
+                    <div className="relative">
+                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-indigo-400 pointer-events-none" />
+                      <input
+                        type="datetime-local"
+                        value={values.scheduledAt}
+                        onChange={(e) => setFieldValue("scheduledAt", e.target.value)}
+                        min={new Date(Date.now() + 60000).toISOString().slice(0, 16)}
+                        className="w-full h-12 bg-gray-50 dark:bg-[#1a1d2e] border-0 rounded-xl pl-11 pr-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                      />
+                      {values.sendType === "schedule" && !values.scheduledAt && (
+                        <p className="text-amber-500 text-sm mt-2 flex items-center gap-1">
+                          <span className="size-1.5 rounded-full bg-amber-500" />
+                          {t("form.scheduleRequired") || "Please select a date and time"}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </SectionCard>
 
             {/* Result/Error Messages */}
             {result && (
-              <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-5 flex items-start gap-4">
-                <div className="p-2 rounded-lg bg-green-500/10">
-                  <CheckCircle className="size-5 text-green-500" />
+              <div className={`${result.scheduledAt ? "bg-indigo-500/10 border-indigo-500/20" : "bg-green-500/10 border-green-500/20"} border rounded-2xl p-5 flex items-start gap-4`}>
+                <div className={`p-2 rounded-lg ${result.scheduledAt ? "bg-indigo-500/10" : "bg-green-500/10"}`}>
+                  {result.scheduledAt ? (
+                    <Calendar className="size-5 text-indigo-500" />
+                  ) : (
+                    <CheckCircle className="size-5 text-green-500" />
+                  )}
                 </div>
                 <div>
-                  <p className="text-green-500 font-semibold">{t("form.sendSuccess") || "Notification sent successfully!"}</p>
-                  <p className="text-green-400/80 text-sm mt-1">
-                    {t("form.success") || "Success"}: {result.successCount || 0} | {t("form.failed") || "Failed"}: {result.failureCount || 0}
+                  <p className={`${result.scheduledAt ? "text-indigo-500" : "text-green-500"} font-semibold`}>
+                    {result.scheduledAt
+                      ? (t("form.scheduleSuccess") || "Notification scheduled successfully!")
+                      : (t("form.sendSuccess") || "Notification sent successfully!")}
+                  </p>
+                  <p className={`${result.scheduledAt ? "text-indigo-400/80" : "text-green-400/80"} text-sm mt-1`}>
+                    {result.scheduledAt ? (
+                      <>
+                        {t("form.scheduledFor") || "Scheduled for"}: {new Date(result.scheduledAt).toLocaleString()}
+                      </>
+                    ) : (
+                      <>
+                        {t("form.success") || "Success"}: {result.successCount || 0} | {t("form.failed") || "Failed"}: {result.failureCount || 0}
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -1154,13 +1241,24 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
             <div className="flex justify-end">
               <Button
                 type="submit"
-                disabled={isSubmitting}
-                className="bg-green-primary hover:bg-green-primary/90 text-white px-8 h-12 rounded-xl font-medium flex items-center gap-2 shadow-lg shadow-green-primary/20 transition-all hover:shadow-green-primary/30"
+                disabled={isSubmitting || (values.sendType === "schedule" && !values.scheduledAt)}
+                className={`${
+                  values.sendType === "schedule"
+                    ? "bg-indigo-500 hover:bg-indigo-600 shadow-indigo-500/20 hover:shadow-indigo-500/30"
+                    : "bg-green-primary hover:bg-green-primary/90 shadow-green-primary/20 hover:shadow-green-primary/30"
+                } text-white px-8 h-12 rounded-xl font-medium flex items-center gap-2 shadow-lg transition-all`}
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="size-5 animate-spin" />
-                    {t("form.sending") || "Sending..."}
+                    {values.sendType === "schedule"
+                      ? (t("form.scheduling_btn") || "Scheduling...")
+                      : (t("form.sending") || "Sending...")}
+                  </>
+                ) : values.sendType === "schedule" ? (
+                  <>
+                    <Calendar className="size-5" />
+                    {t("form.scheduleNotification") || "Schedule Notification"}
                   </>
                 ) : (
                   <>
