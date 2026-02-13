@@ -310,8 +310,8 @@ export default function NotificationsDashboard({ stats, error }) {
         </div>
       )}
 
-      {/* Period Info */}
-      {stats.period && (
+      {/* Period Info — only show when there are notifications */}
+      {stats.period && stats.totalSent > 0 && (
         <div className="flex items-center gap-3 bg-gray-50 dark:bg-[#1a1d2e] rounded-xl p-4 border border-gray-200 dark:border-white/5">
           <div className="size-8 rounded-lg bg-gray-200 dark:bg-[#252a3d] flex items-center justify-center">
             <BarChart3 className="size-4 text-gray-500 dark:text-gray-400" />
