@@ -1485,6 +1485,43 @@ export async function sendNotificationAction(data) {
   }
 }
 
+// Notification Templates
+export async function createTemplateAction(data) {
+  try {
+    const res = await apiClient.post("/admin/notifications/templates", data);
+    return res.data;
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Failed to create template");
+  }
+}
+
+export async function updateTemplateAction(id, data) {
+  try {
+    const res = await apiClient.put(`/admin/notifications/templates/${id}`, data);
+    return res.data;
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Failed to update template");
+  }
+}
+
+export async function deleteTemplateAction(id) {
+  try {
+    const res = await apiClient.delete(`/admin/notifications/templates/${id}`);
+    return res.data;
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Failed to delete template");
+  }
+}
+
+export async function fetchNotificationTimelineAction(period = "30d", groupBy = "day") {
+  try {
+    const res = await apiClient.get(`/admin/notifications/stats/timeline?period=${period}&groupBy=${groupBy}`);
+    return res.data.data;
+  } catch (e) {
+    return { timeline: [] };
+  }
+}
+
 // Content Creator Requests
 export async function approveContentRequest(userId) {
   const locale = await getLocale();

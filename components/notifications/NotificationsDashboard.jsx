@@ -1,11 +1,11 @@
 "use client";
 
+import { useState, useMemo, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import {
   Send,
   CheckCircle,
   MousePointer,
-  Percent,
   Target,
   Smartphone,
   Activity,
@@ -13,13 +13,14 @@ import {
   MonitorSmartphone,
   Globe,
   TrendingUp,
-  Bell,
   AlertCircle,
   Sparkles,
   Zap,
   BarChart3,
   PieChart,
+  Loader2,
 } from "lucide-react";
+import { fetchNotificationTimelineAction } from "@/app/[locale]/_Lib/actions";
 
 function StatCard({ title, value, icon: Icon, color, bgColor, gradientFrom, gradientTo, subtext, delay = 0 }) {
   return (
@@ -27,9 +28,7 @@ function StatCard({ title, value, icon: Icon, color, bgColor, gradientFrom, grad
       className="group relative bg-white dark:bg-[#0f1118] rounded-2xl border border-gray-200 dark:border-white/5 p-5 hover:border-green-primary/30 transition-all duration-300 overflow-hidden"
       style={{ animationDelay: `${delay}ms` }}
     >
-      {/* Gradient glow effect on hover */}
       <div className={`absolute inset-0 bg-gradient-to-br ${gradientFrom || 'from-transparent'} ${gradientTo || 'to-transparent'} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-
       <div className="relative flex items-start justify-between">
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
@@ -45,7 +44,6 @@ function StatCard({ title, value, icon: Icon, color, bgColor, gradientFrom, grad
         </div>
         <div className={`relative p-3 rounded-xl ${bgColor} transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg`}>
           <Icon className={`size-6 ${color}`} />
-          {/* Sparkle effect */}
           <Sparkles className="absolute -top-1 -right-1 size-3 text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
       </div>
@@ -55,43 +53,16 @@ function StatCard({ title, value, icon: Icon, color, bgColor, gradientFrom, grad
 
 function PlatformCard({ platform, count, icon: Icon, total }) {
   const platformConfig = {
-    android: {
-      color: "text-green-500",
-      bgColor: "bg-green-500/10",
-      borderColor: "hover:border-green-500/30",
-      gradientFrom: "from-green-500/5",
-      gradientTo: "to-transparent",
-      label: "Android",
-      barColor: "bg-green-500",
-    },
-    ios: {
-      color: "text-gray-600 dark:text-gray-300",
-      bgColor: "bg-gray-500/10",
-      borderColor: "hover:border-gray-500/30",
-      gradientFrom: "from-gray-500/5",
-      gradientTo: "to-transparent",
-      label: "iOS",
-      barColor: "bg-gray-500",
-    },
-    web: {
-      color: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-      borderColor: "hover:border-blue-500/30",
-      gradientFrom: "from-blue-500/5",
-      gradientTo: "to-transparent",
-      label: "Web",
-      barColor: "bg-blue-500",
-    },
+    android: { color: "text-green-500", bgColor: "bg-green-500/10", borderColor: "hover:border-green-500/30", gradientFrom: "from-green-500/5", gradientTo: "to-transparent", label: "Android", barColor: "bg-green-500" },
+    ios: { color: "text-gray-600 dark:text-gray-300", bgColor: "bg-gray-500/10", borderColor: "hover:border-gray-500/30", gradientFrom: "from-gray-500/5", gradientTo: "to-transparent", label: "iOS", barColor: "bg-gray-500" },
+    web: { color: "text-blue-500", bgColor: "bg-blue-500/10", borderColor: "hover:border-blue-500/30", gradientFrom: "from-blue-500/5", gradientTo: "to-transparent", label: "Web", barColor: "bg-blue-500" },
   };
-
   const config = platformConfig[platform] || platformConfig.android;
   const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
 
   return (
     <div className={`group relative flex flex-col gap-4 bg-white dark:bg-[#0f1118] rounded-2xl p-5 border border-gray-200 dark:border-white/5 ${config.borderColor} transition-all duration-300 overflow-hidden`}>
-      {/* Background gradient */}
       <div className={`absolute inset-0 bg-gradient-to-br ${config.gradientFrom} ${config.gradientTo} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-
       <div className="relative flex items-center gap-4">
         <div className={`p-3 rounded-xl ${config.bgColor} transition-transform duration-300 group-hover:scale-110`}>
           <Icon className={`size-6 ${config.color}`} />
@@ -104,13 +75,8 @@ function PlatformCard({ platform, count, icon: Icon, total }) {
           <p className={`text-lg font-semibold ${config.color}`}>{percentage}%</p>
         </div>
       </div>
-
-      {/* Progress bar */}
       <div className="relative h-2 bg-gray-100 dark:bg-[#1a1d2e] rounded-full overflow-hidden">
-        <div
-          className={`absolute left-0 top-0 h-full ${config.barColor} rounded-full transition-all duration-500 ease-out`}
-          style={{ width: `${percentage}%` }}
-        />
+        <div className={`absolute left-0 top-0 h-full ${config.barColor} rounded-full transition-all duration-500 ease-out`} style={{ width: `${percentage}%` }} />
       </div>
     </div>
   );
@@ -140,7 +106,6 @@ function TypeBadge({ type, count }) {
     player: { color: "text-cyan-500", bgColor: "bg-cyan-500/10", borderColor: "border-cyan-500/20" },
     general: { color: "text-gray-500", bgColor: "bg-gray-500/10", borderColor: "border-gray-500/20" },
   };
-
   const config = typeConfig[type.toLowerCase()] || typeConfig.general;
 
   return (
@@ -151,8 +116,171 @@ function TypeBadge({ type, count }) {
   );
 }
 
-export default function NotificationsDashboard({ stats, error }) {
+// SVG-based line chart
+function TimelineChart({ data, t }) {
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0) return null;
+
+    const maxSent = Math.max(...data.map((d) => d.sent || 0), 1);
+    const maxClicked = Math.max(...data.map((d) => d.clicked || 0), 1);
+    const maxFailed = Math.max(...data.map((d) => d.failed || 0), 1);
+    const maxVal = Math.max(maxSent, maxClicked, maxFailed, 1);
+
+    const width = 800;
+    const height = 200;
+    const padding = { top: 20, right: 20, bottom: 30, left: 50 };
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+
+    const xStep = data.length > 1 ? chartWidth / (data.length - 1) : chartWidth;
+
+    const toPoint = (val, i) => {
+      const x = padding.left + (data.length > 1 ? i * xStep : chartWidth / 2);
+      const y = padding.top + chartHeight - (val / maxVal) * chartHeight;
+      return { x, y };
+    };
+
+    const toPath = (key) => {
+      const points = data.map((d, i) => toPoint(d[key] || 0, i));
+      if (points.length === 1) return "";
+      return points.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(" ");
+    };
+
+    const toArea = (key) => {
+      const points = data.map((d, i) => toPoint(d[key] || 0, i));
+      if (points.length === 1) return "";
+      const line = points.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(" ");
+      const lastX = points[points.length - 1].x;
+      const firstX = points[0].x;
+      const baseY = padding.top + chartHeight;
+      return `${line} L ${lastX} ${baseY} L ${firstX} ${baseY} Z`;
+    };
+
+    // Y-axis gridlines
+    const gridLines = [0, 0.25, 0.5, 0.75, 1].map((pct) => ({
+      y: padding.top + chartHeight - pct * chartHeight,
+      label: Math.round(pct * maxVal),
+    }));
+
+    // X-axis labels (show a subset)
+    const labelStep = Math.max(1, Math.floor(data.length / 7));
+    const xLabels = data
+      .filter((_, i) => i % labelStep === 0 || i === data.length - 1)
+      .map((d, _, arr) => {
+        const idx = data.indexOf(d);
+        const x = padding.left + (data.length > 1 ? idx * xStep : chartWidth / 2);
+        const dateStr = d.date || "";
+        const short = dateStr.length >= 10 ? dateStr.slice(5) : dateStr; // MM-DD
+        return { x, label: short };
+      });
+
+    return { width, height, padding, chartWidth, chartHeight, maxVal, toPath, toArea, gridLines, xLabels, toPoint, data };
+  }, [data]);
+
+  if (!chartData) {
+    return (
+      <div className="flex items-center justify-center h-48 text-gray-400 dark:text-gray-500 text-sm">
+        {t("stats.noTimelineData") || "No timeline data available"}
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full overflow-x-auto">
+      <svg viewBox={`0 0 ${chartData.width} ${chartData.height}`} className="w-full h-auto min-w-[500px]">
+        {/* Grid lines */}
+        {chartData.gridLines.map((line, i) => (
+          <g key={i}>
+            <line
+              x1={chartData.padding.left}
+              y1={line.y}
+              x2={chartData.padding.left + chartData.chartWidth}
+              y2={line.y}
+              stroke="currentColor"
+              className="text-gray-100 dark:text-white/5"
+              strokeDasharray="4 4"
+            />
+            <text
+              x={chartData.padding.left - 8}
+              y={line.y + 4}
+              textAnchor="end"
+              className="fill-gray-400 dark:fill-gray-500"
+              fontSize="10"
+            >
+              {line.label}
+            </text>
+          </g>
+        ))}
+
+        {/* Area fills */}
+        <path d={chartData.toArea("sent")} fill="rgb(59, 130, 246)" opacity="0.08" />
+        <path d={chartData.toArea("clicked")} fill="rgb(168, 85, 247)" opacity="0.08" />
+
+        {/* Lines */}
+        <path d={chartData.toPath("sent")} fill="none" stroke="rgb(59, 130, 246)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={chartData.toPath("clicked")} fill="none" stroke="rgb(168, 85, 247)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={chartData.toPath("failed")} fill="none" stroke="rgb(239, 68, 68)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 3" />
+
+        {/* Data points */}
+        {chartData.data.map((d, i) => {
+          const sent = chartData.toPoint(d.sent || 0, i);
+          const clicked = chartData.toPoint(d.clicked || 0, i);
+          return (
+            <g key={i}>
+              <circle cx={sent.x} cy={sent.y} r="3" fill="rgb(59, 130, 246)" />
+              <circle cx={clicked.x} cy={clicked.y} r="3" fill="rgb(168, 85, 247)" />
+            </g>
+          );
+        })}
+
+        {/* X-axis labels */}
+        {chartData.xLabels.map((label, i) => (
+          <text
+            key={i}
+            x={label.x}
+            y={chartData.height - 5}
+            textAnchor="middle"
+            className="fill-gray-400 dark:fill-gray-500"
+            fontSize="10"
+          >
+            {label.label}
+          </text>
+        ))}
+      </svg>
+
+      {/* Legend */}
+      <div className="flex items-center justify-center gap-6 mt-3">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-0.5 bg-blue-500 rounded" />
+          <span className="text-xs text-gray-500 dark:text-gray-400">{t("stats.sent") || "Sent"}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-0.5 bg-purple-500 rounded" />
+          <span className="text-xs text-gray-500 dark:text-gray-400">{t("stats.clicked") || "Clicked"}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-0.5 bg-red-500 rounded border-dashed" style={{ borderTop: "1.5px dashed rgb(239, 68, 68)", height: 0 }} />
+          <span className="text-xs text-gray-500 dark:text-gray-400">{t("stats.failed") || "Failed"}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function NotificationsDashboard({ stats, initialTimeline, error }) {
   const t = useTranslations("Notifications");
+  const [period, setPeriod] = useState("30d");
+  const [timeline, setTimeline] = useState(initialTimeline);
+  const [isPending, startTransition] = useTransition();
+
+  const handlePeriodChange = (newPeriod) => {
+    setPeriod(newPeriod);
+    const groupBy = newPeriod === "7d" ? "day" : newPeriod === "90d" ? "week" : "day";
+    startTransition(async () => {
+      const data = await fetchNotificationTimelineAction(newPeriod, groupBy);
+      setTimeline(data);
+    });
+  };
 
   if (error) {
     return (
@@ -184,6 +312,11 @@ export default function NotificationsDashboard({ stats, error }) {
   };
 
   const totalDevices = stats.devices?.total || 0;
+  const periods = [
+    { id: "7d", label: t("stats.7days") || "7 Days" },
+    { id: "30d", label: t("stats.30days") || "30 Days" },
+    { id: "90d", label: t("stats.90days") || "90 Days" },
+  ];
 
   return (
     <div className="space-y-8">
@@ -239,6 +372,41 @@ export default function NotificationsDashboard({ stats, error }) {
           gradientTo="to-transparent"
           delay={200}
         />
+      </div>
+
+      {/* Timeline Chart */}
+      <div className="bg-white dark:bg-[#0f1118] rounded-2xl border border-gray-200 dark:border-white/5 overflow-hidden">
+        <div className="px-6 py-5 border-b border-gray-200 dark:border-white/10 bg-gradient-to-r from-blue-500/5 via-transparent to-transparent">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-xl bg-gradient-to-br from-green-primary/20 to-green-primary/5 flex items-center justify-center border border-green-primary/20">
+                <TrendingUp className="size-5 text-green-primary" />
+              </div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t("stats.timeline") || "Notification Timeline"}
+              </h2>
+              {isPending && <Loader2 className="size-4 text-gray-400 animate-spin" />}
+            </div>
+            <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#1a1d2e] rounded-lg p-1">
+              {periods.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => handlePeriodChange(p.id)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    period === p.id
+                      ? "bg-white dark:bg-[#252a3d] text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="p-6">
+          <TimelineChart data={timeline?.timeline || []} t={t} />
+        </div>
       </div>
 
       {/* Device Statistics Section */}

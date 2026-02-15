@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, usePathname } from "@/i18n/navigation";
-import { Bell, Send, Smartphone, BarChart3, Sparkles } from "lucide-react";
+import { Bell, Send, Smartphone, BarChart3, Sparkles, History, FileText } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const navItems = [
@@ -28,6 +28,22 @@ const navItems = [
     exact: false,
     color: "text-orange-500",
     bgColor: "bg-orange-500/10",
+  },
+  {
+    href: "/dashboard/notifications/history",
+    icon: History,
+    labelKey: "history",
+    exact: false,
+    color: "text-cyan-500",
+    bgColor: "bg-cyan-500/10",
+  },
+  {
+    href: "/dashboard/notifications/templates",
+    icon: FileText,
+    labelKey: "templates",
+    exact: false,
+    color: "text-rose-500",
+    bgColor: "bg-rose-500/10",
   },
 ];
 

@@ -1,15 +1,30 @@
-import { getNotificationStats } from "../../_Lib/notificationsApi";
+import {
+  getNotificationStats,
+  getNotificationTimeline,
+} from "../../_Lib/notificationsApi";
 import NotificationsDashboard from "@/components/notifications/NotificationsDashboard";
 
 export default async function NotificationsPage() {
   let stats = null;
+  let timeline = null;
   let error = null;
 
   try {
-    stats = await getNotificationStats();
+    const [statsData, timelineData] = await Promise.all([
+      getNotificationStats(),
+      getNotificationTimeline("30d", "day"),
+    ]);
+    stats = statsData;
+    timeline = timelineData;
   } catch (e) {
     error = e.message;
   }
 
-  return <NotificationsDashboard stats={stats} error={error} />;
+  return (
+    <NotificationsDashboard
+      stats={stats}
+      initialTimeline={timeline}
+      error={error}
+    />
+  );
 }

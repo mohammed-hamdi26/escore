@@ -26,6 +26,8 @@ import {
   Bell,
   Clock,
   Calendar,
+  Layers,
+  Variable,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { sendNotificationAction } from "@/app/[locale]/_Lib/actions";
@@ -79,7 +81,7 @@ function getImageUrl(image) {
   return image.light || image.dark || null;
 }
 
-export default function SendNotificationForm({ games = [], teams = [], tournaments = [], users = [] }) {
+export default function SendNotificationForm({ games = [], teams = [], tournaments = [], users = [], templates = [] }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [userSearch, setUserSearch] = useState("");
@@ -87,6 +89,8 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
   const [teamSearch, setTeamSearch] = useState("");
   const [tournamentSearch, setTournamentSearch] = useState("");
   const [topicSearch, setTopicSearch] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [templateVars, setTemplateVars] = useState({});
   const t = useTranslations("Notifications");
 
   // Generate topics from games, teams, tournaments with images
@@ -1044,6 +1048,106 @@ export default function SendNotificationForm({ games = [], teams = [], tournamen
             {/* Notification Content */}
             <SectionCard title={t("form.notificationContent") || "Notification Content"} icon={FileText}>
               <div className="space-y-5">
+                {/* Template Selector */}
+                {templates.length > 0 && (
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <Layers className="size-4 text-indigo-500" />
+                      {t("form.useTemplate") || "Use Template"}
+                      <span className="text-gray-400 text-xs">({t("form.optional") || "optional"})</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <select
+                        value={selectedTemplate?.id || selectedTemplate?._id || ""}
+                        onChange={(e) => {
+                          const tmpl = templates.find((t) => (t.id || t._id) === e.target.value);
+                          setSelectedTemplate(tmpl || null);
+                          if (tmpl) {
+                            // Extract variables from template
+                            const combined = `${tmpl.title} ${tmpl.body}`;
+                            const matches = combined.match(/\{\{(\w+)\}\}/g);
+                            const vars = matches ? [...new Set(matches.map((m) => m.replace(/\{\{|\}\}/g, "")))] : [];
+                            const newVars = {};
+                            vars.forEach((v) => { newVars[v] = templateVars[v] || ""; });
+                            setTemplateVars(newVars);
+                            // Populate title and body
+                            setFieldValue("title", tmpl.title);
+                            setFieldValue("body", tmpl.body);
+                            if (tmpl.imageUrl) setFieldValue("imageUrl", tmpl.imageUrl);
+                          } else {
+                            setTemplateVars({});
+                          }
+                        }}
+                        className="flex-1 h-12 bg-gray-50 dark:bg-[#1a1d2e] border-0 rounded-xl px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                      >
+                        <option value="">{t("form.selectTemplate") || "Select a template..."}</option>
+                        {templates.map((tmpl) => (
+                          <option key={tmpl.id || tmpl._id} value={tmpl.id || tmpl._id}>
+                            {tmpl.name} ({tmpl.type})
+                          </option>
+                        ))}
+                      </select>
+                      {selectedTemplate && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedTemplate(null);
+                            setTemplateVars({});
+                            setFieldValue("title", "");
+                            setFieldValue("body", "");
+                            setFieldValue("imageUrl", "");
+                          }}
+                          className="px-3 h-12 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
+                        >
+                          <X className="size-4" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Variable Inputs */}
+                    {selectedTemplate && Object.keys(templateVars).length > 0 && (
+                      <div className="mt-3 p-4 bg-indigo-50/50 dark:bg-indigo-500/5 rounded-xl border border-indigo-200 dark:border-indigo-500/20">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Variable className="size-4 text-indigo-500" />
+                          <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                            {t("form.templateVariables") || "Template Variables"}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {Object.keys(templateVars).map((varName) => (
+                            <div key={varName}>
+                              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block font-mono">
+                                {`{{${varName}}}`}
+                              </label>
+                              <input
+                                value={templateVars[varName]}
+                                onChange={(e) => {
+                                  const newVars = { ...templateVars, [varName]: e.target.value };
+                                  setTemplateVars(newVars);
+                                  // Replace variables in title and body
+                                  let newTitle = selectedTemplate.title;
+                                  let newBody = selectedTemplate.body;
+                                  Object.entries(newVars).forEach(([k, v]) => {
+                                    const regex = new RegExp(`\\{\\{${k}\\}\\}`, "g");
+                                    if (v) {
+                                      newTitle = newTitle.replace(regex, v);
+                                      newBody = newBody.replace(regex, v);
+                                    }
+                                  });
+                                  setFieldValue("title", newTitle);
+                                  setFieldValue("body", newBody);
+                                }}
+                                placeholder={`${t("form.enterValue") || "Enter value for"} ${varName}`}
+                                className="w-full h-10 bg-white dark:bg-[#1a1d2e] border border-indigo-200 dark:border-indigo-500/20 rounded-lg px-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Title */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
