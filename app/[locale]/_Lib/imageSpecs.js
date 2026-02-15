@@ -13,9 +13,9 @@ export const IMAGE_SPECS = {
     aspectRatioString: "1:1",
     cropAspect: 1,
     sizes: {
-      thumbnail: { width: 128, height: 128 },
-      medium: { width: 512, height: 512 },
-      large: { width: 1080, height: 1080 },
+      thumbnail: { width: 64, height: 64 },
+      medium: { width: 256, height: 256 },
+      large: { width: 512, height: 512 },
     },
   },
   gameCover: {
@@ -37,9 +37,9 @@ export const IMAGE_SPECS = {
     aspectRatioString: "1:1",
     cropAspect: 1,
     sizes: {
-      thumbnail: { width: 128, height: 128 },
-      medium: { width: 512, height: 512 },
-      large: { width: 1080, height: 1080 },
+      thumbnail: { width: 64, height: 64 },
+      medium: { width: 256, height: 256 },
+      large: { width: 512, height: 512 },
     },
   },
   teamCover: {
@@ -61,9 +61,9 @@ export const IMAGE_SPECS = {
     aspectRatioString: "1:1",
     cropAspect: 1,
     sizes: {
-      thumbnail: { width: 128, height: 128 },
-      medium: { width: 512, height: 512 },
-      large: { width: 1080, height: 1080 },
+      thumbnail: { width: 64, height: 64 },
+      medium: { width: 256, height: 256 },
+      large: { width: 512, height: 512 },
     },
   },
   playerCover: {
@@ -85,9 +85,9 @@ export const IMAGE_SPECS = {
     aspectRatioString: "1:1",
     cropAspect: 1,
     sizes: {
-      thumbnail: { width: 128, height: 128 },
-      medium: { width: 512, height: 512 },
-      large: { width: 1080, height: 1080 },
+      thumbnail: { width: 64, height: 64 },
+      medium: { width: 256, height: 256 },
+      large: { width: 512, height: 512 },
     },
   },
   tournamentCover: {
@@ -113,6 +113,54 @@ export const IMAGE_SPECS = {
     },
   },
 
+  // Event images
+  eventLogo: {
+    name: "Event Logo",
+    aspectRatio: 1,
+    aspectRatioString: "1:1",
+    cropAspect: 1,
+    sizes: {
+      thumbnail: { width: 64, height: 64 },
+      medium: { width: 256, height: 256 },
+      large: { width: 512, height: 512 },
+    },
+  },
+  eventCover: {
+    name: "Event Cover",
+    aspectRatio: 16 / 9,
+    aspectRatioString: "16:9",
+    cropAspect: 16 / 9,
+    sizes: {
+      thumbnail: { width: 320, height: 180 },
+      medium: { width: 640, height: 360 },
+      large: { width: 1280, height: 720 },
+    },
+  },
+
+  // Club images
+  clubLogo: {
+    name: "Club Logo",
+    aspectRatio: 1,
+    aspectRatioString: "1:1",
+    cropAspect: 1,
+    sizes: {
+      thumbnail: { width: 64, height: 64 },
+      medium: { width: 256, height: 256 },
+      large: { width: 512, height: 512 },
+    },
+  },
+  clubCover: {
+    name: "Club Cover",
+    aspectRatio: 3 / 2,
+    aspectRatioString: "3:2",
+    cropAspect: 3 / 2,
+    sizes: {
+      thumbnail: { width: 300, height: 200 },
+      medium: { width: 600, height: 400 },
+      large: { width: 1200, height: 800 },
+    },
+  },
+
   // News images
   newsCover: {
     name: "News Cover",
@@ -133,9 +181,9 @@ export const IMAGE_SPECS = {
     aspectRatioString: "1:1",
     cropAspect: 1,
     sizes: {
-      thumbnail: { width: 128, height: 128 },
-      medium: { width: 512, height: 512 },
-      large: { width: 1080, height: 1080 },
+      thumbnail: { width: 64, height: 64 },
+      medium: { width: 256, height: 256 },
+      large: { width: 512, height: 512 },
     },
   },
   userAvatar: {
@@ -144,9 +192,9 @@ export const IMAGE_SPECS = {
     aspectRatioString: "1:1",
     cropAspect: 1,
     sizes: {
-      thumbnail: { width: 128, height: 128 },
-      medium: { width: 512, height: 512 },
-      large: { width: 1080, height: 1080 },
+      thumbnail: { width: 64, height: 64 },
+      medium: { width: 256, height: 256 },
+      large: { width: 512, height: 512 },
     },
   },
 };

@@ -781,11 +781,13 @@ function ClubForm({ formType = "add", submit, club, countries = [] }) {
               label={t("logoLight") || "Logo (Light)"}
               name="logoLight"
               formik={formik}
+              imageType="clubLogo"
             />
             <ImageUpload
               label={t("logoDark") || "Logo (Dark)"}
               name="logoDark"
               formik={formik}
+              imageType="clubLogo"
             />
           </FormRow>
           <FormRow>
@@ -793,11 +795,13 @@ function ClubForm({ formType = "add", submit, club, countries = [] }) {
               label={t("coverLight") || "Cover (Light)"}
               name="coverImageLight"
               formik={formik}
+              imageType="clubCover"
             />
             <ImageUpload
               label={t("coverDark") || "Cover (Dark)"}
               name="coverImageDark"
               formik={formik}
+              imageType="clubCover"
             />
           </FormRow>
         </FormSection>

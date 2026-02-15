@@ -1115,11 +1115,13 @@ function EventForm({ event, submit, formType = "add", countries = [] }) {
               label={t("logoLight") || "Logo (Light)"}
               name="logoLight"
               formik={formik}
+              imageType="eventLogo"
             />
             <ImageUpload
               label={t("logoDark") || "Logo (Dark)"}
               name="logoDark"
               formik={formik}
+              imageType="eventLogo"
             />
           </FormRow>
           <FormRow>
@@ -1127,11 +1129,13 @@ function EventForm({ event, submit, formType = "add", countries = [] }) {
               label={t("coverLight") || "Cover (Light)"}
               name="coverImageLight"
               formik={formik}
+              imageType="eventCover"
             />
             <ImageUpload
               label={t("coverDark") || "Cover (Dark)"}
               name="coverImageDark"
               formik={formik}
+              imageType="eventCover"
             />
           </FormRow>
         </FormSection>

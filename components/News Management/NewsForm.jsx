@@ -262,14 +262,14 @@ export default function NewsForm({
                 label={t("lightMode") || "Light Mode"}
                 name="coverImageLight"
                 formik={formik}
-                aspectRatio="landscape"
-                hint={t("coverLightHint") || "Recommended: 1200x630px"}
+                imageType="newsCover"
+                hint={t("coverLightHint") || "Recommended: 1200x600px (2:1)"}
               />
               <ImageUpload
                 label={t("darkMode") || "Dark Mode"}
                 name="coverImageDark"
                 formik={formik}
-                aspectRatio="landscape"
+                imageType="newsCover"
                 hint={t("coverDarkHint") || "Optional dark mode version"}
               />
             </div>
@@ -352,14 +352,14 @@ export default function NewsForm({
                 label={t("photoLight") || "Photo (Light)"}
                 name="authorImageLight"
                 formik={formik}
-                aspectRatio="square"
+                imageType="authorAvatar"
                 compact
               />
               <ImageUpload
                 label={t("photoDark") || "Photo (Dark)"}
                 name="authorImageDark"
                 formik={formik}
-                aspectRatio="square"
+                imageType="authorAvatar"
                 compact
               />
             </div>
