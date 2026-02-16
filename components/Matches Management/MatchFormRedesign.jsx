@@ -341,7 +341,7 @@ function MatchFormRedesign({
     let filtered = teamsOptions || [];
     if (formik.values.game) {
       filtered = filtered.filter((team) =>
-        team.games?.some((g) => g.id === formik.values.game)
+        (team.game?.id || team.game) === formik.values.game
       );
     }
     if (excludeTeamId) {

@@ -269,32 +269,24 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
             )}
           </div>
 
-          {/* Games Row */}
-          {team.games?.length > 0 && (
+          {/* Game Badge */}
+          {team.game && (
             <div className="flex items-center gap-1.5 flex-wrap">
-              {team.games.slice(0, 3).map((game) => (
-                <Badge
-                  key={game.id || game._id}
-                  variant="secondary"
-                  className="text-xs gap-1.5 bg-white/5 hover:bg-white/10 border-0"
-                >
-                  {game.logo?.light ? (
-                    <img
-                      src={game.logo.light}
-                      alt={game.name}
-                      className="size-3.5 rounded"
-                    />
-                  ) : (
-                    <Gamepad2 className="size-3.5" />
-                  )}
-                  {game.name}
-                </Badge>
-              ))}
-              {team.games.length > 3 && (
-                <Badge variant="secondary" className="text-xs bg-white/5 border-0">
-                  +{team.games.length - 3}
-                </Badge>
-              )}
+              <Badge
+                variant="secondary"
+                className="text-xs gap-1.5 bg-white/5 hover:bg-white/10 border-0"
+              >
+                {team.game.logo?.light ? (
+                  <img
+                    src={team.game.logo.light}
+                    alt={team.game.name}
+                    className="size-3.5 rounded"
+                  />
+                ) : (
+                  <Gamepad2 className="size-3.5" />
+                )}
+                {team.game.name}
+              </Badge>
             </div>
           )}
         </div>
@@ -370,31 +362,23 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
               {team.region}
             </Badge>
           )}
-          {team.games?.length > 0 && (
+          {team.game && (
             <div className="flex items-center gap-1.5">
-              {team.games.slice(0, 2).map((game) => (
-                <Badge
-                  key={game.id || game._id}
-                  variant="secondary"
-                  className="text-xs gap-1.5 bg-white/5 border-0"
-                >
-                  {game.logo?.light ? (
-                    <img
-                      src={game.logo.light}
-                      alt={game.name}
-                      className="size-3.5 rounded"
-                    />
-                  ) : (
-                    <Gamepad2 className="size-3.5" />
-                  )}
-                  {game.name}
-                </Badge>
-              ))}
-              {team.games.length > 2 && (
-                <Badge variant="secondary" className="text-xs bg-white/5 border-0">
-                  +{team.games.length - 2}
-                </Badge>
-              )}
+              <Badge
+                variant="secondary"
+                className="text-xs gap-1.5 bg-white/5 border-0"
+              >
+                {team.game.logo?.light ? (
+                  <img
+                    src={team.game.logo.light}
+                    alt={team.game.name}
+                    className="size-3.5 rounded"
+                  />
+                ) : (
+                  <Gamepad2 className="size-3.5" />
+                )}
+                {team.game.name}
+              </Badge>
             </div>
           )}
         </div>

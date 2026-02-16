@@ -616,7 +616,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
             const availableTeams = teams.filter(
               (team) =>
                 !selectedGame ||
-                team.games?.some((g) => (g.id || g._id || g) === selectedGame)
+                (team.game?.id || team.game?._id || team.game) === selectedGame
             );
             const filteredTeams = availableTeams.filter((team) =>
               team.name?.toLowerCase().includes(teamSearch.toLowerCase())

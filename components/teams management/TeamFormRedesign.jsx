@@ -41,7 +41,7 @@ import Image from "next/image";
 const validationSchema = yup.object({
   name: yup.string().required("nameRequired").max(100, "nameTooLong"),
   shortName: yup.string().max(20, "shortNameTooLong"),
-  games: yup.array().min(1, "gamesRequired"),
+  game: yup.string().required("gameRequired"),
   tournaments: yup.array(),
   players: yup.array(),
   description: yup.string().max(2000, "descriptionTooLong"),
@@ -100,7 +100,7 @@ function TeamFormRedesign({
       logoDark: team?.logo?.dark || "",
       coverImageLight: team?.coverImage?.light || "",
       coverImageDark: team?.coverImage?.dark || "",
-      games: team?.games?.map(g => g.id || g._id) || [],
+      game: team?.game?.id || team?.game?._id || "",
       tournaments: team?.tournaments?.map(t => t.id || t._id) || [],
       players: team?.players?.map(p => p.id || p._id) || [],
       worldRanking: team?.worldRanking ?? "",
@@ -119,7 +119,7 @@ function TeamFormRedesign({
           ...(team ? { id: team.id || team._id } : {}),
           name: values.name,
           slug: values.slug || values.name.replace(/\s+/g, "-").toLowerCase(),
-          games: values.games,
+          game: values.game,
         };
 
         // Only add optional fields if they have values
@@ -221,9 +221,9 @@ function TeamFormRedesign({
         </FormRow>
       </FormSection>
 
-      {/* Games */}
+      {/* Game */}
       <FormSection
-        title={t("gamesSection") || "Games"}
+        title={t("gamesSection") || "Game"}
         icon={<Gamepad2 className="size-5" />}
         badge={
           <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
@@ -231,12 +231,12 @@ function TeamFormRedesign({
           </span>
         }
       >
-        <GameMultiSelectField
-          label={t("selectGames") || "Select Games"}
-          name="games"
+        <GameSelectField
+          label={t("selectGames") || "Select Game"}
+          name="game"
           games={gamesOptions}
           formik={formik}
-          placeholder={t("gamesPlaceholder") || "Select games..."}
+          placeholder={t("gamesPlaceholder") || "Select game..."}
           searchPlaceholder={t("searchGames") || "Search games..."}
           required
         />
@@ -768,7 +768,147 @@ function RegionSelectField({
   );
 }
 
-// Game Multi-Select Field Component
+// Game Single-Select Field Component
+function GameSelectField({ label, name, games, formik, placeholder, searchPlaceholder, required }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+  const t = useTranslations("teamForm");
+
+  const safeGames = Array.isArray(games) ? games : [];
+  const getGameId = (game) => game?.id || game?._id;
+  const selectedGame = safeGames.find((g) => getGameId(g) === value);
+
+  const filteredGames = safeGames.filter((game) =>
+    game.name?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleSelect = async (game) => {
+    await formik.setFieldValue(name, getGameId(game));
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
+    setIsOpen(false);
+    setSearch("");
+  };
+
+  const handleClear = async (e) => {
+    e.stopPropagation();
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <div
+            role="button"
+            tabIndex={0}
+            className={`w-full h-12 px-4 rounded-xl bg-gray-100 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-gray-200 dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
+              error ? "ring-2 ring-red-500 border-red-500" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {selectedGame ? (
+                <>
+                  <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-green-primary/10 flex items-center justify-center">
+                    {selectedGame.logo?.light ? (
+                      <img src={selectedGame.logo.light} alt={selectedGame.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Gamepad2 className="size-4 text-green-primary" />
+                    )}
+                  </div>
+                  <span className="text-gray-900 dark:text-white font-medium truncate">{selectedGame.name}</span>
+                </>
+              ) : (
+                <>
+                  <div className="size-8 rounded-lg bg-gray-100 dark:bg-[#252a3d] flex items-center justify-center flex-shrink-0">
+                    <Gamepad2 className="size-4 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <span className="text-gray-600 dark:text-gray-400">{placeholder}</span>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {selectedGame && (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={handleClear}
+                  onKeyDown={(e) => e.key === "Enter" && handleClear(e)}
+                  className="size-7 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors group cursor-pointer"
+                >
+                  <X className="size-4 text-gray-400 group-hover:text-red-500" />
+                </span>
+              )}
+              <ChevronDown className={`size-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </div>
+          </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-white dark:bg-[#12141c] border-gray-200 dark:border-white/10" align="start">
+          <div className="p-3 border-b border-gray-200 dark:border-white/10">
+            <div className="relative">
+              <Search className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={searchPlaceholder}
+                className="w-full h-10 pl-10 pr-4 rtl:pl-4 rtl:pr-10 rounded-lg bg-gray-50 dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-primary/50"
+                autoFocus
+              />
+            </div>
+          </div>
+          <div className="max-h-64 overflow-y-auto p-2">
+            {filteredGames.length === 0 ? (
+              <div className="py-6 text-center text-sm text-gray-400">
+                {t("noGamesFound") || "No games found"}
+              </div>
+            ) : (
+              filteredGames.map((game) => {
+                const gameId = getGameId(game);
+                const isSelected = value === gameId;
+                return (
+                  <button
+                    key={gameId}
+                    type="button"
+                    onClick={() => handleSelect(game)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                      isSelected ? "bg-green-primary/10 text-green-primary" : "hover:bg-gray-100 dark:hover:bg-[#1a1d2e]"
+                    }`}
+                  >
+                    <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-[#252a3d]">
+                      {game.logo?.light ? (
+                        <img src={game.logo.light} alt={game.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Gamepad2 className="size-4 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                    <span className={`text-sm font-medium ${isSelected ? "text-green-primary" : "text-gray-900 dark:text-white"}`}>
+                      {game.name}
+                    </span>
+                    {isSelected && <Check className="size-4 text-green-primary ml-auto" />}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+      {error && <p className="text-xs text-red-500">{t(error) || error}</p>}
+    </div>
+  );
+}
+
+// Game Multi-Select Field Component (unused for teams, kept for reference)
 function GameMultiSelectField({
   label,
   name,

@@ -307,7 +307,7 @@ function MatchesFrom({
             options={mappedArrayToSelectOptions(
               (teamsOptions || [])
                 .filter((team) =>
-                  team.games?.find((g) => g.id === formik.values?.game)
+                  (team.game?.id || team.game) === formik.values?.game
                 )
                 .filter((team) => team.id !== formik.values?.team2),
               "name",
@@ -338,7 +338,7 @@ function MatchesFrom({
             options={mappedArrayToSelectOptions(
               (teamsOptions || [])
                 .filter((team) =>
-                  team.games?.find((g) => g.id === formik.values?.game)
+                  (team.game?.id || team.game) === formik.values?.game
                 )
                 .filter((team) => team.id !== formik.values?.team1),
               "name",

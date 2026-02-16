@@ -75,7 +75,7 @@ function TeamForm({
       // game: team?.game || "",
 
       // tournaments: team?.tournaments || [],
-      games: team?.games || [],
+      game: team?.game || null,
       // matches: team?.matches || [],
       // players: team?.players || [],
       // news: team?.news || [],
@@ -88,7 +88,7 @@ function TeamForm({
         (c) => c.value === dataValues.country
       );
 
-      console.log("games", dataValues.games);
+      console.log("game", dataValues.game);
 
       dataValues = {
         ...dataValues,
@@ -102,7 +102,7 @@ function TeamForm({
           code: selectedCountry.value,
           flag: selectedCountry.value,
         },
-        games: dataValues.games.map((g) => g.id || g.value),
+        game: dataValues.game?.id || dataValues.game?.value || dataValues.game,
       };
 
       // console.log("dataValues", dataValues);
@@ -378,21 +378,21 @@ function TeamForm({
 
       <FormSection>
         <FormRow>
-          <ComboboxInput
-            name={"games"}
+          <SelectInput
             formik={formik}
-            placeholder={t("Enter Games")}
+            value={formik?.values?.game?.id || formik?.values?.game}
             options={mappedArrayToSelectOptions(
               gamesOptions || [],
               "name",
               "id"
             )}
-            initialData={mappedArrayToSelectOptions(
-              formik?.values?.games,
-              "name",
-              "id"
-            )}
-            label={t("Games")}
+            name={"game"}
+            label={t("Game")}
+            placeholder={t("Select Game")}
+            onChange={(value) => {
+              const selectedGame = gamesOptions.find((g) => g.id === value);
+              formik.setFieldValue("game", selectedGame || value);
+            }}
           />
           {/* <ComboboxInput
             name={"players"}

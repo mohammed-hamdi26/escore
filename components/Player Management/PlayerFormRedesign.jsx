@@ -813,28 +813,23 @@ function GameSelectField({
 
   const getGameId = (game) => game?.id || game?._id;
 
-  // If a team is selected, show only that team's games
-  const teamGames = selectedTeam?.games || [];
-  const hasTeamFilter = selectedTeam && teamGames.length > 0;
+  // If a team is selected, show only that team's game
+  const teamGame = selectedTeam?.game || null;
+  const hasTeamFilter = selectedTeam && teamGame;
 
   // Determine the display list
   let displayGames;
   if (hasTeamFilter) {
-    // Check if team's games are full objects (have name) or just IDs
-    if (teamGames[0]?.name) {
-      // Full game objects from team - use directly
-      displayGames = teamGames;
+    // Team has a single game - show only that game
+    if (teamGame?.name) {
+      // Full game object from team - use directly
+      displayGames = [teamGame];
     } else {
-      // Just IDs - resolve from all known games
-      const teamGameIds = teamGames.map(g => g?.id || g?._id || g);
+      // Just an ID - resolve from all known games
+      const teamGameId = teamGame?.id || teamGame?._id || teamGame;
       const allKnownGames = [...initialGames, ...games];
-      const seen = new Set();
-      displayGames = allKnownGames.filter(g => {
-        const gId = getGameId(g);
-        if (seen.has(gId)) return false;
-        seen.add(gId);
-        return teamGameIds.includes(gId);
-      });
+      const resolved = allKnownGames.find(g => getGameId(g) === teamGameId);
+      displayGames = resolved ? [resolved] : [];
     }
   } else {
     displayGames = games;
@@ -849,7 +844,7 @@ function GameSelectField({
     return true;
   });
 
-  const selectedGame = [...initialGames, ...games, ...(teamGames[0]?.name ? teamGames : [])].find((g) => getGameId(g) === value);
+  const selectedGame = [...initialGames, ...games, ...(teamGame?.name ? [teamGame] : [])].find((g) => getGameId(g) === value);
 
   // Fetch games from server (only when no team is selected)
   const fetchGames = useCallback(async (searchTerm, pageNum, reset = false) => {
@@ -1207,9 +1202,9 @@ function TeamSelectField({
                     <span className="text-foreground font-medium truncate">
                       {selectedTeam.name}
                     </span>
-                    {selectedTeam.games?.length > 0 && (
+                    {selectedTeam.game && (
                       <span className="text-xs text-muted-foreground bg-muted dark:bg-[#252a3d] px-2 py-0.5 rounded">
-                        {selectedTeam.games.length} games
+                        {selectedTeam.game.name || "1 game"}
                       </span>
                     )}
                   </div>
@@ -1304,9 +1299,9 @@ function TeamSelectField({
                           {team.name}
                         </span>
                       </div>
-                      {team.games?.length > 0 && (
+                      {team.game && (
                         <span className="text-xs text-muted-foreground bg-muted dark:bg-[#252a3d] px-2 py-0.5 rounded">
-                          {team.games.length}
+                          {team.game.name || "1"}
                         </span>
                       )}
                       {isSelected && (

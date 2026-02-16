@@ -409,32 +409,28 @@ function TeamDetails({ team }) {
               <Gamepad2 className="size-5 text-green-primary" />
               {t("games") || "Games"}
             </h3>
-            {team.games && team.games.length > 0 ? (
-              <div className="space-y-3">
-                {team.games.map((game, index) => (
-                  <div key={game.id || game._id || index} className="flex items-center gap-3">
-                    {game.logo?.light ? (
-                      <img
-                        src={game.logo.light}
-                        alt={game.name}
-                        className="size-10 rounded-xl object-cover"
-                      />
-                    ) : (
-                      <div className="size-10 rounded-xl bg-muted flex items-center justify-center">
-                        <Gamepad2 className="size-5 text-muted-foreground" />
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-semibold text-foreground">{game.name}</p>
-                      {game.slug && (
-                        <p className="text-sm text-muted-foreground">@{game.slug}</p>
-                      )}
-                    </div>
+            {team.game ? (
+              <div className="flex items-center gap-3">
+                {team.game.logo?.light ? (
+                  <img
+                    src={team.game.logo.light}
+                    alt={team.game.name}
+                    className="size-10 rounded-xl object-cover"
+                  />
+                ) : (
+                  <div className="size-10 rounded-xl bg-muted flex items-center justify-center">
+                    <Gamepad2 className="size-5 text-muted-foreground" />
                   </div>
-                ))}
+                )}
+                <div>
+                  <p className="font-semibold text-foreground">{team.game.name}</p>
+                  {team.game.slug && (
+                    <p className="text-sm text-muted-foreground">@{team.game.slug}</p>
+                  )}
+                </div>
               </div>
             ) : (
-              <p className="text-muted-foreground">{t("noGames") || "No games assigned"}</p>
+              <p className="text-muted-foreground">{t("noGames") || "No game assigned"}</p>
             )}
           </div>
 
