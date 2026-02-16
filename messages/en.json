@@ -1191,7 +1191,8 @@
     "team1Required": "Team 1 is required",
     "team2Required": "Team 2 is required",
     "quickSelect": "Quick Select",
-    "done": "Done"
+    "done": "Done",
+    "autoStatusHint": "Setting Start Time and End Time enables automatic status transitions. The match will auto-switch to Live when the start time arrives, and to Completed when the end time passes."
   },
   "MatchesTable": {
     "Date": "Date",

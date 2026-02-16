@@ -270,11 +270,15 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
             </div>
           </div>
 
-          {/* Tournament */}
-          {match.tournament && (
+          {/* Event & Tournament */}
+          {(match.event || match.tournament) && (
             <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-              <Trophy className="size-3" />
-              <span className="truncate">{match.tournament.name}</span>
+              <Trophy className="size-3 flex-shrink-0" />
+              <span className="truncate">
+                {match.event && match.tournament
+                  ? `${match.event.name} — ${match.tournament.name}`
+                  : match.tournament?.name || match.event?.name}
+              </span>
             </div>
           )}
 
@@ -540,10 +544,14 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
           </div>
         </div>
 
-        {/* Tournament */}
+        {/* Event & Tournament */}
         <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground min-w-[150px]">
-          <Trophy className="size-4" />
-          <span className="truncate">{match.tournament?.name || "-"}</span>
+          <Trophy className="size-4 flex-shrink-0" />
+          <span className="truncate">
+            {match.event && match.tournament
+              ? `${match.event.name} — ${match.tournament.name}`
+              : match.tournament?.name || match.event?.name || "-"}
+          </span>
         </div>
 
         {/* Date */}

@@ -33,6 +33,7 @@ import {
   ExternalLink,
   Hash,
   AlertCircle,
+  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -573,6 +574,14 @@ function MatchFormRedesign({
             hint={t("actualEndTime") || "Actual end time"}
           />
         </FormRow>
+
+        {/* Auto-status hint */}
+        <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
+          <Info className="size-4 text-blue-500 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-blue-600 dark:text-blue-400 leading-relaxed">
+            {t("autoStatusHint") || "Setting Start Time and End Time enables automatic status transitions. The match will auto-switch to Live when the start time arrives, and to Completed when the end time passes."}
+          </p>
+        </div>
       </FormSection>
 
       {/* Venue Section */}
