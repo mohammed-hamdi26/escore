@@ -618,35 +618,41 @@ function MatchFormRedesign({
         )}
       </FormSection>
 
-      {/* Links Section */}
-      <FormSection
-        title={t("links") || "Links"}
-        icon={<LinkIcon className="size-5" />}
-        badge={
-          <span className="text-xs bg-gray-200 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded">
-            {t("optional") || "Optional"}
-          </span>
-        }
-      >
-        <FormRow cols={2}>
-          <InputField
-            label={t("streamUrl") || "Stream URL"}
-            name="streamUrl"
-            placeholder={t("streamUrlPlaceholder") || "https://twitch.tv/..."}
-            formik={formik}
-            icon={<Video className="size-5 text-purple-500" />}
-            type="url"
-          />
-          <InputField
-            label={t("highlightsUrl") || "Highlights URL"}
-            name="highlightsUrl"
-            placeholder={t("highlightsUrlPlaceholder") || "https://youtube.com/..."}
-            formik={formik}
-            icon={<ExternalLink className="size-5 text-red-500" />}
-            type="url"
-          />
-        </FormRow>
-      </FormSection>
+      {/* Links Section — show Stream URL for scheduled/live, Highlights URL for completed */}
+      {(formik.values.status === "scheduled" || formik.values.status === "live" || formik.values.status === "completed") && (
+        <FormSection
+          title={t("links") || "Links"}
+          icon={<LinkIcon className="size-5" />}
+          badge={
+            <span className="text-xs bg-gray-200 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded">
+              {t("optional") || "Optional"}
+            </span>
+          }
+        >
+          <FormRow cols={1}>
+            {formik.values.status !== "completed" && (
+              <InputField
+                label={t("streamUrl") || "Stream URL"}
+                name="streamUrl"
+                placeholder={t("streamUrlPlaceholder") || "https://twitch.tv/..."}
+                formik={formik}
+                icon={<Video className="size-5 text-purple-500" />}
+                type="url"
+              />
+            )}
+            {formik.values.status === "completed" && (
+              <InputField
+                label={t("highlightsUrl") || "Highlights URL"}
+                name="highlightsUrl"
+                placeholder={t("highlightsUrlPlaceholder") || "https://youtube.com/..."}
+                formik={formik}
+                icon={<ExternalLink className="size-5 text-red-500" />}
+                type="url"
+              />
+            )}
+          </FormRow>
+        </FormSection>
+      )}
 
       {/* Submit Buttons */}
       <div className="flex justify-end gap-4">

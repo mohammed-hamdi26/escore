@@ -679,47 +679,53 @@ function MatchesFrom({
         </FormRow>
       </FormSection>
 
-      {/* URLs Section */}
-      <FormSection>
-        <FormRow>
-          <InputApp
-            t={t}
-            disabled={formik.isSubmitting}
-            label={t("Stream URL")}
-            name={"streamUrl"}
-            type={"text"}
-            placeholder={t("Enter Stream URL")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            error={
-              formik?.errors?.streamUrl && formik?.touched?.streamUrl
-                ? formik?.errors?.streamUrl
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            value={formik.values.streamUrl}
-          />
-          <InputApp
-            label={t("Highlight URL")}
-            name={"highlightsUrl"}
-            type={"text"}
-            placeholder={t("Enter Highlight URL")}
-            className=" border-0 focus:outline-none "
-            backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
-            textColor="text-[#677185]"
-            error={
-              formik?.errors?.highlightsUrl && formik?.touched?.highlightsUrl
-                ? formik?.errors?.highlightsUrl
-                : ""
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            value={formik.values.highlightsUrl}
-          />
-        </FormRow>
-      </FormSection>
+      {/* URLs Section — show Stream URL for scheduled/live, Highlights URL for completed */}
+      {(formik.values.status === "scheduled" || formik.values.status === "live" || formik.values.status === "completed") && (
+        <FormSection>
+          <FormRow>
+            {formik.values.status !== "completed" && (
+              <InputApp
+                t={t}
+                disabled={formik.isSubmitting}
+                label={t("Stream URL")}
+                name={"streamUrl"}
+                type={"text"}
+                placeholder={t("Enter Stream URL")}
+                className=" border-0 focus:outline-none "
+                backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+                textColor="text-[#677185]"
+                error={
+                  formik?.errors?.streamUrl && formik?.touched?.streamUrl
+                    ? formik?.errors?.streamUrl
+                    : ""
+                }
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                value={formik.values.streamUrl}
+              />
+            )}
+            {formik.values.status === "completed" && (
+              <InputApp
+                label={t("Highlight URL")}
+                name={"highlightsUrl"}
+                type={"text"}
+                placeholder={t("Enter Highlight URL")}
+                className=" border-0 focus:outline-none "
+                backGroundColor={"bg-dashboard-box  dark:bg-[#0F1017]"}
+                textColor="text-[#677185]"
+                error={
+                  formik?.errors?.highlightsUrl && formik?.touched?.highlightsUrl
+                    ? formik?.errors?.highlightsUrl
+                    : ""
+                }
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                value={formik.values.highlightsUrl}
+              />
+            )}
+          </FormRow>
+        </FormSection>
+      )}
 
       {/* Submit Button */}
       <div className="flex justify-end">
