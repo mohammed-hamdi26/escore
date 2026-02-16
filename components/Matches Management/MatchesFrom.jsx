@@ -149,28 +149,19 @@ function MatchesFrom({
                 : undefined,
           },
           // isOnline is already a boolean from the toggle
-          scheduledDate: format(
-            combineDateAndTime(dataValues.date, dataValues.time),
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-          ),
+          scheduledDate: combineDateAndTime(dataValues.date, dataValues.time).toISOString(),
         };
 
         // Only include startedAt if provided
         if (dataValues.startedAt) {
-          dataValues.startedAt = format(
-            combineDateAndTime(dataValues.date, dataValues.startedAt),
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-          );
+          dataValues.startedAt = combineDateAndTime(dataValues.date, dataValues.startedAt).toISOString();
         } else {
           delete dataValues.startedAt;
         }
 
         // Only include endedAt if provided
         if (dataValues.endedAt) {
-          dataValues.endedAt = format(
-            combineDateAndTime(dataValues.date, dataValues.endedAt),
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-          );
+          dataValues.endedAt = combineDateAndTime(dataValues.date, dataValues.endedAt).toISOString();
         } else {
           delete dataValues.endedAt;
         }

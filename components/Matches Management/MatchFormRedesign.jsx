@@ -168,26 +168,17 @@ function MatchFormRedesign({
                 ? dataValues.team2
                 : undefined,
           },
-          scheduledDate: format(
-            combineDateAndTime(dataValues.date, dataValues.time),
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-          ),
+          scheduledDate: combineDateAndTime(dataValues.date, dataValues.time).toISOString(),
         };
 
         if (dataValues.startedAt) {
-          dataValues.startedAt = format(
-            combineDateAndTime(dataValues.date, dataValues.startedAt),
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-          );
+          dataValues.startedAt = combineDateAndTime(dataValues.date, dataValues.startedAt).toISOString();
         } else {
           delete dataValues.startedAt;
         }
 
         if (dataValues.endedAt) {
-          dataValues.endedAt = format(
-            combineDateAndTime(dataValues.date, dataValues.endedAt),
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-          );
+          dataValues.endedAt = combineDateAndTime(dataValues.date, dataValues.endedAt).toISOString();
         } else {
           delete dataValues.endedAt;
         }
