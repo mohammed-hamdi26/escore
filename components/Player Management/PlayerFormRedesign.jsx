@@ -42,6 +42,7 @@ import { Calendar as CalendarComponent } from "../ui/calendar";
 import Image from "next/image";
 
 // Validation schema - fullName and gameRosters are required
+// A player can only have one game roster entry (one team, one game, one role)
 const validationSchema = yup.object({
   fullName: yup.string().required("fullNameRequired").max(100, "fullNameTooLong"),
   nickname: yup.string().max(50, "nicknameTooLong"),
@@ -51,15 +52,7 @@ const validationSchema = yup.object({
       team: yup.string().nullable(),
       role: yup.string().max(50, "roleTooLong"),
     })
-  ).min(1, "atLeastOneGame").test(
-    'unique-games',
-    'duplicateGames',
-    function(rosters) {
-      if (!rosters) return true;
-      const games = rosters.map(r => r.game).filter(Boolean);
-      return new Set(games).size === games.length;
-    }
-  ),
+  ).min(1, "atLeastOneGame").max(1, "onlyOneGame"),
   dateOfBirth: yup.string(),
   country: yup.string(),
   photoLight: yup.string(),
@@ -80,20 +73,16 @@ function PlayerFormRedesign({
   const t = useTranslations("playerForm");
   const router = useRouter();
 
-  // Track selected team objects per roster index (for passing to GameSelectField)
-  const [selectedTeamObjects, setSelectedTeamObjects] = useState(() => {
-    const initial = {};
+  // Track the selected team object (for filtering games by team)
+  const [selectedTeamObject, setSelectedTeamObject] = useState(() => {
     const rosters = player?.gameRosters?.length > 0
       ? player.gameRosters
       : (player?.game ? [{ game: player.game, team: player.team }] : []);
-    rosters.forEach((r, i) => {
-      if (r.team) {
-        const teamId = r.team?.id || r.team?._id || r.team;
-        const teamObj = teamsOptions.find(t => (t.id || t._id) === teamId);
-        if (teamObj) initial[i] = teamObj;
-      }
-    });
-    return initial;
+    if (rosters[0]?.team) {
+      const teamId = rosters[0].team?.id || rosters[0].team?._id || rosters[0].team;
+      return teamsOptions.find(t => (t.id || t._id) === teamId) || null;
+    }
+    return null;
   });
 
   // Helper function to format date to YYYY-MM-DD using local timezone
@@ -252,96 +241,48 @@ function PlayerFormRedesign({
         }
       >
         <div className="space-y-4">
-          {formik.values.gameRosters.map((roster, index) => (
-            <div key={index} className="p-4 rounded-xl bg-muted/30 dark:bg-[#151828] border border-border space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-muted-foreground">
-                  {t("gameEntry") || "Game"} #{index + 1}
-                </span>
-                {formik.values.gameRosters.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newRosters = [...formik.values.gameRosters];
-                      newRosters.splice(index, 1);
-                      formik.setFieldValue("gameRosters", newRosters);
-                    }}
-                    className="p-1.5 rounded-lg hover:bg-red-500/20 transition-colors group"
-                  >
-                    <X className="size-4 text-muted-foreground group-hover:text-red-500" />
-                  </button>
-                )}
-              </div>
-              <FormRow cols={3}>
-                <TeamSelectField
-                  label={t("team")}
-                  name={`gameRosters[${index}].team`}
-                  initialTeams={teamsOptions}
-                  formik={formik}
-                  placeholder={t("teamPlaceholder")}
-                  searchPlaceholder={t("searchTeams") || "Search teams..."}
-                  value={roster.team}
-                  onChange={async (teamId, teamObj) => {
-                    await formik.setFieldValue(`gameRosters[${index}].team`, teamId);
-                    // Clear game when team changes (game options depend on team)
-                    await formik.setFieldValue(`gameRosters[${index}].game`, "");
-                    setSelectedTeamObjects(prev => {
-                      const next = { ...prev };
-                      if (teamObj) {
-                        next[index] = teamObj;
-                      } else {
-                        delete next[index];
-                      }
-                      return next;
-                    });
-                  }}
-                />
-                <GameSelectField
-                  label={t("mainGame")}
-                  name={`gameRosters[${index}].game`}
-                  initialGames={gamesOptions}
-                  selectedTeam={selectedTeamObjects[index] || null}
-                  usedGames={formik.values.gameRosters
-                    .filter((r, i) => i !== index && r.game)
-                    .map(r => r.game)}
-                  formik={formik}
-                  placeholder={t("mainGamePlaceholder")}
-                  searchPlaceholder={t("searchGames") || "Search games..."}
-                  required
-                  value={roster.game}
-                  onChange={async (gameId) => {
-                    await formik.setFieldValue(`gameRosters[${index}].game`, gameId);
-                  }}
-                />
-                <RoleSelectField
-                  label={t("role")}
-                  name={`gameRosters[${index}].role`}
-                  placeholder={t("rolePlaceholder")}
-                  formik={formik}
-                  hint={t("roleHint")}
-                  value={roster.role}
-                  onChange={async (role) => {
-                    await formik.setFieldValue(`gameRosters[${index}].role`, role);
-                  }}
-                />
-              </FormRow>
-            </div>
-          ))}
-
-          {/* Add Game button */}
-          <button
-            type="button"
-            onClick={() => {
-              formik.setFieldValue("gameRosters", [
-                ...formik.values.gameRosters,
-                { game: "", team: "", role: "" },
-              ]);
-            }}
-            className="w-full py-3 rounded-xl border-2 border-dashed border-muted-foreground/20 hover:border-green-primary/50 hover:bg-green-primary/5 transition-all flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-green-primary"
-          >
-            <Plus className="size-4" />
-            {t("addGame") || "Add Game"}
-          </button>
+          <FormRow cols={3}>
+            <TeamSelectField
+              label={t("team")}
+              name="gameRosters[0].team"
+              initialTeams={teamsOptions}
+              formik={formik}
+              placeholder={t("teamPlaceholder")}
+              searchPlaceholder={t("searchTeams") || "Search teams..."}
+              value={formik.values.gameRosters[0]?.team}
+              onChange={async (teamId, teamObj) => {
+                await formik.setFieldValue("gameRosters[0].team", teamId);
+                // Clear game when team changes (game options depend on team)
+                await formik.setFieldValue("gameRosters[0].game", "");
+                setSelectedTeamObject(teamObj || null);
+              }}
+            />
+            <GameSelectField
+              label={t("mainGame")}
+              name="gameRosters[0].game"
+              initialGames={gamesOptions}
+              selectedTeam={selectedTeamObject}
+              formik={formik}
+              placeholder={t("mainGamePlaceholder")}
+              searchPlaceholder={t("searchGames") || "Search games..."}
+              required
+              value={formik.values.gameRosters[0]?.game}
+              onChange={async (gameId) => {
+                await formik.setFieldValue("gameRosters[0].game", gameId);
+              }}
+            />
+            <RoleSelectField
+              label={t("role")}
+              name="gameRosters[0].role"
+              placeholder={t("rolePlaceholder")}
+              formik={formik}
+              hint={t("roleHint")}
+              value={formik.values.gameRosters[0]?.role}
+              onChange={async (role) => {
+                await formik.setFieldValue("gameRosters[0].role", role);
+              }}
+            />
+          </FormRow>
 
           {/* Validation error for the array */}
           {typeof formik.errors.gameRosters === 'string' && formik.touched.gameRosters && (
@@ -837,7 +778,6 @@ function GameSelectField({
   name,
   initialGames = [],
   selectedTeam = null,
-  usedGames = [],
   formik,
   placeholder,
   searchPlaceholder,
@@ -900,10 +840,8 @@ function GameSelectField({
     displayGames = games;
   }
 
-  // Filter out already-used games and apply client search when team is selected
+  // Apply client search when team is selected
   const filteredGames = displayGames?.filter(g => {
-    const gId = getGameId(g);
-    if (usedGames.includes(gId) && gId !== value) return false;
     if (hasTeamFilter && search) {
       return g.name?.toLowerCase().includes(search.toLowerCase()) ||
              g.slug?.toLowerCase().includes(search.toLowerCase());
