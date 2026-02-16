@@ -1,4 +1,5 @@
 import { updateMatch } from "@/app/[locale]/_Lib/actions";
+import { getEvents } from "@/app/[locale]/_Lib/eventsApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getMatch } from "@/app/[locale]/_Lib/matchesApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
@@ -12,12 +13,13 @@ export default async function EditMatchPage({ params }) {
   const { id } = await params;
   const t = await getTranslations("MatchForm");
 
-  const [match, { data: teamsOptions }, { data: gamesOptions }, { data: tournamentsOptions }] =
+  const [match, { data: teamsOptions }, { data: gamesOptions }, { data: tournamentsOptions }, { data: eventsOptions }] =
     await Promise.all([
       getMatch(id),
       getTeams({ size: 500 }),
       getGames({ limit: 100 }),
       getTournaments({ size: 500 }),
+      getEvents({ size: 500 }),
     ]);
 
   return (
@@ -28,6 +30,7 @@ export default async function EditMatchPage({ params }) {
           <MatchFormRedesign
             gamesOptions={gamesOptions || []}
             teamsOptions={teamsOptions || []}
+            eventsOptions={eventsOptions || []}
             match={match}
             formType="edit"
             tournamentsOptions={tournamentsOptions || []}

@@ -34,6 +34,7 @@ import {
   Hash,
   AlertCircle,
   Info,
+  CalendarDays,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -108,6 +109,7 @@ function MatchFormRedesign({
   teamsOptions = [],
   gamesOptions = [],
   tournamentsOptions = [],
+  eventsOptions = [],
   submit,
   match,
   formType = "add",
@@ -132,6 +134,7 @@ function MatchFormRedesign({
       streamUrl: match?.streamUrl || "",
       highlightsUrl: match?.highlightsUrl || "",
       round: match?.round || "",
+      event: match?.event?.id || "",
       tournament: match?.tournament?.id || "",
       game: match?.game?.id || "",
       team1: match?.team1?.id || "",
@@ -189,6 +192,7 @@ function MatchFormRedesign({
         delete dataValues.team1Score;
         delete dataValues.team2Score;
 
+        if (!dataValues.event) delete dataValues.event;
         if (!dataValues.tournament) delete dataValues.tournament;
         if (!dataValues.round) delete dataValues.round;
         if (!dataValues.venue) delete dataValues.venue;
@@ -346,6 +350,19 @@ function MatchFormRedesign({
     return filtered;
   };
 
+  // Get tournaments filtered by selected event
+  const getFilteredTournaments = () => {
+    if (formik.values.event) {
+      return tournamentsOptions.filter((t) =>
+        t.parentEvents?.some((pe) => {
+          const peId = pe?.id || pe?._id || pe;
+          return peId === formik.values.event;
+        })
+      );
+    }
+    return tournamentsOptions;
+  };
+
   // Get games from selected tournament or all games
   const getAvailableGames = () => {
     if (formik.values.tournament) {
@@ -357,9 +374,9 @@ function MatchFormRedesign({
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
-      {/* Tournament & Game Section */}
+      {/* Event, Tournament & Game Section */}
       <FormSection
-        title={t("tournamentAndGame") || "Tournament & Game"}
+        title={t("eventTournamentAndGame") || "Event, Tournament & Game"}
         icon={<Trophy className="size-5" />}
         badge={
           <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
@@ -367,18 +384,40 @@ function MatchFormRedesign({
           </span>
         }
       >
-        <FormRow cols={2}>
-          <TournamentSelectField
-            label={t("tournament") || "Tournament"}
-            name="tournament"
-            tournaments={tournamentsOptions}
+        <FormRow cols={3}>
+          <EventSelectField
+            label={t("event") || "Event"}
+            name="event"
+            events={eventsOptions}
             formik={formik}
-            placeholder={t("selectTournament") || "Select tournament"}
-            searchPlaceholder={t("searchTournaments") || "Search tournaments..."}
-            onTournamentChange={() => {
+            placeholder={t("selectEvent") || "Select event"}
+            searchPlaceholder={t("searchEvents") || "Search events..."}
+            onEventChange={() => {
+              formik.setFieldValue("tournament", "");
               formik.setFieldValue("game", "");
               formik.setFieldValue("team1", "");
               formik.setFieldValue("team2", "");
+            }}
+          />
+          <TournamentSelectField
+            label={t("tournament") || "Tournament"}
+            name="tournament"
+            tournaments={getFilteredTournaments()}
+            formik={formik}
+            placeholder={t("selectTournament") || "Select tournament"}
+            searchPlaceholder={t("searchTournaments") || "Search tournaments..."}
+            onTournamentChange={(tournamentId) => {
+              formik.setFieldValue("game", "");
+              formik.setFieldValue("team1", "");
+              formik.setFieldValue("team2", "");
+              // Auto-fill event if tournament belongs to exactly one event
+              if (tournamentId && !formik.values.event) {
+                const selected = tournamentsOptions.find((t) => (t.id || t._id) === tournamentId);
+                if (selected?.parentEvents?.length === 1) {
+                  const peId = selected.parentEvents[0]?.id || selected.parentEvents[0]?._id || selected.parentEvents[0];
+                  formik.setFieldValue("event", peId);
+                }
+              }
             }}
           />
           <GameSelectField
@@ -1033,10 +1072,11 @@ function TournamentSelectField({
   );
 
   const handleSelect = async (tournament) => {
-    await formik.setFieldValue(name, getTournamentId(tournament));
+    const id = getTournamentId(tournament);
+    await formik.setFieldValue(name, id);
     await formik.setFieldTouched(name, true, true);
     formik.validateField(name);
-    if (onTournamentChange) onTournamentChange();
+    if (onTournamentChange) onTournamentChange(id);
     setIsOpen(false);
     setSearch("");
   };
@@ -1046,7 +1086,7 @@ function TournamentSelectField({
     await formik.setFieldValue(name, "");
     await formik.setFieldTouched(name, true, true);
     formik.validateField(name);
-    if (onTournamentChange) onTournamentChange();
+    if (onTournamentChange) onTournamentChange(null);
   };
 
   return (
@@ -1152,6 +1192,163 @@ function TournamentSelectField({
                       {tournament.name}
                     </span>
                     {isSelected && <Check className="size-4 text-amber-500 flex-shrink-0" />}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+      {error && <p className="text-xs text-red-500">{t(error) || error}</p>}
+    </div>
+  );
+}
+
+// Event Select Field
+function EventSelectField({
+  label,
+  name,
+  events,
+  formik,
+  placeholder,
+  searchPlaceholder,
+  onEventChange,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+  const t = useTranslations("MatchForm");
+
+  const getEventId = (event) => event?.id || event?._id;
+  const selectedEvent = events?.find((e) => getEventId(e) === value);
+
+  const filteredEvents = events?.filter(
+    (event) =>
+      event.name?.toLowerCase().includes(search.toLowerCase()) ||
+      event.slug?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleSelect = async (event) => {
+    await formik.setFieldValue(name, getEventId(event));
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
+    if (onEventChange) onEventChange();
+    setIsOpen(false);
+    setSearch("");
+  };
+
+  const handleClear = async (e) => {
+    e.stopPropagation();
+    await formik.setFieldValue(name, "");
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
+    if (onEventChange) onEventChange();
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">{label}</label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <div
+            role="button"
+            tabIndex={0}
+            className={`w-full h-12 px-4 rounded-xl bg-gray-100 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-gray-200 dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
+              error ? "ring-2 ring-red-500 border-red-500" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {selectedEvent ? (
+                <>
+                  <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-purple-500/10 flex items-center justify-center">
+                    {selectedEvent.logo?.light ? (
+                      <img
+                        src={selectedEvent.logo.light}
+                        alt={selectedEvent.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <CalendarDays className="size-4 text-purple-500" />
+                    )}
+                  </div>
+                  <span className="text-gray-900 dark:text-white font-medium truncate">
+                    {selectedEvent.name}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <div className="size-8 rounded-lg bg-gray-100 dark:bg-[#252a3d] flex items-center justify-center flex-shrink-0">
+                    <CalendarDays className="size-4 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <span className="text-gray-600 dark:text-gray-400">{placeholder}</span>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {selectedEvent && (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={handleClear}
+                  onKeyDown={(e) => e.key === "Enter" && handleClear(e)}
+                  className="size-7 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors group cursor-pointer"
+                >
+                  <X className="size-4 text-gray-600 dark:text-gray-400 group-hover:text-red-500" />
+                </span>
+              )}
+              <ChevronDown className={`size-4 text-gray-600 dark:text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </div>
+          </div>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-0 bg-white dark:bg-[#12141c] border-gray-200 dark:border-white/10"
+          align="start"
+        >
+          <div className="p-3 border-b border-gray-200 dark:border-white/10">
+            <div className="relative">
+              <Search className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 size-4 text-gray-600 dark:text-gray-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={searchPlaceholder}
+                className="w-full h-10 pl-10 pr-4 rtl:pl-4 rtl:pr-10 rounded-lg bg-gray-100 dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-primary/50"
+                autoFocus
+              />
+            </div>
+          </div>
+          <div className="max-h-64 overflow-y-auto p-2">
+            {filteredEvents?.length === 0 ? (
+              <div className="py-6 text-center text-sm text-gray-600 dark:text-gray-400">
+                {t("noEventsFound") || "No events found"}
+              </div>
+            ) : (
+              filteredEvents?.map((event) => {
+                const eventId = getEventId(event);
+                const isSelected = value === eventId;
+                return (
+                  <button
+                    key={eventId}
+                    type="button"
+                    onClick={() => handleSelect(event)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                      isSelected ? "bg-purple-500/10 text-purple-500" : "hover:bg-gray-200 dark:hover:bg-[#1a1d2e]"
+                    }`}
+                  >
+                    <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-[#252a3d]">
+                      {event.logo?.light ? (
+                        <img src={event.logo.light} alt={event.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <CalendarDays className="size-4 text-gray-600 dark:text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                    <span className={`flex-1 text-sm font-medium ${isSelected ? "text-purple-500" : "text-gray-900 dark:text-white"}`}>
+                      {event.name}
+                    </span>
+                    {isSelected && <Check className="size-4 text-purple-500 flex-shrink-0" />}
                   </button>
                 );
               })

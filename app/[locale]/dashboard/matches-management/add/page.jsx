@@ -1,4 +1,5 @@
 import { addMatch } from "@/app/[locale]/_Lib/actions";
+import { getEvents } from "@/app/[locale]/_Lib/eventsApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
@@ -10,11 +11,12 @@ import { getTranslations } from "next-intl/server";
 export default async function AddMatchPage() {
   const t = await getTranslations("MatchForm");
 
-  const [{ data: teamsOptions }, { data: gamesOptions }, { data: tournamentsOptions }] =
+  const [{ data: teamsOptions }, { data: gamesOptions }, { data: tournamentsOptions }, { data: eventsOptions }] =
     await Promise.all([
       getTeams({ size: 500 }),
       getGames({ limit: 100 }),
       getTournaments({ size: 500 }),
+      getEvents({ size: 500 }),
     ]);
 
   return (
@@ -27,6 +29,7 @@ export default async function AddMatchPage() {
             gamesOptions={gamesOptions || []}
             teamsOptions={teamsOptions || []}
             tournamentsOptions={tournamentsOptions || []}
+            eventsOptions={eventsOptions || []}
             formType="add"
           />
         </div>

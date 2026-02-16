@@ -1192,7 +1192,12 @@
     "team2Required": "Team 2 is required",
     "quickSelect": "Quick Select",
     "done": "Done",
-    "autoStatusHint": "Setting Start Time and End Time enables automatic status transitions. The match will auto-switch to Live when the start time arrives, and to Completed when the end time passes."
+    "autoStatusHint": "Setting Start Time and End Time enables automatic status transitions. The match will auto-switch to Live when the start time arrives, and to Completed when the end time passes.",
+    "eventTournamentAndGame": "Event, Tournament & Game",
+    "event": "Event",
+    "selectEvent": "Select event",
+    "searchEvents": "Search events...",
+    "noEventsFound": "No events found"
   },
   "MatchesTable": {
     "Date": "Date",
