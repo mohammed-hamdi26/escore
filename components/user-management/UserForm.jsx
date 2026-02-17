@@ -42,6 +42,9 @@ import {
   BookOpen,
   RotateCcw,
   Wand2,
+  Building2,
+  CalendarDays,
+  CircleUserRound,
 } from "lucide-react";
 
 const validationSchema = yup.object({
@@ -86,6 +89,10 @@ function UserForm({
     { label: "Standing", value: "AddStandingPermission", translationKey: "Standing", icon: BarChart3, color: "text-cyan-500", bgColor: "bg-cyan-500/10" },
     { label: "Settings", value: "AddSettingsPermission", translationKey: "Settings", icon: Settings, color: "text-gray-500", bgColor: "bg-gray-500/10" },
     { label: "Support", value: "AddSupportPermission", translationKey: "Support", icon: HeadphonesIcon, color: "text-red-500", bgColor: "bg-red-500/10" },
+    { label: "Club", value: "AddClubPermission", translationKey: "Club", icon: Building2, color: "text-emerald-500", bgColor: "bg-emerald-500/10" },
+    { label: "Event", value: "AddEventPermission", translationKey: "Event", icon: CalendarDays, color: "text-violet-500", bgColor: "bg-violet-500/10" },
+    { label: "User", value: "AddUserPermission", translationKey: "User", icon: UserCog, color: "text-slate-500", bgColor: "bg-slate-500/10" },
+    { label: "Avatar", value: "AddAvatarPermission", translationKey: "Avatar", icon: CircleUserRound, color: "text-teal-500", bgColor: "bg-teal-500/10" },
   ];
 
   const actions = [
@@ -252,8 +259,8 @@ function UserForm({
 
   const handleContentCreatorAccess = () => {
     setPermissionError("");
-    // Content creator preset: News, Match, Player, Team, Tournament, Transfer, Game, Standing with create/read/update
-    const contentPerms = ["AddNewsPermission", "AddMatchPermission", "AddPlayerPermission", "AddTeamPermission", "AddTournamentPermission", "AddTransferPermission", "AddGamePermission", "AddStandingPermission"];
+    // Content creator preset: News, Match, Player, Team, Tournament, Transfer, Game, Standing, Club, Event with create/read/update
+    const contentPerms = ["AddNewsPermission", "AddMatchPermission", "AddPlayerPermission", "AddTeamPermission", "AddTournamentPermission", "AddTransferPermission", "AddGamePermission", "AddStandingPermission", "AddClubPermission", "AddEventPermission"];
     permissions.forEach((perm) => {
       if (contentPerms.includes(perm.value)) {
         formik.setFieldValue(perm.value, true);
