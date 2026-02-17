@@ -1,8 +1,10 @@
 "use client";
 
 import { Link, usePathname } from "@/i18n/navigation";
-import { Users, BarChart3, UserPlus, UserCheck } from "lucide-react";
+import { useRouter } from "@/i18n/navigation";
+import { Users, BarChart3, UserPlus, UserCheck, ShieldAlert } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { usePermissions } from "@/contexts/PermissionsContext";
 
 const navItems = [
   {
@@ -34,6 +36,33 @@ const navItems = [
 export default function UsersLayout({ children }) {
   const pathname = usePathname();
   const t = useTranslations("UsersManagement");
+  const tCommon = useTranslations("common");
+  const { isAdmin } = usePermissions();
+  const router = useRouter();
+
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-8">
+        <div className="bg-white dark:bg-[#0f1118] rounded-2xl border border-gray-200 dark:border-white/5 p-8 max-w-md text-center">
+          <div className="size-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+            <ShieldAlert className="size-8 text-red-500" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            {tCommon("accessDenied") || "Access Denied"}
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">
+            {tCommon("noRoutePermission") || "You don't have permission to access this page. Please contact your administrator if you believe this is an error."}
+          </p>
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="px-6 py-2.5 bg-green-primary hover:bg-green-primary/90 text-white rounded-lg font-medium transition-colors"
+          >
+            {tCommon("backToDashboard") || "Back to Dashboard"}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const isActive = (href, exact) => {
     if (exact) {
