@@ -106,17 +106,20 @@ function BracketView({ tournament }) {
     fetchBracket();
   }, [fetchBracket]);
 
+  const isPlayerBased = tournament.participationType === "player";
+  const participants = isPlayerBased ? tournament.players : tournament.teams;
+
   useEffect(() => {
-    if (tournament.teams && tournament.teams.length > 0) {
+    if (participants && participants.length > 0) {
       setSeeds(
-        tournament.teams.map((team) => ({
-          id: team.id || team._id || team,
-          name: team.name || "Unknown",
-          logo: team.logo,
+        participants.map((p) => ({
+          id: p.id || p._id || p,
+          name: isPlayerBased ? (p.nickname || p.name || "Unknown") : (p.name || "Unknown"),
+          logo: isPlayerBased ? p.photo : p.logo,
         }))
       );
     }
-  }, [tournament.teams]);
+  }, [participants, isPlayerBased]);
 
   // --- Helpers ---
 
@@ -510,12 +513,13 @@ function BracketView({ tournament }) {
           </div>
         )}
 
-        {!tournament.teams || tournament.teams.length < 2 ? (
+        {!participants || participants.length < 2 ? (
           <div className="text-center py-8">
             <Trophy className="size-12 text-muted-foreground/30 mx-auto mb-3" />
             <p className="text-muted-foreground">
-              {t("needTeams") ||
-                "At least 2 teams are required to generate a bracket."}
+              {isPlayerBased
+                ? (t("needPlayers") || "At least 2 players are required to generate a bracket.")
+                : (t("needTeams") || "At least 2 teams are required to generate a bracket.")}
             </p>
           </div>
         ) : (

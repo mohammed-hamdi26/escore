@@ -931,7 +931,15 @@
     "confirmAndGenerate": "Confirm & Generate",
     "stagePending": "Pending",
     "knockout": "Knockout",
-    "groupStage": "Group Stage"
+    "groupStage": "Group Stage",
+    "players": "Players",
+    "playerBased": "Player Based",
+    "needPlayers": "At least 2 players are required to generate a bracket.",
+    "battle_royale": "Battle Royale",
+    "fighting": "Fighting",
+    "racing": "Racing",
+    "ffa": "FFA",
+    "sports_sim": "Sports Sim"
   },
   "TournamentsTable": {
     "name": "Tournament",

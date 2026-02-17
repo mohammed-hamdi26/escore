@@ -10,10 +10,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 01 — Tournament Form & Core Fields — `In Progress` |
-| **Current Milestone** | 04 — Tournament Detail View Updates — `In Progress` |
-| **Current Task** | 1.4.1 — Display competitionType in TournamentDetails — `In Progress` |
-| **Last Completed Checkpoint** | Phase 01, Milestone 03, Task 1.3.4 |
+| **Current Phase** | 02 — Placement Scoring & Standing Config — `In Progress` |
+| **Current Milestone** | 01 — Scoring Type Toggle in Tournament Form — `In Progress` |
+| **Current Task** | 2.1.1 — Add scoringType toggle to TournamentsForm — `In Progress` |
+| **Last Completed Checkpoint** | Phase 01, Milestone 04, Task 1.4.4 |
 
 ---
 
@@ -65,7 +65,7 @@ After completing a Task:
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 01 | Tournament Form & Core Fields | `Planned` |
+| 01 | Tournament Form & Core Fields | `Completed` |
 | 02 | Placement Scoring & Standing Config | `Planned` |
 | 03 | Battle Royale Bracket & Multi-Participant | `Planned` |
 | 04 | Racing / Time-Based UI | `Planned` |
@@ -82,13 +82,13 @@ After completing a Task:
 | 01 | Competition Type Field | `Completed` |
 | 02 | Participation Type & Player Selection | `Completed` |
 | 03 | Tournament Table & Filter Updates | `Completed` |
-| 04 | Tournament Detail View Updates | `In Progress` |
+| 04 | Tournament Detail View Updates | `Completed` |
 
 ### Phase 02 — Placement Scoring & Standing Config
 
 | Milestone | Name | Status |
 |-----------|------|--------|
-| 01 | Scoring Type Toggle in Tournament Form | `Planned` |
+| 01 | Scoring Type Toggle in Tournament Form | `In Progress` |
 | 02 | Placement Config Editor | `Planned` |
 | 03 | Cumulative Standings Table | `Planned` |
 | 04 | Round History Display | `Planned` |
@@ -155,16 +155,16 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 1.4.1 | Display competitionType in TournamentDetails | `In Progress` |
-| 1.4.2 | Display participationType in TournamentDetails | `Planned` |
-| 1.4.3 | Show players list for player tournaments | `Planned` |
-| 1.4.4 | Update bracket seeds display for player tournaments | `Planned` |
+| 1.4.1 | Display competitionType in TournamentDetails | `Completed` |
+| 1.4.2 | Display participationType in TournamentDetails | `Completed` |
+| 1.4.3 | Show players list for player tournaments | `Completed` |
+| 1.4.4 | Update bracket seeds display for player tournaments | `Completed` |
 
 ### Phase 02, Milestone 01 — Scoring Type Toggle in Tournament Form
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 2.1.1 | Add scoringType toggle to TournamentsForm | `Planned` |
+| 2.1.1 | Add scoringType toggle to TournamentsForm | `In Progress` |
 | 2.1.2 | Conditional rendering of win/loss fields | `Planned` |
 | 2.1.3 | Auto-set scoringType based on competitionType | `Planned` |
 | 2.1.4 | Populate scoringType on edit | `Planned` |
@@ -299,3 +299,4 @@ After completing a Task:
 | 4 | 01 | 01 | 1.1.4 | 01564b2 | 2026-02-17 |
 | 5 | 01 | 02 | 1.2.1–1.2.6 | — | 2026-02-17 |
 | 6 | 01 | 03 | 1.3.1–1.3.4 | — | 2026-02-17 |
+| 7 | 01 | 04 | 1.4.1–1.4.4 | — | 2026-02-17 |

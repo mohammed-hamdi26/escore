@@ -927,7 +927,15 @@
     "confirmAndGenerate": "تأكيد وإنشاء",
     "stagePending": "قيد الانتظار",
     "knockout": "خروج مباشر",
-    "groupStage": "مرحلة المجموعات"
+    "groupStage": "مرحلة المجموعات",
+    "players": "اللاعبين",
+    "playerBased": "قائم على اللاعبين",
+    "needPlayers": "مطلوب لاعبين على الأقل لإنشاء القرعة.",
+    "battle_royale": "باتل رويال",
+    "fighting": "قتال",
+    "racing": "سباق",
+    "ffa": "حر للجميع",
+    "sports_sim": "محاكاة رياضية"
   },
   "TournamentsTable": {
     "name": "البطولة",

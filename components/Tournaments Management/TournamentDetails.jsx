@@ -11,6 +11,7 @@ import {
   MapPin,
   Globe,
   Users,
+  User,
   Coins,
   Award,
   Star,
@@ -28,6 +29,7 @@ import {
   Power,
   Eye,
   CalendarRange,
+  Swords,
 } from "lucide-react";
 import BracketView from "./BracketView";
 
@@ -44,6 +46,16 @@ const TIER_CONFIG = {
   S: { color: "bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-500 border-yellow-500/30", badge: "bg-gradient-to-r from-yellow-400 to-orange-500" },
   A: { color: "bg-purple-500/10 text-purple-500 border-purple-500/30", badge: "bg-purple-500" },
   B: { color: "bg-blue-500/10 text-blue-500 border-blue-500/30", badge: "bg-blue-500" },
+};
+
+// Competition type config
+const COMPETITION_TYPE_CONFIG = {
+  standard: { color: "bg-gray-500/10 text-gray-400 border-gray-500/30", label: "Standard" },
+  battle_royale: { color: "bg-red-500/10 text-red-500 border-red-500/30", label: "Battle Royale" },
+  fighting: { color: "bg-orange-500/10 text-orange-500 border-orange-500/30", label: "Fighting" },
+  racing: { color: "bg-blue-500/10 text-blue-500 border-blue-500/30", label: "Racing" },
+  ffa: { color: "bg-purple-500/10 text-purple-500 border-purple-500/30", label: "FFA" },
+  sports_sim: { color: "bg-green-500/10 text-green-500 border-green-500/30", label: "Sports Sim" },
 };
 
 function TournamentDetails({ tournament }) {
@@ -165,6 +177,25 @@ function TournamentDetails({ tournament }) {
                     <Power className="size-4" />
                     {tournament.isActive ? t("active") || "Active" : t("inactive") || "Inactive"}
                   </span>
+
+                  {/* Competition Type */}
+                  {tournament.competitionType && tournament.competitionType !== "standard" && (() => {
+                    const ctConfig = COMPETITION_TYPE_CONFIG[tournament.competitionType] || COMPETITION_TYPE_CONFIG.standard;
+                    return (
+                      <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${ctConfig.color}`}>
+                        <Swords className="size-4" />
+                        {t(tournament.competitionType) || ctConfig.label}
+                      </span>
+                    );
+                  })()}
+
+                  {/* Participation Type */}
+                  {tournament.participationType === "player" && (
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border bg-amber-500/10 text-amber-500 border-amber-500/30">
+                      <User className="size-4" />
+                      {t("playerBased") || "Player Based"}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -354,20 +385,66 @@ function TournamentDetails({ tournament }) {
             </p>
           </div>
 
-          {/* Teams */}
+          {/* Teams / Players */}
           <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Users className="size-5 text-green-primary" />
-              {t("teams") || "Teams"}
+              {tournament.participationType === "player" ? (
+                <>
+                  <User className="size-5 text-green-primary" />
+                  {t("players") || "Players"}
+                </>
+              ) : (
+                <>
+                  <Users className="size-5 text-green-primary" />
+                  {t("teams") || "Teams"}
+                </>
+              )}
             </h3>
             <div className="flex items-baseline gap-2">
               <p className="text-3xl font-bold text-foreground">
-                {tournament.teams?.length || 0}
+                {tournament.participationType === "player"
+                  ? tournament.players?.length || 0
+                  : tournament.teams?.length || 0}
               </p>
-              {tournament.maxTeams && (
-                <p className="text-muted-foreground">/ {tournament.maxTeams} max</p>
-              )}
+              {tournament.participationType === "player"
+                ? tournament.maxPlayers && (
+                    <p className="text-muted-foreground">/ {tournament.maxPlayers} max</p>
+                  )
+                : tournament.maxTeams && (
+                    <p className="text-muted-foreground">/ {tournament.maxTeams} max</p>
+                  )}
             </div>
+            {/* Player list for player-based tournaments */}
+            {tournament.participationType === "player" && tournament.players?.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {tournament.players.map((player) => (
+                  <div
+                    key={player._id || player.id || player}
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/30 dark:bg-[#1a1d2e]"
+                  >
+                    {player.photo?.light ? (
+                      <img
+                        src={player.photo.light}
+                        alt={player.nickname || player.name}
+                        className="size-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="size-8 rounded-full bg-green-primary/10 flex items-center justify-center">
+                        <User className="size-4 text-green-primary" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {player.nickname || player.name || player}
+                      </p>
+                      {player.country?.name && (
+                        <p className="text-xs text-muted-foreground">{player.country.name}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Location */}
