@@ -806,7 +806,13 @@
     "Fighting": "Fighting",
     "Racing": "Racing",
     "Free For All": "Free For All",
-    "Sports Simulation": "Sports Simulation"
+    "Sports Simulation": "Sports Simulation",
+    "Participation Type": "Participation Type",
+    "Team Based": "Team Based",
+    "Player Based": "Player Based",
+    "Players": "Players",
+    "Select Players": "Select Players",
+    "Search players": "Search players..."
   },
   "TournamentsManagement": {
     "title": "Tournaments Management",

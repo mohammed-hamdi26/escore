@@ -802,7 +802,13 @@
     "Fighting": "قتال",
     "Racing": "سباق",
     "Free For All": "الكل ضد الكل",
-    "Sports Simulation": "محاكاة رياضية"
+    "Sports Simulation": "محاكاة رياضية",
+    "Participation Type": "نوع المشاركة",
+    "Team Based": "فرق",
+    "Player Based": "فردي",
+    "Players": "اللاعبين",
+    "Select Players": "اختر اللاعبين",
+    "Search players": "ابحث عن اللاعبين..."
   },
   "TournamentsManagement": {
     "title": "إدارة البطولات",

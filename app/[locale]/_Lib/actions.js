@@ -5,7 +5,7 @@ import apiClient from "./apiCLient";
 
 import { deleteSession, saveSession, saveRefreshToken } from "./session";
 import { redirect } from "next/navigation";
-import { getPlayersLinks } from "./palyerApi";
+import { getPlayers, getPlayersLinks } from "./palyerApi";
 import { getAwardsTeam, getTeamsLinks, getTeams } from "./teamsApi";
 import { getGames } from "./gamesApi";
 import { getTournamentLinks, getTournaments } from "./tournamentsApi";
@@ -86,6 +86,10 @@ export async function searchTeams({ search = "", page = 1, limit = 15 } = {}) {
 
 export async function searchGames({ search = "", page = 1, limit = 15 } = {}) {
   return getGames({ search, page, size: limit });
+}
+
+export async function searchPlayers({ search = "", page = 1, limit = 15 } = {}) {
+  return getPlayers({ search, page, size: limit });
 }
 
 export async function searchTournaments({ search = "", page = 1, limit = 15 } = {}) {

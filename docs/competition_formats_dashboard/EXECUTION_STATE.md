@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 01 — Tournament Form & Core Fields — `In Progress` |
-| **Current Milestone** | 02 — Participation Type & Player Selection — `In Progress` |
-| **Current Task** | 1.2.1 — Add participationType radio/select to TournamentsForm — `In Progress` |
-| **Last Completed Checkpoint** | Phase 01, Milestone 01, Task 1.1.4 |
+| **Current Milestone** | 03 — Tournament Table & Filter Updates — `In Progress` |
+| **Current Task** | 1.3.1 — Add competitionType column to TournamentsTable — `In Progress` |
+| **Last Completed Checkpoint** | Phase 01, Milestone 02, Task 1.2.6 |
 
 ---
 
@@ -80,8 +80,8 @@ After completing a Task:
 | Milestone | Name | Status |
 |-----------|------|--------|
 | 01 | Competition Type Field | `Completed` |
-| 02 | Participation Type & Player Selection | `In Progress` |
-| 03 | Tournament Table & Filter Updates | `Planned` |
+| 02 | Participation Type & Player Selection | `Completed` |
+| 03 | Tournament Table & Filter Updates | `In Progress` |
 | 04 | Tournament Detail View Updates | `Planned` |
 
 ### Phase 02 — Placement Scoring & Standing Config
@@ -135,18 +135,18 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 1.2.1 | Add participationType radio/select to TournamentsForm | `In Progress` |
-| 1.2.2 | Conditional teams/players multi-select | `Planned` |
-| 1.2.3 | Add searchPlayers API function | `Planned` |
-| 1.2.4 | Populate participationType and players on edit | `Planned` |
-| 1.2.5 | Include participationType and players in server action payload | `Planned` |
-| 1.2.6 | Add translation keys for participationType | `Planned` |
+| 1.2.1 | Add participationType radio/select to TournamentsForm | `Completed` |
+| 1.2.2 | Conditional teams/players multi-select | `Completed` |
+| 1.2.3 | Add searchPlayers API function | `Completed` |
+| 1.2.4 | Populate participationType and players on edit | `Completed` |
+| 1.2.5 | Include participationType and players in server action payload | `Completed` |
+| 1.2.6 | Add translation keys for participationType | `Completed` |
 
 ### Phase 01, Milestone 03 — Tournament Table & Filter Updates
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 1.3.1 | Add competitionType column to TournamentsTable | `Planned` |
+| 1.3.1 | Add competitionType column to TournamentsTable | `In Progress` |
 | 1.3.2 | Add participationType indicator to TournamentsTable | `Planned` |
 | 1.3.3 | Add competitionType filter to TournamentsFilter | `Planned` |
 | 1.3.4 | Pass competitionType filter to API | `Planned` |
@@ -296,4 +296,5 @@ After completing a Task:
 | 1 | 01 | 01 | 1.1.1 | 5dcfb6a | 2026-02-17 |
 | 2 | 01 | 01 | 1.1.2 | e66e9a2 | 2026-02-17 |
 | 3 | 01 | 01 | 1.1.3 | a65e7a1 | 2026-02-17 |
-| 4 | 01 | 01 | 1.1.4 | — | 2026-02-17 |
+| 4 | 01 | 01 | 1.1.4 | 01564b2 | 2026-02-17 |
+| 5 | 01 | 02 | 1.2.1–1.2.6 | — | 2026-02-17 |

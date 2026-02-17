@@ -42,6 +42,7 @@ import {
   WifiOff,
   Power,
   Users,
+  User,
   Swords,
 } from "lucide-react";
 
@@ -108,6 +109,12 @@ const validateSchema = yup.object({
     .string()
     .oneOf(["standard", "battle_royale", "fighting", "racing", "ffa", "sports_sim"])
     .required("Competition type is required"),
+  participationType: yup
+    .string()
+    .oneOf(["team", "player"])
+    .required("Participation type is required"),
+  playersData: yup.array().optional(),
+  maxPlayers: yup.number().integer().positive().nullable().optional(),
 });
 
 export default function TournamentsForm({
@@ -119,6 +126,7 @@ export default function TournamentsForm({
   teamOptions = [],
   searchGames,
   searchTeams,
+  searchPlayers,
 }) {
   const t = useTranslations("TournamentForm");
   const router = useRouter();
@@ -166,6 +174,9 @@ export default function TournamentsForm({
       pointsPerDraw: tournament?.standingConfig?.pointsPerDraw ?? 1,
       pointsPerLoss: tournament?.standingConfig?.pointsPerLoss ?? 0,
       competitionType: tournament?.competitionType || "standard",
+      participationType: tournament?.participationType || "team",
+      playersData: tournament?.players || [],
+      maxPlayers: tournament?.maxPlayers || "",
       prizeDistribution: tournament?.prizeDistribution?.map((p) => ({
         place: p.place,
         amount: p.amount,
@@ -232,6 +243,17 @@ export default function TournamentsForm({
         dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value || g._id || g);
         dataValues.teams = dataValues?.teamsData?.map((t) => t.id || t.value || t._id || t) || [];
 
+        // Handle player tournaments
+        if (dataValues.participationType === "player") {
+          dataValues.players = dataValues?.playersData?.map((p) => p.id || p.value || p._id || p) || [];
+          if (dataValues.maxPlayers) dataValues.maxPlayers = parseInt(dataValues.maxPlayers);
+          else delete dataValues.maxPlayers;
+          delete dataValues.teams;
+        } else {
+          delete dataValues.players;
+          delete dataValues.maxPlayers;
+        }
+
         // Convert empty strings to null for optional number fields
         if (dataValues.prizePool === "" || dataValues.prizePool === null) {
           dataValues.prizePool = null;
@@ -272,6 +294,7 @@ export default function TournamentsForm({
         delete dataValues.knockoutImageDark;
         delete dataValues.gamesData;
         delete dataValues.teamsData;
+        delete dataValues.playersData;
         delete dataValues.pointsPerWin;
         delete dataValues.pointsPerDraw;
         delete dataValues.pointsPerLoss;
@@ -344,6 +367,14 @@ export default function TournamentsForm({
       formik.setFieldValue("status", newStatus);
     }
   }, [tournamentStartDate, tournamentEndDate]);
+
+  // Auto-set participationType based on competitionType
+  const competitionTypeValue = formik.values.competitionType;
+  useEffect(() => {
+    if (competitionTypeValue === "fighting") {
+      formik.setFieldValue("participationType", "player");
+    }
+  }, [competitionTypeValue]);
 
   const statusOptions = [
     { value: "upcoming", label: t("Upcoming"), icon: Clock, color: "text-blue-500", bg: "bg-blue-500/10" },
@@ -515,14 +546,57 @@ export default function TournamentsForm({
         />
       </FormSection>
 
-      {/* Teams */}
-      <FormSection title={t("Teams")} icon={<Users className="size-5" />}>
-        <TeamSelectField
-          label={t("Select Teams")}
-          name="teamsData"
-          formik={formik}
-          searchAction={searchTeams}
-        />
+      {/* Participants — Teams or Players */}
+      <FormSection
+        title={formik.values.participationType === "player" ? t("Players") : t("Teams")}
+        icon={formik.values.participationType === "player" ? <User className="size-5" /> : <Users className="size-5" />}
+      >
+        {/* Participation Type Toggle */}
+        <div className="flex items-center gap-2 mb-4">
+          <label className="text-sm font-medium text-muted-foreground mr-2">{t("Participation Type")}</label>
+          <div className="inline-flex rounded-lg bg-muted/50 dark:bg-[#1a1d2e] p-1">
+            <button
+              type="button"
+              onClick={() => formik.setFieldValue("participationType", "team")}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
+                formik.values.participationType === "team"
+                  ? "bg-green-primary text-white shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Users className="size-4" />
+              {t("Team Based")}
+            </button>
+            <button
+              type="button"
+              onClick={() => formik.setFieldValue("participationType", "player")}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
+                formik.values.participationType === "player"
+                  ? "bg-green-primary text-white shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <User className="size-4" />
+              {t("Player Based")}
+            </button>
+          </div>
+        </div>
+
+        {formik.values.participationType === "team" ? (
+          <TeamSelectField
+            label={t("Select Teams")}
+            name="teamsData"
+            formik={formik}
+            searchAction={searchTeams}
+          />
+        ) : (
+          <PlayerSelectField
+            label={t("Select Players")}
+            name="playersData"
+            formik={formik}
+            searchAction={searchPlayers}
+          />
+        )}
       </FormSection>
 
       {/* Links */}
@@ -2122,6 +2196,180 @@ function TeamSelectField({ label, name, formik, searchAction }) {
                 disabled={page >= totalPages}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium bg-muted/50 dark:bg-[#1a1d2e] disabled:opacity-40 hover:bg-muted dark:hover:bg-[#252a3d] transition-colors"
               >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          )}
+        </PopoverContent>
+      </Popover>
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+    </div>
+  );
+}
+
+// Player Select Field with async search — same pattern as TeamSelectField
+function PlayerSelectField({ label, name, formik, searchAction }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [players, setPlayers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const searchTimeoutRef = useRef(null);
+  const selectedIds = formik.values[name]?.map((p) => p.id || p.value || p._id || p) || [];
+  const error = formik.touched[name] && formik.errors[name];
+
+  const fetchPlayers = useCallback(async (searchQuery, pageNum) => {
+    if (!searchAction) return;
+    setLoading(true);
+    try {
+      const result = await searchAction({ search: searchQuery, page: pageNum, limit: 20 });
+      setPlayers(result.data || []);
+      setTotalPages(result.pagination?.totalPages || 1);
+    } catch {
+      setPlayers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchAction]);
+
+  useEffect(() => {
+    if (isOpen) fetchPlayers(search, page);
+  }, [isOpen, page]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => {
+      setPage(1);
+      fetchPlayers(search, 1);
+    }, 400);
+    return () => clearTimeout(searchTimeoutRef.current);
+  }, [search]);
+
+  const togglePlayer = async (player) => {
+    const playerId = player.id || player.value;
+    const isSelected = selectedIds.includes(playerId);
+    let newValue;
+    if (isSelected) {
+      newValue = (formik.values[name] || []).filter((p) => (p.id || p.value || p._id || p) !== playerId);
+    } else {
+      newValue = [...(formik.values[name] || []), { id: playerId, nickname: player.nickname || player.name || player.label, photo: player.photo }];
+    }
+    await formik.setFieldValue(name, newValue);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
+  };
+
+  const removePlayer = async (playerId) => {
+    const newValue = (formik.values[name] || []).filter((p) => (p.id || p.value || p._id || p) !== playerId);
+    await formik.setFieldValue(name, newValue);
+  };
+
+  const getPhotoUrl = (player) => player.photo?.light || player.photo?.dark || player.photo || null;
+
+  return (
+    <div className="space-y-3">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+
+      {/* Selected players as pills */}
+      {selectedIds.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {(formik.values[name] || []).map((player) => {
+            const playerId = player.id || player.value || player._id || player;
+            const playerName = player.nickname || player.name || player.label || playerId;
+            const photoUrl = getPhotoUrl(player);
+            return (
+              <span key={playerId} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-primary/10 text-green-primary text-sm font-medium">
+                {photoUrl ? (
+                  <img src={photoUrl} alt={playerName} className="size-4 rounded-full object-cover" />
+                ) : (
+                  <User className="size-3.5" />
+                )}
+                {playerName}
+                <button type="button" onClick={() => removePlayer(playerId)} className="ml-0.5 hover:text-red-500 transition-colors">
+                  <X className="size-3.5" />
+                </button>
+              </span>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Popover trigger */}
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="w-full flex items-center justify-between h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-border/50 text-sm text-muted-foreground hover:bg-muted dark:hover:bg-[#252a3d] transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <Search className="size-4" />
+              {selectedIds.length > 0
+                ? `${selectedIds.length} player${selectedIds.length > 1 ? "s" : ""} selected`
+                : "Search and select players..."}
+            </span>
+            <ChevronDown className={`size-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-background dark:bg-[#12141c] border-border" align="start">
+          <div className="p-3 border-b border-border/50">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search players..."
+                className="w-full h-10 pl-10 pr-4 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm focus:ring-2 focus:ring-green-primary/50 focus:outline-none text-foreground placeholder:text-muted-foreground"
+                autoFocus
+              />
+            </div>
+          </div>
+
+          <div className="max-h-[280px] overflow-y-auto p-2">
+            {loading ? (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : players.length === 0 ? (
+              <p className="text-center text-sm text-muted-foreground py-6">No players found</p>
+            ) : (
+              players.map((player) => {
+                const playerId = player.id || player.value;
+                const isSelected = selectedIds.includes(playerId);
+                const photoUrl = getPhotoUrl(player);
+                return (
+                  <button
+                    key={playerId}
+                    type="button"
+                    onClick={() => togglePlayer(player)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                      isSelected ? "bg-green-primary/10 text-green-primary" : "text-foreground hover:bg-muted/50 dark:hover:bg-[#1a1d2e]"
+                    }`}
+                  >
+                    {photoUrl ? (
+                      <img src={photoUrl} alt={player.nickname} className="size-6 rounded-full object-cover" />
+                    ) : (
+                      <div className="size-6 rounded-full bg-muted flex items-center justify-center">
+                        <User className="size-3.5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <span className="flex-1 text-start">{player.nickname || player.name || player.label}</span>
+                    {isSelected && <Check className="size-4 text-green-primary" />}
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between p-3 border-t border-border/50">
+              <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-muted/50 dark:bg-[#1a1d2e] disabled:opacity-40 hover:bg-muted dark:hover:bg-[#252a3d] transition-colors">
+                <ChevronLeft className="size-4" />
+              </button>
+              <span className="text-xs text-muted-foreground">{page} / {totalPages}</span>
+              <button type="button" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-muted/50 dark:bg-[#1a1d2e] disabled:opacity-40 hover:bg-muted dark:hover:bg-[#252a3d] transition-colors">
                 <ChevronRight className="size-4" />
               </button>
             </div>

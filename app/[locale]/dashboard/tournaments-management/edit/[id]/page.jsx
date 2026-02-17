@@ -1,4 +1,4 @@
-import { editTournament, searchGames, searchTeams } from "@/app/[locale]/_Lib/actions";
+import { editTournament, searchGames, searchTeams, searchPlayers } from "@/app/[locale]/_Lib/actions";
 import { getCountries } from "@/app/[locale]/_Lib/countriesApi";
 import { getTournament } from "@/app/[locale]/_Lib/tournamentsApi";
 import TournamentsForm from "@/components/Tournaments Management/TournamentsForm";
@@ -18,6 +18,7 @@ async function page({ params }) {
         formType="edit"
         searchGames={searchGames}
         searchTeams={searchTeams}
+        searchPlayers={searchPlayers}
         submit={editTournament}
         tournament={tournament}
       />
