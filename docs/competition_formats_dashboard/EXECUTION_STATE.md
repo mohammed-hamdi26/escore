@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 01 — Tournament Form & Core Fields — `In Progress` |
-| **Current Milestone** | 03 — Tournament Table & Filter Updates — `In Progress` |
-| **Current Task** | 1.3.1 — Add competitionType column to TournamentsTable — `In Progress` |
-| **Last Completed Checkpoint** | Phase 01, Milestone 02, Task 1.2.6 |
+| **Current Milestone** | 04 — Tournament Detail View Updates — `In Progress` |
+| **Current Task** | 1.4.1 — Display competitionType in TournamentDetails — `In Progress` |
+| **Last Completed Checkpoint** | Phase 01, Milestone 03, Task 1.3.4 |
 
 ---
 
@@ -81,8 +81,8 @@ After completing a Task:
 |-----------|------|--------|
 | 01 | Competition Type Field | `Completed` |
 | 02 | Participation Type & Player Selection | `Completed` |
-| 03 | Tournament Table & Filter Updates | `In Progress` |
-| 04 | Tournament Detail View Updates | `Planned` |
+| 03 | Tournament Table & Filter Updates | `Completed` |
+| 04 | Tournament Detail View Updates | `In Progress` |
 
 ### Phase 02 — Placement Scoring & Standing Config
 
@@ -146,16 +146,16 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 1.3.1 | Add competitionType column to TournamentsTable | `In Progress` |
-| 1.3.2 | Add participationType indicator to TournamentsTable | `Planned` |
-| 1.3.3 | Add competitionType filter to TournamentsFilter | `Planned` |
-| 1.3.4 | Pass competitionType filter to API | `Planned` |
+| 1.3.1 | Add competitionType column to TournamentsTable | `Completed` |
+| 1.3.2 | Add participationType indicator to TournamentsTable | `Completed` |
+| 1.3.3 | Add competitionType filter to TournamentsFilter | `Completed` |
+| 1.3.4 | Pass competitionType filter to API | `Completed` |
 
 ### Phase 01, Milestone 04 — Tournament Detail View Updates
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 1.4.1 | Display competitionType in TournamentDetails | `Planned` |
+| 1.4.1 | Display competitionType in TournamentDetails | `In Progress` |
 | 1.4.2 | Display participationType in TournamentDetails | `Planned` |
 | 1.4.3 | Show players list for player tournaments | `Planned` |
 | 1.4.4 | Update bracket seeds display for player tournaments | `Planned` |
@@ -298,3 +298,4 @@ After completing a Task:
 | 3 | 01 | 01 | 1.1.3 | a65e7a1 | 2026-02-17 |
 | 4 | 01 | 01 | 1.1.4 | 01564b2 | 2026-02-17 |
 | 5 | 01 | 02 | 1.2.1–1.2.6 | — | 2026-02-17 |
+| 6 | 01 | 03 | 1.3.1–1.3.4 | — | 2026-02-17 |

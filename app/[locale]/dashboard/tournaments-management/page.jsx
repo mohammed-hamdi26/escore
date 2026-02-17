@@ -4,7 +4,7 @@ import TournamentsTable from "@/components/Tournaments Management/TournamentsTab
 import { TournamentListWrapper } from "@/components/tournaments/TournamentFormWrapper";
 
 async function TournamentsPage({ searchParams }) {
-  const { size, page, search, game, status, tier, isFeatured, sortBy, sortOrder } = await searchParams;
+  const { size, page, search, game, status, tier, competitionType, isFeatured, sortBy, sortOrder } = await searchParams;
 
   // Fetch tournaments and games in parallel
   const [tournamentsResult, gamesResult] = await Promise.all([
@@ -15,6 +15,7 @@ async function TournamentsPage({ searchParams }) {
       game,
       status,
       tier,
+      competitionType,
       isFeatured,
       sortBy,
       sortOrder,

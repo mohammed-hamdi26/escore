@@ -961,7 +961,8 @@
     "ongoing": "Ongoing",
     "completed": "Completed",
     "cancelled": "Cancelled",
-    "standings": "Standings"
+    "standings": "Standings",
+    "type": "Type"
   },
   "TournamentsFilter": {
     "searchPlaceholder": "Search tournaments...",
@@ -984,7 +985,15 @@
     "bTier": "B-Tier",
     "featured": "Featured",
     "all": "All",
-    "notFeatured": "Not Featured"
+    "notFeatured": "Not Featured",
+    "competitionType": "Competition Type",
+    "allTypes": "All Types",
+    "standard": "Standard",
+    "battleRoyale": "Battle Royale",
+    "fighting": "Fighting",
+    "racing": "Racing",
+    "ffa": "FFA",
+    "sportsSim": "Sports Sim"
   },
   "LanguagesTable": {
     "Local name": "Local name",

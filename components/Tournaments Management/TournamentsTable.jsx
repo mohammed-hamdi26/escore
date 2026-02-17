@@ -21,6 +21,7 @@ import {
   Calendar,
   Star,
   Users,
+  User,
   MoreHorizontal,
   Eye,
   StarOff,
@@ -40,6 +41,25 @@ const TIER_COLORS = {
   S: "bg-yellow-500/10 text-yellow-500",
   A: "bg-purple-500/10 text-purple-500",
   B: "bg-cyan-500/10 text-cyan-500",
+};
+
+// Competition type badge colors
+const COMPETITION_TYPE_COLORS = {
+  standard: "bg-gray-500/10 text-gray-400",
+  battle_royale: "bg-red-500/10 text-red-500",
+  fighting: "bg-orange-500/10 text-orange-500",
+  racing: "bg-blue-500/10 text-blue-500",
+  ffa: "bg-purple-500/10 text-purple-500",
+  sports_sim: "bg-green-500/10 text-green-500",
+};
+
+const COMPETITION_TYPE_LABELS = {
+  standard: "Standard",
+  battle_royale: "Battle Royale",
+  fighting: "Fighting",
+  racing: "Racing",
+  ffa: "FFA",
+  sports_sim: "Sports Sim",
 };
 
 function TournamentsTable({ tournaments, pagination, games }) {
@@ -112,7 +132,7 @@ function TournamentsTable({ tournaments, pagination, games }) {
       <div className="glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5">
         {/* Table Header */}
         <div className="bg-muted/50 dark:bg-[#1a1d2e] border-b border-border">
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4">
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4">
             <button
               onClick={() => handleSort("name")}
               className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-start"
@@ -127,6 +147,9 @@ function TournamentsTable({ tournaments, pagination, games }) {
               {t("status") || "Status"}
               {getSortIcon("status")}
             </button>
+            <span className="text-sm font-medium text-muted-foreground">
+              {t("type") || "Type"}
+            </span>
             <button
               onClick={() => handleSort("tier")}
               className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -167,7 +190,7 @@ function TournamentsTable({ tournaments, pagination, games }) {
               <div
                 key={tournament.id}
                 onClick={() => router.push(`/dashboard/tournaments-management/view/${tournament.id}`)}
-                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors cursor-pointer"
+                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors cursor-pointer"
               >
                 {/* Tournament Name & Logo */}
                 <div className="flex items-center gap-3 min-w-0">
@@ -201,6 +224,17 @@ function TournamentsTable({ tournaments, pagination, games }) {
                     }`}
                   >
                     {t(tournament.status) || tournament.status}
+                  </span>
+                </div>
+
+                {/* Competition Type */}
+                <div>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                      COMPETITION_TYPE_COLORS[tournament.competitionType] || COMPETITION_TYPE_COLORS.standard
+                    }`}
+                  >
+                    {COMPETITION_TYPE_LABELS[tournament.competitionType] || "Standard"}
                   </span>
                 </div>
 
@@ -241,11 +275,20 @@ function TournamentsTable({ tournaments, pagination, games }) {
                   ) : (
                     <span className="text-muted-foreground">-</span>
                   )}
-                  {tournament.teams?.length > 0 && (
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                      <Users className="size-3" />
-                      {tournament.teams.length} teams
-                    </p>
+                  {tournament.participationType === "player" ? (
+                    tournament.players?.length > 0 && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <User className="size-3" />
+                        {tournament.players.length} players
+                      </p>
+                    )
+                  ) : (
+                    tournament.teams?.length > 0 && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <Users className="size-3" />
+                        {tournament.teams.length} teams
+                      </p>
+                    )
                   )}
                 </div>
 

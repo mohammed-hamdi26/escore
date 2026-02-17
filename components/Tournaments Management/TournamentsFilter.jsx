@@ -51,6 +51,16 @@ const TIER_OPTIONS = [
   { value: "B", label: "bTier", icon: Award, color: "text-blue-500" },
 ];
 
+const COMPETITION_TYPE_OPTIONS = [
+  { value: "", label: "allTypes", icon: Trophy, color: "text-gray-500" },
+  { value: "standard", label: "standard", icon: Trophy, color: "text-gray-400" },
+  { value: "battle_royale", label: "battleRoyale", icon: Trophy, color: "text-red-500" },
+  { value: "fighting", label: "fighting", icon: Trophy, color: "text-orange-500" },
+  { value: "racing", label: "racing", icon: Trophy, color: "text-blue-500" },
+  { value: "ffa", label: "ffa", icon: Trophy, color: "text-purple-500" },
+  { value: "sports_sim", label: "sportsSim", icon: Trophy, color: "text-green-500" },
+];
+
 const FEATURED_OPTIONS = [
   { value: "", label: "all", icon: ListFilter, color: "text-gray-500" },
   { value: "true", label: "featured", icon: Star, color: "text-yellow-500" },
@@ -72,6 +82,7 @@ function TournamentsFilter({ games = [] }) {
   const [gameSearch, setGameSearch] = useState("");
   const [statusOpen, setStatusOpen] = useState(false);
   const [tierOpen, setTierOpen] = useState(false);
+  const [competitionTypeOpen, setCompetitionTypeOpen] = useState(false);
   const [featuredOpen, setFeaturedOpen] = useState(false);
 
   // Get current filter values from URL
@@ -79,6 +90,7 @@ function TournamentsFilter({ games = [] }) {
   const currentGame = searchParams.get("game") || "";
   const currentStatus = searchParams.get("status") || "";
   const currentTier = searchParams.get("tier") || "";
+  const currentCompetitionType = searchParams.get("competitionType") || "";
   const currentFeatured = searchParams.get("isFeatured") || "";
 
   // Sync search term with URL
@@ -87,7 +99,7 @@ function TournamentsFilter({ games = [] }) {
   }, [currentSearch]);
 
   // Count active filters
-  const activeFiltersCount = [currentGame, currentStatus, currentTier, currentFeatured].filter(Boolean).length;
+  const activeFiltersCount = [currentGame, currentStatus, currentTier, currentCompetitionType, currentFeatured].filter(Boolean).length;
 
   const updateParams = useCallback(
     (key, value) => {
@@ -151,6 +163,11 @@ function TournamentsFilter({ games = [] }) {
   const selectedTier = useMemo(() => {
     return TIER_OPTIONS.find((t) => t.value === currentTier) || TIER_OPTIONS[0];
   }, [currentTier]);
+
+  // Get selected competition type
+  const selectedCompetitionType = useMemo(() => {
+    return COMPETITION_TYPE_OPTIONS.find((c) => c.value === currentCompetitionType) || COMPETITION_TYPE_OPTIONS[0];
+  }, [currentCompetitionType]);
 
   // Get selected featured
   const selectedFeatured = useMemo(() => {
@@ -220,7 +237,7 @@ function TournamentsFilter({ games = [] }) {
       {/* Expanded Filters */}
       {showFilters && (
         <div className="bg-gray-50 dark:bg-[#0f1118] rounded-xl p-4 border border-gray-200 dark:border-white/5 animate-in slide-in-from-top-2 duration-200">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Game Filter - Enhanced with Search */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
@@ -364,6 +381,69 @@ function TournamentsFilter({ games = [] }) {
                               <Check
                                 className={`h-4 w-4 ${
                                   currentStatus === option.value ? "opacity-100" : "opacity-0"
+                                }`}
+                              />
+                              <OptionIcon className={`size-4 ${option.color}`} />
+                              <span>{t(option.label) || option.label}</span>
+                            </CommandItem>
+                          );
+                        })}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Competition Type Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <Trophy className="size-4" />
+                {t("competitionType") || "Type"}
+              </label>
+              <Popover open={competitionTypeOpen} onOpenChange={setCompetitionTypeOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={competitionTypeOpen}
+                    className="w-full h-10 justify-between rounded-lg bg-white dark:bg-[#1a1d2e] border-gray-200 dark:border-white/10 font-normal hover:bg-gray-50 dark:hover:bg-[#252a3d]"
+                  >
+                    <span className="flex items-center gap-2 truncate">
+                      {(() => {
+                        const TypeIcon = selectedCompetitionType.icon;
+                        return (
+                          <>
+                            <TypeIcon className={`size-4 ${selectedCompetitionType.color}`} />
+                            <span className="text-gray-900 dark:text-white">
+                              {t(selectedCompetitionType.label) || selectedCompetitionType.label}
+                            </span>
+                          </>
+                        );
+                      })()}
+                    </span>
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[220px] p-0" align="start">
+                  <Command>
+                    <CommandList>
+                      <CommandGroup>
+                        {COMPETITION_TYPE_OPTIONS.map((option) => {
+                          const OptionIcon = option.icon;
+                          return (
+                            <CommandItem
+                              key={option.value || "all"}
+                              value={option.value || "all"}
+                              onSelect={() => {
+                                updateParams("competitionType", option.value);
+                                setCompetitionTypeOpen(false);
+                              }}
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <Check
+                                className={`h-4 w-4 ${
+                                  currentCompetitionType === option.value ? "opacity-100" : "opacity-0"
                                 }`}
                               />
                               <OptionIcon className={`size-4 ${option.color}`} />

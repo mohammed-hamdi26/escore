@@ -957,7 +957,8 @@
     "ongoing": "جارية",
     "completed": "مكتملة",
     "cancelled": "ملغية",
-    "standings": "الترتيب"
+    "standings": "الترتيب",
+    "type": "النوع"
   },
   "TournamentsFilter": {
     "searchPlaceholder": "البحث عن البطولات...",
@@ -980,7 +981,15 @@
     "bTier": "الفئة B",
     "featured": "مميزة",
     "all": "الكل",
-    "notFeatured": "غير مميزة"
+    "notFeatured": "غير مميزة",
+    "competitionType": "نوع المنافسة",
+    "allTypes": "كل الأنواع",
+    "standard": "قياسي",
+    "battleRoyale": "باتل رويال",
+    "fighting": "قتال",
+    "racing": "سباق",
+    "ffa": "حر للجميع",
+    "sportsSim": "محاكاة رياضية"
   },
   "LanguagesTable": {
     "Local name": "اسم المحلي",

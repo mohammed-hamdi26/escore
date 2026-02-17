@@ -15,6 +15,7 @@ export async function getTournaments(searchParams = {}) {
     if (searchParams.game) params.set("game", searchParams.game);
     if (searchParams.status) params.set("status", searchParams.status);
     if (searchParams.tier) params.set("tier", searchParams.tier);
+    if (searchParams.competitionType) params.set("competitionType", searchParams.competitionType);
     if (searchParams.isFeatured) params.set("isFeatured", searchParams.isFeatured);
 
     // Sorting
