@@ -969,7 +969,11 @@
     "lobby": "Lobby",
     "afterRoundEliminate": "After R{round}: eliminate bottom {count}",
     "killsShort": "K",
-    "ptsShort": "pts"
+    "ptsShort": "pts",
+    "advanceBRRound": "Advance to Round {next}",
+    "bracketCompleted": "Bracket Completed",
+    "brAllRoundsCompleted": "All Battle Royale rounds have been completed. Check standings for final results.",
+    "teamsEliminated": "{count} teams eliminated after this round:"
   },
   "TournamentsTable": {
     "name": "Tournament",

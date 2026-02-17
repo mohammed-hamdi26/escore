@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 03 — Battle Royale Bracket & Multi-Participant — `In Progress` |
-| **Current Milestone** | 02 — BR Round Advancement UI — `In Progress` |
-| **Current Task** | 3.2.1 — Add "Advance Round" button to BR bracket view — `In Progress` |
-| **Last Completed Checkpoint** | Phase 03, Milestone 01, Task 3.1.4 |
+| **Current Milestone** | 03 — Multi-Participant Match Display — `In Progress` |
+| **Current Task** | 3.3.1 — Detect multi-participant matches in MatchDetails — `In Progress` |
+| **Last Completed Checkpoint** | Phase 03, Milestone 02, Task 3.2.4 |
 
 ---
 
@@ -98,8 +98,8 @@ After completing a Task:
 | Milestone | Name | Status |
 |-----------|------|--------|
 | 01 | BR Bracket Type in BracketView | `Completed` |
-| 02 | BR Round Advancement UI | `In Progress` |
-| 03 | Multi-Participant Match Display | `Planned` |
+| 02 | BR Round Advancement UI | `Completed` |
+| 03 | Multi-Participant Match Display | `In Progress` |
 | 04 | Participant Results Editor | `Planned` |
 
 ### Phase 04 — Racing / Time-Based UI
@@ -209,16 +209,16 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 3.2.1 | Add "Advance Round" button to BR bracket view | `In Progress` |
-| 3.2.2 | Show elimination info after advancement | `Planned` |
-| 3.2.3 | Show bracket completion state | `Planned` |
-| 3.2.4 | Handle round advancement errors | `Planned` |
+| 3.2.1 | Add "Advance Round" button to BR bracket view | `Completed` |
+| 3.2.2 | Show elimination info after advancement | `Completed` |
+| 3.2.3 | Show bracket completion state | `Completed` |
+| 3.2.4 | Handle round advancement errors | `Completed` |
 
 ### Phase 03, Milestone 03 — Multi-Participant Match Display
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 3.3.1 | Detect multi-participant matches in MatchDetails | `Planned` |
+| 3.3.1 | Detect multi-participant matches in MatchDetails | `In Progress` |
 | 3.3.2 | Create MultiParticipantMatchView component | `Planned` |
 | 3.3.3 | Update MatchesTable for multi-participant matches | `Planned` |
 | 3.3.4 | Update BracketMatchCard for multi-participant | `Planned` |
@@ -305,3 +305,4 @@ After completing a Task:
 | 10 | 02 | 03 | 2.3.1–2.3.4 | — | 2026-02-17 |
 | 11 | 02 | 04 | 2.4.1–2.4.3 | — | 2026-02-17 |
 | 12 | 03 | 01 | 3.1.1–3.1.4 | — | 2026-02-17 |
+| 13 | 03 | 02 | 3.2.1–3.2.4 | — | 2026-02-17 |

@@ -965,7 +965,11 @@
     "lobby": "لوبي",
     "afterRoundEliminate": "بعد الجولة {round}: إقصاء آخر {count}",
     "killsShort": "ق",
-    "ptsShort": "نقاط"
+    "ptsShort": "نقاط",
+    "advanceBRRound": "التقدم إلى الجولة {next}",
+    "bracketCompleted": "اكتملت القرعة",
+    "brAllRoundsCompleted": "اكتملت جميع جولات باتل رويال. تحقق من الترتيب للنتائج النهائية.",
+    "teamsEliminated": "تم إقصاء {count} فرق بعد هذه الجولة:"
   },
   "TournamentsTable": {
     "name": "البطولة",

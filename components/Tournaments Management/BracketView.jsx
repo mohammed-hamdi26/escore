@@ -27,6 +27,7 @@ import {
   generateBracketAction,
   deleteBracketAction,
   advanceSwissRoundAction,
+  advanceBRRoundAction,
   calculateStageAdvancementAction,
   confirmStageAdvancementAction,
   updateStageVisibilityAction,
@@ -65,6 +66,7 @@ function BracketView({ tournament }) {
     eliminationRules: [],
   });
   const [advancingRound, setAdvancingRound] = useState(false);
+  const [advancingBRRound, setAdvancingBRRound] = useState(false);
 
   // Multi-stage states
   const [isMultiStage, setIsMultiStage] = useState(false);
@@ -421,6 +423,23 @@ function BracketView({ tournament }) {
       setError(e.message);
     } finally {
       setAdvancingRound(false);
+    }
+  };
+
+  const handleAdvanceBRRound = async () => {
+    setAdvancingBRRound(true);
+    setError(null);
+    try {
+      const result = await advanceBRRoundAction(tournamentId);
+      if (result.success) {
+        await fetchBracket();
+      } else {
+        setError(result.error);
+      }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setAdvancingBRRound(false);
     }
   };
 
@@ -2124,24 +2143,101 @@ function BracketView({ tournament }) {
                     <Crosshair className="size-4" />
                     {t("brRounds") || "Battle Royale Rounds"}
                   </h4>
-                  {bracket.battleRoyaleConfig?.eliminationRules?.length > 0 && (
-                    <div className="flex items-center gap-2">
-                      {bracket.battleRoyaleConfig.eliminationRules.map((rule, i) => (
-                        <span
-                          key={i}
-                          className="text-xs px-2 py-1 rounded-full bg-red-500/10 text-red-500"
-                        >
-                          {t("afterRoundEliminate") || "After R{round}: eliminate bottom {count}"
-                            .replace("{round}", rule.afterRound)
-                            .replace("{count}", rule.eliminateBottom)}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {/* Elimination rules badges */}
+                    {bracket.battleRoyaleConfig?.eliminationRules?.length > 0 && (
+                      <div className="hidden md:flex items-center gap-1">
+                        {bracket.battleRoyaleConfig.eliminationRules.map((rule, i) => (
+                          <span
+                            key={i}
+                            className="text-xs px-2 py-1 rounded-full bg-red-500/10 text-red-500"
+                          >
+                            {(t("afterRoundEliminate") || "After R{round}: eliminate bottom {count}")
+                              .replace("{round}", rule.afterRound)
+                              .replace("{count}", rule.eliminateBottom)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Advance BR Round button */}
+                    {bracket.bracketStatus !== "completed" && (
+                      <Button
+                        onClick={handleAdvanceBRRound}
+                        disabled={advancingBRRound || (() => {
+                          const currentRound = bracket.brRounds[(bracket.currentBRRound || 1) - 1];
+                          return currentRound?.matches?.some((m) => m.status !== "completed");
+                        })()}
+                        size="sm"
+                        className="gap-2 bg-orange-500 hover:bg-orange-500/90 text-white"
+                      >
+                        {advancingBRRound ? (
+                          <>
+                            <Loader2 className="size-4 animate-spin" />
+                            {t("advancing") || "Advancing..."}
+                          </>
+                        ) : (
+                          <>
+                            <Play className="size-4" />
+                            {(t("advanceBRRound") || "Advance to Round {next}")
+                              .replace("{next}", (bracket.currentBRRound || 1) + 1)}
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
+
+                {/* Bracket Completed Banner */}
+                {bracket.bracketStatus === "completed" && (
+                  <div className="mb-4 p-4 rounded-xl border border-purple-500/30 bg-purple-500/5">
+                    <div className="flex items-center gap-3">
+                      <Trophy className="size-6 text-purple-500" />
+                      <div>
+                        <h5 className="text-sm font-semibold text-foreground">
+                          {t("bracketCompleted") || "Bracket Completed"}
+                        </h5>
+                        <p className="text-xs text-muted-foreground">
+                          {t("brAllRoundsCompleted") || "All Battle Royale rounds have been completed. Check standings for final results."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-6">
                   {bracket.brRounds.map((round, roundIndex) => {
                     const isCurrent = roundIndex === (bracket.currentBRRound || 1) - 1;
+
+                    // Determine eliminated teams by comparing with next round
+                    const nextRound = bracket.brRounds[roundIndex + 1];
+                    let eliminatedTeams = [];
+                    if (nextRound && round.matches?.length > 0 && nextRound.matches?.length > 0) {
+                      const currentParticipantIds = new Set();
+                      round.matches.forEach((m) =>
+                        (m.participants || []).forEach((p) => {
+                          const id = p.team?.id || p.player?.id;
+                          if (id) currentParticipantIds.add(id);
+                        })
+                      );
+                      const nextParticipantIds = new Set();
+                      nextRound.matches.forEach((m) =>
+                        (m.participants || []).forEach((p) => {
+                          const id = p.team?.id || p.player?.id;
+                          if (id) nextParticipantIds.add(id);
+                        })
+                      );
+                      round.matches.forEach((m) =>
+                        (m.participants || []).forEach((p) => {
+                          const id = p.team?.id || p.player?.id;
+                          const team = p.team || p.player;
+                          if (id && !nextParticipantIds.has(id)) {
+                            eliminatedTeams.push(team?.name || team?.nickname || "Unknown");
+                          }
+                        })
+                      );
+                    }
+
                     return (
                       <div key={roundIndex}>
                         <div className="text-center mb-3">
@@ -2157,6 +2253,22 @@ function BracketView({ tournament }) {
                             {isCurrent && ` (${t("current") || "Current"})`}
                           </span>
                         </div>
+
+                        {/* Elimination info banner */}
+                        {eliminatedTeams.length > 0 && (
+                          <div className="mb-3 p-3 rounded-lg border border-red-500/20 bg-red-500/5">
+                            <div className="flex items-center gap-2 text-xs text-red-500">
+                              <AlertTriangle className="size-3.5 shrink-0" />
+                              <span className="font-medium">
+                                {(t("teamsEliminated") || "{count} teams eliminated after this round:")
+                                  .replace("{count}", eliminatedTeams.length)}
+                              </span>
+                              <span className="text-red-400">
+                                {eliminatedTeams.join(", ")}
+                              </span>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Lobby matches */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

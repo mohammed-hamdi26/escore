@@ -1421,6 +1421,25 @@ export async function advanceSwissRoundAction(tournamentId) {
   }
 }
 
+export async function advanceBRRoundAction(tournamentId) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/advance-br-round`
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("BR round advance error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error advancing BR round",
+    };
+  }
+}
+
 export async function calculateStageAdvancementAction(tournamentId) {
   try {
     const res = await apiClient.get(
