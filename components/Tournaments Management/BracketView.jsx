@@ -19,6 +19,8 @@ import {
   ArrowRight,
   Check,
   Layers,
+  Crosshair,
+  Target,
 } from "lucide-react";
 import {
   getBracketAction,
@@ -55,6 +57,12 @@ function BracketView({ tournament }) {
     totalRounds: 5,
     winsToQualify: 3,
     lossesToEliminate: 3,
+  });
+  const [brConfig, setBrConfig] = useState({
+    totalRounds: 3,
+    teamsPerLobby: 10,
+    totalLobbies: 0,
+    eliminationRules: [],
   });
   const [advancingRound, setAdvancingRound] = useState(false);
 
@@ -356,6 +364,15 @@ function BracketView({ tournament }) {
 
         if (bracketType === "swiss") {
           payload.swissConfig = swissConfig;
+        }
+
+        if (bracketType === "battle_royale") {
+          payload.battleRoyaleConfig = {
+            totalRounds: brConfig.totalRounds,
+            teamsPerLobby: brConfig.teamsPerLobby,
+            ...(brConfig.totalLobbies > 0 && { totalLobbies: brConfig.totalLobbies }),
+            ...(brConfig.eliminationRules.length > 0 && { eliminationRules: brConfig.eliminationRules }),
+          };
         }
       }
 
@@ -1002,6 +1019,11 @@ function BracketView({ tournament }) {
                         label: t("swissSystem") || "Swiss System",
                         desc: t("swissSystemDesc") || "Pairing based on performance",
                       },
+                      {
+                        value: "battle_royale",
+                        label: t("battleRoyaleBracket") || "Battle Royale",
+                        desc: t("battleRoyaleDesc") || "Multi-participant lobbies with elimination rounds",
+                      },
                     ].map((opt) => (
                       <button
                         key={opt.value}
@@ -1113,6 +1135,160 @@ function BracketView({ tournament }) {
                     <p className="text-xs text-muted-foreground mt-2">
                       {t("swissConfigDesc") ||
                         "Teams paired by record each round. Configure thresholds for qualification and elimination."}
+                    </p>
+                  </div>
+                )}
+
+                {/* Battle Royale Configuration */}
+                {bracketType === "battle_royale" && (
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-3">
+                      {t("brConfiguration") || "Battle Royale Configuration"}
+                    </label>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs text-muted-foreground mb-1">
+                          {t("totalRounds") || "Total Rounds"}
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="20"
+                          value={brConfig.totalRounds}
+                          onChange={(e) =>
+                            setBrConfig({
+                              ...brConfig,
+                              totalRounds: parseInt(e.target.value) || 1,
+                            })
+                          }
+                          className="w-full px-3 py-2 rounded-lg bg-background border border-gray-300 dark:border-gray-600 text-foreground text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-muted-foreground mb-1">
+                          {t("teamsPerLobby") || "Teams per Lobby"}
+                        </label>
+                        <input
+                          type="number"
+                          min="2"
+                          max="100"
+                          value={brConfig.teamsPerLobby}
+                          onChange={(e) =>
+                            setBrConfig({
+                              ...brConfig,
+                              teamsPerLobby: parseInt(e.target.value) || 2,
+                            })
+                          }
+                          className="w-full px-3 py-2 rounded-lg bg-background border border-gray-300 dark:border-gray-600 text-foreground text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-muted-foreground mb-1">
+                          {t("totalLobbies") || "Total Lobbies"}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="20"
+                          value={brConfig.totalLobbies}
+                          onChange={(e) =>
+                            setBrConfig({
+                              ...brConfig,
+                              totalLobbies: parseInt(e.target.value) || 0,
+                            })
+                          }
+                          className="w-full px-3 py-2 rounded-lg bg-background border border-gray-300 dark:border-gray-600 text-foreground text-sm"
+                          placeholder={t("autoCalculated") || "Auto"}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Elimination Rules */}
+                    <div className="mt-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-xs text-muted-foreground">
+                          {t("eliminationRules") || "Elimination Rules"}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setBrConfig({
+                              ...brConfig,
+                              eliminationRules: [
+                                ...brConfig.eliminationRules,
+                                { afterRound: brConfig.eliminationRules.length + 1, eliminateBottom: 2 },
+                              ],
+                            })
+                          }
+                          className="flex items-center gap-1 text-xs text-green-primary hover:text-green-primary/80 font-medium"
+                        >
+                          <Plus className="size-3" />
+                          {t("addRule") || "Add Rule"}
+                        </button>
+                      </div>
+                      {brConfig.eliminationRules.length === 0 && (
+                        <p className="text-xs text-muted-foreground/70 italic">
+                          {t("noEliminationRules") || "No elimination rules. All teams play every round."}
+                        </p>
+                      )}
+                      <div className="space-y-2">
+                        {brConfig.eliminationRules.map((rule, ruleIndex) => (
+                          <div
+                            key={ruleIndex}
+                            className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 dark:bg-[#1a1d2e] border border-gray-200 dark:border-gray-700"
+                          >
+                            <div className="flex-1">
+                              <label className="block text-xs text-muted-foreground mb-1">
+                                {t("afterRound") || "After Round"}
+                              </label>
+                              <input
+                                type="number"
+                                min="1"
+                                max={brConfig.totalRounds}
+                                value={rule.afterRound}
+                                onChange={(e) => {
+                                  const updated = [...brConfig.eliminationRules];
+                                  updated[ruleIndex] = { ...rule, afterRound: parseInt(e.target.value) || 1 };
+                                  setBrConfig({ ...brConfig, eliminationRules: updated });
+                                }}
+                                className="w-full px-3 py-2 rounded-lg bg-background border border-gray-300 dark:border-gray-600 text-foreground text-sm"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <label className="block text-xs text-muted-foreground mb-1">
+                                {t("eliminateBottom") || "Eliminate Bottom"}
+                              </label>
+                              <input
+                                type="number"
+                                min="1"
+                                max="50"
+                                value={rule.eliminateBottom}
+                                onChange={(e) => {
+                                  const updated = [...brConfig.eliminationRules];
+                                  updated[ruleIndex] = { ...rule, eliminateBottom: parseInt(e.target.value) || 1 };
+                                  setBrConfig({ ...brConfig, eliminationRules: updated });
+                                }}
+                                className="w-full px-3 py-2 rounded-lg bg-background border border-gray-300 dark:border-gray-600 text-foreground text-sm"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = brConfig.eliminationRules.filter((_, i) => i !== ruleIndex);
+                                setBrConfig({ ...brConfig, eliminationRules: updated });
+                              }}
+                              className="p-2 text-red-500 hover:bg-red-500/10 rounded transition-colors mt-4"
+                            >
+                              <Trash2 className="size-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {t("brConfigDesc") ||
+                        "Multi-participant lobbies each round. Configure elimination rules to narrow the field."}
                     </p>
                   </div>
                 )}
@@ -1427,6 +1603,7 @@ function BracketView({ tournament }) {
     double_elimination: t("doubleElimination") || "Double Elimination",
     round_robin: t("roundRobin") || "Round Robin",
     swiss: t("swissSystem") || "Swiss System",
+    battle_royale: t("battleRoyaleBracket") || "Battle Royale",
     multi_stage: t("multiStage") || "Multi-Stage",
   };
 
@@ -1456,6 +1633,12 @@ function BracketView({ tournament }) {
               <span className="text-xs font-normal text-muted-foreground">
                 ({t("round") || "Round"} {bracket.currentSwissRound}/
                 {bracket.swissConfig?.totalRounds || "?"})
+              </span>
+            )}
+            {bracket.bracketType === "battle_royale" && bracket.currentBRRound && (
+              <span className="text-xs font-normal text-muted-foreground">
+                ({t("round") || "Round"} {bracket.currentBRRound}/
+                {bracket.battleRoyaleConfig?.totalRounds || "?"})
               </span>
             )}
           </h3>
@@ -1929,6 +2112,139 @@ function BracketView({ tournament }) {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Battle Royale Rounds */}
+            {bracket.brRounds && bracket.brRounds.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Crosshair className="size-4" />
+                    {t("brRounds") || "Battle Royale Rounds"}
+                  </h4>
+                  {bracket.battleRoyaleConfig?.eliminationRules?.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      {bracket.battleRoyaleConfig.eliminationRules.map((rule, i) => (
+                        <span
+                          key={i}
+                          className="text-xs px-2 py-1 rounded-full bg-red-500/10 text-red-500"
+                        >
+                          {t("afterRoundEliminate") || "After R{round}: eliminate bottom {count}"
+                            .replace("{round}", rule.afterRound)
+                            .replace("{count}", rule.eliminateBottom)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-6">
+                  {bracket.brRounds.map((round, roundIndex) => {
+                    const isCurrent = roundIndex === (bracket.currentBRRound || 1) - 1;
+                    return (
+                      <div key={roundIndex}>
+                        <div className="text-center mb-3">
+                          <span
+                            className={`text-xs font-medium px-3 py-1 rounded-full ${
+                              isCurrent
+                                ? "bg-orange-500/10 text-orange-500"
+                                : "bg-muted/50 text-muted-foreground"
+                            }`}
+                          >
+                            <Crosshair className="size-3 inline mr-1" />
+                            {round.name || `${t("brRound") || "BR Round"} ${roundIndex + 1}`}
+                            {isCurrent && ` (${t("current") || "Current"})`}
+                          </span>
+                        </div>
+
+                        {/* Lobby matches */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          {round.matches.map((match, matchIndex) => (
+                            <div
+                              key={match.id}
+                              className={`rounded-xl border p-4 ${
+                                isCurrent
+                                  ? "border-orange-500/30 bg-orange-500/5"
+                                  : "border-gray-200 dark:border-gray-700 bg-muted/20 dark:bg-[#1a1d2e]"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <h5 className="text-sm font-medium text-foreground flex items-center gap-2">
+                                  <Target className="size-4 text-orange-500" />
+                                  {match.matchLabel || `${t("lobby") || "Lobby"} ${String.fromCharCode(65 + matchIndex)}`}
+                                </h5>
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                    match.status === "completed"
+                                      ? "bg-purple-500/10 text-purple-500"
+                                      : match.status === "in_progress"
+                                      ? "bg-green-500/10 text-green-500"
+                                      : "bg-blue-500/10 text-blue-500"
+                                  }`}
+                                >
+                                  {t(match.status) || match.status}
+                                </span>
+                              </div>
+
+                              {/* Participant list */}
+                              {match.participants && match.participants.length > 0 ? (
+                                <div className="space-y-1.5">
+                                  {[...match.participants]
+                                    .sort((a, b) => (a.placement || 999) - (b.placement || 999))
+                                    .map((p, pIndex) => {
+                                      const team = p.team || p.player;
+                                      const logo = team?.logo || team?.photo;
+                                      return (
+                                        <div
+                                          key={p.team?.id || p.player?.id || pIndex}
+                                          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/50 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-colors"
+                                        >
+                                          <span className={`text-xs font-bold w-5 text-center ${
+                                            p.placement === 1 ? "text-yellow-500" :
+                                            p.placement === 2 ? "text-gray-400" :
+                                            p.placement === 3 ? "text-orange-600" :
+                                            "text-muted-foreground"
+                                          }`}>
+                                            {p.placement ? `#${p.placement}` : "-"}
+                                          </span>
+                                          {logo?.light ? (
+                                            <img
+                                              src={logo.light}
+                                              alt={team?.name}
+                                              className="size-5 rounded object-cover"
+                                            />
+                                          ) : (
+                                            <div className="size-5 rounded bg-muted flex items-center justify-center">
+                                              <Trophy className="size-3 text-muted-foreground" />
+                                            </div>
+                                          )}
+                                          <span className="text-sm text-foreground flex-1 truncate">
+                                            {team?.name || team?.nickname || t("unknown") || "Unknown"}
+                                          </span>
+                                          {p.kills !== undefined && p.kills !== null && (
+                                            <span className="text-xs text-muted-foreground">
+                                              {p.kills} {t("killsShort") || "K"}
+                                            </span>
+                                          )}
+                                          {p.points !== undefined && p.points !== null && (
+                                            <span className="text-xs font-medium text-foreground">
+                                              {p.points} {t("ptsShort") || "pts"}
+                                            </span>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                </div>
+                              ) : (
+                                <BracketMatchCard match={match} />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

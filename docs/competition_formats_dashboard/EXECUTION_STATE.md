@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 03 — Battle Royale Bracket & Multi-Participant — `In Progress` |
-| **Current Milestone** | 01 — BR Bracket Type in BracketView — `In Progress` |
-| **Current Task** | 3.1.1 — Add battle_royale option to bracket type selector — `In Progress` |
-| **Last Completed Checkpoint** | Phase 02, Milestone 04, Task 2.4.3 |
+| **Current Milestone** | 02 — BR Round Advancement UI — `In Progress` |
+| **Current Task** | 3.2.1 — Add "Advance Round" button to BR bracket view — `In Progress` |
+| **Last Completed Checkpoint** | Phase 03, Milestone 01, Task 3.1.4 |
 
 ---
 
@@ -97,8 +97,8 @@ After completing a Task:
 
 | Milestone | Name | Status |
 |-----------|------|--------|
-| 01 | BR Bracket Type in BracketView | `In Progress` |
-| 02 | BR Round Advancement UI | `Planned` |
+| 01 | BR Bracket Type in BracketView | `Completed` |
+| 02 | BR Round Advancement UI | `In Progress` |
 | 03 | Multi-Participant Match Display | `Planned` |
 | 04 | Participant Results Editor | `Planned` |
 
@@ -200,16 +200,16 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 3.1.1 | Add battle_royale option to bracket type selector | `In Progress` |
-| 3.1.2 | Add BR config fields to generation form | `Planned` |
-| 3.1.3 | Send battleRoyaleConfig in bracket generation | `Planned` |
-| 3.1.4 | Render BR bracket rounds view | `Planned` |
+| 3.1.1 | Add battle_royale option to bracket type selector | `Completed` |
+| 3.1.2 | Add BR config fields to generation form | `Completed` |
+| 3.1.3 | Send battleRoyaleConfig in bracket generation | `Completed` |
+| 3.1.4 | Render BR bracket rounds view | `Completed` |
 
 ### Phase 03, Milestone 02 — BR Round Advancement UI
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 3.2.1 | Add "Advance Round" button to BR bracket view | `Planned` |
+| 3.2.1 | Add "Advance Round" button to BR bracket view | `In Progress` |
 | 3.2.2 | Show elimination info after advancement | `Planned` |
 | 3.2.3 | Show bracket completion state | `Planned` |
 | 3.2.4 | Handle round advancement errors | `Planned` |
@@ -304,3 +304,4 @@ After completing a Task:
 | 9 | 02 | 02 | 2.2.1–2.2.5 | — | 2026-02-17 |
 | 10 | 02 | 03 | 2.3.1–2.3.4 | — | 2026-02-17 |
 | 11 | 02 | 04 | 2.4.1–2.4.3 | — | 2026-02-17 |
+| 12 | 03 | 01 | 3.1.1–3.1.4 | — | 2026-02-17 |
