@@ -1408,7 +1408,19 @@
     "cancelMatch": "إلغاء",
     "reschedule": "إعادة الجدولة",
     "standings": "الترتيب",
-    "tournament": "البطولة"
+    "tournament": "البطولة",
+    "brLobbyMatch": "مباراة لوبي BR",
+    "participantResults": "نتائج المشاركين",
+    "participants": "مشاركين",
+    "teamPlayer": "الفريق / اللاعب",
+    "killsCol": "القتلات",
+    "deathsCol": "الوفيات",
+    "assistsCol": "المساعدات",
+    "pointsCol": "النقاط",
+    "statusCol": "الحالة",
+    "eliminated": "مقصى",
+    "noParticipants": "لم يتم تسجيل أي مشاركين بعد.",
+    "unknown": "غير معروف"
   },
   "NewsTable": {
     "title": "العنوان",

@@ -1302,7 +1302,8 @@
     "Error updating status": "Error updating status",
     "Error toggling featured": "Error toggling featured",
     "Are you sure you want to delete this match?": "Are you sure you want to delete this match?",
-    "No matches found": "No matches found"
+    "No matches found": "No matches found",
+    "brMatch": "BR Match"
   },
   "MatchesList": {
     "title": "Matches Management",
@@ -1411,7 +1412,19 @@
     "cancelMatch": "Cancel",
     "reschedule": "Reschedule",
     "standings": "Standings",
-    "tournament": "Tournament"
+    "tournament": "Tournament",
+    "brLobbyMatch": "BR Lobby Match",
+    "participantResults": "Participant Results",
+    "participants": "participants",
+    "teamPlayer": "Team / Player",
+    "killsCol": "Kills",
+    "deathsCol": "Deaths",
+    "assistsCol": "Assists",
+    "pointsCol": "Points",
+    "statusCol": "Status",
+    "eliminated": "Eliminated",
+    "noParticipants": "No participants recorded yet.",
+    "unknown": "Unknown"
   },
   "NewsTable": {
     "title": "Title",

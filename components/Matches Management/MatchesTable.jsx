@@ -30,6 +30,8 @@ import {
   Clock,
   XCircle,
   CheckCircle,
+  Crosshair,
+  Users,
 } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "../ui/badge";
@@ -157,39 +159,67 @@ function MatchesTable({ matches, columns, players, pagination }) {
           >
             {/* Team 1 */}
             <Table.Cell className="flex gap-3 items-center">
-              {match?.team1?.logo?.light && (
-                <img
-                  width={28}
-                  height={28}
-                  src={match?.team1?.logo?.light}
-                  alt={match?.team1?.name}
-                  className="rounded"
-                />
-              )}
-              <span className="truncate">{match?.team1?.name}</span>
-              {match?.result && (
-                <span className="text-sm font-bold text-green-primary">
-                  {match.result.team1Score}
-                </span>
+              {match?.isMultiParticipant ? (
+                <>
+                  <Crosshair className="size-5 text-orange-500 shrink-0" />
+                  <span className="truncate font-medium">
+                    {match.matchLabel || t("brMatch") || "BR Match"}
+                  </span>
+                  <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500/30 text-xs shrink-0">
+                    <Users className="size-3 mr-1" />
+                    {match.participants?.length || 0}
+                  </Badge>
+                </>
+              ) : (
+                <>
+                  {match?.team1?.logo?.light && (
+                    <img
+                      width={28}
+                      height={28}
+                      src={match?.team1?.logo?.light}
+                      alt={match?.team1?.name}
+                      className="rounded"
+                    />
+                  )}
+                  <span className="truncate">{match?.team1?.name}</span>
+                  {match?.result && (
+                    <span className="text-sm font-bold text-green-primary">
+                      {match.result.team1Score}
+                    </span>
+                  )}
+                </>
               )}
             </Table.Cell>
 
             {/* Team 2 */}
             <Table.Cell className="flex gap-3 items-center">
-              {match?.team2?.logo?.light && (
-                <img
-                  width={28}
-                  height={28}
-                  src={match?.team2?.logo?.light}
-                  alt={match?.team2?.name}
-                  className="rounded"
-                />
-              )}
-              <span className="truncate">{match?.team2?.name}</span>
-              {match?.result && (
-                <span className="text-sm font-bold text-green-primary">
-                  {match.result.team2Score}
+              {match?.isMultiParticipant ? (
+                <span className="text-xs text-muted-foreground truncate">
+                  {(() => {
+                    const top = [...(match.participants || [])]
+                      .sort((a, b) => (a.placement || 999) - (b.placement || 999))[0];
+                    const name = top?.team?.name || top?.player?.nickname || top?.player?.name;
+                    return name ? `🥇 ${name}` : "—";
+                  })()}
                 </span>
+              ) : (
+                <>
+                  {match?.team2?.logo?.light && (
+                    <img
+                      width={28}
+                      height={28}
+                      src={match?.team2?.logo?.light}
+                      alt={match?.team2?.name}
+                      className="rounded"
+                    />
+                  )}
+                  <span className="truncate">{match?.team2?.name}</span>
+                  {match?.result && (
+                    <span className="text-sm font-bold text-green-primary">
+                      {match.result.team2Score}
+                    </span>
+                  )}
+                </>
               )}
             </Table.Cell>
 

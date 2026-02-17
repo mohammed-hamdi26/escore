@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 03 — Battle Royale Bracket & Multi-Participant — `In Progress` |
-| **Current Milestone** | 03 — Multi-Participant Match Display — `In Progress` |
-| **Current Task** | 3.3.1 — Detect multi-participant matches in MatchDetails — `In Progress` |
-| **Last Completed Checkpoint** | Phase 03, Milestone 02, Task 3.2.4 |
+| **Current Milestone** | 04 — Participant Results Editor — `In Progress` |
+| **Current Task** | 3.4.1 — Create ParticipantResultsEditor component — `In Progress` |
+| **Last Completed Checkpoint** | Phase 03, Milestone 03, Task 3.3.4 |
 
 ---
 
@@ -99,8 +99,8 @@ After completing a Task:
 |-----------|------|--------|
 | 01 | BR Bracket Type in BracketView | `Completed` |
 | 02 | BR Round Advancement UI | `Completed` |
-| 03 | Multi-Participant Match Display | `In Progress` |
-| 04 | Participant Results Editor | `Planned` |
+| 03 | Multi-Participant Match Display | `Completed` |
+| 04 | Participant Results Editor | `In Progress` |
 
 ### Phase 04 — Racing / Time-Based UI
 
@@ -218,16 +218,16 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 3.3.1 | Detect multi-participant matches in MatchDetails | `In Progress` |
-| 3.3.2 | Create MultiParticipantMatchView component | `Planned` |
-| 3.3.3 | Update MatchesTable for multi-participant matches | `Planned` |
-| 3.3.4 | Update BracketMatchCard for multi-participant | `Planned` |
+| 3.3.1 | Detect multi-participant matches in MatchDetails | `Completed` |
+| 3.3.2 | Create MultiParticipantMatchView component | `Completed` |
+| 3.3.3 | Update MatchesTable for multi-participant matches | `Completed` |
+| 3.3.4 | Update BracketMatchCard for multi-participant | `Completed` |
 
 ### Phase 03, Milestone 04 — Participant Results Editor
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 3.4.1 | Create ParticipantResultsEditor component | `Planned` |
+| 3.4.1 | Create ParticipantResultsEditor component | `In Progress` |
 | 3.4.2 | Add auto-sort by placement | `Planned` |
 | 3.4.3 | Add auto-calculate points | `Planned` |
 | 3.4.4 | Integrate editor into match detail view | `Planned` |
@@ -306,3 +306,4 @@ After completing a Task:
 | 11 | 02 | 04 | 2.4.1–2.4.3 | — | 2026-02-17 |
 | 12 | 03 | 01 | 3.1.1–3.1.4 | — | 2026-02-17 |
 | 13 | 03 | 02 | 3.2.1–3.2.4 | — | 2026-02-17 |
+| 14 | 03 | 03 | 3.3.1–3.3.4 | — | 2026-02-17 |

@@ -30,6 +30,7 @@ import {
   Minus,
 } from "lucide-react";
 import { startMatch, updateMatchStatus, updateMatchResult } from "@/app/[locale]/_Lib/actions";
+import MultiParticipantMatchView from "./MultiParticipantMatchView";
 import toast from "react-hot-toast";
 
 const STATUS_CONFIG = {
@@ -72,6 +73,10 @@ function MatchDetails({ match }) {
         {t("matchNotFound")}
       </div>
     );
+  }
+
+  if (match.isMultiParticipant) {
+    return <MultiParticipantMatchView match={match} />;
   }
 
   const statusConfig = STATUS_CONFIG[match.status] || STATUS_CONFIG.scheduled;

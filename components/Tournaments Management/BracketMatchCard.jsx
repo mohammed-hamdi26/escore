@@ -68,6 +68,84 @@ function TeamRow({ team, score, isWinner, isBye }) {
 
 function BracketMatchCard({ match }) {
   const statusColor = STATUS_COLORS[match.status] || STATUS_COLORS.scheduled;
+
+  // Multi-participant match rendering
+  if (match.isMultiParticipant && match.participants?.length > 0) {
+    const sorted = [...match.participants]
+      .sort((a, b) => (a.placement || 999) - (b.placement || 999));
+    const top3 = sorted.slice(0, 3);
+    const remaining = sorted.length - 3;
+
+    return (
+      <div
+        className={`rounded-lg border overflow-hidden min-w-[180px] max-w-[220px] ${statusColor}`}
+      >
+        {/* Match header */}
+        <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-white/5">
+          <span className="text-[10px] text-muted-foreground font-medium">
+            {match.matchLabel || match.round || match.roundName || `R${match.bracketRound}`}
+          </span>
+          {match.status === "live" && (
+            <span className="text-[10px] text-green-500 font-bold uppercase animate-pulse">
+              LIVE
+            </span>
+          )}
+          {match.status === "completed" && (
+            <span className="text-[10px] text-purple-500 font-medium">
+              Final
+            </span>
+          )}
+        </div>
+
+        {/* Top 3 participants */}
+        <div className="divide-y divide-white/5">
+          {top3.map((p, i) => {
+            const entity = p.team || p.player;
+            const logo = entity?.logo || entity?.photo;
+            const name = entity?.name || entity?.nickname || "Unknown";
+            return (
+              <div key={entity?.id || i} className="flex items-center justify-between px-3 py-1.5">
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                  <span className={`text-[10px] font-bold w-4 ${
+                    p.placement === 1 ? "text-yellow-500" :
+                    p.placement === 2 ? "text-gray-400" :
+                    p.placement === 3 ? "text-orange-600" :
+                    "text-muted-foreground"
+                  }`}>
+                    {p.placement ? `#${p.placement}` : "-"}
+                  </span>
+                  {logo?.light ? (
+                    <img src={logo.light} alt={name} className="size-4 rounded object-cover shrink-0" />
+                  ) : (
+                    <div className="size-4 rounded bg-muted flex items-center justify-center shrink-0">
+                      <Trophy className="size-2.5 text-muted-foreground" />
+                    </div>
+                  )}
+                  <span className="text-[11px] text-foreground truncate">{name}</span>
+                </div>
+                {p.points !== undefined && p.points !== null && (
+                  <span className="text-[10px] font-mono text-muted-foreground ml-1">
+                    {p.points}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* More indicator */}
+        {remaining > 0 && (
+          <div className="px-3 py-1 bg-muted/20 border-t border-white/5">
+            <span className="text-[10px] text-muted-foreground">
+              +{remaining} more
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Standard 2-team match rendering
   const winnerId = match.result?.winner;
 
   const team1Score = match.result?.team1Score ?? null;
