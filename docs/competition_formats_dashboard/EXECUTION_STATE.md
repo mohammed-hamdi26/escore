@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 02 — Placement Scoring & Standing Config — `In Progress` |
-| **Current Milestone** | 02 — Placement Config Editor — `In Progress` |
-| **Current Task** | 2.2.1 — Create PlacementConfigEditor component — `In Progress` |
-| **Last Completed Checkpoint** | Phase 02, Milestone 01, Task 2.1.4 |
+| **Current Milestone** | 03 — Cumulative Standings Table — `In Progress` |
+| **Current Task** | 2.3.1 — Detect scoringType and switch standings layout — `In Progress` |
+| **Last Completed Checkpoint** | Phase 02, Milestone 02, Task 2.2.5 |
 
 ---
 
@@ -89,8 +89,8 @@ After completing a Task:
 | Milestone | Name | Status |
 |-----------|------|--------|
 | 01 | Scoring Type Toggle in Tournament Form | `Completed` |
-| 02 | Placement Config Editor | `In Progress` |
-| 03 | Cumulative Standings Table | `Planned` |
+| 02 | Placement Config Editor | `Completed` |
+| 03 | Cumulative Standings Table | `In Progress` |
 | 04 | Round History Display | `Planned` |
 
 ### Phase 03 — Battle Royale Bracket & Multi-Participant
@@ -173,17 +173,17 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 2.2.1 | Create PlacementConfigEditor component | `In Progress` |
-| 2.2.2 | Integrate PlacementConfigEditor in TournamentsForm | `Planned` |
-| 2.2.3 | Include placementConfig in submission payload | `Planned` |
-| 2.2.4 | Populate placementConfig on edit | `Planned` |
-| 2.2.5 | Add preset placement tables | `Planned` |
+| 2.2.1 | Create PlacementConfigEditor component | `Completed` |
+| 2.2.2 | Integrate PlacementConfigEditor in TournamentsForm | `Completed` |
+| 2.2.3 | Include placementConfig in submission payload | `Completed` |
+| 2.2.4 | Populate placementConfig on edit | `Completed` |
+| 2.2.5 | Add preset placement tables | `Completed` |
 
 ### Phase 02, Milestone 03 — Cumulative Standings Table
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 2.3.1 | Detect scoringType and switch standings layout | `Planned` |
+| 2.3.1 | Detect scoringType and switch standings layout | `In Progress` |
 | 2.3.2 | Create cumulative standings columns | `Planned` |
 | 2.3.3 | Style cumulative standings with medals and elimination | `Planned` |
 | 2.3.4 | Add "Recalculate" button for placement standings | `Planned` |
@@ -301,3 +301,4 @@ After completing a Task:
 | 6 | 01 | 03 | 1.3.1–1.3.4 | — | 2026-02-17 |
 | 7 | 01 | 04 | 1.4.1–1.4.4 | — | 2026-02-17 |
 | 8 | 02 | 01 | 2.1.1–2.1.4 | — | 2026-02-17 |
+| 9 | 02 | 02 | 2.2.1–2.2.5 | — | 2026-02-17 |

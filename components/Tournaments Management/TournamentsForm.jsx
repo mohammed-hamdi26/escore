@@ -46,6 +46,8 @@ import {
   Swords,
 } from "lucide-react";
 
+import PlacementConfigEditor from "./PlacementConfigEditor";
+
 // Currency options
 const CURRENCY_OPTIONS = [
   { value: "USD", label: "USD - US Dollar", symbol: "$" },
@@ -106,6 +108,15 @@ const validateSchema = yup.object({
   pointsPerWin: yup.number().min(0).max(100).nullable(),
   pointsPerDraw: yup.number().min(0).max(100).nullable(),
   pointsPerLoss: yup.number().min(0).max(100).nullable(),
+  placementConfig: yup.object({
+    placementPoints: yup.array().of(
+      yup.object({
+        place: yup.number().integer().positive().required(),
+        points: yup.number().min(0).required(),
+      })
+    ).min(1, "At least one placement entry is required"),
+    killPoints: yup.number().min(0).optional(),
+  }).nullable().optional(),
   competitionType: yup
     .string()
     .oneOf(["standard", "battle_royale", "fighting", "racing", "ffa", "sports_sim"])
@@ -175,6 +186,16 @@ export default function TournamentsForm({
       pointsPerWin: tournament?.standingConfig?.pointsPerWin ?? 3,
       pointsPerDraw: tournament?.standingConfig?.pointsPerDraw ?? 1,
       pointsPerLoss: tournament?.standingConfig?.pointsPerLoss ?? 0,
+      placementConfig: tournament?.standingConfig?.placementConfig || {
+        placementPoints: [
+          { place: 1, points: 12 },
+          { place: 2, points: 9 },
+          { place: 3, points: 7 },
+          { place: 4, points: 5 },
+          { place: 5, points: 4 },
+        ],
+        killPoints: 0,
+      },
       competitionType: tournament?.competitionType || "standard",
       participationType: tournament?.participationType || "team",
       playersData: tournament?.players || [],
@@ -272,12 +293,19 @@ export default function TournamentsForm({
         if (!dataValues.tier) delete dataValues.tier;
 
         // Build standingConfig object
-        dataValues.standingConfig = {
-          scoringType: dataValues.scoringType || "win_loss",
-          pointsPerWin: parseInt(dataValues.pointsPerWin) || 3,
-          pointsPerDraw: parseInt(dataValues.pointsPerDraw) || 1,
-          pointsPerLoss: parseInt(dataValues.pointsPerLoss) || 0,
-        };
+        if (dataValues.scoringType === "placement") {
+          dataValues.standingConfig = {
+            scoringType: "placement",
+            placementConfig: dataValues.placementConfig,
+          };
+        } else {
+          dataValues.standingConfig = {
+            scoringType: "win_loss",
+            pointsPerWin: parseInt(dataValues.pointsPerWin) || 3,
+            pointsPerDraw: parseInt(dataValues.pointsPerDraw) || 1,
+            pointsPerLoss: parseInt(dataValues.pointsPerLoss) || 0,
+          };
+        }
 
         // Build prizeDistribution array (filter out empty entries)
         if (dataValues.prizeDistribution?.length > 0) {
@@ -302,6 +330,7 @@ export default function TournamentsForm({
         delete dataValues.pointsPerWin;
         delete dataValues.pointsPerDraw;
         delete dataValues.pointsPerLoss;
+        delete dataValues.placementConfig;
 
         await submit(dataValues);
         toast.success(
@@ -708,13 +737,9 @@ export default function TournamentsForm({
           </FormRow>
         )}
 
-        {/* Placement info - show when placement scoring */}
+        {/* Placement Config Editor - show when placement scoring */}
         {formik.values.scoringType === "placement" && (
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <p className="text-sm text-amber-600 dark:text-amber-400">
-              {t("Placement scoring configuration will be available in the standings management section after creating the tournament.")}
-            </p>
-          </div>
+          <PlacementConfigEditor formik={formik} />
         )}
       </FormSection>
 
