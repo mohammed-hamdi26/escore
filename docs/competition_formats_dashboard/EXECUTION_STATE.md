@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 02 — Placement Scoring & Standing Config — `In Progress` |
-| **Current Milestone** | 01 — Scoring Type Toggle in Tournament Form — `In Progress` |
-| **Current Task** | 2.1.1 — Add scoringType toggle to TournamentsForm — `In Progress` |
-| **Last Completed Checkpoint** | Phase 01, Milestone 04, Task 1.4.4 |
+| **Current Milestone** | 02 — Placement Config Editor — `In Progress` |
+| **Current Task** | 2.2.1 — Create PlacementConfigEditor component — `In Progress` |
+| **Last Completed Checkpoint** | Phase 02, Milestone 01, Task 2.1.4 |
 
 ---
 
@@ -88,8 +88,8 @@ After completing a Task:
 
 | Milestone | Name | Status |
 |-----------|------|--------|
-| 01 | Scoring Type Toggle in Tournament Form | `In Progress` |
-| 02 | Placement Config Editor | `Planned` |
+| 01 | Scoring Type Toggle in Tournament Form | `Completed` |
+| 02 | Placement Config Editor | `In Progress` |
 | 03 | Cumulative Standings Table | `Planned` |
 | 04 | Round History Display | `Planned` |
 
@@ -164,16 +164,16 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 2.1.1 | Add scoringType toggle to TournamentsForm | `In Progress` |
-| 2.1.2 | Conditional rendering of win/loss fields | `Planned` |
-| 2.1.3 | Auto-set scoringType based on competitionType | `Planned` |
-| 2.1.4 | Populate scoringType on edit | `Planned` |
+| 2.1.1 | Add scoringType toggle to TournamentsForm | `Completed` |
+| 2.1.2 | Conditional rendering of win/loss fields | `Completed` |
+| 2.1.3 | Auto-set scoringType based on competitionType | `Completed` |
+| 2.1.4 | Populate scoringType on edit | `Completed` |
 
 ### Phase 02, Milestone 02 — Placement Config Editor
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 2.2.1 | Create PlacementConfigEditor component | `Planned` |
+| 2.2.1 | Create PlacementConfigEditor component | `In Progress` |
 | 2.2.2 | Integrate PlacementConfigEditor in TournamentsForm | `Planned` |
 | 2.2.3 | Include placementConfig in submission payload | `Planned` |
 | 2.2.4 | Populate placementConfig on edit | `Planned` |
@@ -300,3 +300,4 @@ After completing a Task:
 | 5 | 01 | 02 | 1.2.1–1.2.6 | — | 2026-02-17 |
 | 6 | 01 | 03 | 1.3.1–1.3.4 | — | 2026-02-17 |
 | 7 | 01 | 04 | 1.4.1–1.4.4 | — | 2026-02-17 |
+| 8 | 02 | 01 | 2.1.1–2.1.4 | — | 2026-02-17 |

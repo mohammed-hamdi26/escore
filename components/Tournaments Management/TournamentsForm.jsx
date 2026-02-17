@@ -102,6 +102,7 @@ const validateSchema = yup.object({
   coverImageDark: yup.string(),
   knockoutImageLight: yup.string(),
   knockoutImageDark: yup.string(),
+  scoringType: yup.string().oneOf(["win_loss", "placement"]).required(),
   pointsPerWin: yup.number().min(0).max(100).nullable(),
   pointsPerDraw: yup.number().min(0).max(100).nullable(),
   pointsPerLoss: yup.number().min(0).max(100).nullable(),
@@ -170,6 +171,7 @@ export default function TournamentsForm({
       isOnline: tournament?.isOnline || false,
       isActive: tournament?.isActive !== undefined ? tournament.isActive : true,
       isFeatured: tournament?.isFeatured || false,
+      scoringType: tournament?.standingConfig?.scoringType || "win_loss",
       pointsPerWin: tournament?.standingConfig?.pointsPerWin ?? 3,
       pointsPerDraw: tournament?.standingConfig?.pointsPerDraw ?? 1,
       pointsPerLoss: tournament?.standingConfig?.pointsPerLoss ?? 0,
@@ -271,6 +273,7 @@ export default function TournamentsForm({
 
         // Build standingConfig object
         dataValues.standingConfig = {
+          scoringType: dataValues.scoringType || "win_loss",
           pointsPerWin: parseInt(dataValues.pointsPerWin) || 3,
           pointsPerDraw: parseInt(dataValues.pointsPerDraw) || 1,
           pointsPerLoss: parseInt(dataValues.pointsPerLoss) || 0,
@@ -295,6 +298,7 @@ export default function TournamentsForm({
         delete dataValues.gamesData;
         delete dataValues.teamsData;
         delete dataValues.playersData;
+        delete dataValues.scoringType;
         delete dataValues.pointsPerWin;
         delete dataValues.pointsPerDraw;
         delete dataValues.pointsPerLoss;
@@ -373,6 +377,13 @@ export default function TournamentsForm({
   useEffect(() => {
     if (competitionTypeValue === "fighting") {
       formik.setFieldValue("participationType", "player");
+    }
+  }, [competitionTypeValue]);
+
+  // Auto-set scoringType to "placement" for battle royale
+  useEffect(() => {
+    if (competitionTypeValue === "battle_royale") {
+      formik.setFieldValue("scoringType", "placement");
     }
   }, [competitionTypeValue]);
 
@@ -632,29 +643,79 @@ export default function TournamentsForm({
 
       {/* Standing Settings */}
       <FormSection title={t("Standing Settings")} icon={<Trophy className="size-5" />}>
-        <FormRow cols={3}>
-          <InputField
-            label={t("Points Per Win")}
-            name="pointsPerWin"
-            type="number"
-            placeholder="3"
-            formik={formik}
-          />
-          <InputField
-            label={t("Points Per Draw")}
-            name="pointsPerDraw"
-            type="number"
-            placeholder="1"
-            formik={formik}
-          />
-          <InputField
-            label={t("Points Per Loss")}
-            name="pointsPerLoss"
-            type="number"
-            placeholder="0"
-            formik={formik}
-          />
-        </FormRow>
+        {/* Scoring Type Toggle */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-foreground mb-2">
+            {t("Scoring Type")}
+          </label>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => formik.setFieldValue("scoringType", "win_loss")}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-medium transition-all ${
+                formik.values.scoringType === "win_loss"
+                  ? "border-green-primary bg-green-primary/10 text-green-primary"
+                  : "border-gray-300 dark:border-gray-600 text-muted-foreground hover:border-green-primary/50"
+              }`}
+            >
+              <Trophy className="size-4" />
+              {t("Win / Loss")}
+            </button>
+            <button
+              type="button"
+              onClick={() => formik.setFieldValue("scoringType", "placement")}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-medium transition-all ${
+                formik.values.scoringType === "placement"
+                  ? "border-green-primary bg-green-primary/10 text-green-primary"
+                  : "border-gray-300 dark:border-gray-600 text-muted-foreground hover:border-green-primary/50"
+              }`}
+            >
+              <Award className="size-4" />
+              {t("Placement")}
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1.5">
+            {formik.values.scoringType === "win_loss"
+              ? t("Win/Loss scoring uses points for wins, draws, and losses")
+              : t("Placement scoring awards points based on finishing position")}
+          </p>
+        </div>
+
+        {/* Win/Loss Point Fields - only show for win_loss scoring */}
+        {formik.values.scoringType === "win_loss" && (
+          <FormRow cols={3}>
+            <InputField
+              label={t("Points Per Win")}
+              name="pointsPerWin"
+              type="number"
+              placeholder="3"
+              formik={formik}
+            />
+            <InputField
+              label={t("Points Per Draw")}
+              name="pointsPerDraw"
+              type="number"
+              placeholder="1"
+              formik={formik}
+            />
+            <InputField
+              label={t("Points Per Loss")}
+              name="pointsPerLoss"
+              type="number"
+              placeholder="0"
+              formik={formik}
+            />
+          </FormRow>
+        )}
+
+        {/* Placement info - show when placement scoring */}
+        {formik.values.scoringType === "placement" && (
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              {t("Placement scoring configuration will be available in the standings management section after creating the tournament.")}
+            </p>
+          </div>
+        )}
       </FormSection>
 
       {/* Prize Distribution */}
