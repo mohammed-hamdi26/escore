@@ -42,6 +42,7 @@ import {
   WifiOff,
   Power,
   Users,
+  Swords,
 } from "lucide-react";
 
 // Currency options
@@ -103,6 +104,10 @@ const validateSchema = yup.object({
   pointsPerWin: yup.number().min(0).max(100).nullable(),
   pointsPerDraw: yup.number().min(0).max(100).nullable(),
   pointsPerLoss: yup.number().min(0).max(100).nullable(),
+  competitionType: yup
+    .string()
+    .oneOf(["standard", "battle_royale", "fighting", "racing", "ffa", "sports_sim"])
+    .required("Competition type is required"),
 });
 
 export default function TournamentsForm({
@@ -160,6 +165,7 @@ export default function TournamentsForm({
       pointsPerWin: tournament?.standingConfig?.pointsPerWin ?? 3,
       pointsPerDraw: tournament?.standingConfig?.pointsPerDraw ?? 1,
       pointsPerLoss: tournament?.standingConfig?.pointsPerLoss ?? 0,
+      competitionType: tournament?.competitionType || "standard",
       prizeDistribution: tournament?.prizeDistribution?.map((p) => ({
         place: p.place,
         amount: p.amount,
@@ -352,6 +358,15 @@ export default function TournamentsForm({
     { value: "B", label: "B-Tier", color: "text-blue-500", bg: "bg-blue-500/10", badge: "bg-blue-500" },
   ];
 
+  const competitionTypeOptions = [
+    { value: "standard", label: t("Standard"), icon: Trophy, color: "text-blue-500", bg: "bg-blue-500/10" },
+    { value: "battle_royale", label: t("Battle Royale"), icon: Users, color: "text-orange-500", bg: "bg-orange-500/10" },
+    { value: "fighting", label: t("Fighting"), icon: Swords, color: "text-red-500", bg: "bg-red-500/10" },
+    { value: "racing", label: t("Racing"), icon: Clock, color: "text-green-500", bg: "bg-green-500/10" },
+    { value: "ffa", label: t("Free For All"), icon: Users, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { value: "sports_sim", label: t("Sports Simulation"), icon: Gamepad2, color: "text-cyan-500", bg: "bg-cyan-500/10" },
+  ];
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       {/* Basic Information */}
@@ -381,7 +396,14 @@ export default function TournamentsForm({
           rows={3}
         />
 
-        <FormRow cols={2}>
+        <FormRow cols={3}>
+          <CompetitionTypeSelectField
+            label={t("Competition Type")}
+            name="competitionType"
+            options={competitionTypeOptions}
+            formik={formik}
+            placeholder={t("Select Competition Type")}
+          />
           <StatusSelectField
             label={t("Status")}
             name="status"
@@ -764,6 +786,87 @@ function StatusSelectField({ label, name, options, formik, placeholder }) {
                 <>
                   <div className="size-8 rounded-lg bg-muted dark:bg-[#252a3d] flex items-center justify-center">
                     <Clock className="size-4 text-muted-foreground" />
+                  </div>
+                  <span className="text-muted-foreground">{placeholder}</span>
+                </>
+              )}
+            </div>
+            <ChevronDown className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-2 bg-background dark:bg-[#12141c] border-border"
+          align="start"
+        >
+          {options.map((option) => {
+            const isSelected = value === option.value;
+            const IconComponent = option.icon;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => handleSelect(option)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
+                  isSelected
+                    ? `${option.bg} ${option.color}`
+                    : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
+                }`}
+              >
+                <div className={`size-8 rounded-lg ${option.bg} flex items-center justify-center`}>
+                  <IconComponent className={`size-4 ${option.color}`} />
+                </div>
+                <span className={`flex-1 text-sm font-medium ${isSelected ? option.color : "text-foreground"}`}>
+                  {option.label}
+                </span>
+                {isSelected && <Check className={`size-4 ${option.color}`} />}
+              </button>
+            );
+          })}
+        </PopoverContent>
+      </Popover>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// Competition Type Select Field with Icons and Colors
+function CompetitionTypeSelectField({ label, name, options, formik, placeholder }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const error = formik.touched[name] && formik.errors[name];
+  const value = formik.values[name];
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  const handleSelect = async (option) => {
+    await formik.setFieldValue(name, option.value);
+    await formik.setFieldTouched(name, true, true);
+    formik.validateField(name);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 focus:border-green-primary/30 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
+              error ? "ring-2 ring-red-500 border-red-500" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {selectedOption ? (
+                <>
+                  <div className={`size-8 rounded-lg ${selectedOption.bg} flex items-center justify-center`}>
+                    <selectedOption.icon className={`size-4 ${selectedOption.color}`} />
+                  </div>
+                  <span className={`font-medium ${selectedOption.color}`}>{selectedOption.label}</span>
+                </>
+              ) : (
+                <>
+                  <div className="size-8 rounded-lg bg-muted dark:bg-[#252a3d] flex items-center justify-center">
+                    <Trophy className="size-4 text-muted-foreground" />
                   </div>
                   <span className="text-muted-foreground">{placeholder}</span>
                 </>

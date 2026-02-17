@@ -794,7 +794,15 @@
     "Points Per Win": "نقاط الفوز",
     "Points Per Draw": "نقاط التعادل",
     "Points Per Loss": "نقاط الخسارة",
-    "Prize Distribution": "توزيع الجوائز"
+    "Prize Distribution": "توزيع الجوائز",
+    "Competition Type": "نوع المسابقة",
+    "Select Competition Type": "اختر نوع المسابقة",
+    "Standard": "قياسي",
+    "Battle Royale": "باتل رويال",
+    "Fighting": "قتال",
+    "Racing": "سباق",
+    "Free For All": "الكل ضد الكل",
+    "Sports Simulation": "محاكاة رياضية"
   },
   "TournamentsManagement": {
     "title": "إدارة البطولات",

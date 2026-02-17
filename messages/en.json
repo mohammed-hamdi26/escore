@@ -798,7 +798,15 @@
     "Points Per Win": "Points Per Win",
     "Points Per Draw": "Points Per Draw",
     "Points Per Loss": "Points Per Loss",
-    "Prize Distribution": "Prize Distribution"
+    "Prize Distribution": "Prize Distribution",
+    "Competition Type": "Competition Type",
+    "Select Competition Type": "Select Competition Type",
+    "Standard": "Standard",
+    "Battle Royale": "Battle Royale",
+    "Fighting": "Fighting",
+    "Racing": "Racing",
+    "Free For All": "Free For All",
+    "Sports Simulation": "Sports Simulation"
   },
   "TournamentsManagement": {
     "title": "Tournaments Management",
