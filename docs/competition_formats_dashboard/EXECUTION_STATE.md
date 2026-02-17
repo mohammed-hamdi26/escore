@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 02 — Placement Scoring & Standing Config — `In Progress` |
-| **Current Milestone** | 03 — Cumulative Standings Table — `In Progress` |
-| **Current Task** | 2.3.1 — Detect scoringType and switch standings layout — `In Progress` |
-| **Last Completed Checkpoint** | Phase 02, Milestone 02, Task 2.2.5 |
+| **Current Milestone** | 04 — Round History Display — `In Progress` |
+| **Current Task** | 2.4.1 — Add expandable round history to standing rows — `In Progress` |
+| **Last Completed Checkpoint** | Phase 02, Milestone 03, Task 2.3.4 |
 
 ---
 
@@ -90,8 +90,8 @@ After completing a Task:
 |-----------|------|--------|
 | 01 | Scoring Type Toggle in Tournament Form | `Completed` |
 | 02 | Placement Config Editor | `Completed` |
-| 03 | Cumulative Standings Table | `In Progress` |
-| 04 | Round History Display | `Planned` |
+| 03 | Cumulative Standings Table | `Completed` |
+| 04 | Round History Display | `In Progress` |
 
 ### Phase 03 — Battle Royale Bracket & Multi-Participant
 
@@ -183,16 +183,16 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 2.3.1 | Detect scoringType and switch standings layout | `In Progress` |
-| 2.3.2 | Create cumulative standings columns | `Planned` |
-| 2.3.3 | Style cumulative standings with medals and elimination | `Planned` |
-| 2.3.4 | Add "Recalculate" button for placement standings | `Planned` |
+| 2.3.1 | Detect scoringType and switch standings layout | `Completed` |
+| 2.3.2 | Create cumulative standings columns | `Completed` |
+| 2.3.3 | Style cumulative standings with medals and elimination | `Completed` |
+| 2.3.4 | Add "Recalculate" button for placement standings | `Completed` |
 
 ### Phase 02, Milestone 04 — Round History Display
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 2.4.1 | Add expandable round history to standing rows | `Planned` |
+| 2.4.1 | Add expandable round history to standing rows | `In Progress` |
 | 2.4.2 | Style round history sub-table | `Planned` |
 | 2.4.3 | Handle empty round history | `Planned` |
 
@@ -302,3 +302,4 @@ After completing a Task:
 | 7 | 01 | 04 | 1.4.1–1.4.4 | — | 2026-02-17 |
 | 8 | 02 | 01 | 2.1.1–2.1.4 | — | 2026-02-17 |
 | 9 | 02 | 02 | 2.2.1–2.2.5 | — | 2026-02-17 |
+| 10 | 02 | 03 | 2.3.1–2.3.4 | — | 2026-02-17 |

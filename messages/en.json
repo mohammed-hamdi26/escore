@@ -3533,7 +3533,22 @@
     "defaultLabel": "Default",
     "defaultNote": "Default standings - click Initialize to save to database",
     "recalculateFromMatches": "Recalculate from Matches",
-    "recalculateFromMatchesSuccess": "Standings recalculated from match results successfully"
+    "recalculateFromMatchesSuccess": "Standings recalculated from match results successfully",
+    "recalculatePlacement": "Recalculate Placement",
+    "recalculatePlacementSuccess": "Placement standings recalculated successfully",
+    "placementScoring": "Placement Scoring",
+    "perKill": "per kill",
+    "player": "Player",
+    "totalPoints": "Total Points",
+    "placementPoints": "Placement Points",
+    "killPoints": "Kill Points",
+    "totalKills": "Total Kills",
+    "kills": "Kills",
+    "averagePlacement": "Average Placement",
+    "avgPlace": "Avg",
+    "bestPlacement": "Best Placement",
+    "best": "Best",
+    "status": "Status"
   },
   "teamForm": {
     "basicInfo": "Basic Information",

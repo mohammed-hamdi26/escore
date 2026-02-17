@@ -3453,7 +3453,22 @@
     "defaultLabel": "افتراضي",
     "defaultNote": "ترتيب افتراضي - اضغط تهيئة لحفظه في قاعدة البيانات",
     "recalculateFromMatches": "إعادة حساب من المباريات",
-    "recalculateFromMatchesSuccess": "تم إعادة حساب الترتيب من نتائج المباريات بنجاح"
+    "recalculateFromMatchesSuccess": "تم إعادة حساب الترتيب من نتائج المباريات بنجاح",
+    "recalculatePlacement": "إعادة حساب الترتيب",
+    "recalculatePlacementSuccess": "تم إعادة حساب ترتيب المراكز بنجاح",
+    "placementScoring": "تسجيل بالترتيب",
+    "perKill": "لكل قتل",
+    "player": "اللاعب",
+    "totalPoints": "إجمالي النقاط",
+    "placementPoints": "نقاط الترتيب",
+    "killPoints": "نقاط القتل",
+    "totalKills": "إجمالي القتل",
+    "kills": "القتل",
+    "averagePlacement": "متوسط الترتيب",
+    "avgPlace": "المتوسط",
+    "bestPlacement": "أفضل ترتيب",
+    "best": "الأفضل",
+    "status": "الحالة"
   },
   "teamForm": {
     "basicInfo": "المعلومات الأساسية",

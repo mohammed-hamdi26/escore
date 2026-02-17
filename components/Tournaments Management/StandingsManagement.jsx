@@ -19,12 +19,15 @@ import {
   TrendingUp,
   TrendingDown,
   AlertTriangle,
+  User,
+  Target,
 } from "lucide-react";
 import {
   initializeStandings,
   updateStanding,
   recalculateStandings,
   recalculateStandingsFromMatches,
+  recalculatePlacementStandings,
   deleteStanding,
   deleteAllStandings,
 } from "@/app/[locale]/_Lib/actions";
@@ -81,6 +84,8 @@ export default function StandingsManagement({ tournament, initialStandings }) {
     pointsPerDraw: 1,
     pointsPerLoss: 0,
   };
+  const isPlacement = config.scoringType === "placement";
+  const isPlayerBased = tournament?.participationType === "player";
 
   // === Actions ===
 
@@ -135,6 +140,26 @@ export default function StandingsManagement({ tournament, initialStandings }) {
       }
     } catch {
       toast.error("Failed to recalculate from matches");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleRecalculatePlacement = async () => {
+    setLoading("recalculatePlacement");
+    try {
+      const result = await recalculatePlacementStandings(tournamentId);
+      if (result.success) {
+        toast.success(
+          t("recalculatePlacementSuccess") ||
+            "Placement standings recalculated"
+        );
+        router.refresh();
+      } else {
+        toast.error(result.error || "Failed to recalculate placement standings");
+      }
+    } catch {
+      toast.error("Failed to recalculate placement standings");
     } finally {
       setLoading(null);
     }
@@ -276,18 +301,33 @@ export default function StandingsManagement({ tournament, initialStandings }) {
         {/* Standing Config Badge */}
         <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-border">
           <Trophy className="size-4 text-green-primary" />
-          <span className="text-sm text-muted-foreground">
-            {t("pointsSystem") || "Points"}:
-          </span>
-          <span className="text-sm font-medium text-green-500">
-            W={config.pointsPerWin}
-          </span>
-          <span className="text-sm font-medium text-gray-500">
-            D={config.pointsPerDraw}
-          </span>
-          <span className="text-sm font-medium text-red-500">
-            L={config.pointsPerLoss}
-          </span>
+          {isPlacement ? (
+            <>
+              <span className="text-sm font-medium text-amber-500">
+                {t("placementScoring") || "Placement Scoring"}
+              </span>
+              {config.placementConfig?.killPoints > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  +{config.placementConfig.killPoints} {t("perKill") || "per kill"}
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              <span className="text-sm text-muted-foreground">
+                {t("pointsSystem") || "Points"}:
+              </span>
+              <span className="text-sm font-medium text-green-500">
+                W={config.pointsPerWin}
+              </span>
+              <span className="text-sm font-medium text-gray-500">
+                D={config.pointsPerDraw}
+              </span>
+              <span className="text-sm font-medium text-red-500">
+                L={config.pointsPerLoss}
+              </span>
+            </>
+          )}
         </div>
       </div>
 
@@ -338,6 +378,22 @@ export default function StandingsManagement({ tournament, initialStandings }) {
               {t("recalculateFromMatches") || "Recalculate from Matches"}
             </Button>
 
+            {isPlacement && (
+              <Button
+                onClick={handleRecalculatePlacement}
+                disabled={loading === "recalculatePlacement"}
+                variant="outline"
+                className="gap-2 border-amber-300 dark:border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10"
+              >
+                {loading === "recalculatePlacement" ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Target className="size-4" />
+                )}
+                {t("recalculatePlacement") || "Recalculate Placement"}
+              </Button>
+            )}
+
             <Button
               onClick={handleDeleteAll}
               disabled={loading === "deleteAll"}
@@ -386,35 +442,63 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                 <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-white/5">
                   <th className="px-4 py-3 text-left font-semibold">#</th>
                   <th className="px-4 py-3 text-left font-semibold">
-                    {t("team") || "Team"}
+                    {isPlayerBased ? (t("player") || "Player") : (t("team") || "Team")}
                   </th>
                   <th className="px-4 py-3 text-center font-semibold">
                     {t("played") || "P"}
                   </th>
-                  <th className="px-4 py-3 text-center font-semibold">
-                    {t("wins") || "W"}
-                  </th>
-                  <th className="px-4 py-3 text-center font-semibold">
-                    {t("draws") || "D"}
-                  </th>
-                  <th className="px-4 py-3 text-center font-semibold">
-                    {t("losses") || "L"}
-                  </th>
-                  <th className="px-4 py-3 text-center font-semibold">
-                    {t("pf") || "PF"}
-                  </th>
-                  <th className="px-4 py-3 text-center font-semibold">
-                    {t("pa") || "PA"}
-                  </th>
-                  <th className="px-4 py-3 text-center font-semibold">
-                    {t("diff") || "+/-"}
-                  </th>
-                  <th className="px-4 py-3 text-center font-semibold">
-                    {t("points") || "PTS"}
-                  </th>
-                  <th className="px-4 py-3 text-center font-semibold">
-                    {t("form") || "Form"}
-                  </th>
+                  {isPlacement ? (
+                    <>
+                      <th className="px-4 py-3 text-center font-semibold" title={t("totalPoints") || "Total Points"}>
+                        {t("points") || "PTS"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold" title={t("placementPoints") || "Placement Points"}>
+                        PP
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold" title={t("killPoints") || "Kill Points"}>
+                        KP
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold" title={t("totalKills") || "Total Kills"}>
+                        {t("kills") || "Kills"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold hidden md:table-cell" title={t("averagePlacement") || "Average Placement"}>
+                        {t("avgPlace") || "Avg"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold hidden md:table-cell" title={t("bestPlacement") || "Best Placement"}>
+                        {t("best") || "Best"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold">
+                        {t("status") || "Status"}
+                      </th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="px-4 py-3 text-center font-semibold">
+                        {t("wins") || "W"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold">
+                        {t("draws") || "D"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold">
+                        {t("losses") || "L"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold">
+                        {t("pf") || "PF"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold">
+                        {t("pa") || "PA"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold">
+                        {t("diff") || "+/-"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold">
+                        {t("points") || "PTS"}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold">
+                        {t("form") || "Form"}
+                      </th>
+                    </>
+                  )}
                   <th className="px-4 py-3 text-center font-semibold">
                     {t("actions") || "Actions"}
                   </th>
@@ -423,8 +507,12 @@ export default function StandingsManagement({ tournament, initialStandings }) {
               <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                 {standings.map((standing) => {
                   const isEditing = editingId === standing.id;
-                  const teamLogo =
-                    standing.team?.logo?.light || standing.team?.logo?.dark;
+                  const teamLogo = isPlayerBased
+                    ? (standing.player?.photo?.light || standing.player?.photo?.dark)
+                    : (standing.team?.logo?.light || standing.team?.logo?.dark);
+                  const entityName = isPlayerBased
+                    ? (standing.player?.nickname || standing.player?.name)
+                    : standing.team?.name;
                   const positionStyle = getPositionStyle(
                     standing.position,
                     standing.isQualified,
@@ -465,136 +553,227 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                         )}
                       </td>
 
-                      {/* Team */}
+                      {/* Team / Player */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="size-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden flex-shrink-0">
+                          <div className={`size-8 ${isPlayerBased ? "rounded-full" : "rounded-lg"} bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden flex-shrink-0`}>
                             {teamLogo ? (
                               <img
                                 src={teamLogo}
-                                alt={standing.team?.name}
-                                className="size-6 object-contain"
+                                alt={entityName}
+                                className="size-full object-cover"
                               />
+                            ) : isPlayerBased ? (
+                              <User className="size-4 text-gray-400 dark:text-gray-500" />
                             ) : (
                               <Users className="size-4 text-gray-400 dark:text-gray-500" />
                             )}
                           </div>
                           <div className="min-w-0">
                             <p className="font-medium text-gray-900 dark:text-white truncate">
-                              {standing.team?.name || standing.player?.nickname}
+                              {entityName || "-"}
                             </p>
                           </div>
-                          {standing.isQualified && (
+                          {!isPlacement && standing.isQualified && (
                             <TrendingUp className="size-4 text-green-500 flex-shrink-0" />
                           )}
-                          {standing.isEliminated && (
+                          {!isPlacement && standing.isEliminated && (
                             <TrendingDown className="size-4 text-red-500 flex-shrink-0" />
                           )}
                         </div>
                       </td>
 
-                      {/* Stats - editable or display */}
+                      {/* Stats columns */}
+                      {/* Played (common) */}
                       {isEditing ? (
-                        <>
-                          <EditCell
-                            value={editValues.matchesPlayed}
-                            onChange={(v) =>
-                              handleEditChange("matchesPlayed", v)
-                            }
-                          />
-                          <EditCell
-                            value={editValues.wins}
-                            onChange={(v) => handleEditChange("wins", v)}
-                          />
-                          <EditCell
-                            value={editValues.draws}
-                            onChange={(v) => handleEditChange("draws", v)}
-                          />
-                          <EditCell
-                            value={editValues.losses}
-                            onChange={(v) => handleEditChange("losses", v)}
-                          />
-                          <EditCell
-                            value={editValues.pointsFor}
-                            onChange={(v) => handleEditChange("pointsFor", v)}
-                          />
-                          <EditCell
-                            value={editValues.pointsAgainst}
-                            onChange={(v) =>
-                              handleEditChange("pointsAgainst", v)
-                            }
-                          />
-                          <td className="px-4 py-3 text-center text-sm text-muted-foreground">
-                            {(editValues.pointsFor || 0) -
-                              (editValues.pointsAgainst || 0)}
-                          </td>
-                          <EditCell
-                            value={editValues.points}
-                            onChange={(v) => handleEditChange("points", v)}
-                          />
-                        </>
+                        <EditCell
+                          value={editValues.matchesPlayed}
+                          onChange={(v) =>
+                            handleEditChange("matchesPlayed", v)
+                          }
+                        />
                       ) : (
-                        <>
-                          <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                            {standing.matchesPlayed || 0}
-                          </td>
-                          <td className="px-4 py-3 text-center text-green-600 dark:text-green-400 font-medium">
-                            {standing.wins || 0}
-                          </td>
-                          <td className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
-                            {standing.draws || 0}
-                          </td>
-                          <td className="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
-                            {standing.losses || 0}
-                          </td>
-                          <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                            {standing.pointsFor || 0}
-                          </td>
-                          <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
-                            {standing.pointsAgainst || 0}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span
-                              className={`font-medium ${
-                                standing.pointsDiff > 0
-                                  ? "text-green-600 dark:text-green-400"
-                                  : standing.pointsDiff < 0
-                                    ? "text-red-600 dark:text-red-400"
-                                    : "text-gray-500 dark:text-gray-400"
-                              }`}
-                            >
-                              {standing.pointsDiff > 0 ? "+" : ""}
-                              {standing.pointsDiff || 0}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className="inline-flex items-center justify-center min-w-[40px] px-2 py-1 rounded-lg bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 font-bold text-sm">
-                              {standing.points || 0}
-                            </span>
-                          </td>
-                        </>
+                        <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                          {standing.matchesPlayed || 0}
+                        </td>
                       )}
 
-                      {/* Form / Last Results */}
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-center gap-1">
-                          {standing.lastResults &&
-                          standing.lastResults.length > 0 ? (
-                            standing.lastResults.slice(-5).map((result, idx) => (
-                              <span
-                                key={idx}
-                                className={`size-5 rounded text-xs font-bold flex items-center justify-center ${getResultBadge(result)}`}
-                              >
-                                {result}
+                      {isPlacement ? (
+                        /* Placement columns */
+                        isEditing ? (
+                          <>
+                            <EditCell
+                              value={editValues.points}
+                              onChange={(v) => handleEditChange("points", v)}
+                            />
+                            <td className="px-4 py-3 text-center text-sm text-muted-foreground">
+                              {standing.totalPlacementPoints || 0}
+                            </td>
+                            <td className="px-4 py-3 text-center text-sm text-muted-foreground">
+                              {standing.totalKillPoints || 0}
+                            </td>
+                            <EditCell
+                              value={editValues.totalKills ?? standing.totalKills ?? 0}
+                              onChange={(v) => handleEditChange("totalKills", v)}
+                            />
+                            <td className="px-4 py-3 text-center text-sm text-muted-foreground hidden md:table-cell">
+                              {standing.averagePlacement ? standing.averagePlacement.toFixed(1) : "-"}
+                            </td>
+                            <td className="px-4 py-3 text-center text-sm text-muted-foreground hidden md:table-cell">
+                              {standing.bestPlacement || "-"}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {standing.isEliminated ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-500">
+                                  <TrendingDown className="size-3" />
+                                  {t("eliminated") || "Out"}
+                                </span>
+                              ) : standing.isQualified ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500">
+                                  <TrendingUp className="size-3" />
+                                  {t("qualified") || "Qual"}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400 dark:text-gray-500">-</span>
+                              )}
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td className="px-4 py-3 text-center">
+                              <span className="inline-flex items-center justify-center min-w-[40px] px-2 py-1 rounded-lg bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 font-bold text-sm">
+                                {standing.points || 0}
                               </span>
-                            ))
-                          ) : (
-                            <span className="text-gray-400 dark:text-gray-500">
-                              -
-                            </span>
-                          )}
-                        </div>
-                      </td>
+                            </td>
+                            <td className="px-4 py-3 text-center text-amber-600 dark:text-amber-400 font-medium">
+                              {standing.totalPlacementPoints || 0}
+                            </td>
+                            <td className="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
+                              {standing.totalKillPoints || 0}
+                            </td>
+                            <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                              {standing.totalKills || 0}
+                            </td>
+                            <td className="px-4 py-3 text-center text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                              {standing.averagePlacement ? standing.averagePlacement.toFixed(1) : "-"}
+                            </td>
+                            <td className="px-4 py-3 text-center text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                              {standing.bestPlacement || "-"}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {standing.isEliminated ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-500">
+                                  <TrendingDown className="size-3" />
+                                  {t("eliminated") || "Out"}
+                                </span>
+                              ) : standing.isQualified ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500">
+                                  <TrendingUp className="size-3" />
+                                  {t("qualified") || "Qual"}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400 dark:text-gray-500">-</span>
+                              )}
+                            </td>
+                          </>
+                        )
+                      ) : (
+                        /* Win/Loss columns */
+                        isEditing ? (
+                          <>
+                            <EditCell
+                              value={editValues.wins}
+                              onChange={(v) => handleEditChange("wins", v)}
+                            />
+                            <EditCell
+                              value={editValues.draws}
+                              onChange={(v) => handleEditChange("draws", v)}
+                            />
+                            <EditCell
+                              value={editValues.losses}
+                              onChange={(v) => handleEditChange("losses", v)}
+                            />
+                            <EditCell
+                              value={editValues.pointsFor}
+                              onChange={(v) => handleEditChange("pointsFor", v)}
+                            />
+                            <EditCell
+                              value={editValues.pointsAgainst}
+                              onChange={(v) =>
+                                handleEditChange("pointsAgainst", v)
+                              }
+                            />
+                            <td className="px-4 py-3 text-center text-sm text-muted-foreground">
+                              {(editValues.pointsFor || 0) -
+                                (editValues.pointsAgainst || 0)}
+                            </td>
+                            <EditCell
+                              value={editValues.points}
+                              onChange={(v) => handleEditChange("points", v)}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <td className="px-4 py-3 text-center text-green-600 dark:text-green-400 font-medium">
+                              {standing.wins || 0}
+                            </td>
+                            <td className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
+                              {standing.draws || 0}
+                            </td>
+                            <td className="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
+                              {standing.losses || 0}
+                            </td>
+                            <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                              {standing.pointsFor || 0}
+                            </td>
+                            <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                              {standing.pointsAgainst || 0}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span
+                                className={`font-medium ${
+                                  standing.pointsDiff > 0
+                                    ? "text-green-600 dark:text-green-400"
+                                    : standing.pointsDiff < 0
+                                      ? "text-red-600 dark:text-red-400"
+                                      : "text-gray-500 dark:text-gray-400"
+                                }`}
+                              >
+                                {standing.pointsDiff > 0 ? "+" : ""}
+                                {standing.pointsDiff || 0}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className="inline-flex items-center justify-center min-w-[40px] px-2 py-1 rounded-lg bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 font-bold text-sm">
+                                {standing.points || 0}
+                              </span>
+                            </td>
+                          </>
+                        )
+                      )}
+
+                      {/* Form / Last Results - only for win/loss */}
+                      {!isPlacement && (
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-center gap-1">
+                            {standing.lastResults &&
+                            standing.lastResults.length > 0 ? (
+                              standing.lastResults.slice(-5).map((result, idx) => (
+                                <span
+                                  key={idx}
+                                  className={`size-5 rounded text-xs font-bold flex items-center justify-center ${getResultBadge(result)}`}
+                                >
+                                  {result}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-gray-400 dark:text-gray-500">
+                                -
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      )}
 
                       {/* Actions */}
                       <td className="px-4 py-3">
