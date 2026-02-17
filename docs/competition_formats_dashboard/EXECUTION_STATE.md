@@ -12,8 +12,8 @@
 |-------|-------|
 | **Current Phase** | 01 — Tournament Form & Core Fields — `In Progress` |
 | **Current Milestone** | 01 — Competition Type Field — `In Progress` |
-| **Current Task** | 1.1.3 — Add competitionType labels to translations — `In Progress` |
-| **Last Completed Checkpoint** | Phase 01, Milestone 01, Task 1.1.2 |
+| **Current Task** | 1.1.4 — Include competitionType in server action payload — `In Progress` |
+| **Last Completed Checkpoint** | Phase 01, Milestone 01, Task 1.1.3 |
 
 ---
 
@@ -128,8 +128,8 @@ After completing a Task:
 |------|-------------|--------|
 | 1.1.1 | Add competitionType select to TournamentsForm | `Completed` |
 | 1.1.2 | Populate competitionType on edit | `Completed` |
-| 1.1.3 | Add competitionType labels to translations | `In Progress` |
-| 1.1.4 | Include competitionType in server action payload | `Planned` |
+| 1.1.3 | Add competitionType labels to translations | `Completed` |
+| 1.1.4 | Include competitionType in server action payload | `In Progress` |
 
 ### Phase 01, Milestone 02 — Participation Type & Player Selection
 
@@ -294,4 +294,5 @@ After completing a Task:
 | # | Phase | Milestone | Task | Committed | Date |
 |---|-------|-----------|------|-----------|------|
 | 1 | 01 | 01 | 1.1.1 | 5dcfb6a | 2026-02-17 |
-| 2 | 01 | 01 | 1.1.2 | — | 2026-02-17 |
+| 2 | 01 | 01 | 1.1.2 | e66e9a2 | 2026-02-17 |
+| 3 | 01 | 01 | 1.1.3 | — | 2026-02-17 |
