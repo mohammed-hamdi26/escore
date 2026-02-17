@@ -1420,7 +1420,19 @@
     "statusCol": "الحالة",
     "eliminated": "مقصى",
     "noParticipants": "لم يتم تسجيل أي مشاركين بعد.",
-    "unknown": "غير معروف"
+    "unknown": "غير معروف",
+    "editResults": "تعديل النتائج",
+    "viewResults": "عرض النتائج",
+    "sortByPlacement": "ترتيب حسب المركز",
+    "autoAssignPlacements": "تعيين المراكز تلقائياً",
+    "autoCalculatePoints": "حساب النقاط تلقائياً",
+    "pointsCalculated": "تم حساب النقاط من الإعدادات",
+    "duplicatePlacementWarning": "تحذير: مراكز مكررة",
+    "placementInput": "المركز",
+    "saveResults": "حفظ النتائج",
+    "saving": "جارٍ الحفظ...",
+    "resultsSaved": "تم حفظ النتائج بنجاح",
+    "errorSavingResults": "خطأ في حفظ النتائج"
   },
   "NewsTable": {
     "title": "العنوان",

@@ -474,6 +474,32 @@ export async function updateMatchResult(id, result) {
   }
 }
 
+// Update participant results for multi-participant matches
+export async function updateParticipantResults(matchId, participants) {
+  "use server";
+  const locale = await getLocale();
+
+  try {
+    const res = await apiClient.patch(`/matches/${matchId}/participants`, {
+      participants,
+    });
+    revalidatePath(`/${locale}/dashboard/matches-management`);
+    revalidatePath(
+      `/${locale}/dashboard/matches-management/view/${matchId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log(
+      "Error updating participant results:",
+      e.response?.data || e.message
+    );
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error updating participant results",
+    };
+  }
+}
+
 // Update match status
 export async function updateMatchStatus(id, status) {
   const locale = await getLocale();

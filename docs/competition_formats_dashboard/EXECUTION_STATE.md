@@ -10,10 +10,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 03 — Battle Royale Bracket & Multi-Participant — `In Progress` |
-| **Current Milestone** | 04 — Participant Results Editor — `In Progress` |
-| **Current Task** | 3.4.1 — Create ParticipantResultsEditor component — `In Progress` |
-| **Last Completed Checkpoint** | Phase 03, Milestone 03, Task 3.3.4 |
+| **Current Phase** | 04 — Racing / Time-Based UI — `In Progress` |
+| **Current Milestone** | 01 — Time Fields in Participant Editor — `In Progress` |
+| **Current Task** | 4.1.1 — Add time columns to ParticipantResultsEditor — `In Progress` |
+| **Last Completed Checkpoint** | Phase 03, Milestone 04, Task 3.4.5 |
 
 ---
 
@@ -67,8 +67,8 @@ After completing a Task:
 |-------|------|--------|
 | 01 | Tournament Form & Core Fields | `Completed` |
 | 02 | Placement Scoring & Standing Config | `Completed` |
-| 03 | Battle Royale Bracket & Multi-Participant | `In Progress` |
-| 04 | Racing / Time-Based UI | `Planned` |
+| 03 | Battle Royale Bracket & Multi-Participant | `Completed` |
+| 04 | Racing / Time-Based UI | `In Progress` |
 | 05 | Translations & Final Polish | `Planned` |
 
 ---
@@ -100,13 +100,13 @@ After completing a Task:
 | 01 | BR Bracket Type in BracketView | `Completed` |
 | 02 | BR Round Advancement UI | `Completed` |
 | 03 | Multi-Participant Match Display | `Completed` |
-| 04 | Participant Results Editor | `In Progress` |
+| 04 | Participant Results Editor | `Completed` |
 
 ### Phase 04 — Racing / Time-Based UI
 
 | Milestone | Name | Status |
 |-----------|------|--------|
-| 01 | Time Fields in Participant Editor | `Planned` |
+| 01 | Time Fields in Participant Editor | `In Progress` |
 | 02 | Racing Standings Display | `Planned` |
 | 03 | Time Formatting Utility | `Planned` |
 
@@ -227,17 +227,17 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 3.4.1 | Create ParticipantResultsEditor component | `In Progress` |
-| 3.4.2 | Add auto-sort by placement | `Planned` |
-| 3.4.3 | Add auto-calculate points | `Planned` |
-| 3.4.4 | Integrate editor into match detail view | `Planned` |
-| 3.4.5 | Add updateParticipantResults server action | `Planned` |
+| 3.4.1 | Create ParticipantResultsEditor component | `Completed` |
+| 3.4.2 | Add auto-sort by placement | `Completed` |
+| 3.4.3 | Add auto-calculate points | `Completed` |
+| 3.4.4 | Integrate editor into match detail view | `Completed` |
+| 3.4.5 | Add updateParticipantResults server action | `Completed` |
 
 ### Phase 04, Milestone 01 — Time Fields in Participant Editor
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 4.1.1 | Add time columns to ParticipantResultsEditor | `Planned` |
+| 4.1.1 | Add time columns to ParticipantResultsEditor | `In Progress` |
 | 4.1.2 | Create TimeInput component | `Planned` |
 | 4.1.3 | Include time fields in submission payload | `Planned` |
 | 4.1.4 | DNF/DSQ interaction logic | `Planned` |
@@ -307,3 +307,4 @@ After completing a Task:
 | 12 | 03 | 01 | 3.1.1–3.1.4 | — | 2026-02-17 |
 | 13 | 03 | 02 | 3.2.1–3.2.4 | — | 2026-02-17 |
 | 14 | 03 | 03 | 3.3.1–3.3.4 | — | 2026-02-17 |
+| 15 | 03 | 04 | 3.4.1–3.4.5 | — | 2026-02-17 |

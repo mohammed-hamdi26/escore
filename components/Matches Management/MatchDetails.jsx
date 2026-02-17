@@ -76,7 +76,7 @@ function MatchDetails({ match }) {
   }
 
   if (match.isMultiParticipant) {
-    return <MultiParticipantMatchView match={match} />;
+    return <MultiParticipantMatchView match={match} tournament={match.tournament} />;
   }
 
   const statusConfig = STATUS_CONFIG[match.status] || STATUS_CONFIG.scheduled;

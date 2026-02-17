@@ -1424,7 +1424,19 @@
     "statusCol": "Status",
     "eliminated": "Eliminated",
     "noParticipants": "No participants recorded yet.",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "editResults": "Edit Results",
+    "viewResults": "View Results",
+    "sortByPlacement": "Sort by Placement",
+    "autoAssignPlacements": "Auto-assign Placements",
+    "autoCalculatePoints": "Auto-calculate Points",
+    "pointsCalculated": "Points calculated from config",
+    "duplicatePlacementWarning": "Warning: Duplicate placements",
+    "placementInput": "Place",
+    "saveResults": "Save Results",
+    "saving": "Saving...",
+    "resultsSaved": "Results saved successfully",
+    "errorSavingResults": "Error saving results"
   },
   "NewsTable": {
     "title": "Title",

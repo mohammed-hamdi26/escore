@@ -14,7 +14,9 @@ import {
   Edit,
   Calendar,
   Gamepad2,
+  Eye,
 } from "lucide-react";
+import ParticipantResultsEditor from "./ParticipantResultsEditor";
 
 const STATUS_CONFIG = {
   scheduled: { label: "Scheduled", className: "bg-blue-500/10 text-blue-500" },
@@ -24,8 +26,11 @@ const STATUS_CONFIG = {
   cancelled: { label: "Cancelled", className: "bg-red-500/10 text-red-500" },
 };
 
-function MultiParticipantMatchView({ match }) {
+function MultiParticipantMatchView({ match, tournament }) {
   const t = useTranslations("MatchDetails");
+  const [isEditing, setIsEditing] = useState(
+    match?.status === "scheduled" || match?.status === "live"
+  );
 
   if (!match) return null;
 
@@ -107,17 +112,45 @@ function MultiParticipantMatchView({ match }) {
         </div>
       </div>
 
-      {/* Participants Table */}
+      {/* Participants Section */}
       <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
-        <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-          <Target className="size-4 text-orange-500" />
-          {t("participantResults") || "Participant Results"}
-          <span className="text-xs text-muted-foreground font-normal ml-1">
-            ({participants.length} {t("participants") || "participants"})
-          </span>
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Target className="size-4 text-orange-500" />
+            {t("participantResults") || "Participant Results"}
+            <span className="text-xs text-muted-foreground font-normal ml-1">
+              ({participants.length} {t("participants") || "participants"})
+            </span>
+          </h3>
+          {participants.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditing(!isEditing)}
+              className="gap-1 text-xs"
+            >
+              {isEditing ? (
+                <>
+                  <Eye className="size-3.5" />
+                  {t("viewResults") || "View Results"}
+                </>
+              ) : (
+                <>
+                  <Edit className="size-3.5" />
+                  {t("editResults") || "Edit Results"}
+                </>
+              )}
+            </Button>
+          )}
+        </div>
 
-        {sorted.length > 0 ? (
+        {isEditing && participants.length > 0 ? (
+          <ParticipantResultsEditor
+            match={match}
+            tournament={tournament}
+            onSaved={() => setIsEditing(false)}
+          />
+        ) : sorted.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -157,7 +190,6 @@ function MultiParticipantMatchView({ match }) {
                         p.isEliminated ? "opacity-60" : ""
                       }`}
                     >
-                      {/* Placement */}
                       <td className="px-3 py-3">
                         <span
                           className={`text-sm font-bold ${
@@ -173,16 +205,10 @@ function MultiParticipantMatchView({ match }) {
                           {placement ? `#${placement}` : "-"}
                         </span>
                       </td>
-
-                      {/* Team/Player */}
                       <td className="px-3 py-3">
                         <div className="flex items-center gap-3">
                           {logo?.light ? (
-                            <img
-                              src={logo.light}
-                              alt={name}
-                              className="size-8 rounded object-cover"
-                            />
+                            <img src={logo.light} alt={name} className="size-8 rounded object-cover" />
                           ) : (
                             <div className="size-8 rounded bg-muted flex items-center justify-center">
                               <Trophy className="size-4 text-muted-foreground" />
@@ -191,30 +217,10 @@ function MultiParticipantMatchView({ match }) {
                           <span className="text-sm font-medium text-foreground">{name}</span>
                         </div>
                       </td>
-
-                      {/* Kills */}
-                      <td className="px-3 py-3 text-center">
-                        <span className="text-sm text-foreground">{p.kills ?? "-"}</span>
-                      </td>
-
-                      {/* Deaths */}
-                      <td className="px-3 py-3 text-center">
-                        <span className="text-sm text-foreground">{p.deaths ?? "-"}</span>
-                      </td>
-
-                      {/* Assists */}
-                      <td className="px-3 py-3 text-center">
-                        <span className="text-sm text-foreground">{p.assists ?? "-"}</span>
-                      </td>
-
-                      {/* Points */}
-                      <td className="px-3 py-3 text-center">
-                        <span className="text-sm font-semibold text-foreground">
-                          {p.points ?? "-"}
-                        </span>
-                      </td>
-
-                      {/* Status */}
+                      <td className="px-3 py-3 text-center text-sm text-foreground">{p.kills ?? "-"}</td>
+                      <td className="px-3 py-3 text-center text-sm text-foreground">{p.deaths ?? "-"}</td>
+                      <td className="px-3 py-3 text-center text-sm text-foreground">{p.assists ?? "-"}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-foreground">{p.points ?? "-"}</td>
                       <td className="px-3 py-3 text-center">
                         {p.isEliminated ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-500">
