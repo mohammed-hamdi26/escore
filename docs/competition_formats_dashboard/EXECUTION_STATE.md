@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | 01 — Tournament Form & Core Fields — `In Progress` |
-| **Current Milestone** | 01 — Competition Type Field — `In Progress` |
-| **Current Task** | 1.1.4 — Include competitionType in server action payload — `In Progress` |
-| **Last Completed Checkpoint** | Phase 01, Milestone 01, Task 1.1.3 |
+| **Current Milestone** | 02 — Participation Type & Player Selection — `In Progress` |
+| **Current Task** | 1.2.1 — Add participationType radio/select to TournamentsForm — `In Progress` |
+| **Last Completed Checkpoint** | Phase 01, Milestone 01, Task 1.1.4 |
 
 ---
 
@@ -79,8 +79,8 @@ After completing a Task:
 
 | Milestone | Name | Status |
 |-----------|------|--------|
-| 01 | Competition Type Field | `Planned` |
-| 02 | Participation Type & Player Selection | `Planned` |
+| 01 | Competition Type Field | `Completed` |
+| 02 | Participation Type & Player Selection | `In Progress` |
 | 03 | Tournament Table & Filter Updates | `Planned` |
 | 04 | Tournament Detail View Updates | `Planned` |
 
@@ -129,13 +129,13 @@ After completing a Task:
 | 1.1.1 | Add competitionType select to TournamentsForm | `Completed` |
 | 1.1.2 | Populate competitionType on edit | `Completed` |
 | 1.1.3 | Add competitionType labels to translations | `Completed` |
-| 1.1.4 | Include competitionType in server action payload | `In Progress` |
+| 1.1.4 | Include competitionType in server action payload | `Completed` |
 
 ### Phase 01, Milestone 02 — Participation Type & Player Selection
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 1.2.1 | Add participationType radio/select to TournamentsForm | `Planned` |
+| 1.2.1 | Add participationType radio/select to TournamentsForm | `In Progress` |
 | 1.2.2 | Conditional teams/players multi-select | `Planned` |
 | 1.2.3 | Add searchPlayers API function | `Planned` |
 | 1.2.4 | Populate participationType and players on edit | `Planned` |
@@ -295,4 +295,5 @@ After completing a Task:
 |---|-------|-----------|------|-----------|------|
 | 1 | 01 | 01 | 1.1.1 | 5dcfb6a | 2026-02-17 |
 | 2 | 01 | 01 | 1.1.2 | e66e9a2 | 2026-02-17 |
-| 3 | 01 | 01 | 1.1.3 | — | 2026-02-17 |
+| 3 | 01 | 01 | 1.1.3 | a65e7a1 | 2026-02-17 |
+| 4 | 01 | 01 | 1.1.4 | — | 2026-02-17 |
