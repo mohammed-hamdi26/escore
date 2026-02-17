@@ -3468,7 +3468,12 @@
     "avgPlace": "المتوسط",
     "bestPlacement": "أفضل ترتيب",
     "best": "الأفضل",
-    "status": "الحالة"
+    "status": "الحالة",
+    "round": "الجولة",
+    "placementCol": "المركز",
+    "bonus": "مكافأة",
+    "total": "المجموع",
+    "noRoundsPlayed": "لم تُلعب أي جولات بعد"
   },
   "teamForm": {
     "basicInfo": "المعلومات الأساسية",

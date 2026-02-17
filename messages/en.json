@@ -3548,7 +3548,12 @@
     "avgPlace": "Avg",
     "bestPlacement": "Best Placement",
     "best": "Best",
-    "status": "Status"
+    "status": "Status",
+    "round": "Round",
+    "placementCol": "Place",
+    "bonus": "Bonus",
+    "total": "Total",
+    "noRoundsPlayed": "No rounds played yet"
   },
   "teamForm": {
     "basicInfo": "Basic Information",

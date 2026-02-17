@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { Button } from "../ui/button";
 import { useTranslations } from "next-intl";
@@ -21,6 +21,7 @@ import {
   AlertTriangle,
   User,
   Target,
+  ChevronDown,
 } from "lucide-react";
 import {
   initializeStandings,
@@ -68,6 +69,7 @@ export default function StandingsManagement({ tournament, initialStandings }) {
   const [editingId, setEditingId] = useState(null);
   const [editValues, setEditValues] = useState({});
   const [loading, setLoading] = useState(null); // tracks which action is loading
+  const [expandedId, setExpandedId] = useState(null); // for round history expansion
 
   const tournamentId = tournament?.id || tournament?._id;
 
@@ -521,13 +523,19 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                   const isDefaultRow = String(standing.id).startsWith(
                     "default-"
                   );
+                  const hasRoundHistory = isPlacement && standing.roundHistory?.length > 0;
+                  const isExpanded = expandedId === standing.id;
+                  const bestRoundPoints = hasRoundHistory
+                    ? Math.max(...standing.roundHistory.map((r) => r.totalRoundPoints || 0))
+                    : 0;
 
                   return (
+                    <React.Fragment key={standing.id}>
                     <tr
-                      key={standing.id}
                       className={`hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${
                         standing.isEliminated ? "opacity-60" : ""
-                      } ${isEditing ? "bg-green-50/50 dark:bg-green-500/5" : ""}`}
+                      } ${isEditing ? "bg-green-50/50 dark:bg-green-500/5" : ""} ${hasRoundHistory ? "cursor-pointer" : ""}`}
+                      onClick={hasRoundHistory && !isEditing ? () => setExpandedId(isExpanded ? null : standing.id) : undefined}
                     >
                       {/* Position */}
                       <td className="px-4 py-3">
@@ -545,11 +553,16 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                             min={1}
                           />
                         ) : (
-                          <span
-                            className={`inline-flex items-center justify-center size-7 rounded-lg text-sm font-bold border ${positionStyle}`}
-                          >
-                            {standing.position}
-                          </span>
+                          <div className="flex items-center gap-1">
+                            {hasRoundHistory && (
+                              <ChevronDown className={`size-3.5 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                            )}
+                            <span
+                              className={`inline-flex items-center justify-center size-7 rounded-lg text-sm font-bold border ${positionStyle}`}
+                            >
+                              {standing.position}
+                            </span>
+                          </div>
                         )}
                       </td>
 
@@ -841,6 +854,70 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                         </div>
                       </td>
                     </tr>
+
+                    {/* Round History Expansion Row */}
+                    {isPlacement && isExpanded && (
+                      <tr className="bg-gray-50/50 dark:bg-white/[0.02]">
+                        <td colSpan={100} className="px-4 py-0">
+                          <div className="py-3 ps-10">
+                            {hasRoundHistory ? (
+                              <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <table className="w-full text-xs">
+                                  <thead>
+                                    <tr className="bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400">
+                                      <th className="px-3 py-2 text-left font-medium">{t("round") || "Round"}</th>
+                                      <th className="px-3 py-2 text-center font-medium">{t("placementCol") || "Place"}</th>
+                                      <th className="px-3 py-2 text-center font-medium">PP</th>
+                                      <th className="px-3 py-2 text-center font-medium">KP</th>
+                                      <th className="px-3 py-2 text-center font-medium">{t("bonus") || "Bonus"}</th>
+                                      <th className="px-3 py-2 text-center font-medium">{t("total") || "Total"}</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                    {standing.roundHistory.map((rh, idx) => {
+                                      const isBestRound = (rh.totalRoundPoints || 0) === bestRoundPoints && bestRoundPoints > 0;
+                                      return (
+                                        <tr
+                                          key={idx}
+                                          className={isBestRound ? "bg-green-50/50 dark:bg-green-500/5" : ""}
+                                        >
+                                          <td className="px-3 py-1.5 text-left">
+                                            <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium">
+                                              R{rh.round}
+                                            </span>
+                                          </td>
+                                          <td className="px-3 py-1.5 text-center font-medium text-foreground">
+                                            {rh.placement ? `#${rh.placement}` : "-"}
+                                          </td>
+                                          <td className="px-3 py-1.5 text-center text-amber-600 dark:text-amber-400">
+                                            {rh.placementPoints ?? 0}
+                                          </td>
+                                          <td className="px-3 py-1.5 text-center text-red-600 dark:text-red-400">
+                                            {rh.killPoints ?? 0}
+                                          </td>
+                                          <td className="px-3 py-1.5 text-center text-purple-600 dark:text-purple-400">
+                                            {rh.bonusPoints ?? 0}
+                                          </td>
+                                          <td className="px-3 py-1.5 text-center font-bold text-foreground">
+                                            {rh.totalRoundPoints ?? 0}
+                                            {isBestRound && <span className="ms-1 text-green-500">★</span>}
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                            ) : (
+                              <p className="text-xs text-muted-foreground py-2">
+                                {t("noRoundsPlayed") || "No rounds played yet"}
+                              </p>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>

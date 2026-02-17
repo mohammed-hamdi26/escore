@@ -10,10 +10,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 02 — Placement Scoring & Standing Config — `In Progress` |
-| **Current Milestone** | 04 — Round History Display — `In Progress` |
-| **Current Task** | 2.4.1 — Add expandable round history to standing rows — `In Progress` |
-| **Last Completed Checkpoint** | Phase 02, Milestone 03, Task 2.3.4 |
+| **Current Phase** | 03 — Battle Royale Bracket & Multi-Participant — `In Progress` |
+| **Current Milestone** | 01 — BR Bracket Type in BracketView — `In Progress` |
+| **Current Task** | 3.1.1 — Add battle_royale option to bracket type selector — `In Progress` |
+| **Last Completed Checkpoint** | Phase 02, Milestone 04, Task 2.4.3 |
 
 ---
 
@@ -66,8 +66,8 @@ After completing a Task:
 | Phase | Name | Status |
 |-------|------|--------|
 | 01 | Tournament Form & Core Fields | `Completed` |
-| 02 | Placement Scoring & Standing Config | `Planned` |
-| 03 | Battle Royale Bracket & Multi-Participant | `Planned` |
+| 02 | Placement Scoring & Standing Config | `Completed` |
+| 03 | Battle Royale Bracket & Multi-Participant | `In Progress` |
 | 04 | Racing / Time-Based UI | `Planned` |
 | 05 | Translations & Final Polish | `Planned` |
 
@@ -91,13 +91,13 @@ After completing a Task:
 | 01 | Scoring Type Toggle in Tournament Form | `Completed` |
 | 02 | Placement Config Editor | `Completed` |
 | 03 | Cumulative Standings Table | `Completed` |
-| 04 | Round History Display | `In Progress` |
+| 04 | Round History Display | `Completed` |
 
 ### Phase 03 — Battle Royale Bracket & Multi-Participant
 
 | Milestone | Name | Status |
 |-----------|------|--------|
-| 01 | BR Bracket Type in BracketView | `Planned` |
+| 01 | BR Bracket Type in BracketView | `In Progress` |
 | 02 | BR Round Advancement UI | `Planned` |
 | 03 | Multi-Participant Match Display | `Planned` |
 | 04 | Participant Results Editor | `Planned` |
@@ -192,15 +192,15 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 2.4.1 | Add expandable round history to standing rows | `In Progress` |
-| 2.4.2 | Style round history sub-table | `Planned` |
-| 2.4.3 | Handle empty round history | `Planned` |
+| 2.4.1 | Add expandable round history to standing rows | `Completed` |
+| 2.4.2 | Style round history sub-table | `Completed` |
+| 2.4.3 | Handle empty round history | `Completed` |
 
 ### Phase 03, Milestone 01 — BR Bracket Type in BracketView
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 3.1.1 | Add battle_royale option to bracket type selector | `Planned` |
+| 3.1.1 | Add battle_royale option to bracket type selector | `In Progress` |
 | 3.1.2 | Add BR config fields to generation form | `Planned` |
 | 3.1.3 | Send battleRoyaleConfig in bracket generation | `Planned` |
 | 3.1.4 | Render BR bracket rounds view | `Planned` |
@@ -303,3 +303,4 @@ After completing a Task:
 | 8 | 02 | 01 | 2.1.1–2.1.4 | — | 2026-02-17 |
 | 9 | 02 | 02 | 2.2.1–2.2.5 | — | 2026-02-17 |
 | 10 | 02 | 03 | 2.3.1–2.3.4 | — | 2026-02-17 |
+| 11 | 02 | 04 | 2.4.1–2.4.3 | — | 2026-02-17 |
