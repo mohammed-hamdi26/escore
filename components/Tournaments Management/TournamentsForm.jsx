@@ -10,6 +10,7 @@ import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import FormSection from "../ui app/FormSection";
 import FormRow from "../ui app/FormRow";
 import ImageUpload from "../ui app/ImageUpload";
+import RichTextEditor from "../ui app/RichTextEditor";
 import { Calendar as CalendarComponent } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -655,12 +656,11 @@ export default function TournamentsForm({
 
       {/* Rules */}
       <FormSection title={t("Rules")} icon={<FileText className="size-5" />}>
-        <TextAreaField
-          label={t("Tournament Rules")}
+        <RichTextEditor
+          formik={formik}
           name="rules"
           placeholder={t("Enter tournament rules and regulations")}
-          formik={formik}
-          rows={6}
+          minHeight="250px"
         />
       </FormSection>
 
