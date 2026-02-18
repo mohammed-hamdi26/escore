@@ -171,7 +171,7 @@ function PlayerFormRedesign({
           };
         }
         if (values.bio) dataValues.bio = values.bio;
-        if (values.ranking !== "" && values.ranking !== null) dataValues.ranking = Number(values.ranking);
+        if (values.ranking) dataValues.ranking = Number(values.ranking);
         if (values.marketValue !== "" && values.marketValue !== null) dataValues.marketValue = Number(values.marketValue);
 
         await submit(dataValues);
