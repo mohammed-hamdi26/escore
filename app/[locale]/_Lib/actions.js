@@ -1950,7 +1950,8 @@ export async function deleteClub(id) {
 export async function addTeamToClub(clubId, teamData) {
   const locale = await getLocale();
   try {
-    await apiClient.post(`/clubs/${clubId}/teams`, teamData);
+    // Only send team ID — game is auto-resolved by backend
+    await apiClient.post(`/clubs/${clubId}/teams`, { team: teamData.team || teamData });
     revalidatePath(`/${locale}/dashboard/clubs-management/view/${clubId}`);
     return { success: true };
   } catch (e) {
