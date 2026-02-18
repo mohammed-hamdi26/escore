@@ -19,7 +19,6 @@ import {
   CalendarDays,
   FileText,
   Power,
-  Hash,
   ChevronLeft,
   ChevronRight,
   X,
@@ -27,7 +26,7 @@ import {
 
 const validationSchema = yup.object({
   name: yup.string().required("Game name is required").max(100, "Name must be at most 100 characters"),
-  slug: yup.string().max(100, "Slug must be at most 100 characters"),
+
   description: yup.string().max(2000, "Description must be at most 2000 characters"),
   logoLight: yup.string(),
   logoDark: yup.string(),
@@ -58,7 +57,7 @@ export default function GamesForm({
   const formik = useFormik({
     initialValues: {
       name: data?.name || "",
-      slug: data?.slug || "",
+
       description: data?.description || "",
       logoLight: data?.logo?.light || "",
       logoDark: data?.logo?.dark || "",
@@ -76,9 +75,6 @@ export default function GamesForm({
 
         // Required field
         dataValues.name = values.name;
-
-        // Auto-generate slug if not provided, otherwise use provided slug
-        dataValues.slug = values.slug || values.name.replace(/\s+/g, "-").toLowerCase();
 
         // Optional description - only include if has value
         if (values.description && values.description.trim()) {
@@ -155,25 +151,6 @@ export default function GamesForm({
             )}
           </div>
 
-          {/* Slug */}
-          <div className="space-y-2 flex-1">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-              <Hash className="size-4" />
-              {t("slug") || "Slug"}
-            </label>
-            <input
-              type="text"
-              name="slug"
-              value={formik.values.slug}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder={t("slugPlaceholder") || "Auto-generated from name if empty"}
-              className="w-full h-11 px-4 rounded-xl bg-gray-100 dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
-            />
-            {formik.touched.slug && formik.errors.slug && (
-              <p className="text-sm text-red-500">{formik.errors.slug}</p>
-            )}
-          </div>
         </FormRow>
 
         {/* Description */}

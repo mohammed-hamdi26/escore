@@ -91,7 +91,7 @@ function TeamFormRedesign({
     initialValues: {
       name: team?.name || "",
       shortName: team?.shortName || "",
-      slug: team?.slug || "",
+
       description: team?.description || "",
       country: team?.country?.name || "",
       region: team?.region || "",
@@ -118,7 +118,6 @@ function TeamFormRedesign({
         const dataValues = {
           ...(team ? { id: team.id || team._id } : {}),
           name: values.name,
-          slug: values.slug || values.name.replace(/\s+/g, "-").toLowerCase(),
           game: values.game,
         };
 
@@ -209,14 +208,6 @@ function TeamFormRedesign({
             formik={formik}
             icon={<Hash className="size-5 text-muted-foreground" />}
             hint={t("shortNameHint") || "Abbreviated team name (2-5 characters)"}
-          />
-          {/* Slug */}
-          <InputField
-            label={t("slug") || "Slug"}
-            name="slug"
-            placeholder={t("slugPlaceholder") || "auto-generated-slug"}
-            formik={formik}
-            hint={t("slugHint") || "URL-friendly identifier (auto-generated if empty)"}
           />
         </FormRow>
       </FormSection>

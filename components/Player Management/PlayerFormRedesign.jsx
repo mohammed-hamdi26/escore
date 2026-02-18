@@ -133,7 +133,6 @@ function PlayerFormRedesign({
         const dataValues = {
           ...(player ? { id: player.id } : {}),
           fullName: values.fullName,
-          slug: `${values.fullName}`.replace(/\s+/g, "-").toLowerCase(),
           gameRosters: values.gameRosters
             .filter(r => r.game) // only include entries with a game
             .map(r => ({

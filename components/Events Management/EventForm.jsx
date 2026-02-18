@@ -778,7 +778,7 @@ function EventForm({ event, submit, formType = "add", countries = [] }) {
   const formik = useFormik({
     initialValues: {
       name: event?.name || "",
-      slug: event?.slug || "",
+
       description: event?.description || "",
       country: event?.country?.name || "",
       countryCode: event?.country?.code || "",
@@ -814,9 +814,6 @@ function EventForm({ event, submit, formType = "add", countries = [] }) {
 
         dataValues = {
           ...dataValues,
-          slug:
-            dataValues.slug ||
-            dataValues.name.replace(/\s+/g, "-").toLowerCase(),
           logo: {
             light: dataValues.logoLight,
             dark: dataValues.logoDark,

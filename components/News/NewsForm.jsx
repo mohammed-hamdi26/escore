@@ -94,7 +94,6 @@ function NewsForm({
 
         dataValues = {
           ...dataValues,
-          slug: dataValues.title.replace(/\s+/g, "-").toLowerCase(),
           coverImage: {
             light: dataValues.image,
             dark: dataValues.imageDark,

@@ -257,12 +257,6 @@ export default function TournamentsForm({
           dataValues.endDate = date.toISOString();
         }
 
-        dataValues.slug = dataValues?.name
-          .toLowerCase()
-          .replace(/[^a-z0-9\s-]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/-+/g, "-")
-          .replace(/^-|-$/g, "");
         dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value || g._id || g);
         dataValues.teams = dataValues?.teamsData?.map((t) => t.id || t.value || t._id || t) || [];
 

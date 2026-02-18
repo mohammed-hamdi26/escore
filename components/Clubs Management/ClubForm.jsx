@@ -636,7 +636,7 @@ function ClubForm({ formType = "add", submit, club, countries = [] }) {
     initialValues: {
       name: club?.name || "",
       shortName: club?.shortName || "",
-      slug: club?.slug || "",
+
       description: club?.description || "",
       country: club?.country?.name || "",
       countryCode: club?.country?.code || "",
@@ -658,9 +658,6 @@ function ClubForm({ formType = "add", submit, club, countries = [] }) {
 
         dataValues = {
           ...dataValues,
-          slug:
-            dataValues.slug ||
-            dataValues.name.replace(/\s+/g, "-").toLowerCase(),
           logo: {
             light: dataValues.logoLight,
             dark: dataValues.logoDark,

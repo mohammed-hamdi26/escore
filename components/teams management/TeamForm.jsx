@@ -92,7 +92,6 @@ function TeamForm({
 
       dataValues = {
         ...dataValues,
-        slug: dataValues.name.replace(/\s+/g, "-").toLowerCase(),
         logo: {
           light: dataValues.logoLight,
           dark: dataValues.logoDark,
