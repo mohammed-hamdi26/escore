@@ -12,10 +12,12 @@ import {
   Skull,
 } from "lucide-react";
 import { updateParticipantResults } from "@/app/[locale]/_Lib/actions";
+import TimeInput from "@/components/ui/TimeInput";
 import toast from "react-hot-toast";
 
 function ParticipantResultsEditor({ match, tournament, onSaved }) {
   const t = useTranslations("MatchDetails");
+  const isRacing = tournament?.competitionType === "racing";
 
   const initialRows = useMemo(() => {
     return (match.participants || []).map((p, i) => {
@@ -31,6 +33,13 @@ function ParticipantResultsEditor({ match, tournament, onSaved }) {
         assists: p.assists ?? 0,
         points: p.points ?? 0,
         isEliminated: p.isEliminated || false,
+        // Racing fields
+        finishTimeMs: p.finishTimeMs ?? null,
+        bestLapMs: p.bestLapMs ?? null,
+        totalLaps: p.totalLaps ?? 0,
+        penaltyMs: p.penaltyMs ?? 0,
+        dnf: p.dnf || false,
+        dsq: p.dsq || false,
       };
     });
   }, [match.participants]);
@@ -42,9 +51,20 @@ function ParticipantResultsEditor({ match, tournament, onSaved }) {
 
   const updateRow = (index, field, value) => {
     setRows((prev) =>
-      prev.map((r, i) =>
-        i === index ? { ...r, [field]: value } : r
-      )
+      prev.map((r, i) => {
+        if (i !== index) return r;
+        const updated = { ...r, [field]: value };
+        // DNF/DSQ mutual exclusivity and clear finish time
+        if (field === "dnf" && value) {
+          updated.dsq = false;
+          updated.finishTimeMs = null;
+        }
+        if (field === "dsq" && value) {
+          updated.dnf = false;
+          updated.finishTimeMs = null;
+        }
+        return updated;
+      })
     );
   };
 
@@ -105,6 +125,14 @@ function ParticipantResultsEditor({ match, tournament, onSaved }) {
         assists: r.assists,
         points: r.points,
         isEliminated: r.isEliminated,
+        ...(isRacing ? {
+          finishTimeMs: r.finishTimeMs,
+          bestLapMs: r.bestLapMs,
+          totalLaps: r.totalLaps,
+          penaltyMs: r.penaltyMs,
+          dnf: r.dnf,
+          dsq: r.dsq,
+        } : {}),
       }));
 
       const result = await updateParticipantResults(
@@ -178,15 +206,41 @@ function ParticipantResultsEditor({ match, tournament, onSaved }) {
               <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-20">
                 {t("placementInput") || "Place"}
               </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-16">
-                {t("killsCol") || "Kills"}
-              </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-16">
-                {t("deathsCol") || "Deaths"}
-              </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-16">
-                {t("assistsCol") || "Assists"}
-              </th>
+              {!isRacing && (
+                <>
+                  <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-16">
+                    {t("killsCol") || "Kills"}
+                  </th>
+                  <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-16">
+                    {t("deathsCol") || "Deaths"}
+                  </th>
+                  <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-16">
+                    {t("assistsCol") || "Assists"}
+                  </th>
+                </>
+              )}
+              {isRacing && (
+                <>
+                  <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-24">
+                    {t("finishTime") || "Finish Time"}
+                  </th>
+                  <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-24">
+                    {t("bestLap") || "Best Lap"}
+                  </th>
+                  <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-14">
+                    {t("laps") || "Laps"}
+                  </th>
+                  <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-20">
+                    {t("penalty") || "Penalty"}
+                  </th>
+                  <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-12">
+                    {t("dnfLabel") || "DNF"}
+                  </th>
+                  <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-12">
+                    {t("dsqLabel") || "DSQ"}
+                  </th>
+                </>
+              )}
               <th className="text-center text-xs font-medium text-muted-foreground px-2 py-2 w-20">
                 {t("pointsCol") || "Points"}
               </th>
@@ -201,7 +255,7 @@ function ParticipantResultsEditor({ match, tournament, onSaved }) {
                 key={row.teamId || row.playerId || index}
                 className={`border-b border-gray-100 dark:border-gray-800 ${
                   row.isEliminated ? "opacity-50" : ""
-                }`}
+                } ${row.dsq ? "bg-red-500/5" : ""}`}
               >
                 {/* Team/Player (read-only) */}
                 <td className="px-2 py-2">
@@ -217,7 +271,7 @@ function ParticipantResultsEditor({ match, tournament, onSaved }) {
                         <Trophy className="size-3 text-muted-foreground" />
                       </div>
                     )}
-                    <span className="text-sm font-medium text-foreground truncate max-w-[140px]">
+                    <span className={`text-sm font-medium text-foreground truncate max-w-[140px] ${row.dsq ? "line-through" : ""}`}>
                       {row.name}
                     </span>
                   </div>
@@ -240,44 +294,99 @@ function ParticipantResultsEditor({ match, tournament, onSaved }) {
                   />
                 </td>
 
-                {/* Kills */}
-                <td className="px-2 py-2">
-                  <input
-                    type="number"
-                    min="0"
-                    value={row.kills}
-                    onChange={(e) =>
-                      updateRow(index, "kills", parseInt(e.target.value) || 0)
-                    }
-                    className="w-full px-2 py-1 rounded text-center text-sm border border-gray-300 dark:border-gray-600 bg-background text-foreground"
-                  />
-                </td>
+                {/* Standard kills/deaths/assists — hidden for racing */}
+                {!isRacing && (
+                  <>
+                    <td className="px-2 py-2">
+                      <input
+                        type="number"
+                        min="0"
+                        value={row.kills}
+                        onChange={(e) =>
+                          updateRow(index, "kills", parseInt(e.target.value) || 0)
+                        }
+                        className="w-full px-2 py-1 rounded text-center text-sm border border-gray-300 dark:border-gray-600 bg-background text-foreground"
+                      />
+                    </td>
+                    <td className="px-2 py-2">
+                      <input
+                        type="number"
+                        min="0"
+                        value={row.deaths}
+                        onChange={(e) =>
+                          updateRow(index, "deaths", parseInt(e.target.value) || 0)
+                        }
+                        className="w-full px-2 py-1 rounded text-center text-sm border border-gray-300 dark:border-gray-600 bg-background text-foreground"
+                      />
+                    </td>
+                    <td className="px-2 py-2">
+                      <input
+                        type="number"
+                        min="0"
+                        value={row.assists}
+                        onChange={(e) =>
+                          updateRow(index, "assists", parseInt(e.target.value) || 0)
+                        }
+                        className="w-full px-2 py-1 rounded text-center text-sm border border-gray-300 dark:border-gray-600 bg-background text-foreground"
+                      />
+                    </td>
+                  </>
+                )}
 
-                {/* Deaths */}
-                <td className="px-2 py-2">
-                  <input
-                    type="number"
-                    min="0"
-                    value={row.deaths}
-                    onChange={(e) =>
-                      updateRow(index, "deaths", parseInt(e.target.value) || 0)
-                    }
-                    className="w-full px-2 py-1 rounded text-center text-sm border border-gray-300 dark:border-gray-600 bg-background text-foreground"
-                  />
-                </td>
-
-                {/* Assists */}
-                <td className="px-2 py-2">
-                  <input
-                    type="number"
-                    min="0"
-                    value={row.assists}
-                    onChange={(e) =>
-                      updateRow(index, "assists", parseInt(e.target.value) || 0)
-                    }
-                    className="w-full px-2 py-1 rounded text-center text-sm border border-gray-300 dark:border-gray-600 bg-background text-foreground"
-                  />
-                </td>
+                {/* Racing time fields */}
+                {isRacing && (
+                  <>
+                    <td className="px-2 py-2">
+                      <TimeInput
+                        value={row.finishTimeMs}
+                        onChange={(ms) => updateRow(index, "finishTimeMs", ms)}
+                        disabled={row.dnf || row.dsq}
+                        placeholder="1:33.450"
+                      />
+                    </td>
+                    <td className="px-2 py-2">
+                      <TimeInput
+                        value={row.bestLapMs}
+                        onChange={(ms) => updateRow(index, "bestLapMs", ms)}
+                        placeholder="0:30.200"
+                      />
+                    </td>
+                    <td className="px-2 py-2">
+                      <input
+                        type="number"
+                        min="0"
+                        value={row.totalLaps}
+                        onChange={(e) =>
+                          updateRow(index, "totalLaps", parseInt(e.target.value) || 0)
+                        }
+                        className="w-full px-2 py-1 rounded text-center text-sm border border-gray-300 dark:border-gray-600 bg-background text-foreground"
+                      />
+                    </td>
+                    <td className="px-2 py-2">
+                      <TimeInput
+                        value={row.penaltyMs}
+                        onChange={(ms) => updateRow(index, "penaltyMs", ms || 0)}
+                        placeholder="0.000"
+                      />
+                    </td>
+                    <td className="px-2 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={row.dnf}
+                        onChange={(e) => updateRow(index, "dnf", e.target.checked)}
+                        className="size-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                      />
+                    </td>
+                    <td className="px-2 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={row.dsq}
+                        onChange={(e) => updateRow(index, "dsq", e.target.checked)}
+                        className="size-4 rounded border-gray-300 text-red-500 focus:ring-red-500"
+                      />
+                    </td>
+                  </>
+                )}
 
                 {/* Points */}
                 <td className="px-2 py-2">

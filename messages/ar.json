@@ -969,7 +969,8 @@
     "advanceBRRound": "التقدم إلى الجولة {next}",
     "bracketCompleted": "اكتملت القرعة",
     "brAllRoundsCompleted": "اكتملت جميع جولات باتل رويال. تحقق من الترتيب للنتائج النهائية.",
-    "teamsEliminated": "تم إقصاء {count} فرق بعد هذه الجولة:"
+    "teamsEliminated": "تم إقصاء {count} فرق بعد هذه الجولة:",
+    "unknown": "غير معروف"
   },
   "TournamentsTable": {
     "name": "البطولة",
@@ -1432,7 +1433,14 @@
     "saveResults": "حفظ النتائج",
     "saving": "جارٍ الحفظ...",
     "resultsSaved": "تم حفظ النتائج بنجاح",
-    "errorSavingResults": "خطأ في حفظ النتائج"
+    "errorSavingResults": "خطأ في حفظ النتائج",
+    "finishTime": "وقت الوصول",
+    "bestLap": "أفضل لفة",
+    "laps": "اللفات",
+    "penalty": "عقوبة",
+    "dnfLabel": "DNF",
+    "dsqLabel": "DSQ",
+    "round": "الجولة"
   },
   "NewsTable": {
     "title": "العنوان",
@@ -3463,7 +3471,10 @@
     "form": "الشكل",
     "qualified": "متأهل",
     "eliminated": "خارج المنافسة",
-    "tournament": "البطولة"
+    "tournament": "البطولة",
+    "player": "اللاعب",
+    "bestTime": "أفضل وقت",
+    "bestLap": "أفضل لفة"
   },
   "StandingsManagement": {
     "title": "إدارة الترتيب",
@@ -3519,7 +3530,19 @@
     "placementCol": "المركز",
     "bonus": "مكافأة",
     "total": "المجموع",
-    "noRoundsPlayed": "لم تُلعب أي جولات بعد"
+    "noRoundsPlayed": "لم تُلعب أي جولات بعد",
+    "racingScoring": "تسجيل السباق",
+    "bestTime": "أفضل وقت",
+    "bestFinishTime": "أفضل وقت وصول",
+    "bestLap": "أفضل لفة",
+    "bestLapTime": "أفضل وقت لفة",
+    "totalPenalties": "إجمالي العقوبات",
+    "penalties": "العقوبات",
+    "totalLapsCompleted": "إجمالي اللفات المكتملة",
+    "laps": "اللفات",
+    "didNotFinish": "لم يكمل السباق",
+    "disqualified": "مستبعد",
+    "finishTime": "وقت الوصول"
   },
   "teamForm": {
     "basicInfo": "المعلومات الأساسية",

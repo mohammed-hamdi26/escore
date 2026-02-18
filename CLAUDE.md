@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Important
+
+- Don't commit or push without asking first
+- Do NOT add "Co-Authored-By" lines to commit messages
+
 ## Commands
 
 ```bash
@@ -10,12 +15,12 @@ npm run dev        # Start dev server with Turbopack (http://localhost:3000)
 
 # Build & Production
 npm run build      # Build for production with Turbopack
-npm start          # Run production server
+npm start          # Run production server (port 3000)
 
 # Linting
 npm run lint       # Run ESLint
 
-# Testing
+# Testing (Jest + React Testing Library)
 npm test                        # Run all tests
 npm run test:watch              # Run tests in watch mode
 npm run test:coverage           # Run tests with coverage report
@@ -28,44 +33,118 @@ npx playwright test e2e/auth.spec.ts  # Run a single e2e spec
 
 ## Architecture
 
-### Overview
-Escore is a Next.js 16 admin dashboard (React 19) for managing esports content (players, teams, matches, tournaments, news, transfers). It uses the App Router with locale-based routing for internationalization (English/Arabic).
+Next.js 16 (App Router) + React 19 admin dashboard for managing esports content. JavaScript only (no TypeScript). Tailwind CSS v4, shadcn/ui (new-york style, jsx not tsx), Formik + Yup forms, next-intl i18n, Axios HTTP client, react-hot-toast notifications.
+
+### Path Alias
+
+```js
+"@/*" → "./*"   // maps to project root (NOT src/)
+
+// Usage:
+import apiClient from "@/app/[locale]/_Lib/apiCLient";
+import { cn } from "@/lib/utils";
+import { PermissionGate } from "@/contexts/PermissionsContext";
+```
 
 ### Directory Structure
 
-- `app/[locale]/` - Locale-prefixed routes (en, ar)
-  - `_Lib/` - API clients and server actions
-    - `apiCLient.js` - Axios instance with auth interceptor (reads session from cookies)
-    - `actions.js` - Server actions for all CRUD operations (players, teams, matches, etc.)
-    - `session.js` - Session management with AES-256-GCM encryption (save/delete cookies)
-    - `helps.js` - Helper utilities (pagination, date/time, select option mapping)
-    - `imageSpecs.js` - Image aspect ratios and size specs per entity (mirrors backend config)
-    - `*Api.js` - Data fetching functions per entity (e.g., `palyerApi.js`, `teamsApi.js`)
-  - `dashboard/` - Protected admin routes (requires session cookie)
-    - Entity management folders follow pattern: `add/`, `edit/`, `edit/[id]/`
-    - `settings/` - App settings (appearance/themes, language/dictionary, about, privacy-policy, links)
-  - Auth routes at locale root: `login/`, `register/`, `forget-password/`
+- `app/[locale]/` — Locale-prefixed routes (en, ar)
+  - `_Lib/` — API clients and server actions (server-only)
+    - `apiCLient.js` — Axios instance with auth interceptors + token refresh
+    - `actions.js` — ALL server actions (`"use server"`) for every entity CRUD
+    - `session.js` — AES-256-GCM session encryption (httpOnly cookies, `server-only`)
+    - `helps.js` — Utility functions (pagination, date/time, select option mapping)
+    - `imageSpecs.js` — Image type → aspect ratio / size specs (mirrors backend)
+    - `*Api.js` — Per-entity read-only data fetching (e.g., `palyerApi.js`, `teamsApi.js`)
+  - `dashboard/` — Protected admin routes (requires session cookie)
+    - Entity management folders: `games-management/`, `player-management/`, `teams-management/`, `tournaments-management/`, `matches-management/`, `news-management/`, `clubs-management/`, `events-management/`, `transfers-management/`
+    - `users/` — User management + content requests
+    - `notifications/` — Send, templates, devices, history
+    - `support-center/` — Support tickets
+    - `settings/` — Themes, language/dictionary, about, privacy, links, avatars
+  - Auth routes: `login/`, `register/`, `forget-password/`
+  - `api/auth/` — Route Handlers for `refresh-session` and `force-logout`
 
-- `components/` - Reusable React components
-  - `ui/` - shadcn/ui primitives (button, dialog, table, etc.)
-  - `ui app/` - Custom app-specific UI components (InputApp, FileInput, ComboBoxInput, etc.)
-  - Entity-specific folders (e.g., `Player Management/`, `teams management/`, `Matches Management/`)
+- `components/`
+  - `ui/` — shadcn/ui primitives (button, dialog, table, input, etc.)
+  - `ui app/` — Custom app components (ImageUpload, InputApp, SelectInput, etc.)
+  - Entity-specific folders (e.g., `games-management/`, `Tournaments Management/`, `Matches Management/`)
+  - `dashboard/` — Navigation: SideNavBar, TopNav, NavItems
 
-- `contexts/` - React contexts (e.g., `PermissionsContext.jsx`)
+- `contexts/PermissionsContext.jsx` — Role-based permission context + gate components
+- `i18n/` — next-intl config (routing, navigation, request)
+- `messages/` — Translation files (en.json, ar.json)
+- `lib/utils.js` — `cn()` utility (twMerge + clsx)
+- `lib/timeUtils.js` — Racing/time formatting utilities
 
-- `i18n/` - next-intl configuration
-  - `routing.js` - Locale routing config (en, ar, always prefix)
-  - `navigation.js` - Localized navigation helpers (Link, redirect, usePathname, useRouter)
+### Route Registration
 
-- `messages/` - Translation files (en.json, ar.json)
+All routes under `app/[locale]/`. Locale is always present (`localePrefix: "always"`).
 
-- `__tests__/` - Test files (unit/ and integration/)
+**Redirects** (in `next.config.mjs`):
+- `/en/`, `/ar/` → `/:locale/dashboard`
+- Entity root routes (e.g., `/dashboard/matches-management`) → `/dashboard/matches-management/add`
 
-### Key Patterns
+**Route protection** (`middleware.js`):
+- `/dashboard/*` requires `session` cookie → redirects to `/:locale/login` if missing
+- Auth routes redirect to dashboard if session cookie present
+- Proactive token refresh: checks `token_exp` cookie, redirects to `/api/auth/refresh-session?redirect=...` if expired
 
-**Server Actions**: All mutations go through `app/[locale]/_Lib/actions.js` (marked `"use server"`). Pattern: `getLocale()` → build data object → `cleanNullValues()` → `apiClient.[method]()` → `revalidatePath()` → `redirect()`. Special action types include toggle actions (`toggleGameActive`, `toggleMatchFeatured`, etc.) and match state transitions (`startMatch`, `endMatch`, `updateMatchResult`).
+### Request Flow
 
-**NEXT_REDIRECT handling**: When `redirect()` is called in server actions, it throws a special `NEXT_REDIRECT` error. Form submit handlers must catch this and re-throw it so Next.js can handle the redirect:
+```
+Page (Server Component) → _Lib/*Api.js → apiClient.get() → Backend API
+Form (Client Component) → Server Action (_Lib/actions.js) → apiClient.post/patch/delete() → Backend API
+```
+
+### Authentication & Token Refresh
+
+**Storage:** Three httpOnly cookies — `session` (encrypted JWT, 7d), `refresh_token` (encrypted, 30d), `token_exp` (expiry timestamp).
+
+**API Client** (`_Lib/apiCLient.js`):
+- Request interceptor: decrypts `session` cookie → attaches `Authorization: Bearer <token>`
+- Response interceptor: on 401, attempts `refreshSession()` with deduplication (singleton `refreshPromise`), retries original request. On failure, clears cookies and sets `error.isAuthError = true`
+
+**Dashboard Layout** (`dashboard/layout.jsx`): Server-side auth guard — fetches user via `getLoginUser()`, redirects to `/api/auth/force-logout` on failure. Wraps children in `<PermissionsProvider user={user}>`.
+
+**API Route Handlers:**
+- `GET /api/auth/refresh-session?redirect=...` — Refreshes JWT, redirects back
+- `GET /api/auth/force-logout?locale=...` — Clears all cookies, redirects to login
+
+## Key Patterns
+
+### Server Actions
+
+All mutations go through `app/[locale]/_Lib/actions.js` (`"use server"`).
+
+**Standard pattern (with redirect):**
+```js
+export async function addSomething(data) {
+  const locale = await getLocale();
+  try {
+    const cleanData = cleanNullValues(data);  // strips null/undefined/"" values
+    await apiClient.post("/something", cleanData);
+  } catch (e) {
+    throw new Error(e.response?.data?.message || "Error");
+  }
+  redirect(`/${locale}/dashboard/something-management`);
+}
+```
+
+**Return-value pattern (no redirect):**
+```js
+export async function doSomething(id, data) {
+  try {
+    const res = await apiClient.patch(`/something/${id}`, data);
+    revalidatePath(`/${locale}/dashboard/...`);
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    return { success: false, error: e.response?.data?.message || "Failed" };
+  }
+}
+```
+
+**NEXT_REDIRECT handling** — form submit handlers MUST re-throw redirect errors:
 ```js
 try {
   await submitAction(data);
@@ -76,58 +155,189 @@ try {
 }
 ```
 
-**Authentication**: JWT token encrypted with AES-256-GCM and stored in httpOnly cookie named "session" (7-day expiry). `apiClient` automatically attaches Bearer token via request interceptor. The response interceptor sets `isAuthError` flag on 401/403 responses. `middleware.js` guards `/dashboard/*` routes (checks cookie presence) and redirects unauthenticated users to login. Already-logged-in users are redirected away from auth pages.
+### Data Fetching
 
-**Dashboard Layout Auth**: `app/[locale]/dashboard/layout.jsx` fetches the current user via `getLoginUser()`. On auth failure, it deletes the session cookie and redirects to login. Wraps children in `<PermissionsProvider user={user}>`.
+API functions in `_Lib/*Api.js` are called from server components (page.jsx files).
 
-**Data Fetching**: API functions in `_Lib/*Api.js` build `URLSearchParams` for filtering/pagination. List endpoints return `{ data: res.data.data, pagination: res.data.meta }`. Single entity endpoints return `res.data.data`. Page components use `Promise.all()` for parallel data fetching. Search params in pages use `await searchParams` (Next.js 16 async pattern).
+```js
+// List: returns { data: [...], pagination: { totalPages, total, page, limit } }
+const { data, pagination } = await getTournaments({ page: 1, size: 20, search: "..." });
 
-**Forms**: Formik + Yup validation. Custom inputs in `components/ui app/` accept `formik` prop and call `formik.setFieldValue(name, value)` internally. Standard controlled inputs use `formik.handleChange`/`formik.handleBlur`. Errors display when both `formik.touched[name]` and `formik.errors[name]` are truthy. Translation function `t` is passed to inputs for localizing error messages. Yup validation messages use translation keys (e.g., `"fullNameRequired"`).
+// Parallel fetching in page components:
+const [games, players, countries] = await Promise.all([
+  getGames({}), getPlayers({}), getCountries(),
+]);
 
-**Image Upload System**: `FileInput` component handles the full flow: file selection → 5MB size validation → cropper dialog → upload to backend via `uploadPhoto(formData, imageType)` → set Formik field with returned URL. The `imageType` param (e.g., `gameLogo`, `teamCover`, `playerPhoto`) controls aspect ratio locking in the cropper and backend resizing. Image specs are defined in `_Lib/imageSpecs.js` with aspect ratios (1:1, 16:9, 3:2, 2:1) and size tiers (thumbnail, medium, large).
+// Next.js 16 async searchParams:
+export default async function Page({ searchParams }) {
+  const params = await searchParams;  // MUST await in Next.js 16
+  const page = params.page || 1;
+}
+```
 
-**Data Tables**: @tanstack/react-table with `DataTable` component wrapping `useReactTable` + `getCoreRowModel`. Column definitions use `accessorKey` for data columns and `id` for custom cells (actions).
+### Forms (Formik + Yup)
 
-**Styling**: Tailwind CSS v4 with `cn()` utility from `lib/utils.js` (`twMerge(clsx(inputs))`). Theme uses CSS custom properties in `globals.css` with light/dark mode variants (default: dark). RTL support via `rtl:` prefix classes. Root layout sets `dir="rtl"` for Arabic locale.
+All forms are client components. Custom inputs accept `formik` + `name` props and call `formik.setFieldValue(name, value)` internally.
 
-**Notifications**: `react-hot-toast` for success/error toasts in form submissions.
+```jsx
+"use client";
+const formik = useFormik({
+  initialValues: { name: data?.name || "" },
+  validationSchema: Yup.object({ name: Yup.string().required(t("nameRequired")) }),
+  onSubmit: async (values) => {
+    try {
+      await submitFunction(values);
+      toast.success(t("success"));
+    } catch (error) {
+      if (error?.digest?.startsWith("NEXT_REDIRECT")) throw error;
+      toast.error(error.message);
+    }
+  },
+});
+```
+
+### Custom UI Components (`components/ui app/`)
+
+**Image upload** — two components, different behaviors:
+- `ImageUpload` — drag-and-drop zone, auto-uploads after crop. Props: `name`, `formik`, `imageType`, `enableCrop`, `compact`, `showUrlInput`, `hint`
+- `FileInput` — file picker with manual upload button. Props: `name`, `formik`, `imageType`, `enableCrop`, `label`
+
+Both use `formik.setFieldValue(name, url)` internally. `imageType` (e.g., `gameLogo`, `teamCover`, `playerPhoto`) locks crop aspect ratio.
+
+**Form inputs** — all take `name` + `formik` props:
+- `InputApp` — text input (also accepts `icon`, `error`, `type`, `label`)
+- `SelectInput` — dropdown select (accepts `options: [{ value, name }]`)
+- `ComboBoxInput` — multi-select combobox with badges
+- `TextAreaInput` — textarea
+- `DatePicker` — date picker
+- `SelectDateAndTimeInput` — combined date + time picker
+- `RichTextEditor` — React Quill WYSIWYG editor
+- `MarkDown` — MDEditor markdown editor
+- `ListInput` — list of text entries
+
+**Exception:** `SearchableSelect` does NOT use formik — it takes `value` + `onChange` props directly.
+
+**Layout components:**
+- `FormSection` — card wrapper with title + icon (props: `title`, `icon`, `badge`)
+- `FormRow` — responsive grid row (props: `cols: 1|2|3|4`, default 2)
+
+**Permission gates** (`PermissionGate.jsx`):
+```jsx
+<PermissionGate entity="Game" action="create">...</PermissionGate>
+<AdminGate>...</AdminGate>
+<CreateGate entity="Game">...</CreateGate>
+<ReadGate>, <UpdateGate>, <DeleteGate>, <EntityGate>
+```
+
+**Modals** — two patterns:
+- shadcn `Dialog` (preferred for complex modals)
+- Custom `Model` compound component (older pattern, uses `createPortal`):
+```jsx
+<Model>
+  <Model.Open name="edit"><button>Open</button></Model.Open>
+  <Model.Window openName="edit"><MyForm /></Model.Window>
+</Model>
+```
+
+**Other:** `Pagination` (URL-based, reads `?page=`), `Table` (CSS grid-based), `Loading`, `BackPage`, `SelectSizeRows`
 
 ### Entity Page Pattern
 
-Each entity (players, teams, etc.) follows the same structure:
-1. **List page** (server component): Fetches data with pagination/filters → renders `DataTable`
-2. **Add page** (server component): Fetches dropdown options (games, countries, etc.) via `Promise.all()` → renders client form component
-3. **Edit page** (`edit/[id]/`, server component): Fetches entity data + dropdown options → renders same form component with initial values
-4. **Form component** (client component, in `components/`): Formik form with Yup schema, custom inputs, submit handler calling server action
+Each entity follows:
+1. **List page** (server component): fetches data with pagination/filters → renders table/cards
+2. **Add page** (server component): fetches dropdown options via `Promise.all()` → renders client form
+3. **Edit page** (`edit/[id]/`, server component): fetches entity + dropdown options → renders same form with `initialValues`
+4. **Form component** (client, in `components/`): Formik + Yup, calls server action on submit
 
-### Helper Utilities (`_Lib/helps.js`)
+### URL-Based Filtering
 
-- `mappedArrayToSelectOptions(array, labelKey, valueKey)` - Maps API data to `{label, value, image?}` format for select/combobox inputs
-- `combineDateAndTime(date, time)` - Combines date string and "HH:MM AM/PM" time to Date object
-- `getNumPages(totalItems, pageSize)` - Pagination page count
-- `getFlagEmoji(countryCode)` - Converts 2-letter code to flag emoji
-
-### Environment Variables
-- `NEXT_PUBLIC_BASE_URL` - Backend API base URL (API path: `/api/v1`)
-- `SESSION_SECRET` or `NEXTAUTH_SECRET` - Used for AES-256-GCM encryption of session tokens
+List pages sync filters to URL search params:
+```js
+const updateParams = (key, value) => {
+  const params = new URLSearchParams(searchParams);
+  value ? params.set(key, value) : params.delete(key);
+  params.set("page", "1");
+  router.push(`${pathname}?${params.toString()}`);
+};
+```
 
 ### Internationalization
-Locales: `en` (default), `ar`. All routes are always prefixed with locale (`localePrefix: "always"`). Server components use `await getLocale()`. Client components use `useTranslations()` hook from `next-intl`. Use `Link` and `redirect` from `@/i18n/navigation` for locale-aware navigation.
 
-### Role-Based Permissions
-User roles: `user`, `admin`, `content`, `support`. Permission system in `contexts/PermissionsContext.jsx` with entities (Game, Team, Player, Tournament, Match, News, Transfer, Standing, Settings, Support, User, Avatar) and actions (create, read, update, delete). Admins have all permissions automatically.
+Locales: `en` (default), `ar`. RTL: root layout sets `dir="rtl"` for Arabic; use `rtl:` Tailwind prefix.
 
-Usage in client components:
-- `usePermissions()` hook → `hasPermission(entity, action)`, `canCreate(entity)`, `canRead(entity)`, `canUpdate(entity)`, `canDelete(entity)`, `isAdmin`
-- `<PermissionGate entity="..." action="..." fallback={...}>` for conditional rendering
-- Shorthand gates: `<CreateGate>`, `<ReadGate>`, `<UpdateGate>`, `<DeleteGate>`, `<AdminGate>`, `<EntityGate>`
+```js
+// Server components:
+import { getLocale, getTranslations } from "next-intl/server";
+const t = await getTranslations("namespace");
 
-### Configuration Notes
-- Server actions have a 5MB body size limit (`next.config.mjs`)
-- Entity management root routes (e.g., `/dashboard/players`) redirect to `/add` via next.config redirects
-- Locale root (`/en/`, `/ar/`) redirects to `/dashboard`
-- Playwright runs in non-headless mode with a single worker and auto-starts the dev server
+// Client components:
+import { useTranslations } from "next-intl";
+const t = useTranslations("namespace");
+```
 
-### Important
-- بعد كدا متعملش كوميت ولا بوش الا لما تستأذن (Don't commit or push without asking first)
-- Do NOT add "Co-Authored-By" lines to commit messages
+**Always use locale-aware navigation** from `@/i18n/navigation` (NOT `next/navigation`):
+```js
+import { Link, redirect, usePathname, useRouter } from "@/i18n/navigation";
+```
+
+### Styling
+
+- Tailwind CSS v4 with `cn()` utility (`twMerge(clsx(...))`)
+- Dark mode default via `next-themes` (`attribute="class"`)
+- Green primary: `bg-green-primary` / `text-green-primary` (`--green-primary: #289546`)
+- Input convention: `bg-gray-100 dark:bg-[#1a1d2e] border-0 rounded-xl focus:ring-2 focus:ring-green-primary/50`
+- Glass effect: `.glass` class (backdrop-blur + semi-transparent bg)
+
+### Permissions
+
+```js
+const { hasPermission, canCreate, canRead, canUpdate, canDelete, isAdmin } = usePermissions();
+```
+
+Entities: `Game`, `Team`, `Club`, `Event`, `Player`, `Tournament`, `Match`, `News`, `Transfer`, `Standing`, `Settings`, `Support`, `User`, `Avatar`. Actions: `create`, `read`, `update`, `delete`. Admins bypass all checks.
+
+## Helper Utilities
+
+**`_Lib/helps.js`:**
+- `mappedArrayToSelectOptions(array, labelKey, valueKey)` → `[{ name, value, image? }]` for select inputs
+- `cleanNullValues(data)` — strips null/undefined/"" before sending to API
+- `combineDateAndTime(date, time)` — merges date + "HH:MM AM/PM" into Date
+- `getNumPages(totalItems, pageSize)` — pagination page count
+- `getFlagEmoji(countryCode)` — 2-letter ISO code → flag emoji
+
+**`lib/timeUtils.js`** (racing/time competitions):
+- `formatTimeMs(ms)` → `"1:33.450"`, `parseTimeString(str)` → ms, `formatGap(gapMs)` → `"+1.650"`
+
+## Environment Variables
+
+```bash
+NEXT_PUBLIC_BASE_URL=https://api.escore.app   # Backend API (path: /api/v1)
+SESSION_SECRET=...                             # AES-256-GCM encryption key
+# Fallback: NEXTAUTH_SECRET if SESSION_SECRET not set
+```
+
+## Deployment
+
+**Production:** `/var/www/escore-frontend` (NOT escore-dashboard) on `207.154.255.80`
+
+```bash
+ssh root@207.154.255.80 "cd /var/www/escore-frontend && git pull origin master && npm install && npm run build && pm2 restart escore-frontend"
+```
+
+- Dashboard repo pushes to `master` branch (not `main`)
+- PM2 process name: `escore-frontend`
+- Domain: `dashboard.escore.app`
+
+## Testing
+
+**Jest + React Testing Library:** Config in `jest.config.js` (uses `next/jest`, jsdom). Setup: `jest.setup.js` imports `@testing-library/jest-dom`. Tests in `__tests__/unit/` and `__tests__/integration/`.
+
+**Playwright E2E:** Config in `playwright.config.ts`. Tests in `e2e/`. Runs non-headless, single worker, auto-starts dev server.
+
+## Gotchas
+
+- `palyerApi.js` has a typo in the filename — do NOT rename it (would break imports everywhere)
+- `apiCLient.js` also has inconsistent casing — do NOT rename
+- `session.js` is marked `server-only` — cannot be imported in client components
+- `components.json` (shadcn config): `jsx: true` (not tsx), `style: "new-york"`, aliases use `@/`
+- Server actions body size limit: 5MB (in `next.config.mjs`)

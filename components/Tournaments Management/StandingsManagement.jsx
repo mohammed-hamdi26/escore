@@ -22,6 +22,9 @@ import {
   User,
   Target,
   ChevronDown,
+  ChevronUp,
+  Timer,
+  ArrowUpDown,
 } from "lucide-react";
 import {
   initializeStandings,
@@ -32,6 +35,8 @@ import {
   deleteStanding,
   deleteAllStandings,
 } from "@/app/[locale]/_Lib/actions";
+import { TimeCell } from "@/components/ui/TimeInput";
+import { formatTimeMs, formatPenalty } from "@/lib/timeUtils";
 
 // Position styling
 const getPositionStyle = (position, isQualified, isEliminated) => {
@@ -88,6 +93,36 @@ export default function StandingsManagement({ tournament, initialStandings }) {
   };
   const isPlacement = config.scoringType === "placement";
   const isPlayerBased = tournament?.participationType === "player";
+  const isRacing = tournament?.competitionType === "racing";
+
+  // Racing sort state: { key, direction }
+  const [racingSort, setRacingSort] = useState({ key: "position", direction: "asc" });
+
+  const handleRacingSortToggle = (key) => {
+    setRacingSort((prev) =>
+      prev.key === key
+        ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
+        : { key, direction: key === "points" ? "desc" : "asc" }
+    );
+  };
+
+  // Sort standings for display
+  const sortedStandings = React.useMemo(() => {
+    if (!isRacing || racingSort.key === "position") return standings;
+
+    return [...standings].sort((a, b) => {
+      const dir = racingSort.direction === "asc" ? 1 : -1;
+      const aVal = a[racingSort.key];
+      const bVal = b[racingSort.key];
+
+      // Nulls always go last
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+
+      return (aVal - bVal) * dir;
+    });
+  }, [standings, racingSort, isRacing]);
 
   // === Actions ===
 
@@ -303,7 +338,14 @@ export default function StandingsManagement({ tournament, initialStandings }) {
         {/* Standing Config Badge */}
         <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-border">
           <Trophy className="size-4 text-green-primary" />
-          {isPlacement ? (
+          {isRacing ? (
+            <>
+              <Timer className="size-4 text-blue-500" />
+              <span className="text-sm font-medium text-blue-500">
+                {t("racingScoring") || "Racing / Time-Based"}
+              </span>
+            </>
+          ) : isPlacement ? (
             <>
               <span className="text-sm font-medium text-amber-500">
                 {t("placementScoring") || "Placement Scoring"}
@@ -449,7 +491,24 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                   <th className="px-4 py-3 text-center font-semibold">
                     {t("played") || "P"}
                   </th>
-                  {isPlacement ? (
+                  {isRacing ? (
+                    <>
+                      <RacingSortHeader sortKey="points" label={t("points") || "PTS"} currentSort={racingSort} onToggle={handleRacingSortToggle} />
+                      <RacingSortHeader sortKey="bestFinishTimeMs" label={t("bestTime") || "Best Time"} title={t("bestFinishTime") || "Best Finish Time"} currentSort={racingSort} onToggle={handleRacingSortToggle} />
+                      <RacingSortHeader sortKey="bestLapMs" label={t("bestLap") || "Best Lap"} title={t("bestLapTime") || "Best Lap Time"} currentSort={racingSort} onToggle={handleRacingSortToggle} />
+                      <th className="px-4 py-3 text-center font-semibold hidden md:table-cell" title={t("totalPenalties") || "Total Penalties"}>
+                        {t("penalties") || "Pen."}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold hidden md:table-cell" title={t("totalLapsCompleted") || "Total Laps"}>
+                        {t("laps") || "Laps"}
+                      </th>
+                      <RacingSortHeader sortKey="dnfCount" label="DNF" title={t("didNotFinish") || "Did Not Finish"} currentSort={racingSort} onToggle={handleRacingSortToggle} />
+                      <RacingSortHeader sortKey="dsqCount" label="DSQ" title={t("disqualified") || "Disqualified"} currentSort={racingSort} onToggle={handleRacingSortToggle} />
+                      <th className="px-4 py-3 text-center font-semibold">
+                        {t("status") || "Status"}
+                      </th>
+                    </>
+                  ) : isPlacement ? (
                     <>
                       <th className="px-4 py-3 text-center font-semibold" title={t("totalPoints") || "Total Points"}>
                         {t("points") || "PTS"}
@@ -507,7 +566,7 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-white/5">
-                {standings.map((standing) => {
+                {sortedStandings.map((standing) => {
                   const isEditing = editingId === standing.id;
                   const teamLogo = isPlayerBased
                     ? (standing.player?.photo?.light || standing.player?.photo?.dark)
@@ -523,7 +582,7 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                   const isDefaultRow = String(standing.id).startsWith(
                     "default-"
                   );
-                  const hasRoundHistory = isPlacement && standing.roundHistory?.length > 0;
+                  const hasRoundHistory = (isPlacement || isRacing) && standing.roundHistory?.length > 0;
                   const isExpanded = expandedId === standing.id;
                   const bestRoundPoints = hasRoundHistory
                     ? Math.max(...standing.roundHistory.map((r) => r.totalRoundPoints || 0))
@@ -587,10 +646,10 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                               {entityName || "-"}
                             </p>
                           </div>
-                          {!isPlacement && standing.isQualified && (
+                          {!isPlacement && !isRacing && standing.isQualified && (
                             <TrendingUp className="size-4 text-green-500 flex-shrink-0" />
                           )}
-                          {!isPlacement && standing.isEliminated && (
+                          {!isPlacement && !isRacing && standing.isEliminated && (
                             <TrendingDown className="size-4 text-red-500 flex-shrink-0" />
                           )}
                         </div>
@@ -611,7 +670,57 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                         </td>
                       )}
 
-                      {isPlacement ? (
+                      {isRacing ? (
+                        /* Racing columns */
+                        <>
+                          <td className="px-4 py-3 text-center">
+                            <span className="inline-flex items-center justify-center min-w-[40px] px-2 py-1 rounded-lg bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 font-bold text-sm">
+                              {standing.points || 0}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <TimeCell value={standing.bestFinishTimeMs} dnf={false} dsq={false} />
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <TimeCell value={standing.bestLapMs} />
+                          </td>
+                          <td className="px-4 py-3 text-center text-amber-600 dark:text-amber-400 hidden md:table-cell">
+                            {standing.totalPenaltyMs ? (
+                              <span className="text-sm font-mono">{formatPenalty(standing.totalPenaltyMs)}</span>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 hidden md:table-cell">
+                            {standing.totalLapsCompleted ?? 0}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`text-sm font-medium ${(standing.dnfCount || 0) > 0 ? "text-red-500" : "text-gray-400 dark:text-gray-500"}`}>
+                              {standing.dnfCount || 0}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`text-sm font-medium ${(standing.dsqCount || 0) > 0 ? "text-red-500" : "text-gray-400 dark:text-gray-500"}`}>
+                              {standing.dsqCount || 0}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {standing.isEliminated ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-500">
+                                <TrendingDown className="size-3" />
+                                {t("eliminated") || "Out"}
+                              </span>
+                            ) : standing.isQualified ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500">
+                                <TrendingUp className="size-3" />
+                                {t("qualified") || "Qual"}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 dark:text-gray-500">-</span>
+                            )}
+                          </td>
+                        </>
+                      ) : isPlacement ? (
                         /* Placement columns */
                         isEditing ? (
                           <>
@@ -766,7 +875,7 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                       )}
 
                       {/* Form / Last Results - only for win/loss */}
-                      {!isPlacement && (
+                      {!isPlacement && !isRacing && (
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-center gap-1">
                             {standing.lastResults &&
@@ -855,7 +964,72 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                       </td>
                     </tr>
 
-                    {/* Round History Expansion Row */}
+                    {/* Round History Expansion Row — Racing */}
+                    {isRacing && isExpanded && (
+                      <tr className="bg-gray-50/50 dark:bg-white/[0.02]">
+                        <td colSpan={100} className="px-4 py-0">
+                          <div className="py-3 ps-10">
+                            {hasRoundHistory ? (
+                              <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <table className="w-full text-xs">
+                                  <thead>
+                                    <tr className="bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400">
+                                      <th className="px-3 py-2 text-left font-medium">{t("round") || "Round"}</th>
+                                      <th className="px-3 py-2 text-center font-medium">{t("placementCol") || "Place"}</th>
+                                      <th className="px-3 py-2 text-center font-medium">{t("finishTime") || "Finish"}</th>
+                                      <th className="px-3 py-2 text-center font-medium">{t("bestLap") || "Best Lap"}</th>
+                                      <th className="px-3 py-2 text-center font-medium">{t("laps") || "Laps"}</th>
+                                      <th className="px-3 py-2 text-center font-medium">{t("penalties") || "Pen."}</th>
+                                      <th className="px-3 py-2 text-center font-medium">{t("points") || "PTS"}</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                    {standing.roundHistory.map((rh, idx) => (
+                                      <tr
+                                        key={idx}
+                                        className={rh.dnf || rh.dsq ? "opacity-60" : ""}
+                                      >
+                                        <td className="px-3 py-1.5 text-left">
+                                          <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium">
+                                            R{rh.round}
+                                          </span>
+                                        </td>
+                                        <td className="px-3 py-1.5 text-center font-medium text-foreground">
+                                          {rh.placement ? `#${rh.placement}` : "-"}
+                                        </td>
+                                        <td className="px-3 py-1.5 text-center">
+                                          <TimeCell value={rh.finishTimeMs} dnf={rh.dnf} dsq={rh.dsq} />
+                                        </td>
+                                        <td className="px-3 py-1.5 text-center">
+                                          <TimeCell value={rh.bestLapMs} />
+                                        </td>
+                                        <td className="px-3 py-1.5 text-center text-gray-700 dark:text-gray-300">
+                                          {rh.totalLaps ?? "-"}
+                                        </td>
+                                        <td className="px-3 py-1.5 text-center text-amber-600 dark:text-amber-400">
+                                          {rh.penaltyMs ? (
+                                            <span className="font-mono">{formatPenalty(rh.penaltyMs)}</span>
+                                          ) : "—"}
+                                        </td>
+                                        <td className="px-3 py-1.5 text-center font-bold text-foreground">
+                                          {rh.totalRoundPoints ?? 0}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            ) : (
+                              <p className="text-xs text-muted-foreground py-2">
+                                {t("noRoundsPlayed") || "No rounds played yet"}
+                              </p>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+
+                    {/* Round History Expansion Row — Placement */}
                     {isPlacement && isExpanded && (
                       <tr className="bg-gray-50/50 dark:bg-white/[0.02]">
                         <td colSpan={100} className="px-4 py-0">
@@ -963,6 +1137,31 @@ export default function StandingsManagement({ tournament, initialStandings }) {
         )}
       </div>
     </div>
+  );
+}
+
+// Sortable column header for racing standings
+function RacingSortHeader({ sortKey, label, title, currentSort, onToggle }) {
+  const isActive = currentSort.key === sortKey;
+  return (
+    <th
+      className="px-4 py-3 text-center font-semibold cursor-pointer select-none hover:text-foreground transition-colors"
+      title={title}
+      onClick={() => onToggle(sortKey)}
+    >
+      <span className="inline-flex items-center gap-1">
+        {label}
+        {isActive ? (
+          currentSort.direction === "asc" ? (
+            <ChevronUp className="size-3" />
+          ) : (
+            <ChevronDown className="size-3" />
+          )
+        ) : (
+          <ArrowUpDown className="size-3 opacity-30" />
+        )}
+      </span>
+    </th>
   );
 }
 

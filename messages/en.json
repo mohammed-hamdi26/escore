@@ -973,7 +973,8 @@
     "advanceBRRound": "Advance to Round {next}",
     "bracketCompleted": "Bracket Completed",
     "brAllRoundsCompleted": "All Battle Royale rounds have been completed. Check standings for final results.",
-    "teamsEliminated": "{count} teams eliminated after this round:"
+    "teamsEliminated": "{count} teams eliminated after this round:",
+    "unknown": "Unknown"
   },
   "TournamentsTable": {
     "name": "Tournament",
@@ -1436,7 +1437,14 @@
     "saveResults": "Save Results",
     "saving": "Saving...",
     "resultsSaved": "Results saved successfully",
-    "errorSavingResults": "Error saving results"
+    "errorSavingResults": "Error saving results",
+    "finishTime": "Finish Time",
+    "bestLap": "Best Lap",
+    "laps": "Laps",
+    "penalty": "Penalty",
+    "dnfLabel": "DNF",
+    "dsqLabel": "DSQ",
+    "round": "Round"
   },
   "NewsTable": {
     "title": "Title",
@@ -3544,7 +3552,10 @@
     "form": "Form",
     "qualified": "Qualified",
     "eliminated": "Eliminated",
-    "tournament": "Tournament"
+    "tournament": "Tournament",
+    "player": "Player",
+    "bestTime": "Best Time",
+    "bestLap": "Best Lap"
   },
   "StandingsManagement": {
     "title": "Manage Standings",
@@ -3600,7 +3611,19 @@
     "placementCol": "Place",
     "bonus": "Bonus",
     "total": "Total",
-    "noRoundsPlayed": "No rounds played yet"
+    "noRoundsPlayed": "No rounds played yet",
+    "racingScoring": "Racing Scoring",
+    "bestTime": "Best Time",
+    "bestFinishTime": "Best Finish Time",
+    "bestLap": "Best Lap",
+    "bestLapTime": "Best Lap Time",
+    "totalPenalties": "Total Penalties",
+    "penalties": "Penalties",
+    "totalLapsCompleted": "Total Laps Completed",
+    "laps": "Laps",
+    "didNotFinish": "Did Not Finish",
+    "disqualified": "Disqualified",
+    "finishTime": "Finish Time"
   },
   "teamForm": {
     "basicInfo": "Basic Information",

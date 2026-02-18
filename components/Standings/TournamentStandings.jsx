@@ -7,10 +7,14 @@ import {
   TrendingDown,
   Minus,
   Users,
+  User,
   Medal,
   Target,
   Zap,
+  Timer,
 } from "lucide-react";
+import { TimeCell } from "@/components/ui/TimeInput";
+import { formatTimeMs, formatPenalty } from "@/lib/timeUtils";
 
 // Streak badge styling
 const getStreakBadge = (streak) => {
@@ -61,7 +65,9 @@ const getPositionStyle = (position, isQualified, isEliminated) => {
   return "bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/10";
 };
 
-function TournamentStandings({ standings = [], grouped = {}, title, compact = false }) {
+function TournamentStandings({ standings = [], grouped = {}, title, compact = false, competitionType, participationType }) {
+  const isRacing = competitionType === "racing";
+  const isPlayerBased = participationType === "player";
   const t = useTranslations("Standings");
 
   // Ensure standings is an array
@@ -125,25 +131,49 @@ function TournamentStandings({ standings = [], grouped = {}, title, compact = fa
                 <thead>
                   <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-white/5">
                     <th className="px-4 py-3 text-left font-semibold">#</th>
-                    <th className="px-4 py-3 text-left font-semibold">{t("team") || "Team"}</th>
-                    {!compact && (
+                    <th className="px-4 py-3 text-left font-semibold">
+                      {isPlayerBased ? (t("player") || "Player") : (t("team") || "Team")}
+                    </th>
+                    {isRacing ? (
                       <>
                         <th className="px-4 py-3 text-center font-semibold">{t("played") || "P"}</th>
-                        <th className="px-4 py-3 text-center font-semibold">{t("wins") || "W"}</th>
-                        <th className="px-4 py-3 text-center font-semibold">{t("draws") || "D"}</th>
-                        <th className="px-4 py-3 text-center font-semibold">{t("losses") || "L"}</th>
-                        <th className="px-4 py-3 text-center font-semibold">{t("diff") || "+/-"}</th>
+                        <th className="px-4 py-3 text-center font-semibold">{t("points") || "PTS"}</th>
+                        {!compact && (
+                          <>
+                            <th className="px-4 py-3 text-center font-semibold">{t("bestTime") || "Best Time"}</th>
+                            <th className="px-4 py-3 text-center font-semibold">{t("bestLap") || "Best Lap"}</th>
+                            <th className="px-4 py-3 text-center font-semibold">DNF</th>
+                            <th className="px-4 py-3 text-center font-semibold">DSQ</th>
+                          </>
+                        )}
                       </>
-                    )}
-                    <th className="px-4 py-3 text-center font-semibold">{t("points") || "PTS"}</th>
-                    {!compact && (
-                      <th className="px-4 py-3 text-center font-semibold">{t("form") || "Form"}</th>
+                    ) : (
+                      <>
+                        {!compact && (
+                          <>
+                            <th className="px-4 py-3 text-center font-semibold">{t("played") || "P"}</th>
+                            <th className="px-4 py-3 text-center font-semibold">{t("wins") || "W"}</th>
+                            <th className="px-4 py-3 text-center font-semibold">{t("draws") || "D"}</th>
+                            <th className="px-4 py-3 text-center font-semibold">{t("losses") || "L"}</th>
+                            <th className="px-4 py-3 text-center font-semibold">{t("diff") || "+/-"}</th>
+                          </>
+                        )}
+                        <th className="px-4 py-3 text-center font-semibold">{t("points") || "PTS"}</th>
+                        {!compact && (
+                          <th className="px-4 py-3 text-center font-semibold">{t("form") || "Form"}</th>
+                        )}
+                      </>
                     )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                   {(groupStandings || []).map((standing) => {
-                    const teamLogo = standing.team?.logo?.light || standing.team?.logo?.dark;
+                    const entityLogo = isPlayerBased
+                      ? (standing.player?.photo?.light || standing.player?.photo?.dark)
+                      : (standing.team?.logo?.light || standing.team?.logo?.dark);
+                    const entityName = isPlayerBased
+                      ? (standing.player?.nickname || standing.player?.name)
+                      : standing.team?.name;
                     const positionStyle = getPositionStyle(standing.position, standing.isQualified, standing.isEliminated);
 
                     return (
@@ -160,112 +190,177 @@ function TournamentStandings({ standings = [], grouped = {}, title, compact = fa
                           </span>
                         </td>
 
-                        {/* Team */}
+                        {/* Team / Player */}
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <div className="size-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden flex-shrink-0">
-                              {teamLogo ? (
+                            <div className={`size-8 ${isPlayerBased ? "rounded-full" : "rounded-lg"} bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden flex-shrink-0`}>
+                              {entityLogo ? (
                                 <img
-                                  src={teamLogo}
-                                  alt={standing.team?.name}
-                                  className="size-6 object-contain"
+                                  src={entityLogo}
+                                  alt={entityName}
+                                  className="size-full object-cover"
                                 />
+                              ) : isPlayerBased ? (
+                                <User className="size-4 text-gray-400 dark:text-gray-500" />
                               ) : (
                                 <Users className="size-4 text-gray-400 dark:text-gray-500" />
                               )}
                             </div>
                             <div className="min-w-0">
                               <p className="font-medium text-gray-900 dark:text-white truncate">
-                                {standing.team?.name}
+                                {entityName || "-"}
                               </p>
-                              {standing.team?.shortName && (
+                              {!isPlayerBased && standing.team?.shortName && (
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                   {standing.team?.shortName}
                                 </p>
                               )}
                             </div>
                             {/* Status indicators */}
-                            <div className="flex gap-1">
-                              {standing.isQualified && (
-                                <span title={t("qualified") || "Qualified"}>
-                                  <TrendingUp className="size-4 text-green-500" />
-                                </span>
-                              )}
-                              {standing.isEliminated && (
-                                <span title={t("eliminated") || "Eliminated"}>
-                                  <TrendingDown className="size-4 text-red-500" />
-                                </span>
-                              )}
-                            </div>
+                            {!isRacing && (
+                              <div className="flex gap-1">
+                                {standing.isQualified && (
+                                  <span title={t("qualified") || "Qualified"}>
+                                    <TrendingUp className="size-4 text-green-500" />
+                                  </span>
+                                )}
+                                {standing.isEliminated && (
+                                  <span title={t("eliminated") || "Eliminated"}>
+                                    <TrendingDown className="size-4 text-red-500" />
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            {/* DNF/DSQ badges for racing */}
+                            {isRacing && ((standing.dnfCount || 0) > 0 || (standing.dsqCount || 0) > 0) && (
+                              <div className="flex gap-1">
+                                {(standing.dnfCount || 0) > 0 && (
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-500">
+                                    {standing.dnfCount} DNF
+                                  </span>
+                                )}
+                                {(standing.dsqCount || 0) > 0 && (
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-500 line-through">
+                                    {standing.dsqCount} DSQ
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </td>
 
-                        {!compact && (
+                        {isRacing ? (
                           <>
                             {/* Matches Played */}
                             <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
                               {standing.matchesPlayed || 0}
                             </td>
 
-                            {/* Wins */}
-                            <td className="px-4 py-3 text-center text-green-600 dark:text-green-400 font-medium">
-                              {standing.wins || 0}
-                            </td>
-
-                            {/* Draws */}
-                            <td className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
-                              {standing.draws || 0}
-                            </td>
-
-                            {/* Losses */}
-                            <td className="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
-                              {standing.losses || 0}
-                            </td>
-
-                            {/* Point Difference */}
+                            {/* Points */}
                             <td className="px-4 py-3 text-center">
-                              <span className={`font-medium ${
-                                standing.pointsDiff > 0
-                                  ? "text-green-600 dark:text-green-400"
-                                  : standing.pointsDiff < 0
-                                    ? "text-red-600 dark:text-red-400"
-                                    : "text-gray-500 dark:text-gray-400"
-                              }`}>
-                                {standing.pointsDiff > 0 ? "+" : ""}{standing.pointsDiff || 0}
+                              <span className="inline-flex items-center justify-center min-w-[40px] px-2 py-1 rounded-lg bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 font-bold text-sm">
+                                {standing.points || 0}
                               </span>
                             </td>
-                          </>
-                        )}
 
-                        {/* Points */}
-                        <td className="px-4 py-3 text-center">
-                          <span className="inline-flex items-center justify-center min-w-[40px] px-2 py-1 rounded-lg bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 font-bold text-sm">
-                            {standing.points || 0}
-                          </span>
-                        </td>
+                            {!compact && (
+                              <>
+                                {/* Best Time */}
+                                <td className="px-4 py-3 text-center">
+                                  <TimeCell value={standing.bestFinishTimeMs} />
+                                </td>
 
-                        {!compact && (
-                          /* Form / Last Results */
-                          <td className="px-4 py-3">
-                            <div className="flex items-center justify-center gap-1">
-                              {standing.lastResults && standing.lastResults.length > 0 ? (
-                                standing.lastResults.slice(-5).map((result, idx) => (
-                                  <span
-                                    key={idx}
-                                    className={`size-5 rounded text-xs font-bold flex items-center justify-center ${getResultBadge(result)}`}
-                                  >
-                                    {result}
+                                {/* Best Lap */}
+                                <td className="px-4 py-3 text-center">
+                                  <TimeCell value={standing.bestLapMs} />
+                                </td>
+
+                                {/* DNF */}
+                                <td className="px-4 py-3 text-center">
+                                  <span className={`text-sm font-medium ${(standing.dnfCount || 0) > 0 ? "text-red-500" : "text-gray-400 dark:text-gray-500"}`}>
+                                    {standing.dnfCount || 0}
                                   </span>
-                                ))
-                              ) : standing.streak ? (
-                                <span className={`px-2 py-1 rounded text-xs font-medium ${getStreakBadge(standing.streak)}`}>
-                                  {standing.streak}
-                                </span>
-                              ) : (
-                                <span className="text-gray-400 dark:text-gray-500">-</span>
-                              )}
-                            </div>
-                          </td>
+                                </td>
+
+                                {/* DSQ */}
+                                <td className="px-4 py-3 text-center">
+                                  <span className={`text-sm font-medium ${(standing.dsqCount || 0) > 0 ? "text-red-500" : "text-gray-400 dark:text-gray-500"}`}>
+                                    {standing.dsqCount || 0}
+                                  </span>
+                                </td>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            {!compact && (
+                              <>
+                                {/* Matches Played */}
+                                <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                                  {standing.matchesPlayed || 0}
+                                </td>
+
+                                {/* Wins */}
+                                <td className="px-4 py-3 text-center text-green-600 dark:text-green-400 font-medium">
+                                  {standing.wins || 0}
+                                </td>
+
+                                {/* Draws */}
+                                <td className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
+                                  {standing.draws || 0}
+                                </td>
+
+                                {/* Losses */}
+                                <td className="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
+                                  {standing.losses || 0}
+                                </td>
+
+                                {/* Point Difference */}
+                                <td className="px-4 py-3 text-center">
+                                  <span className={`font-medium ${
+                                    standing.pointsDiff > 0
+                                      ? "text-green-600 dark:text-green-400"
+                                      : standing.pointsDiff < 0
+                                        ? "text-red-600 dark:text-red-400"
+                                        : "text-gray-500 dark:text-gray-400"
+                                  }`}>
+                                    {standing.pointsDiff > 0 ? "+" : ""}{standing.pointsDiff || 0}
+                                  </span>
+                                </td>
+                              </>
+                            )}
+
+                            {/* Points */}
+                            <td className="px-4 py-3 text-center">
+                              <span className="inline-flex items-center justify-center min-w-[40px] px-2 py-1 rounded-lg bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 font-bold text-sm">
+                                {standing.points || 0}
+                              </span>
+                            </td>
+
+                            {!compact && (
+                              /* Form / Last Results */
+                              <td className="px-4 py-3">
+                                <div className="flex items-center justify-center gap-1">
+                                  {standing.lastResults && standing.lastResults.length > 0 ? (
+                                    standing.lastResults.slice(-5).map((result, idx) => (
+                                      <span
+                                        key={idx}
+                                        className={`size-5 rounded text-xs font-bold flex items-center justify-center ${getResultBadge(result)}`}
+                                      >
+                                        {result}
+                                      </span>
+                                    ))
+                                  ) : standing.streak ? (
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${getStreakBadge(standing.streak)}`}>
+                                      {standing.streak}
+                                    </span>
+                                  ) : (
+                                    <span className="text-gray-400 dark:text-gray-500">-</span>
+                                  )}
+                                </div>
+                              </td>
+                            )}
+                          </>
                         )}
                       </tr>
                     );

@@ -10,10 +10,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | 04 — Racing / Time-Based UI — `In Progress` |
-| **Current Milestone** | 01 — Time Fields in Participant Editor — `In Progress` |
-| **Current Task** | 4.1.1 — Add time columns to ParticipantResultsEditor — `In Progress` |
-| **Last Completed Checkpoint** | Phase 03, Milestone 04, Task 3.4.5 |
+| **Current Phase** | ALL PHASES COMPLETED |
+| **Current Milestone** | — |
+| **Current Task** | — |
+| **Last Completed Checkpoint** | Phase 05, Milestone 03, Task 5.3.5 |
 
 ---
 
@@ -68,8 +68,8 @@ After completing a Task:
 | 01 | Tournament Form & Core Fields | `Completed` |
 | 02 | Placement Scoring & Standing Config | `Completed` |
 | 03 | Battle Royale Bracket & Multi-Participant | `Completed` |
-| 04 | Racing / Time-Based UI | `In Progress` |
-| 05 | Translations & Final Polish | `Planned` |
+| 04 | Racing / Time-Based UI | `Completed` |
+| 05 | Translations & Final Polish | `Completed` |
 
 ---
 
@@ -106,17 +106,17 @@ After completing a Task:
 
 | Milestone | Name | Status |
 |-----------|------|--------|
-| 01 | Time Fields in Participant Editor | `In Progress` |
-| 02 | Racing Standings Display | `Planned` |
-| 03 | Time Formatting Utility | `Planned` |
+| 01 | Time Fields in Participant Editor | `Completed` |
+| 02 | Racing Standings Display | `Completed` |
+| 03 | Time Formatting Utility | `Completed` |
 
 ### Phase 05 — Translations & Final Polish
 
 | Milestone | Name | Status |
 |-----------|------|--------|
-| 01 | Translation Keys (en + ar) | `Planned` |
-| 02 | Server Actions & API Functions | `Planned` |
-| 03 | Final Integration & Verification | `Planned` |
+| 01 | Translation Keys (en + ar) | `Completed` |
+| 02 | Server Actions & API Functions | `Completed` |
+| 03 | Final Integration & Verification | `Completed` |
 
 ---
 
@@ -237,55 +237,55 @@ After completing a Task:
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 4.1.1 | Add time columns to ParticipantResultsEditor | `In Progress` |
-| 4.1.2 | Create TimeInput component | `Planned` |
-| 4.1.3 | Include time fields in submission payload | `Planned` |
-| 4.1.4 | DNF/DSQ interaction logic | `Planned` |
+| 4.1.1 | Add time columns to ParticipantResultsEditor | `Completed` |
+| 4.1.2 | Create TimeInput component | `Completed` |
+| 4.1.3 | Include time fields in submission payload | `Completed` |
+| 4.1.4 | DNF/DSQ interaction logic | `Completed` |
 
 ### Phase 04, Milestone 02 — Racing Standings Display
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 4.2.1 | Add racing columns to StandingsManagement table | `Planned` |
-| 4.2.2 | Add racing columns to TournamentStandings (public view) | `Planned` |
-| 4.2.3 | Add racing fields to round history detail | `Planned` |
-| 4.2.4 | Sort standings by racing criteria | `Planned` |
+| 4.2.1 | Add racing columns to StandingsManagement table | `Completed` |
+| 4.2.2 | Add racing columns to TournamentStandings (public view) | `Completed` |
+| 4.2.3 | Add racing fields to round history detail | `Completed` |
+| 4.2.4 | Sort standings by racing criteria | `Completed` |
 
 ### Phase 04, Milestone 03 — Time Formatting Utility
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 4.3.1 | Create time formatting utility functions | `Planned` |
-| 4.3.2 | Add time display helpers for table cells | `Planned` |
-| 4.3.3 | Validate time input format | `Planned` |
+| 4.3.1 | Create time formatting utility functions | `Completed` |
+| 4.3.2 | Add time display helpers for table cells | `Completed` |
+| 4.3.3 | Validate time input format | `Completed` |
 
 ### Phase 05, Milestone 01 — Translation Keys (en + ar)
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 5.1.1 | Add tournament form translation keys | `Planned` |
-| 5.1.2 | Add bracket & match translation keys | `Planned` |
-| 5.1.3 | Add racing & time-based translation keys | `Planned` |
-| 5.1.4 | Add filter & status translation keys | `Planned` |
+| 5.1.1 | Add tournament form translation keys | `Completed` |
+| 5.1.2 | Add bracket & match translation keys | `Completed` |
+| 5.1.3 | Add racing & time-based translation keys | `Completed` |
+| 5.1.4 | Add filter & status translation keys | `Completed` |
 
 ### Phase 05, Milestone 02 — Server Actions & API Functions
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 5.2.1 | Add BR bracket server actions | `Planned` |
-| 5.2.2 | Add participant results server actions | `Planned` |
-| 5.2.3 | Add standings recalculation action | `Planned` |
-| 5.2.4 | Verify all existing actions forward new fields | `Planned` |
+| 5.2.1 | Add BR bracket server actions | `Completed` |
+| 5.2.2 | Add participant results server actions | `Completed` |
+| 5.2.3 | Add standings recalculation action | `Completed` |
+| 5.2.4 | Verify all existing actions forward new fields | `Completed` |
 
 ### Phase 05, Milestone 03 — Final Integration & Verification
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 5.3.1 | End-to-end flow: Standard tournament with placement scoring | `Planned` |
-| 5.3.2 | End-to-end flow: Battle Royale tournament | `Planned` |
-| 5.3.3 | End-to-end flow: Racing tournament | `Planned` |
-| 5.3.4 | Verify translations in both languages | `Planned` |
-| 5.3.5 | Fix regressions and edge cases | `Planned` |
+| 5.3.1 | End-to-end flow: Standard tournament with placement scoring | `Completed` |
+| 5.3.2 | End-to-end flow: Battle Royale tournament | `Completed` |
+| 5.3.3 | End-to-end flow: Racing tournament | `Completed` |
+| 5.3.4 | Verify translations in both languages | `Completed` |
+| 5.3.5 | Fix regressions and edge cases | `Completed` |
 
 ---
 
@@ -308,3 +308,9 @@ After completing a Task:
 | 13 | 03 | 02 | 3.2.1–3.2.4 | — | 2026-02-17 |
 | 14 | 03 | 03 | 3.3.1–3.3.4 | — | 2026-02-17 |
 | 15 | 03 | 04 | 3.4.1–3.4.5 | — | 2026-02-17 |
+| 16 | 04 | 01 | 4.1.1–4.1.4 | — | 2026-02-18 |
+| 17 | 04 | 03 | 4.3.1–4.3.3 | — | 2026-02-18 |
+| 18 | 04 | 02 | 4.2.1–4.2.4 | — | 2026-02-18 |
+| 19 | 05 | 01 | 5.1.1–5.1.4 | — | 2026-02-18 |
+| 20 | 05 | 02 | 5.2.1–5.2.4 | — | 2026-02-18 |
+| 21 | 05 | 03 | 5.3.1–5.3.5 | — | 2026-02-18 |
