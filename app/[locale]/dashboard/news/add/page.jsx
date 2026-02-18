@@ -1,45 +1,27 @@
 import { addNews } from "@/app/[locale]/_Lib/actions";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
-import { getMatches } from "@/app/[locale]/_Lib/matchesApi";
-import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
-import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
-import NewsFormRedesign from "@/components/News/NewsFormRedesign";
-import { NewsAddWrapper } from "@/components/News/NewsFormWrapper";
-import { getLocale } from "next-intl/server";
+import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
+import { getPlayers } from "@/app/[locale]/_Lib/palyerApi";
+import NewsForm from "@/components/News Management/NewsForm";
 
-async function page() {
-  const locale = await getLocale();
-
-  const [
-    { data: playersOptions },
-    { data: teamsOptions },
-    { data: tournamentsOptions },
-    { data: gamesOptions },
-    { data: matchesOptions },
-  ] = await Promise.all([
-    getPlayers(),
-    getTeams(),
-    getTournaments(),
+export default async function AddNewsPage() {
+  const [gamesResult, tournamentsResult, teamsResult, playersResult] = await Promise.all([
     getGames({ limit: 100 }),
-    getMatches(),
+    getTournaments({ size: 100 }),
+    getTeams({ limit: 100 }),
+    getPlayers({ size: 100 }),
   ]);
 
   return (
-    <NewsAddWrapper>
-      <NewsFormRedesign
-        options={{
-          playersOptions,
-          teamsOptions,
-          tournamentsOptions,
-          gamesOptions,
-          matchesOptions,
-        }}
+    <div>
+      <NewsForm
         submit={addNews}
-        locale={locale}
+        games={gamesResult?.data || []}
+        tournaments={tournamentsResult?.data || []}
+        teams={teamsResult?.data || []}
+        players={playersResult?.data || []}
       />
-    </NewsAddWrapper>
+    </div>
   );
 }
-
-export default page;

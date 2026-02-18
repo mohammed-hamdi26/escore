@@ -1,44 +1,47 @@
 import { getNews } from "@/app/[locale]/_Lib/newsApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
-import NewsListRedesign from "@/components/News/NewsListRedesign";
-import { NewsListWrapper } from "@/components/News/NewsFormWrapper";
-import { getLocale } from "next-intl/server";
-
-export const dynamic = "force-dynamic";
+import NewsTable from "@/components/News Management/NewsTable";
 
 async function NewsPage({ searchParams }) {
-  const params = await searchParams;
-  const locale = await getLocale();
+  const {
+    size,
+    page,
+    search,
+    category,
+    game,
+    isPublished,
+    isFeatured,
+    isPinned,
+    sortBy,
+    sortOrder
+  } = await searchParams;
 
-  // Fetch news with all filters
-  const [newsResponse, gamesResponse] = await Promise.all([
+  // Fetch news and games in parallel
+  const [newsResult, gamesResult] = await Promise.all([
     getNews({
-      page: params.page || 1,
-      limit: params.limit || 10,
-      search: params.search,
-      game: params.game,
-      status: params.status,
-      isPublished: params.isPublished,
-      isFeatured: params.isFeatured,
-      sortBy: params.sortBy || "createdAt",
-      sortOrder: params.sortOrder || "desc",
+      limit: size || 10,
+      page: page || 1,
+      search,
+      category,
+      game,
+      isPublished,
+      isFeatured,
+      isPinned,
+      sortBy: sortBy || "createdAt",
+      sortOrder: sortOrder || "desc",
     }),
     getGames({ limit: 100 }),
   ]);
 
-  const news = newsResponse.data || [];
-  const pagination = newsResponse.pagination || null;
-  const games = gamesResponse.data || [];
+  const { data: news, pagination } = newsResult;
+  const games = gamesResult?.data || [];
 
   return (
-    <NewsListWrapper>
-      <NewsListRedesign
-        news={news}
-        pagination={pagination}
-        games={games}
-        locale={locale}
-      />
-    </NewsListWrapper>
+    <NewsTable
+      news={news || []}
+      pagination={pagination}
+      games={games}
+    />
   );
 }
 

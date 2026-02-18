@@ -62,7 +62,7 @@ function NewsDetails({ news }) {
       setIsDeleting(true);
       await deleteNew(news.id);
       toast.success(t("deleteSuccess") || "News deleted successfully");
-      router.push("/dashboard/news-management");
+      router.push("/dashboard/news");
     } catch (e) {
       toast.error(t("deleteError") || "Failed to delete news");
     } finally {
@@ -163,7 +163,7 @@ function NewsDetails({ news }) {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/news-management">
+          <Link href="/dashboard/news">
             <Button variant="outline" size="sm" className="gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
               <ArrowLeft className="size-4" />
               {t("back") || "Back"}
@@ -172,7 +172,7 @@ function NewsDetails({ news }) {
           <h1 className="text-2xl font-bold text-foreground">{t("title") || "News Details"}</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Link href={`/dashboard/news-management/edit/${news.id || news._id}`}>
+          <Link href={`/dashboard/news/edit/${news.id || news._id}`}>
             <Button className="gap-2 bg-green-primary hover:bg-green-primary/90 text-white">
               <Pencil className="size-4" />
               {t("edit") || "Edit"}
@@ -261,13 +261,13 @@ function NewsDetails({ news }) {
           </div>
 
           {/* Article Content */}
-          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5 overflow-hidden">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <FileText className="size-5 text-green-primary" />
               {t("content") || "Content"}
             </h3>
             <div
-              className="prose prose-sm max-w-none dark:prose-invert"
+              className="prose prose-sm max-w-none dark:prose-invert break-words overflow-hidden [&_*]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_iframe]:max-w-full"
               dangerouslySetInnerHTML={{ __html: renderContent(news.content) }}
             />
           </div>

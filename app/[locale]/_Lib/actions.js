@@ -276,7 +276,7 @@ export async function addNews(newsData) {
     console.log("News creation error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in adding news");
   }
-  redirect(`/${locale}/dashboard/news-management`);
+  redirect(`/${locale}/dashboard/news`);
 }
 
 export async function editNews(newsData) {
@@ -289,7 +289,7 @@ export async function editNews(newsData) {
     console.log("News update error:", e.response?.data || e.message);
     throw new Error(e.response?.data?.message || "Error in updating news");
   }
-  redirect(`/${locale}/dashboard/news-management`);
+  redirect(`/${locale}/dashboard/news`);
 }
 export async function deleteNew(id) {
   const locale = await getLocale();
