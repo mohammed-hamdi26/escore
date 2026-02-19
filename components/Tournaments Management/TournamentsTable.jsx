@@ -197,7 +197,7 @@ function TournamentsTable({ tournaments, pagination, games }) {
                 <div className="flex items-center gap-3 min-w-0">
                   {tournament?.logo?.light ? (
                     <img
-                      src={getImgUrl(tournament.logo.light)}
+                      src={getImgUrl(tournament.logo.light, "thumbnail")}
                       alt={tournament.name}
                       className="size-10 rounded-lg object-cover flex-shrink-0"
                     />

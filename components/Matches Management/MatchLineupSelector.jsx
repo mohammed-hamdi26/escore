@@ -78,7 +78,7 @@ function MatchLineupSelector({
           <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 dark:bg-[#232838] flex items-center justify-center">
             {teamLogo ? (
               <Image
-                src={getImgUrl(teamLogo)}
+                src={getImgUrl(teamLogo, "thumbnail")}
                 width={32}
                 height={32}
                 alt={teamName || "Team"}
@@ -140,7 +140,7 @@ function MatchLineupSelector({
           {players?.map((player) => {
             const playerId = player.id || player._id;
             const isSelected = selectedPlayers.includes(playerId);
-            const photoUrl = getImgUrl(player?.photo?.light) || getImgUrl(player?.photo?.dark);
+            const photoUrl = getImgUrl(player?.photo?.light, "thumbnail") || getImgUrl(player?.photo?.dark, "thumbnail");
 
             return (
               <label

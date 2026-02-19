@@ -36,8 +36,8 @@ function MultiParticipantMatchView({ match, tournament }) {
   if (!match) return null;
 
   const status = STATUS_CONFIG[match.status] || STATUS_CONFIG.scheduled;
-  const gameLogo = getImgUrl(match.game?.logo?.light) || getImgUrl(match.game?.logo?.dark);
-  const tournamentLogo = getImgUrl(match.tournament?.logo?.light) || getImgUrl(match.tournament?.logo?.dark);
+  const gameLogo = getImgUrl(match.game?.logo?.light, "medium") || getImgUrl(match.game?.logo?.dark, "medium");
+  const tournamentLogo = getImgUrl(match.tournament?.logo?.light, "medium") || getImgUrl(match.tournament?.logo?.dark, "medium");
 
   const participants = match.participants || [];
   const sorted = [...participants].sort(
@@ -209,7 +209,7 @@ function MultiParticipantMatchView({ match, tournament }) {
                       <td className="px-3 py-3">
                         <div className="flex items-center gap-3">
                           {logo?.light ? (
-                            <img src={getImgUrl(logo.light)} alt={name} className="size-8 rounded object-cover" />
+                            <img src={getImgUrl(logo.light, "thumbnail")} alt={name} className="size-8 rounded object-cover" />
                           ) : (
                             <div className="size-8 rounded bg-muted flex items-center justify-center">
                               <Trophy className="size-4 text-muted-foreground" />

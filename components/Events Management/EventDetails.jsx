@@ -719,7 +719,7 @@ function EventDetails({
                         className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-green-primary/10 transition-colors text-left cursor-pointer"
                       >
                         {tr.logo?.light ? (
-                          <img src={getImgUrl(tr.logo.light)} alt="" className="size-8 rounded-lg object-contain bg-muted/50 p-0.5" />
+                          <img src={getImgUrl(tr.logo.light, "thumbnail")} alt="" className="size-8 rounded-lg object-contain bg-muted/50 p-0.5" />
                         ) : (
                           <div className="size-8 rounded-lg bg-muted/50 flex items-center justify-center">
                             <Trophy className="size-4 text-muted-foreground" />
@@ -752,7 +752,7 @@ function EventDetails({
                     <div className="p-4 flex items-center gap-4">
                       {tournament.logo?.light ? (
                         <img
-                          src={getImgUrl(tournament.logo.light)}
+                          src={getImgUrl(tournament.logo.light, "thumbnail")}
                           alt=""
                           className="size-14 rounded-xl object-contain bg-muted/30 ring-1 ring-gray-200 dark:ring-white/10 p-1"
                         />
@@ -866,7 +866,7 @@ function EventDetails({
                                     {selectedClubObj ? (
                                       <span className="flex items-center gap-2 truncate">
                                         {selectedClubObj.logo?.light ? (
-                                          <img src={getImgUrl(selectedClubObj.logo.light)} alt="" className="size-5 rounded object-contain" />
+                                          <img src={getImgUrl(selectedClubObj.logo.light, "thumbnail")} alt="" className="size-5 rounded object-contain" />
                                         ) : (
                                           <Building2 className="size-4 text-muted-foreground shrink-0" />
                                         )}
@@ -905,7 +905,7 @@ function EventDetails({
                                               className="flex items-center gap-2 cursor-pointer"
                                             >
                                               {c.logo?.light ? (
-                                                <img src={getImgUrl(c.logo.light)} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                                <img src={getImgUrl(c.logo.light, "thumbnail")} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                               ) : (
                                                 <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                                   <Building2 className="size-3.5 text-muted-foreground" />
@@ -944,7 +944,7 @@ function EventDetails({
                                       {selectedTeamObj ? (
                                         <span className="flex items-center gap-2 truncate">
                                           {selectedTeamObj.team?.logo?.light ? (
-                                            <img src={getImgUrl(selectedTeamObj.team.logo.light)} alt="" className="size-5 rounded object-contain" />
+                                            <img src={getImgUrl(selectedTeamObj.team.logo.light, "thumbnail")} alt="" className="size-5 rounded object-contain" />
                                           ) : (
                                             <Users className="size-4 text-muted-foreground shrink-0" />
                                           )}
@@ -985,7 +985,7 @@ function EventDetails({
                                                   className="flex items-center gap-2 cursor-pointer"
                                                 >
                                                   {ct.team?.logo?.light ? (
-                                                    <img src={getImgUrl(ct.team.logo.light)} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                                    <img src={getImgUrl(ct.team.logo.light, "thumbnail")} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                                   ) : (
                                                     <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                                       <Users className="size-3.5 text-muted-foreground" />
@@ -1041,7 +1041,7 @@ function EventDetails({
                               <div className="flex items-center gap-3">
                                 {assignment.club?.logo?.light ? (
                                   <img
-                                    src={getImgUrl(assignment.club.logo.light)}
+                                    src={getImgUrl(assignment.club.logo.light, "thumbnail")}
                                     alt=""
                                     className="size-8 rounded-lg object-contain bg-muted/30 p-0.5"
                                   />
@@ -1135,7 +1135,7 @@ function EventDetails({
                     ...clubTeamsForResult.map((ct) => ({
                       id: ct.team?.id || ct.team,
                       name: ct.team?.name || "Team",
-                      logo: getImgUrl(ct.team?.logo?.light),
+                      logo: getImgUrl(ct.team?.logo?.light, "thumbnail"),
                       type: "Team",
                       gameLabel: ct.game?.name || "",
                       icon: Users,
@@ -1143,7 +1143,7 @@ function EventDetails({
                     ...clubPlayersForResult.map((cp) => ({
                       id: cp.player?.id || cp.player,
                       name: cp.player?.name || cp.player?.nickname || "Player",
-                      logo: getImgUrl(cp.player?.logo?.light),
+                      logo: getImgUrl(cp.player?.logo?.light, "thumbnail"),
                       type: "Player",
                       gameLabel: cp.game?.name || "",
                       icon: User,
@@ -1185,7 +1185,7 @@ function EventDetails({
                               {selectedResultTournament ? (
                                 <span className="flex items-center gap-2 truncate">
                                   {selectedResultTournament.logo?.light ? (
-                                    <img src={getImgUrl(selectedResultTournament.logo.light)} alt="" className="size-5 rounded object-contain" />
+                                    <img src={getImgUrl(selectedResultTournament.logo.light, "thumbnail")} alt="" className="size-5 rounded object-contain" />
                                   ) : (
                                     <Trophy className="size-4 text-muted-foreground shrink-0" />
                                   )}
@@ -1222,7 +1222,7 @@ function EventDetails({
                                       className="flex items-center gap-2 cursor-pointer"
                                     >
                                       {tr.logo?.light ? (
-                                        <img src={getImgUrl(tr.logo.light)} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                        <img src={getImgUrl(tr.logo.light, "thumbnail")} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                       ) : (
                                         <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                           <Trophy className="size-3.5 text-muted-foreground" />
@@ -1261,7 +1261,7 @@ function EventDetails({
                               {selectedResultClub ? (
                                 <span className="flex items-center gap-2 truncate">
                                   {selectedResultClub.logo?.light ? (
-                                    <img src={getImgUrl(selectedResultClub.logo.light)} alt="" className="size-5 rounded object-contain" />
+                                    <img src={getImgUrl(selectedResultClub.logo.light, "thumbnail")} alt="" className="size-5 rounded object-contain" />
                                   ) : (
                                     <Building2 className="size-4 text-muted-foreground shrink-0" />
                                   )}
@@ -1300,7 +1300,7 @@ function EventDetails({
                                       className="flex items-center gap-2 cursor-pointer"
                                     >
                                       {c.logo?.light ? (
-                                        <img src={getImgUrl(c.logo.light)} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                        <img src={getImgUrl(c.logo.light, "thumbnail")} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                       ) : (
                                         <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                           <Building2 className="size-3.5 text-muted-foreground" />
@@ -1546,7 +1546,7 @@ function EventDetails({
                       <tbody>
                         {standings.map((standing) => {
                           const clubLogo =
-                            getImgUrl(standing.club?.logo?.light) || getImgUrl(standing.club?.logo?.dark);
+                            getImgUrl(standing.club?.logo?.light, "thumbnail") || getImgUrl(standing.club?.logo?.dark, "thumbnail");
                           const isExpanded = expandedStanding === standing.id;
                           return (
                             <React.Fragment key={standing.id}>
@@ -1631,7 +1631,7 @@ function EventDetails({
                                           <div className="flex items-center gap-3">
                                             {result.game?.logo?.light ? (
                                               <img
-                                                src={getImgUrl(result.game.logo.light)}
+                                                src={getImgUrl(result.game.logo.light, "thumbnail")}
                                                 alt=""
                                                 className="size-5 object-contain"
                                               />

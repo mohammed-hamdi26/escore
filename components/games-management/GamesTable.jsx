@@ -70,7 +70,7 @@ export default function GamesTable({ games, pagination }) {
             <Table.Cell className="flex gap-3 items-center">
               {game?.logo?.light ? (
                 <img
-                  src={getImgUrl(game.logo.light)}
+                  src={getImgUrl(game.logo.light, "thumbnail")}
                   alt={game.name}
                   className="size-10 rounded-lg object-cover"
                 />

@@ -120,7 +120,7 @@ export default function UsersListTable({ users, meta }) {
               <div className="flex items-center gap-3">
                 {user.avatar?.light ? (
                   <img
-                    src={getImgUrl(user.avatar.light)}
+                    src={getImgUrl(user.avatar.light, "thumbnail")}
                     alt=""
                     className="size-12 rounded-xl object-cover ring-2 ring-gray-100 dark:ring-white/10"
                   />

@@ -1407,7 +1407,7 @@ function MultiSelectField({ label, name, formik, searchAction, required }) {
                   >
                     {game.logo?.light ? (
                       <img
-                        src={getImgUrl(game.logo.light)}
+                        src={getImgUrl(game.logo.light, "thumbnail")}
                         alt={game.name}
                         className="size-6 rounded object-cover"
                       />
@@ -2144,7 +2144,7 @@ function TeamSelectField({ label, name, formik, searchAction }) {
     await formik.setFieldValue(name, newValue);
   };
 
-  const getLogoUrl = (team) => getImgUrl(team.logo?.light) || getImgUrl(team.logo?.dark) || null;
+  const getLogoUrl = (team) => getImgUrl(team.logo?.light, "thumbnail") || getImgUrl(team.logo?.dark, "thumbnail") || null;
 
   return (
     <div className="space-y-3">
@@ -2347,7 +2347,7 @@ function PlayerSelectField({ label, name, formik, searchAction }) {
     await formik.setFieldValue(name, newValue);
   };
 
-  const getPhotoUrl = (player) => getImgUrl(player.photo?.light) || getImgUrl(player.photo?.dark) || getImgUrl(player.photo) || null;
+  const getPhotoUrl = (player) => getImgUrl(player.photo?.light, "thumbnail") || getImgUrl(player.photo?.dark, "thumbnail") || getImgUrl(player.photo, "thumbnail") || null;
 
   return (
     <div className="space-y-3">

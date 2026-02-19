@@ -53,7 +53,7 @@ function EventCard({ event, viewMode = "grid", onDelete, t }) {
   const canEdit = hasPermission(ENTITIES.EVENT, ACTIONS.UPDATE);
   const canDelete = hasPermission(ENTITIES.EVENT, ACTIONS.DELETE);
 
-  const eventLogo = getImgUrl(event.logo?.light) || getImgUrl(event.logo?.dark);
+  const eventLogo = getImgUrl(event.logo?.light, "medium") || getImgUrl(event.logo?.dark, "medium");
   const countryFlag = event.country?.code
     ? `https://flagcdn.com/24x18/${event.country.code.toLowerCase()}.png`
     : null;

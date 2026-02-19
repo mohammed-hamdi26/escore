@@ -177,7 +177,7 @@ function MatchesTable({ matches, columns, players, pagination }) {
                     <img
                       width={28}
                       height={28}
-                      src={getImgUrl(match?.team1?.logo?.light)}
+                      src={getImgUrl(match?.team1?.logo?.light, "thumbnail")}
                       alt={match?.team1?.name}
                       className="rounded"
                     />
@@ -209,7 +209,7 @@ function MatchesTable({ matches, columns, players, pagination }) {
                     <img
                       width={28}
                       height={28}
-                      src={getImgUrl(match?.team2?.logo?.light)}
+                      src={getImgUrl(match?.team2?.logo?.light, "thumbnail")}
                       alt={match?.team2?.name}
                       className="rounded"
                     />

@@ -77,8 +77,8 @@ function FavoriteCharacterTable({
       {/* Characters Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {characters.map((character) => {
-          const characterImage = getImgUrl(character.image?.light) || getImgUrl(character.image?.dark) || getImgUrl(character.icon);
-          const gameImage = getImgUrl(character.game?.logo?.light) || getImgUrl(character.game?.logo?.dark);
+          const characterImage = getImgUrl(character.image?.light, "thumbnail") || getImgUrl(character.image?.dark, "thumbnail") || getImgUrl(character.icon, "thumbnail");
+          const gameImage = getImgUrl(character.game?.logo?.light, "thumbnail") || getImgUrl(character.game?.logo?.dark, "thumbnail");
 
           return (
             <div

@@ -117,7 +117,7 @@ function NewsTableNew({ news, pagination, games = [] }) {
               <Table.Cell className="flex gap-3 items-center">
                 {newsItem?.coverImage?.light ? (
                   <img
-                    src={getImgUrl(newsItem.coverImage.light)}
+                    src={getImgUrl(newsItem.coverImage.light, "thumbnail")}
                     alt={newsItem.title}
                     className="size-10 rounded-lg object-cover"
                   />
@@ -137,7 +137,7 @@ function NewsTableNew({ news, pagination, games = [] }) {
               <Table.Cell className="flex gap-2 items-center">
                 {newsItem?.authorImage?.light ? (
                   <img
-                    src={getImgUrl(newsItem.authorImage.light)}
+                    src={getImgUrl(newsItem.authorImage.light, "thumbnail")}
                     alt={newsItem.authorName}
                     className="size-6 rounded-full object-cover"
                   />

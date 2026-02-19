@@ -46,8 +46,8 @@ function NewsCard({
 
   const isPublished =
     news.publishedAt && new Date(news.publishedAt) <= new Date();
-  const coverImage = getImgUrl(news.coverImage?.light) || getImgUrl(news.coverImage?.dark);
-  const gameImage = getImgUrl(news.game?.logo?.light) || getImgUrl(news.game?.logo?.dark);
+  const coverImage = getImgUrl(news.coverImage?.light, "medium") || getImgUrl(news.coverImage?.dark, "medium");
+  const gameImage = getImgUrl(news.game?.logo?.light, "medium") || getImgUrl(news.game?.logo?.dark, "medium");
 
   const handleAction = async (action, actionName) => {
     setIsLoading(true);

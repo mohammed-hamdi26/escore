@@ -82,9 +82,9 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
   const statusConfig = STATUS_CONFIG[match.status] || STATUS_CONFIG.scheduled;
   const StatusIcon = statusConfig.icon;
 
-  const team1Logo = getImgUrl(match.team1?.logo?.light) || getImgUrl(match.team1?.logo?.dark);
-  const team2Logo = getImgUrl(match.team2?.logo?.light) || getImgUrl(match.team2?.logo?.dark);
-  const gameLogo = getImgUrl(match.game?.logo?.light) || getImgUrl(match.game?.logo?.dark);
+  const team1Logo = getImgUrl(match.team1?.logo?.light, "medium") || getImgUrl(match.team1?.logo?.dark, "medium");
+  const team2Logo = getImgUrl(match.team2?.logo?.light, "medium") || getImgUrl(match.team2?.logo?.dark, "medium");
+  const gameLogo = getImgUrl(match.game?.logo?.light, "medium") || getImgUrl(match.game?.logo?.dark, "medium");
 
   const formatDate = (date) => {
     if (!date) return "-";

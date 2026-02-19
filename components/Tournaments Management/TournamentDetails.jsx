@@ -425,7 +425,7 @@ function TournamentDetails({ tournament }) {
                   >
                     {player.photo?.light ? (
                       <img
-                        src={getImgUrl(player.photo.light)}
+                        src={getImgUrl(player.photo.light, "thumbnail")}
                         alt={player.nickname || player.name}
                         className="size-8 rounded-full object-cover"
                       />

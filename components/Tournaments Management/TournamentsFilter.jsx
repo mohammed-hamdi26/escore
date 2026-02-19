@@ -258,7 +258,7 @@ function TournamentsFilter({ games = [] }) {
                         <>
                           {gamesArray.find((g) => (g.id || g._id) === currentGame)?.logo && (
                             <img
-                              src={getImgUrl(gamesArray.find((g) => (g.id || g._id) === currentGame)?.logo?.light) || getImgUrl(gamesArray.find((g) => (g.id || g._id) === currentGame)?.logo?.dark)}
+                              src={getImgUrl(gamesArray.find((g) => (g.id || g._id) === currentGame)?.logo?.light, "thumbnail") || getImgUrl(gamesArray.find((g) => (g.id || g._id) === currentGame)?.logo?.dark, "thumbnail")}
                               alt=""
                               className="size-5 rounded object-contain"
                             />
@@ -299,7 +299,7 @@ function TournamentsFilter({ games = [] }) {
                         </CommandItem>
                         {filteredGames.map((game) => {
                           const gameId = game.id || game._id;
-                          const gameLogo = getImgUrl(game.logo?.light) || getImgUrl(game.logo?.dark);
+                          const gameLogo = getImgUrl(game.logo?.light, "thumbnail") || getImgUrl(game.logo?.dark, "thumbnail");
                           return (
                             <CommandItem
                               key={gameId}

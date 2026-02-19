@@ -580,7 +580,7 @@ function NewsFormRedesign({
               options={gamesOptions.map((g) => ({
                 value: g.id || g._id,
                 label: g.name,
-                image: getImgUrl(g.logo?.light) || getImgUrl(g.logo?.dark),
+                image: getImgUrl(g.logo?.light, "thumbnail") || getImgUrl(g.logo?.dark, "thumbnail"),
               }))}
             />
             <SearchableSelect
@@ -594,7 +594,7 @@ function NewsFormRedesign({
               options={tournamentsOptions.map((t) => ({
                 value: t.id || t._id,
                 label: t.name,
-                image: getImgUrl(t.logo?.light) || getImgUrl(t.logo?.dark),
+                image: getImgUrl(t.logo?.light, "thumbnail") || getImgUrl(t.logo?.dark, "thumbnail"),
               }))}
             />
             <SearchableSelect
@@ -608,7 +608,7 @@ function NewsFormRedesign({
               options={teamsOptions.map((t) => ({
                 value: t.id || t._id,
                 label: t.name,
-                image: getImgUrl(t.logo?.light) || getImgUrl(t.logo?.dark),
+                image: getImgUrl(t.logo?.light, "thumbnail") || getImgUrl(t.logo?.dark, "thumbnail"),
                 subtitle: t.shortName,
               }))}
             />
@@ -623,7 +623,7 @@ function NewsFormRedesign({
               options={playersOptions.map((p) => ({
                 value: p.id || p._id,
                 label: p.nickname || p.fullName || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Unknown',
-                image: getImgUrl(p.photo?.light) || getImgUrl(p.photo?.dark),
+                image: getImgUrl(p.photo?.light, "thumbnail") || getImgUrl(p.photo?.dark, "thumbnail"),
                 subtitle: p.team?.name,
               }))}
             />

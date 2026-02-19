@@ -315,7 +315,7 @@ function TransfersForm({
                       <>
                         {selectedPlayer.photo && (
                           <img
-                            src={getImgUrl(selectedPlayer.photo.light) || getImgUrl(selectedPlayer.photo)}
+                            src={getImgUrl(selectedPlayer.photo.light, "thumbnail") || getImgUrl(selectedPlayer.photo, "thumbnail")}
                             alt=""
                             className="size-6 rounded-full object-cover"
                           />
@@ -360,7 +360,7 @@ function TransfersForm({
                             />
                             {player.photo && (
                               <img
-                                src={getImgUrl(player.photo.light) || getImgUrl(player.photo)}
+                                src={getImgUrl(player.photo.light, "thumbnail") || getImgUrl(player.photo, "thumbnail")}
                                 alt=""
                                 className="size-6 rounded-full mr-2 object-cover"
                               />
@@ -400,7 +400,7 @@ function TransfersForm({
                       <>
                         {selectedGame.logo && (
                           <img
-                            src={getImgUrl(selectedGame.logo.light) || getImgUrl(selectedGame.logo.dark)}
+                            src={getImgUrl(selectedGame.logo.light, "thumbnail") || getImgUrl(selectedGame.logo.dark, "thumbnail")}
                             alt=""
                             className="size-6 rounded object-contain"
                           />
@@ -443,7 +443,7 @@ function TransfersForm({
                             />
                             {game.logo && (
                               <img
-                                src={getImgUrl(game.logo.light) || getImgUrl(game.logo.dark)}
+                                src={getImgUrl(game.logo.light, "thumbnail") || getImgUrl(game.logo.dark, "thumbnail")}
                                 alt=""
                                 className="size-6 rounded mr-2 object-contain"
                               />
@@ -489,7 +489,7 @@ function TransfersForm({
                       <>
                         {selectedFromTeam.logo && (
                           <img
-                            src={getImgUrl(selectedFromTeam.logo.light) || getImgUrl(selectedFromTeam.logo.dark)}
+                            src={getImgUrl(selectedFromTeam.logo.light, "thumbnail") || getImgUrl(selectedFromTeam.logo.dark, "thumbnail")}
                             alt=""
                             className="size-6 rounded object-contain"
                           />
@@ -548,7 +548,7 @@ function TransfersForm({
                             />
                             {team.logo && (
                               <img
-                                src={getImgUrl(team.logo.light) || getImgUrl(team.logo.dark)}
+                                src={getImgUrl(team.logo.light, "thumbnail") || getImgUrl(team.logo.dark, "thumbnail")}
                                 alt=""
                                 className="size-6 rounded mr-2 object-contain"
                               />
@@ -587,7 +587,7 @@ function TransfersForm({
                       <>
                         {selectedToTeam.logo && (
                           <img
-                            src={getImgUrl(selectedToTeam.logo.light) || getImgUrl(selectedToTeam.logo.dark)}
+                            src={getImgUrl(selectedToTeam.logo.light, "thumbnail") || getImgUrl(selectedToTeam.logo.dark, "thumbnail")}
                             alt=""
                             className="size-6 rounded object-contain"
                           />
@@ -645,7 +645,7 @@ function TransfersForm({
                             />
                             {team.logo && (
                               <img
-                                src={getImgUrl(team.logo.light) || getImgUrl(team.logo.dark)}
+                                src={getImgUrl(team.logo.light, "thumbnail") || getImgUrl(team.logo.dark, "thumbnail")}
                                 alt=""
                                 className="size-6 rounded mr-2 object-contain"
                               />

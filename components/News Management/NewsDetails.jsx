@@ -506,7 +506,7 @@ function NewsDetails({ news }) {
 // Entity Card Component
 function EntityCard({ icon, label, entity }) {
   const name = entity?.name || entity?.nickname || entity?.fullName || "Unknown";
-  const logo = getImgUrl(entity?.logo?.light) || getImgUrl(entity?.logo?.dark) || getImgUrl(entity?.photo?.light);
+  const logo = getImgUrl(entity?.logo?.light, "thumbnail") || getImgUrl(entity?.logo?.dark, "thumbnail") || getImgUrl(entity?.photo?.light, "thumbnail");
 
   return (
     <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e]">

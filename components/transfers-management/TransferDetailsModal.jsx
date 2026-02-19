@@ -89,7 +89,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
                   <>
                     {transfer.fromTeam.logo && (
                       <Image
-                        src={getImgUrl(transfer.fromTeam.logo.light) || getImgUrl(transfer.fromTeam.logo)}
+                        src={getImgUrl(transfer.fromTeam.logo.light, "medium") || getImgUrl(transfer.fromTeam.logo, "medium")}
                         alt={transfer.fromTeam.name}
                         width={48}
                         height={48}
@@ -98,7 +98,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
                     )}
                     {transfer.fromTeam.logo?.dark && (
                       <Image
-                        src={getImgUrl(transfer.fromTeam.logo.dark)}
+                        src={getImgUrl(transfer.fromTeam.logo.dark, "medium")}
                         alt={transfer.fromTeam.name}
                         width={48}
                         height={48}
@@ -124,7 +124,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
                   <>
                     {transfer.toTeam.logo && (
                       <Image
-                        src={getImgUrl(transfer.toTeam.logo.light) || getImgUrl(transfer.toTeam.logo)}
+                        src={getImgUrl(transfer.toTeam.logo.light, "medium") || getImgUrl(transfer.toTeam.logo, "medium")}
                         alt={transfer.toTeam.name}
                         width={48}
                         height={48}
@@ -133,7 +133,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
                     )}
                     {transfer.toTeam.logo?.dark && (
                       <Image
-                        src={getImgUrl(transfer.toTeam.logo.dark)}
+                        src={getImgUrl(transfer.toTeam.logo.dark, "medium")}
                         alt={transfer.toTeam.name}
                         width={48}
                         height={48}
@@ -155,7 +155,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
               <div className="flex items-center gap-3">
                 {transfer.player?.photo && (
                   <Image
-                    src={getImgUrl(transfer.player.photo.light) || getImgUrl(transfer.player.photo)}
+                    src={getImgUrl(transfer.player.photo.light, "medium") || getImgUrl(transfer.player.photo, "medium")}
                     alt={transfer.player.nickname}
                     width={40}
                     height={40}

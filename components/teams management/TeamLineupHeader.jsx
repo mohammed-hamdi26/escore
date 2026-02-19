@@ -3,7 +3,7 @@ import { Users } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 
 function TeamLineupHeader({ team, playersCount }) {
-  const logoUrl = getImgUrl(team?.logo?.light) || getImgUrl(team?.logo?.dark);
+  const logoUrl = getImgUrl(team?.logo?.light, "medium") || getImgUrl(team?.logo?.dark, "medium");
 
   return (
     <div className="flex items-center gap-6 mb-8">

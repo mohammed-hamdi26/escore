@@ -170,8 +170,8 @@ function TournamentStandings({ standings = [], grouped = {}, title, compact = fa
                 <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                   {(groupStandings || []).map((standing) => {
                     const entityLogo = isPlayerBased
-                      ? (getImgUrl(standing.player?.photo?.light) || getImgUrl(standing.player?.photo?.dark))
-                      : (getImgUrl(standing.team?.logo?.light) || getImgUrl(standing.team?.logo?.dark));
+                      ? (getImgUrl(standing.player?.photo?.light, "thumbnail") || getImgUrl(standing.player?.photo?.dark, "thumbnail"))
+                      : (getImgUrl(standing.team?.logo?.light, "thumbnail") || getImgUrl(standing.team?.logo?.dark, "thumbnail"));
                     const entityName = isPlayerBased
                       ? (standing.player?.nickname || standing.player?.name)
                       : standing.team?.name;

@@ -263,7 +263,7 @@ function ParticipantResultsEditor({ match, tournament, onSaved }) {
                   <div className="flex items-center gap-2">
                     {row.logo?.light ? (
                       <img
-                        src={getImgUrl(row.logo.light)}
+                        src={getImgUrl(row.logo.light, "thumbnail")}
                         alt={row.name}
                         className="size-6 rounded object-cover"
                       />

@@ -539,7 +539,7 @@ function MatchDetails({ match }) {
                   <div key={index} className="space-y-3">
                     <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-white/5">
                       {lineup.team?.logo?.light && (
-                        <img src={getImgUrl(lineup.team.logo.light)} alt={lineup.team.name} className="size-6 rounded" />
+                        <img src={getImgUrl(lineup.team.logo.light, "thumbnail")} alt={lineup.team.name} className="size-6 rounded" />
                       )}
                       <span className="font-medium text-gray-900 dark:text-white">{lineup.team?.name}</span>
                     </div>
@@ -548,7 +548,7 @@ function MatchDetails({ match }) {
                         <div key={player._id || player.id} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-white/5">
                           <div className="size-10 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                             {player.photo?.light ? (
-                              <img src={getImgUrl(player.photo.light)} alt={player.nickname || player.fullName || 'Player'} className="size-full object-cover" />
+                              <img src={getImgUrl(player.photo.light, "thumbnail")} alt={player.nickname || player.fullName || 'Player'} className="size-full object-cover" />
                             ) : (
                               <Users className="size-5 text-gray-400 dark:text-gray-500" />
                             )}

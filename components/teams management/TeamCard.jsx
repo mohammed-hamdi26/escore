@@ -44,7 +44,7 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
   const canUpdate = hasPermission(ENTITIES.TEAM, ACTIONS.UPDATE);
   const canDelete = hasPermission(ENTITIES.TEAM, ACTIONS.DELETE);
 
-  const teamLogo = getImgUrl(team.logo?.light) || getImgUrl(team.logo?.dark);
+  const teamLogo = getImgUrl(team.logo?.light, "medium") || getImgUrl(team.logo?.dark, "medium");
 
   // Get country flag
   const countryFlag = team.country?.code
@@ -279,7 +279,7 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
               >
                 {team.game.logo?.light ? (
                   <img
-                    src={getImgUrl(team.game.logo.light)}
+                    src={getImgUrl(team.game.logo.light, "medium")}
                     alt={team.game.name}
                     className="size-3.5 rounded"
                   />
@@ -371,7 +371,7 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
               >
                 {team.game.logo?.light ? (
                   <img
-                    src={getImgUrl(team.game.logo.light)}
+                    src={getImgUrl(team.game.logo.light, "medium")}
                     alt={team.game.name}
                     className="size-3.5 rounded"
                   />

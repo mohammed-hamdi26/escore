@@ -73,8 +73,8 @@ function AwardsTable({ awards, games, awardsType, idUser }) {
       {/* Awards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {awards.map((award) => {
-          const awardImage = getImgUrl(award.image?.light) || getImgUrl(award.image?.dark) || getImgUrl(award.icon);
-          const gameImage = getImgUrl(award.game?.logo?.light) || getImgUrl(award.game?.logo?.dark);
+          const awardImage = getImgUrl(award.image?.light, "thumbnail") || getImgUrl(award.image?.dark, "thumbnail") || getImgUrl(award.icon, "thumbnail");
+          const gameImage = getImgUrl(award.game?.logo?.light, "thumbnail") || getImgUrl(award.game?.logo?.dark, "thumbnail");
 
           return (
             <div

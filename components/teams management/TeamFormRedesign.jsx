@@ -811,7 +811,7 @@ function GameSelectField({ label, name, games, formik, placeholder, searchPlaceh
                 <>
                   <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-green-primary/10 flex items-center justify-center">
                     {selectedGame.logo?.light ? (
-                      <img src={getImgUrl(selectedGame.logo.light)} alt={selectedGame.name} className="w-full h-full object-cover" />
+                      <img src={getImgUrl(selectedGame.logo.light, "thumbnail")} alt={selectedGame.name} className="w-full h-full object-cover" />
                     ) : (
                       <Gamepad2 className="size-4 text-green-primary" />
                     )}
@@ -877,7 +877,7 @@ function GameSelectField({ label, name, games, formik, placeholder, searchPlaceh
                   >
                     <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-[#252a3d]">
                       {game.logo?.light ? (
-                        <img src={getImgUrl(game.logo.light)} alt={game.name} className="w-full h-full object-cover" />
+                        <img src={getImgUrl(game.logo.light, "thumbnail")} alt={game.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <Gamepad2 className="size-4 text-gray-400" />
@@ -970,7 +970,7 @@ function GameMultiSelectField({
                   >
                     {game.logo?.light && (
                       <img
-                        src={getImgUrl(game.logo.light)}
+                        src={getImgUrl(game.logo.light, "thumbnail")}
                         alt=""
                         className="size-4 rounded"
                       />
@@ -1025,7 +1025,7 @@ function GameMultiSelectField({
                 >
                   {game.logo?.light ? (
                     <img
-                      src={getImgUrl(game.logo.light)}
+                      src={getImgUrl(game.logo.light, "thumbnail")}
                       alt=""
                       className="size-8 rounded-lg object-cover"
                     />
@@ -1297,7 +1297,7 @@ function TournamentMultiSelectField({
                   >
                     {tournament.logo?.light && (
                       <img
-                        src={getImgUrl(tournament.logo.light)}
+                        src={getImgUrl(tournament.logo.light, "thumbnail")}
                         alt=""
                         className="size-4 rounded"
                       />
@@ -1352,7 +1352,7 @@ function TournamentMultiSelectField({
                 >
                   {tournament.logo?.light ? (
                     <img
-                      src={getImgUrl(tournament.logo.light)}
+                      src={getImgUrl(tournament.logo.light, "thumbnail")}
                       alt=""
                       className="size-8 rounded-lg object-cover"
                     />
@@ -1470,7 +1470,7 @@ function PlayerMultiSelectField({
                   >
                     {player.photo?.light && (
                       <img
-                        src={getImgUrl(player.photo.light)}
+                        src={getImgUrl(player.photo.light, "thumbnail")}
                         alt=""
                         className="size-4 rounded-full"
                       />
@@ -1525,7 +1525,7 @@ function PlayerMultiSelectField({
                 >
                   {player.photo?.light ? (
                     <img
-                      src={getImgUrl(player.photo.light)}
+                      src={getImgUrl(player.photo.light, "thumbnail")}
                       alt=""
                       className="size-8 rounded-full object-cover"
                     />
@@ -1543,7 +1543,7 @@ function PlayerMultiSelectField({
                     )}
                   </div>
                   {player.country?.flag && (
-                    <img src={getImgUrl(player.country.flag)} alt="" className="size-5 rounded" />
+                    <img src={getImgUrl(player.country.flag, "thumbnail")} alt="" className="size-5 rounded" />
                   )}
                   {isSelected && (
                     <Check className="size-4 text-blue-500" />

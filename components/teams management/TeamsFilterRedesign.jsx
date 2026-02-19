@@ -246,7 +246,7 @@ function TeamsFilterRedesign({ games = [], countries = [] }) {
                         <>
                           {selectedGame.logo?.light || selectedGame.logo?.dark ? (
                             <Image
-                              src={getImgUrl(selectedGame.logo.light) || getImgUrl(selectedGame.logo.dark)}
+                              src={getImgUrl(selectedGame.logo.light, "thumbnail") || getImgUrl(selectedGame.logo.dark, "thumbnail")}
                               alt={selectedGame.name}
                               width={20}
                               height={20}
@@ -306,7 +306,7 @@ function TeamsFilterRedesign({ games = [], countries = [] }) {
                           >
                             {game.logo?.light || game.logo?.dark ? (
                               <Image
-                                src={getImgUrl(game.logo.light) || getImgUrl(game.logo.dark)}
+                                src={getImgUrl(game.logo.light, "thumbnail") || getImgUrl(game.logo.dark, "thumbnail")}
                                 alt={game.name}
                                 width={20}
                                 height={20}

@@ -38,8 +38,8 @@ function GameCard({ game, onDelete, onToggleActive, t, viewMode = "grid" }) {
   const canUpdate = hasPermission(ENTITIES.GAME, ACTIONS.UPDATE);
   const canDelete = hasPermission(ENTITIES.GAME, ACTIONS.DELETE);
 
-  const gameImage = getImgUrl(game.logo?.light) || getImgUrl(game.logo?.dark);
-  const coverImage = getImgUrl(game.coverImage?.light) || getImgUrl(game.coverImage?.dark);
+  const gameImage = getImgUrl(game.logo?.light, "medium") || getImgUrl(game.logo?.dark, "medium");
+  const coverImage = getImgUrl(game.coverImage?.light, "medium") || getImgUrl(game.coverImage?.dark, "medium");
 
   const handleAction = async (action, actionName) => {
     setIsLoading(true);

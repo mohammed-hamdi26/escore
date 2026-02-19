@@ -101,7 +101,7 @@ function TeamLineupTable({ players, teamId }) {
           </thead>
           <tbody>
             {players.map((player) => {
-              const photoUrl = getImgUrl(player?.photo?.light) || getImgUrl(player?.photo?.dark);
+              const photoUrl = getImgUrl(player?.photo?.light, "thumbnail") || getImgUrl(player?.photo?.dark, "thumbnail");
               const age = calculateAge(player?.dateOfBirth);
 
               return (

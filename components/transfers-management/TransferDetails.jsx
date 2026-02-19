@@ -306,7 +306,7 @@ function TransferDetails({ transfer }) {
               <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e]">
                 {transfer.player.photo ? (
                   <img
-                    src={getImgUrl(transfer.player.photo.light) || getImgUrl(transfer.player.photo)}
+                    src={getImgUrl(transfer.player.photo.light, "medium") || getImgUrl(transfer.player.photo, "medium")}
                     alt={transfer.player.nickname}
                     className="size-12 rounded-full object-cover"
                   />

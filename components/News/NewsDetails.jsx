@@ -194,7 +194,7 @@ function NewsDetails({ news }) {
               <div className="flex items-center gap-3">
                 {news.authorImage?.light ? (
                   <img
-                    src={getImgUrl(news.authorImage.light)}
+                    src={getImgUrl(news.authorImage.light, "medium")}
                     alt={news.authorName}
                     className="size-10 rounded-full object-cover"
                   />
@@ -324,7 +324,7 @@ function NewsDetails({ news }) {
               <div className="flex items-center gap-3">
                 {news.game.logo?.light ? (
                   <img
-                    src={getImgUrl(news.game.logo.light)}
+                    src={getImgUrl(news.game.logo.light, "thumbnail")}
                     alt={news.game.name}
                     className="size-12 rounded-xl object-cover"
                   />
@@ -353,7 +353,7 @@ function NewsDetails({ news }) {
               <div className="flex items-center gap-3">
                 {news.tournament.logo?.light ? (
                   <img
-                    src={getImgUrl(news.tournament.logo.light)}
+                    src={getImgUrl(news.tournament.logo.light, "thumbnail")}
                     alt={news.tournament.name}
                     className="size-12 rounded-xl object-cover"
                   />
@@ -382,7 +382,7 @@ function NewsDetails({ news }) {
               <div className="flex items-center gap-3">
                 {news.team.logo?.light ? (
                   <img
-                    src={getImgUrl(news.team.logo.light)}
+                    src={getImgUrl(news.team.logo.light, "thumbnail")}
                     alt={news.team.name}
                     className="size-12 rounded-xl object-cover"
                   />
@@ -411,7 +411,7 @@ function NewsDetails({ news }) {
               <div className="flex items-center gap-3">
                 {news.player.image?.light ? (
                   <img
-                    src={getImgUrl(news.player.image.light)}
+                    src={getImgUrl(news.player.image.light, "thumbnail")}
                     alt={news.player.nickname || news.player.fullName || 'Player'}
                     className="size-12 rounded-full object-cover"
                   />
@@ -441,7 +441,7 @@ function NewsDetails({ news }) {
                 <div className="text-center">
                   {news.match.team1?.logo?.light ? (
                     <img
-                      src={getImgUrl(news.match.team1.logo.light)}
+                      src={getImgUrl(news.match.team1.logo.light, "thumbnail")}
                       alt={news.match.team1.name}
                       className="size-10 rounded-lg object-cover mx-auto mb-1"
                     />
@@ -456,7 +456,7 @@ function NewsDetails({ news }) {
                 <div className="text-center">
                   {news.match.team2?.logo?.light ? (
                     <img
-                      src={getImgUrl(news.match.team2.logo.light)}
+                      src={getImgUrl(news.match.team2.logo.light, "thumbnail")}
                       alt={news.match.team2.name}
                       className="size-10 rounded-lg object-cover mx-auto mb-1"
                     />

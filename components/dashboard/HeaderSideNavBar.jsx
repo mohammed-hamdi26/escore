@@ -36,7 +36,7 @@ function HeaderSideNavBar({ user, t }) {
           {(user?.avatar?.light || user?.avatar?.dark) ? (
             <img
               alt="avatar"
-              src={getImgUrl(user?.avatar?.light) || getImgUrl(user?.avatar?.dark)}
+              src={getImgUrl(user?.avatar?.light, "medium") || getImgUrl(user?.avatar?.dark, "medium")}
               className="w-full h-full object-cover object-center"
             />
           ) : (

@@ -943,7 +943,7 @@ function GameSelectField({
                   <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-green-primary/10 flex items-center justify-center">
                     {selectedGame.logo?.light ? (
                       <img
-                        src={getImgUrl(selectedGame.logo.light)}
+                        src={getImgUrl(selectedGame.logo.light, "thumbnail")}
                         alt={selectedGame.name}
                         className="w-full h-full object-cover"
                       />
@@ -1025,7 +1025,7 @@ function GameSelectField({
                     >
                       <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
                         {game.logo?.light ? (
-                          <img src={getImgUrl(game.logo.light)} alt={game.name} className="w-full h-full object-cover" />
+                          <img src={getImgUrl(game.logo.light, "thumbnail")} alt={game.name} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Gamepad2 className="size-4 text-muted-foreground" />
@@ -1190,7 +1190,7 @@ function TeamSelectField({
                   <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-blue-500/10 flex items-center justify-center">
                     {selectedTeam.logo?.light ? (
                       <img
-                        src={getImgUrl(selectedTeam.logo.light)}
+                        src={getImgUrl(selectedTeam.logo.light, "thumbnail")}
                         alt={selectedTeam.name}
                         className="w-full h-full object-cover"
                       />
@@ -1280,7 +1280,7 @@ function TeamSelectField({
                       <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
                         {team.logo?.light ? (
                           <img
-                            src={getImgUrl(team.logo.light)}
+                            src={getImgUrl(team.logo.light, "thumbnail")}
                             alt={team.name}
                             className="w-full h-full object-cover"
                           />
@@ -1477,7 +1477,7 @@ function TournamentMultiSelectField({
                   >
                     {tournament.logo?.light && (
                       <img
-                        src={getImgUrl(tournament.logo.light)}
+                        src={getImgUrl(tournament.logo.light, "thumbnail")}
                         alt={tournament.name}
                         className="size-4 rounded object-cover"
                       />
@@ -1579,7 +1579,7 @@ function TournamentMultiSelectField({
                       <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
                         {tournament.logo?.light ? (
                           <img
-                            src={getImgUrl(tournament.logo.light)}
+                            src={getImgUrl(tournament.logo.light, "thumbnail")}
                             alt={tournament.name}
                             className="w-full h-full object-cover"
                           />

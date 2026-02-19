@@ -293,7 +293,7 @@ function PlayerDetails({ player }) {
                 {player.awards.map((award, index) => (
                   <div key={award.id || index} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e]">
                     {award.image?.light ? (
-                      <img src={getImgUrl(award.image.light)} alt={award.name} className="size-10 rounded-lg object-cover" />
+                      <img src={getImgUrl(award.image.light, "thumbnail")} alt={award.name} className="size-10 rounded-lg object-cover" />
                     ) : (
                       <div className="size-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
                         <Award className="size-5 text-yellow-500" />
@@ -322,7 +322,7 @@ function PlayerDetails({ player }) {
                 {player.favouriteCharacters.map((char, index) => (
                   <div key={char.id || index} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/30 dark:bg-[#1a1d2e]">
                     {char.image?.light ? (
-                      <img src={getImgUrl(char.image.light)} alt={char.name} className="size-8 rounded-lg object-cover" />
+                      <img src={getImgUrl(char.image.light, "thumbnail")} alt={char.name} className="size-8 rounded-lg object-cover" />
                     ) : (
                       <div className="size-8 rounded-lg bg-pink-500/10 flex items-center justify-center">
                         <Heart className="size-4 text-pink-500" />
@@ -346,7 +346,7 @@ function PlayerDetails({ player }) {
                 {player.tournaments.map((tournament, index) => (
                   <div key={tournament.id || tournament._id || index} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e]">
                     {tournament.logo?.light ? (
-                      <img src={getImgUrl(tournament.logo.light)} alt={tournament.name} className="size-10 rounded-lg object-cover" />
+                      <img src={getImgUrl(tournament.logo.light, "thumbnail")} alt={tournament.name} className="size-10 rounded-lg object-cover" />
                     ) : (
                       <div className="size-10 rounded-lg bg-green-500/10 flex items-center justify-center">
                         <Trophy className="size-5 text-green-500" />
@@ -388,7 +388,7 @@ function PlayerDetails({ player }) {
                     className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
                   >
                     {link.image?.light ? (
-                      <img src={getImgUrl(link.image.light)} alt={link.name} className="size-6 rounded" />
+                      <img src={getImgUrl(link.image.light, "thumbnail")} alt={link.name} className="size-6 rounded" />
                     ) : (
                       <LinkIcon className="size-5 text-blue-500" />
                     )}
@@ -421,7 +421,7 @@ function PlayerDetails({ player }) {
                     <div className="flex items-center gap-3">
                       {roster.game?.logo?.light ? (
                         <img
-                          src={getImgUrl(roster.game.logo.light)}
+                          src={getImgUrl(roster.game.logo.light, "thumbnail")}
                           alt={roster.game.name}
                           className="size-10 rounded-lg object-cover"
                         />
@@ -446,7 +446,7 @@ function PlayerDetails({ player }) {
                       <div className="flex items-center gap-3 pl-2 border-l-2 border-blue-500/30 ml-1">
                         {roster.team.logo?.light ? (
                           <img
-                            src={getImgUrl(roster.team.logo.light)}
+                            src={getImgUrl(roster.team.logo.light, "thumbnail")}
                             alt={roster.team.name}
                             className="size-8 rounded-lg object-cover"
                           />
@@ -473,7 +473,7 @@ function PlayerDetails({ player }) {
                 <div className="flex items-center gap-3">
                   {player.game.logo?.light ? (
                     <img
-                      src={getImgUrl(player.game.logo.light)}
+                      src={getImgUrl(player.game.logo.light, "thumbnail")}
                       alt={player.game.name}
                       className="size-10 rounded-lg object-cover"
                     />
@@ -495,7 +495,7 @@ function PlayerDetails({ player }) {
                   <div className="flex items-center gap-3 pl-2 border-l-2 border-blue-500/30 ml-1">
                     {player.team.logo?.light ? (
                       <img
-                        src={getImgUrl(player.team.logo.light)}
+                        src={getImgUrl(player.team.logo.light, "thumbnail")}
                         alt={player.team.name}
                         className="size-8 rounded-lg object-cover"
                       />

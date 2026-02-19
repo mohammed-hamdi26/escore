@@ -100,7 +100,7 @@ function LinksTable({ links, numOfLinks, idUser, linksType = "players" }) {
       {/* Links Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {links.map((link) => {
-          const linkImage = getImgUrl(link.image?.light) || getImgUrl(link.image?.dark);
+          const linkImage = getImgUrl(link.image?.light, "thumbnail") || getImgUrl(link.image?.dark, "thumbnail");
           const isActive = link.isActive !== false; // Default to true if not set
 
           return (

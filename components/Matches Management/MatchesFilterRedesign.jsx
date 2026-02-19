@@ -388,7 +388,7 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
                         <>
                           {games?.find((g) => (g.id || g._id) === currentGame)?.logo && (
                             <img
-                              src={getImgUrl(games?.find((g) => (g.id || g._id) === currentGame)?.logo?.light) || getImgUrl(games?.find((g) => (g.id || g._id) === currentGame)?.logo?.dark)}
+                              src={getImgUrl(games?.find((g) => (g.id || g._id) === currentGame)?.logo?.light, "thumbnail") || getImgUrl(games?.find((g) => (g.id || g._id) === currentGame)?.logo?.dark, "thumbnail")}
                               alt=""
                               className="size-5 rounded object-contain"
                             />
@@ -429,7 +429,7 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
                         </CommandItem>
                         {filteredGames.map((game) => {
                           const gameId = game.id || game._id;
-                          const gameLogo = getImgUrl(game.logo?.light) || getImgUrl(game.logo?.dark);
+                          const gameLogo = getImgUrl(game.logo?.light, "thumbnail") || getImgUrl(game.logo?.dark, "thumbnail");
                           return (
                             <CommandItem
                               key={gameId}
@@ -482,7 +482,7 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
                         <>
                           {tournaments?.find((t) => (t.id || t._id) === currentTournament)?.logo && (
                             <img
-                              src={getImgUrl(tournaments?.find((t) => (t.id || t._id) === currentTournament)?.logo?.light) || getImgUrl(tournaments?.find((t) => (t.id || t._id) === currentTournament)?.logo?.dark)}
+                              src={getImgUrl(tournaments?.find((t) => (t.id || t._id) === currentTournament)?.logo?.light, "thumbnail") || getImgUrl(tournaments?.find((t) => (t.id || t._id) === currentTournament)?.logo?.dark, "thumbnail")}
                               alt=""
                               className="size-5 rounded object-contain"
                             />
@@ -523,7 +523,7 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
                         </CommandItem>
                         {filteredTournaments.map((tournament) => {
                           const tournamentId = tournament.id || tournament._id;
-                          const tournamentLogo = getImgUrl(tournament.logo?.light) || getImgUrl(tournament.logo?.dark);
+                          const tournamentLogo = getImgUrl(tournament.logo?.light, "thumbnail") || getImgUrl(tournament.logo?.dark, "thumbnail");
                           return (
                             <CommandItem
                               key={tournamentId}
@@ -576,7 +576,7 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
                         <>
                           {teams?.find((t) => (t.id || t._id) === currentTeam)?.logo && (
                             <img
-                              src={getImgUrl(teams?.find((t) => (t.id || t._id) === currentTeam)?.logo?.light) || getImgUrl(teams?.find((t) => (t.id || t._id) === currentTeam)?.logo?.dark)}
+                              src={getImgUrl(teams?.find((t) => (t.id || t._id) === currentTeam)?.logo?.light, "thumbnail") || getImgUrl(teams?.find((t) => (t.id || t._id) === currentTeam)?.logo?.dark, "thumbnail")}
                               alt=""
                               className="size-5 rounded object-contain"
                             />
@@ -617,7 +617,7 @@ function MatchesFilterRedesign({ games = [], tournaments = [], teams = [] }) {
                         </CommandItem>
                         {filteredTeams.map((team) => {
                           const teamId = team.id || team._id;
-                          const teamLogo = getImgUrl(team.logo?.light) || getImgUrl(team.logo?.dark);
+                          const teamLogo = getImgUrl(team.logo?.light, "thumbnail") || getImgUrl(team.logo?.dark, "thumbnail");
                           return (
                             <CommandItem
                               key={teamId}

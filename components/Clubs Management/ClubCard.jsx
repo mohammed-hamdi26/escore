@@ -43,7 +43,7 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
   const canUpdate = hasPermission(ENTITIES.CLUB, ACTIONS.UPDATE);
   const canDelete = hasPermission(ENTITIES.CLUB, ACTIONS.DELETE);
 
-  const clubLogo = getImgUrl(club.logo?.light) || getImgUrl(club.logo?.dark);
+  const clubLogo = getImgUrl(club.logo?.light, "medium") || getImgUrl(club.logo?.dark, "medium");
 
   const countryFlag = club.country?.code
     ? `https://flagcdn.com/24x18/${club.country.code.toLowerCase()}.png`

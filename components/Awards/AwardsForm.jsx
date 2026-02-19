@@ -198,7 +198,7 @@ function AwardsForm({ awardsType, award, games, tournaments, id, t, setOpen }) {
             /* Image Preview */
             <div className={`relative aspect-square ${bgGradient}`}>
               <img
-                src={getImgUrl(value)}
+                src={getImgUrl(value, "thumbnail")}
                 alt={label}
                 className="w-full h-full object-contain p-4"
                 onError={(e) => {
@@ -340,7 +340,7 @@ function AwardsForm({ awardsType, award, games, tournaments, id, t, setOpen }) {
         <div className="flex items-center gap-3 p-3 bg-green-primary/10 rounded-lg border border-green-primary/20">
           {(selectedGame.logo?.light || selectedGame.logo?.dark) && (
             <img
-              src={getImgUrl(selectedGame.logo?.light) || getImgUrl(selectedGame.logo?.dark)}
+              src={getImgUrl(selectedGame.logo?.light, "thumbnail") || getImgUrl(selectedGame.logo?.dark, "thumbnail")}
               alt={selectedGame.name}
               className="size-8 rounded object-cover"
             />

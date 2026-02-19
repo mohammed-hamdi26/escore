@@ -19,7 +19,7 @@ function UsersTable({ users, meta }) {
             <Table.Cell className="flex gap-4 items-center">
               {user.avatar && (
                 <img
-                  src={getImgUrl(user.avatar.light)}
+                  src={getImgUrl(user.avatar.light, "thumbnail")}
                   width={30}
                   height={30}
                   alt=""

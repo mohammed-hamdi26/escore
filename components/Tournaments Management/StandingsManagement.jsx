@@ -570,8 +570,8 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                 {sortedStandings.map((standing) => {
                   const isEditing = editingId === standing.id;
                   const teamLogo = isPlayerBased
-                    ? (getImgUrl(standing.player?.photo?.light) || getImgUrl(standing.player?.photo?.dark))
-                    : (getImgUrl(standing.team?.logo?.light) || getImgUrl(standing.team?.logo?.dark));
+                    ? (getImgUrl(standing.player?.photo?.light, "thumbnail") || getImgUrl(standing.player?.photo?.dark, "thumbnail"))
+                    : (getImgUrl(standing.team?.logo?.light, "thumbnail") || getImgUrl(standing.team?.logo?.dark, "thumbnail"));
                   const entityName = isPlayerBased
                     ? (standing.player?.nickname || standing.player?.name)
                     : standing.team?.name;

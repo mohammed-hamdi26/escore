@@ -39,7 +39,7 @@ function TeamRow({ team, score, isWinner, isBye }) {
       <div className="flex items-center gap-2 min-w-0 flex-1">
         {team.logo?.light ? (
           <img
-            src={getImgUrl(team.logo.light)}
+            src={getImgUrl(team.logo.light, "thumbnail")}
             alt={team.name}
             className="size-5 rounded object-cover flex-shrink-0"
           />
@@ -116,7 +116,7 @@ function BracketMatchCard({ match }) {
                     {p.placement ? `#${p.placement}` : "-"}
                   </span>
                   {logo?.light ? (
-                    <img src={getImgUrl(logo.light)} alt={name} className="size-4 rounded object-cover shrink-0" />
+                    <img src={getImgUrl(logo.light, "thumbnail")} alt={name} className="size-4 rounded object-cover shrink-0" />
                   ) : (
                     <div className="size-4 rounded bg-muted flex items-center justify-center shrink-0">
                       <Trophy className="size-2.5 text-muted-foreground" />

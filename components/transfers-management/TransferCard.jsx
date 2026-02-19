@@ -75,12 +75,12 @@ function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
     }
   };
 
-  const playerPhoto = getImgUrl(transfer.player?.photo?.light) || getImgUrl(transfer.player?.photo);
-  const fromTeamLogo = getImgUrl(transfer.fromTeam?.logo?.light) || getImgUrl(transfer.fromTeam?.logo);
-  const fromTeamLogoDark = getImgUrl(transfer.fromTeam?.logo?.dark);
-  const toTeamLogo = getImgUrl(transfer.toTeam?.logo?.light) || getImgUrl(transfer.toTeam?.logo);
-  const toTeamLogoDark = getImgUrl(transfer.toTeam?.logo?.dark);
-  const gameLogo = getImgUrl(transfer.game?.logo?.light) || getImgUrl(transfer.game?.logo?.dark);
+  const playerPhoto = getImgUrl(transfer.player?.photo?.light, "medium") || getImgUrl(transfer.player?.photo, "medium");
+  const fromTeamLogo = getImgUrl(transfer.fromTeam?.logo?.light, "medium") || getImgUrl(transfer.fromTeam?.logo, "medium");
+  const fromTeamLogoDark = getImgUrl(transfer.fromTeam?.logo?.dark, "medium");
+  const toTeamLogo = getImgUrl(transfer.toTeam?.logo?.light, "medium") || getImgUrl(transfer.toTeam?.logo, "medium");
+  const toTeamLogoDark = getImgUrl(transfer.toTeam?.logo?.dark, "medium");
+  const gameLogo = getImgUrl(transfer.game?.logo?.light, "medium") || getImgUrl(transfer.game?.logo?.dark, "medium");
 
   // Grid View Card
   if (viewMode === "grid") {
