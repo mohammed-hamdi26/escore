@@ -267,7 +267,7 @@ function NewsDetails({ news }) {
               {t("content") || "Content"}
             </h3>
             <div
-              className="prose prose-sm max-w-none dark:prose-invert"
+              className="prose prose-sm max-w-none dark:prose-invert overflow-hidden break-words"
               dangerouslySetInnerHTML={{ __html: renderContent(news.content) }}
             />
           </div>

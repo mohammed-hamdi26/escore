@@ -58,7 +58,6 @@ const LANGUAGE_OPTIONS = [
 const validateSchema = yup.object({
   title: yup.string().required("Title is required"),
   content: yup.string().required("Content is required"),
-  externalUrl: yup.string().url("Must be a valid URL").nullable(),
 });
 
 export default function NewsForm({
@@ -83,7 +82,6 @@ export default function NewsForm({
       authorName: news?.authorName || "",
       authorImageLight: news?.authorImage?.light || "",
       authorImageDark: news?.authorImage?.dark || "",
-      externalUrl: news?.externalUrl || "",
       tags: news?.tags || [],
       game: news?.game?.id || news?.game?._id || news?.game || "",
       tournament: news?.tournament?.id || news?.tournament?._id || news?.tournament || "",
@@ -118,7 +116,6 @@ export default function NewsForm({
         delete dataValues.slug;
 
         // Convert empty strings to null
-        if (!dataValues.externalUrl) dataValues.externalUrl = null;
         if (!dataValues.game) dataValues.game = null;
         if (!dataValues.tournament) dataValues.tournament = null;
         if (!dataValues.team) dataValues.team = null;
@@ -407,30 +404,6 @@ export default function NewsForm({
             />
           </FormSection>
 
-          {/* External URL */}
-          <FormSection
-            title={t("externalUrl") || "External Link"}
-            icon={<LinkIcon className="size-5" />}
-            badge={
-              <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded">
-                {t("optional") || "Optional"}
-              </span>
-            }
-          >
-            <div className="space-y-2">
-              <input
-                type="url"
-                name="externalUrl"
-                value={formik.values.externalUrl}
-                onChange={formik.handleChange}
-                placeholder="https://..."
-                className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
-              />
-              {formik.errors.externalUrl && (
-                <p className="text-xs text-red-500">{formik.errors.externalUrl}</p>
-              )}
-            </div>
-          </FormSection>
         </div>
       </div>
 
