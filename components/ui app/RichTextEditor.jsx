@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import { Maximize2, Minimize2 } from "lucide-react";
 
 export default function RichTextEditor({
   formik,
@@ -15,6 +16,7 @@ export default function RichTextEditor({
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   const [mounted, setMounted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [wordCount, setWordCount] = useState(0);
   const [charCount, setCharCount] = useState(0);
   const [QuillComponent, setQuillComponent] = useState(null);
@@ -332,8 +334,80 @@ export default function RichTextEditor({
     );
   }
 
-  const editorHeight = minHeight;
+  const editorHeight = isFullscreen ? "calc(100vh - 140px)" : minHeight;
 
+  // Fullscreen wrapper
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-background p-4 flex flex-col">
+        <div
+          className={`flex-1 flex flex-col rounded-xl overflow-hidden border border-border ${
+            isDark ? "quill-dark" : "quill-light"
+          }`}
+        >
+          {/* Custom header with Preview and Fullscreen */}
+          <div
+            className={`flex items-center justify-between px-3 py-2 border-b border-border ${
+              isDark ? "bg-[#1a1d2e]" : "bg-gray-50"
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-muted-foreground">
+                {charCount} {t("characters") || "characters"} · {wordCount}{" "}
+                {t("words") || "words"}
+              </span>
+              <span className="text-xs text-muted-foreground/60 hidden sm:block">
+                Ctrl+B Bold · Ctrl+I Italic · Ctrl+U Underline
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {/* Fullscreen toggle */}
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(false)}
+                className="p-1.5 rounded-lg bg-muted dark:bg-[#252a3d] text-muted-foreground hover:text-foreground transition-all"
+                title={t("exitFullscreen") || "Exit Fullscreen"}
+              >
+                <Minimize2 className="size-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Editor */}
+          {QuillComponent ? (
+            <div
+              className={`quill-wrapper ${isDark ? "dark" : ""} flex-1 overflow-hidden`}
+              style={{ height: "calc(100vh - 120px)" }}
+            >
+              <QuillComponent
+                ref={quillRef}
+                theme="snow"
+                value={formik?.values[name] || ""}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                modules={modules}
+                formats={formats}
+                placeholder={placeholder || t("placeholder") || "Start writing..."}
+              />
+            </div>
+          ) : (
+            <div
+              className={`flex-1 flex items-center justify-center ${
+                isDark ? "bg-[#0f1118]" : "bg-white"
+              }`}
+            >
+              <span className="text-muted-foreground text-sm">Loading editor...</span>
+            </div>
+          )}
+        </div>
+
+        {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
+      </div>
+    );
+  }
+
+  // Normal view
   return (
     <div className="space-y-2">
       {label && (
@@ -363,6 +437,17 @@ export default function RichTextEditor({
             </span>
           </div>
 
+          <div className="flex items-center gap-2">
+            {/* Fullscreen toggle */}
+            <button
+              type="button"
+              onClick={() => setIsFullscreen(true)}
+              className="p-1.5 rounded-lg bg-muted dark:bg-[#252a3d] text-muted-foreground hover:text-foreground transition-all"
+              title={t("fullscreen") || "Fullscreen"}
+            >
+              <Maximize2 className="size-4" />
+            </button>
+          </div>
         </div>
 
         {/* Editor */}

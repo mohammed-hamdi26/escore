@@ -17,6 +17,7 @@ const ROUTE_TO_ENTITY = {
   "tournaments-management": ENTITIES.TOURNAMENT,
   "transfers-management": ENTITIES.TRANSFER,
   "news": ENTITIES.NEWS,
+  "news-management": ENTITIES.NEWS,
   "users": ENTITIES.USER,
   "support-center": ENTITIES.SUPPORT,
   "settings": ENTITIES.SETTINGS,
