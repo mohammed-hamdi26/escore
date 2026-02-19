@@ -28,8 +28,8 @@ import { useLocale } from "next-intl";
 
 const validationSchema = Yup.object({
   name: Yup.string().min(1).max(100).required("Name is required"),
-  lightImage: Yup.string().required("Light image is required"),
-  darkImage: Yup.string(),
+  lightImage: Yup.mixed().required("Light image is required"),
+  darkImage: Yup.mixed(),
 });
 
 function AvatarForm({ t, setOpen, avatar, onSuccess }) {
@@ -139,12 +139,19 @@ function AvatarForm({ t, setOpen, avatar, onSuccess }) {
     formik.setFieldValue(fieldName, "");
   };
 
-  const getImageUrl = (url) => {
-    if (!url) return null;
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-      return url;
+  const getImageUrl = (value) => {
+    if (!value) return null;
+    // Handle ImageSizes object { thumbnail, medium, large }
+    if (typeof value === "object" && value !== null) {
+      const url = value.large || value.medium || value.thumbnail;
+      if (!url) return null;
+      if (url.startsWith("http://") || url.startsWith("https://")) return url;
+      return `${process.env.NEXT_PUBLIC_BASE_URL}${url}`;
     }
-    return `${process.env.NEXT_PUBLIC_BASE_URL}${url}`;
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      return value;
+    }
+    return `${process.env.NEXT_PUBLIC_BASE_URL}${value}`;
   };
 
   const ImageUploadCard = ({

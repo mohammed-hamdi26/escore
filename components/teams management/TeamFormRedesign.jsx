@@ -48,10 +48,10 @@ const validationSchema = yup.object({
   country: yup.string(),
   region: yup.string(),
   foundedDate: yup.string(),
-  logoLight: yup.string(),
-  logoDark: yup.string(),
-  coverImageLight: yup.string(),
-  coverImageDark: yup.string(),
+  logoLight: yup.mixed(),
+  logoDark: yup.mixed(),
+  coverImageLight: yup.mixed(),
+  coverImageDark: yup.mixed(),
   worldRanking: yup.number().min(0, "rankingMin").integer("rankingInteger").nullable(),
 });
 

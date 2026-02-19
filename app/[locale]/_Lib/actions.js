@@ -316,8 +316,14 @@ export async function uploadPhoto(formData, imageType = null) {
       },
     });
 
-    // Return the URL (large size if available, otherwise single url)
-    const uploadedUrl = res.data?.data?.url;
+    const data = res.data?.data;
+
+    // Return ImageSizes object if available, fallback to URL string
+    if (data?.imageSizes) {
+      return data.imageSizes; // { thumbnail, medium, large }
+    }
+
+    const uploadedUrl = data?.url;
     if (!uploadedUrl) {
       console.error("Upload response missing URL:", res.data);
       throw new Error("Upload succeeded but no URL returned");

@@ -46,15 +46,15 @@ const validationSchema = yup.object({
   // Required fields
   title: yup.string().required("titleRequired").max(300, "titleTooLong"),
   content: yup.string().required("contentRequired").min(10, "contentTooShort"),
-  coverImageLight: yup.string().required("coverImageRequired"),
+  coverImageLight: yup.mixed().required("coverImageRequired"),
   authorName: yup
     .string()
     .required("authorNameRequired")
     .max(100, "authorNameTooLong"),
-  authorPicture: yup.string().required("authorImageRequired"),
+  authorPicture: yup.mixed().required("authorImageRequired"),
 
   // Optional fields
-  coverImageDark: yup.string(),
+  coverImageDark: yup.mixed(),
   urlExternal: yup.string().url("invalidUrl").nullable(),
   game: yup.string().nullable(),
   tournament: yup.string().nullable(),

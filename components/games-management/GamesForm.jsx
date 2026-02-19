@@ -28,10 +28,10 @@ const validationSchema = yup.object({
   name: yup.string().required("Game name is required").max(100, "Name must be at most 100 characters"),
 
   description: yup.string().max(2000, "Description must be at most 2000 characters"),
-  logoLight: yup.string(),
-  logoDark: yup.string(),
-  coverImageLight: yup.string(),
-  coverImageDark: yup.string(),
+  logoLight: yup.mixed(),
+  logoDark: yup.mixed(),
+  coverImageLight: yup.mixed(),
+  coverImageDark: yup.mixed(),
   releaseDate: yup.date().nullable().typeError("Invalid date"),
   isActive: yup.boolean(),
 });

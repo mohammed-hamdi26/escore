@@ -42,10 +42,10 @@ const validationSchema = yup.object({
   region: yup.string(),
   founded: yup.string(),
   websiteUrl: yup.string().url("invalidUrl"),
-  logoLight: yup.string(),
-  logoDark: yup.string(),
-  coverImageLight: yup.string(),
-  coverImageDark: yup.string(),
+  logoLight: yup.mixed(),
+  logoDark: yup.mixed(),
+  coverImageLight: yup.mixed(),
+  coverImageDark: yup.mixed(),
 });
 
 // ─── Region Options ──────────────────────────────────────────

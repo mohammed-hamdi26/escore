@@ -30,8 +30,13 @@ function ImageUpload({
   const [previewUrl, setPreviewUrl] = useState(null);
   const t = useTranslations("ImageUpload");
 
-  const currentValue = formik?.values?.[name] || "";
-  const hasImage = !!currentValue;
+  const rawValue = formik?.values?.[name] || "";
+  // Support both string URLs and ImageSizes objects { thumbnail, medium, large }
+  const displayUrl = typeof rawValue === "object" && rawValue !== null
+    ? (rawValue.large || rawValue.medium || rawValue.thumbnail || "")
+    : rawValue;
+  const currentValue = displayUrl;
+  const hasImage = !!displayUrl;
   const error = formik?.touched?.[name] && formik?.errors?.[name];
 
   // Aspect ratio CSS classes (legacy)

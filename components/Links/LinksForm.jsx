@@ -73,7 +73,7 @@ const SOCIAL_PRESETS = [
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
-  icon: Yup.string().required("Icon is required"),
+  icon: Yup.mixed().required("Icon is required"),
   url: Yup.string().url("Invalid URL").required("URL is required"),
 });
 
@@ -203,7 +203,11 @@ function LinksForm({ players, teams, id, linksType = "players", link, setOpen })
     isRequired,
     hasError,
   }) => {
-    const hasImage = !!value;
+    // Support both string URLs and ImageSizes objects
+    const displayUrl = typeof value === "object" && value !== null
+      ? (value.large || value.medium || value.thumbnail || "")
+      : value;
+    const hasImage = !!displayUrl;
 
     return (
       <div className="flex-1">
@@ -227,7 +231,7 @@ function LinksForm({ players, teams, id, linksType = "players", link, setOpen })
           {hasImage ? (
             <div className={`relative aspect-square ${bgGradient}`}>
               <img
-                src={value}
+                src={displayUrl}
                 alt={label}
                 className="w-full h-full object-contain p-4"
                 onError={(e) => {
