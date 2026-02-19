@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "../ui/badge";
+import { getImgUrl } from "@/lib/utils";
 
 // Status badge component
 function StatusBadge({ status }) {
@@ -176,7 +177,7 @@ function MatchesTable({ matches, columns, players, pagination }) {
                     <img
                       width={28}
                       height={28}
-                      src={match?.team1?.logo?.light}
+                      src={getImgUrl(match?.team1?.logo?.light)}
                       alt={match?.team1?.name}
                       className="rounded"
                     />
@@ -208,7 +209,7 @@ function MatchesTable({ matches, columns, players, pagination }) {
                     <img
                       width={28}
                       height={28}
-                      src={match?.team2?.logo?.light}
+                      src={getImgUrl(match?.team2?.logo?.light)}
                       alt={match?.team2?.name}
                       className="rounded"
                     />

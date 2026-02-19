@@ -1,4 +1,5 @@
 import { Shield, User, Newspaper, HeadphonesIcon } from "lucide-react";
+import { getImgUrl } from "@/lib/utils";
 
 const roleConfig = {
   admin: {
@@ -35,7 +36,7 @@ function HeaderSideNavBar({ user, t }) {
           {(user?.avatar?.light || user?.avatar?.dark) ? (
             <img
               alt="avatar"
-              src={user?.avatar?.light || user?.avatar?.dark}
+              src={getImgUrl(user?.avatar?.light) || getImgUrl(user?.avatar?.dark)}
               className="w-full h-full object-cover object-center"
             />
           ) : (

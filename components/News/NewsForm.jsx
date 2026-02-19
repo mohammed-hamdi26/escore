@@ -1,5 +1,6 @@
 "use client";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
+import { getImgUrl } from "@/lib/utils";
 import { useFormik } from "formik";
 import { Link, Newspaper } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -64,12 +65,12 @@ function NewsForm({
       title: newData?.title || "",
       content: newData?.content || "",
       summary: newData?.summary || "",
-      image: newData?.coverImage?.light || "",
-      imageDark: newData?.coverImage?.dark || "",
+      image: getImgUrl(newData?.coverImage?.light) || "",
+      imageDark: getImgUrl(newData?.coverImage?.dark) || "",
       videoUrl: newData?.videoUrl || "",
       // publishAt: newData?.publishAt || "",
       authorName: newData?.authorName || "",
-      authorPicture: newData?.authorImage?.light || "",
+      authorPicture: getImgUrl(newData?.authorImage?.light) || "",
       authorProfile: newData?.authorProfile || "",
       urlExternal: newData?.urlExternal || "",
       // status: newData?.status || "PUBLISHED",

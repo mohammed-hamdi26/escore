@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { TimeCell } from "@/components/ui/TimeInput";
 import { formatTimeMs, formatPenalty } from "@/lib/timeUtils";
+import { getImgUrl } from "@/lib/utils";
 
 // Streak badge styling
 const getStreakBadge = (streak) => {
@@ -169,8 +170,8 @@ function TournamentStandings({ standings = [], grouped = {}, title, compact = fa
                 <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                   {(groupStandings || []).map((standing) => {
                     const entityLogo = isPlayerBased
-                      ? (standing.player?.photo?.light || standing.player?.photo?.dark)
-                      : (standing.team?.logo?.light || standing.team?.logo?.dark);
+                      ? (getImgUrl(standing.player?.photo?.light) || getImgUrl(standing.player?.photo?.dark))
+                      : (getImgUrl(standing.team?.logo?.light) || getImgUrl(standing.team?.logo?.dark));
                     const entityName = isPlayerBased
                       ? (standing.player?.nickname || standing.player?.name)
                       : standing.team?.name;

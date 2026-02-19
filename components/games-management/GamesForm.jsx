@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { getImgUrl } from "@/lib/utils";
 import { Button } from "../ui/button";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
@@ -59,10 +60,10 @@ export default function GamesForm({
       name: data?.name || "",
 
       description: data?.description || "",
-      logoLight: data?.logo?.light || "",
-      logoDark: data?.logo?.dark || "",
-      coverImageLight: data?.coverImage?.light || "",
-      coverImageDark: data?.coverImage?.dark || "",
+      logoLight: getImgUrl(data?.logo?.light) || "",
+      logoDark: getImgUrl(data?.logo?.dark) || "",
+      coverImageLight: getImgUrl(data?.coverImage?.light) || "",
+      coverImageDark: getImgUrl(data?.coverImage?.dark) || "",
       releaseDate: formatDateToLocal(data?.releaseDate),
       isActive: data?.isActive !== undefined ? data.isActive : true,
     },

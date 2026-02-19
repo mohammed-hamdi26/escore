@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getImgUrl } from "@/lib/utils";
 import { useFormik } from "formik";
 import {
   CalendarDays,
@@ -792,10 +793,10 @@ function EventForm({ event, submit, formType = "add", countries = [] }) {
       rosterLockDate: formatDateToLocal(event?.rosterLockDate),
       websiteUrl: event?.websiteUrl || "",
       streamUrl: event?.streamUrl || "",
-      logoLight: event?.logo?.light || "",
-      logoDark: event?.logo?.dark || "",
-      coverImageLight: event?.coverImage?.light || "",
-      coverImageDark: event?.coverImage?.dark || "",
+      logoLight: getImgUrl(event?.logo?.light) || "",
+      logoDark: getImgUrl(event?.logo?.dark) || "",
+      coverImageLight: getImgUrl(event?.coverImage?.light) || "",
+      coverImageDark: getImgUrl(event?.coverImage?.dark) || "",
       championshipEnabled: event?.clubChampionship?.enabled || false,
       championshipPrizePool: event?.clubChampionship?.prizePool || "",
       pointsDistribution:

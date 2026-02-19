@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Spinner } from "../ui/spinner";
+import { getImgUrl } from "@/lib/utils";
 
 function LinksTable({ links, numOfLinks, idUser, linksType = "players" }) {
   const t = useTranslations("Links");
@@ -99,7 +100,7 @@ function LinksTable({ links, numOfLinks, idUser, linksType = "players" }) {
       {/* Links Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {links.map((link) => {
-          const linkImage = link.image?.light || link.image?.dark;
+          const linkImage = getImgUrl(link.image?.light) || getImgUrl(link.image?.dark);
           const isActive = link.isActive !== false; // Default to true if not set
 
           return (

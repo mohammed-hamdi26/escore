@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getImgUrl } from "@/lib/utils";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { format } from "date-fns";
@@ -74,12 +75,12 @@ function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
     }
   };
 
-  const playerPhoto = transfer.player?.photo?.light || transfer.player?.photo;
-  const fromTeamLogo = transfer.fromTeam?.logo?.light || transfer.fromTeam?.logo;
-  const fromTeamLogoDark = transfer.fromTeam?.logo?.dark;
-  const toTeamLogo = transfer.toTeam?.logo?.light || transfer.toTeam?.logo;
-  const toTeamLogoDark = transfer.toTeam?.logo?.dark;
-  const gameLogo = transfer.game?.logo?.light || transfer.game?.logo?.dark;
+  const playerPhoto = getImgUrl(transfer.player?.photo?.light) || getImgUrl(transfer.player?.photo);
+  const fromTeamLogo = getImgUrl(transfer.fromTeam?.logo?.light) || getImgUrl(transfer.fromTeam?.logo);
+  const fromTeamLogoDark = getImgUrl(transfer.fromTeam?.logo?.dark);
+  const toTeamLogo = getImgUrl(transfer.toTeam?.logo?.light) || getImgUrl(transfer.toTeam?.logo);
+  const toTeamLogoDark = getImgUrl(transfer.toTeam?.logo?.dark);
+  const gameLogo = getImgUrl(transfer.game?.logo?.light) || getImgUrl(transfer.game?.logo?.dark);
 
   // Grid View Card
   if (viewMode === "grid") {

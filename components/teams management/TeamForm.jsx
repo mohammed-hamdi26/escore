@@ -61,8 +61,8 @@ function TeamForm({
       name: team?.name || "",
       country: team?.country || null,
       region: team?.region || "",
-      logoLight: team?.logo.light || "",
-      logoDark: team?.logo.dark || "",
+      logoLight: team?.logo?.light || "",
+      logoDark: team?.logo?.dark || "",
       description: team?.description || "",
       founded: team?.founded || "",
 

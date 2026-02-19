@@ -17,6 +17,7 @@ import {
   Eye,
 } from "lucide-react";
 import ParticipantResultsEditor from "./ParticipantResultsEditor";
+import { getImgUrl } from "@/lib/utils";
 
 const STATUS_CONFIG = {
   scheduled: { label: "Scheduled", className: "bg-blue-500/10 text-blue-500" },
@@ -35,8 +36,8 @@ function MultiParticipantMatchView({ match, tournament }) {
   if (!match) return null;
 
   const status = STATUS_CONFIG[match.status] || STATUS_CONFIG.scheduled;
-  const gameLogo = match.game?.logo?.light || match.game?.logo?.dark;
-  const tournamentLogo = match.tournament?.logo?.light || match.tournament?.logo?.dark;
+  const gameLogo = getImgUrl(match.game?.logo?.light) || getImgUrl(match.game?.logo?.dark);
+  const tournamentLogo = getImgUrl(match.tournament?.logo?.light) || getImgUrl(match.tournament?.logo?.dark);
 
   const participants = match.participants || [];
   const sorted = [...participants].sort(
@@ -208,7 +209,7 @@ function MultiParticipantMatchView({ match, tournament }) {
                       <td className="px-3 py-3">
                         <div className="flex items-center gap-3">
                           {logo?.light ? (
-                            <img src={logo.light} alt={name} className="size-8 rounded object-cover" />
+                            <img src={getImgUrl(logo.light)} alt={name} className="size-8 rounded object-cover" />
                           ) : (
                             <div className="size-8 rounded bg-muted flex items-center justify-center">
                               <Trophy className="size-4 text-muted-foreground" />

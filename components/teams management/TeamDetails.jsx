@@ -22,6 +22,7 @@ import {
   Building2,
   User,
 } from "lucide-react";
+import { getImgUrl } from "@/lib/utils";
 
 function TeamDetails({ team }) {
   const t = useTranslations("TeamDetails");
@@ -47,7 +48,7 @@ function TeamDetails({ team }) {
     return count.toString();
   };
 
-  const teamLogo = team.logo?.light || team.logo?.dark;
+  const teamLogo = getImgUrl(team.logo?.light) || getImgUrl(team.logo?.dark);
 
   return (
     <div className="space-y-6">
@@ -173,7 +174,7 @@ function TeamDetails({ team }) {
                           <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                           <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
                             <img
-                              src={team.logo.light}
+                              src={getImgUrl(team.logo.light)}
                               alt="Logo Light"
                               className="w-full h-full object-contain"
                             />
@@ -185,7 +186,7 @@ function TeamDetails({ team }) {
                           <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                           <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
                             <img
-                              src={team.logo.dark}
+                              src={getImgUrl(team.logo.dark)}
                               alt="Logo Dark"
                               className="w-full h-full object-contain"
                             />
@@ -206,7 +207,7 @@ function TeamDetails({ team }) {
                           <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                           <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
                             <img
-                              src={team.coverImage.light}
+                              src={getImgUrl(team.coverImage.light)}
                               alt="Cover Light"
                               className="w-full h-full object-cover"
                             />
@@ -218,7 +219,7 @@ function TeamDetails({ team }) {
                           <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                           <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
                             <img
-                              src={team.coverImage.dark}
+                              src={getImgUrl(team.coverImage.dark)}
                               alt="Cover Dark"
                               className="w-full h-full object-cover"
                             />
@@ -284,7 +285,7 @@ function TeamDetails({ team }) {
                     className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] hover:bg-muted/50 dark:hover:bg-[#252a3d] transition-colors"
                   >
                     {player.photo?.light ? (
-                      <img src={player.photo.light} alt={player.nickname || player.fullName || 'Player'} className="size-10 rounded-lg object-cover" />
+                      <img src={getImgUrl(player.photo.light)} alt={player.nickname || player.fullName || 'Player'} className="size-10 rounded-lg object-cover" />
                     ) : (
                       <div className="size-10 rounded-lg bg-green-500/10 flex items-center justify-center">
                         <User className="size-5 text-green-500" />
@@ -318,7 +319,7 @@ function TeamDetails({ team }) {
                 {team.tournaments.map((tournament, index) => (
                   <div key={tournament.id || tournament._id || index} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e]">
                     {tournament.logo?.light ? (
-                      <img src={tournament.logo.light} alt={tournament.name} className="size-10 rounded-lg object-cover" />
+                      <img src={getImgUrl(tournament.logo.light)} alt={tournament.name} className="size-10 rounded-lg object-cover" />
                     ) : (
                       <div className="size-10 rounded-lg bg-green-500/10 flex items-center justify-center">
                         <Trophy className="size-5 text-green-500" />
@@ -354,7 +355,7 @@ function TeamDetails({ team }) {
                 {team.awards.map((award, index) => (
                   <div key={award.id || index} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e]">
                     {award.image?.light ? (
-                      <img src={award.image.light} alt={award.name} className="size-10 rounded-lg object-cover" />
+                      <img src={getImgUrl(award.image.light)} alt={award.name} className="size-10 rounded-lg object-cover" />
                     ) : (
                       <div className="size-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
                         <Award className="size-5 text-yellow-500" />
@@ -389,7 +390,7 @@ function TeamDetails({ team }) {
                     className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
                   >
                     {link.image?.light ? (
-                      <img src={link.image.light} alt={link.name} className="size-6 rounded" />
+                      <img src={getImgUrl(link.image.light)} alt={link.name} className="size-6 rounded" />
                     ) : (
                       <LinkIcon className="size-5 text-blue-500" />
                     )}
@@ -413,7 +414,7 @@ function TeamDetails({ team }) {
               <div className="flex items-center gap-3">
                 {team.game.logo?.light ? (
                   <img
-                    src={team.game.logo.light}
+                    src={getImgUrl(team.game.logo.light)}
                     alt={team.game.name}
                     className="size-10 rounded-xl object-cover"
                   />

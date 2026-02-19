@@ -1,4 +1,5 @@
 "use client";
+import { getImgUrl } from "@/lib/utils";
 import { useFormik } from "formik";
 import {
   Link,
@@ -316,10 +317,10 @@ function NewsFormRedesign({
     initialValues: {
       title: newData?.title || "",
       content: newData?.content || "",
-      coverImageLight: newData?.coverImage?.light || "",
-      coverImageDark: newData?.coverImage?.dark || "",
+      coverImageLight: getImgUrl(newData?.coverImage?.light) || "",
+      coverImageDark: getImgUrl(newData?.coverImage?.dark) || "",
       authorName: newData?.authorName || "",
-      authorPicture: newData?.authorImage?.light || "",
+      authorPicture: getImgUrl(newData?.authorImage?.light) || "",
       urlExternal: newData?.urlExternal || "",
       game: newData?.game?.id || "",
       tournament: newData?.tournament?.id || "",
@@ -579,7 +580,7 @@ function NewsFormRedesign({
               options={gamesOptions.map((g) => ({
                 value: g.id || g._id,
                 label: g.name,
-                image: g.logo?.light || g.logo?.dark,
+                image: getImgUrl(g.logo?.light) || getImgUrl(g.logo?.dark),
               }))}
             />
             <SearchableSelect
@@ -593,7 +594,7 @@ function NewsFormRedesign({
               options={tournamentsOptions.map((t) => ({
                 value: t.id || t._id,
                 label: t.name,
-                image: t.logo?.light || t.logo?.dark,
+                image: getImgUrl(t.logo?.light) || getImgUrl(t.logo?.dark),
               }))}
             />
             <SearchableSelect
@@ -607,7 +608,7 @@ function NewsFormRedesign({
               options={teamsOptions.map((t) => ({
                 value: t.id || t._id,
                 label: t.name,
-                image: t.logo?.light || t.logo?.dark,
+                image: getImgUrl(t.logo?.light) || getImgUrl(t.logo?.dark),
                 subtitle: t.shortName,
               }))}
             />
@@ -622,7 +623,7 @@ function NewsFormRedesign({
               options={playersOptions.map((p) => ({
                 value: p.id || p._id,
                 label: p.nickname || p.fullName || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Unknown',
-                image: p.photo?.light || p.photo?.dark,
+                image: getImgUrl(p.photo?.light) || getImgUrl(p.photo?.dark),
                 subtitle: p.team?.name,
               }))}
             />

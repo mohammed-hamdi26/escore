@@ -26,6 +26,7 @@ import {
 import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
+import { getImgUrl } from "@/lib/utils";
 
 function GameCard({ game, onDelete, onToggleActive, t, viewMode = "grid" }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,8 +38,8 @@ function GameCard({ game, onDelete, onToggleActive, t, viewMode = "grid" }) {
   const canUpdate = hasPermission(ENTITIES.GAME, ACTIONS.UPDATE);
   const canDelete = hasPermission(ENTITIES.GAME, ACTIONS.DELETE);
 
-  const gameImage = game.logo?.light || game.logo?.dark;
-  const coverImage = game.coverImage?.light || game.coverImage?.dark;
+  const gameImage = getImgUrl(game.logo?.light) || getImgUrl(game.logo?.dark);
+  const coverImage = getImgUrl(game.coverImage?.light) || getImgUrl(game.coverImage?.dark);
 
   const handleAction = async (action, actionName) => {
     setIsLoading(true);

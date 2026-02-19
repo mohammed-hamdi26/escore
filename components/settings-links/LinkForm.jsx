@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { getImgUrl } from "@/lib/utils";
 import { Button } from "../ui/button";
 import {
   Loader2,
@@ -117,8 +118,8 @@ function LinkForm({ t, setOpen, link, onSuccess }) {
     initialValues: {
       name: link?.name || "",
       url: link?.url || "",
-      darkImage: link?.image?.dark || "",
-      lightImage: link?.image?.light || "",
+      darkImage: getImgUrl(link?.image?.dark) || "",
+      lightImage: getImgUrl(link?.image?.light) || "",
     },
     validationSchema,
     onSubmit: async (values) => {

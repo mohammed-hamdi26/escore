@@ -11,6 +11,7 @@ import ImageUpload from "../ui app/ImageUpload";
 import RichTextEditor from "../ui app/RichTextEditor";
 import { Calendar as CalendarComponent } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { getImgUrl } from "@/lib/utils";
 import {
   Newspaper,
   Calendar,
@@ -595,9 +596,9 @@ function EntitySelectField({ label, name, options, formik, placeholder, icon }) 
             <div className="flex items-center gap-3 flex-1 min-w-0">
               {selectedOption ? (
                 <>
-                  {(selectedOption.logo?.light || selectedOption.logo?.dark || selectedOption.photo?.light) && (
+                  {(getImgUrl(selectedOption.logo?.light) || getImgUrl(selectedOption.logo?.dark) || getImgUrl(selectedOption.photo?.light)) && (
                     <img
-                      src={selectedOption.logo?.light || selectedOption.logo?.dark || selectedOption.photo?.light}
+                      src={getImgUrl(selectedOption.logo?.light) || getImgUrl(selectedOption.logo?.dark) || getImgUrl(selectedOption.photo?.light)}
                       alt=""
                       className="size-8 rounded-lg object-cover"
                     />
@@ -658,7 +659,7 @@ function EntitySelectField({ label, name, options, formik, placeholder, icon }) 
               const optionId = option.id || option._id;
               const isSelected = value === optionId;
               const optionName = option.name || option.nickname || option.fullName;
-              const optionLogo = option.logo?.light || option.logo?.dark || option.photo?.light;
+              const optionLogo = getImgUrl(option.logo?.light) || getImgUrl(option.logo?.dark) || getImgUrl(option.photo?.light);
               return (
                 <button
                   key={optionId}

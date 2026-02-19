@@ -32,6 +32,7 @@ import {
 import { startMatch, updateMatchStatus, updateMatchResult } from "@/app/[locale]/_Lib/actions";
 import MultiParticipantMatchView from "./MultiParticipantMatchView";
 import toast from "react-hot-toast";
+import { getImgUrl } from "@/lib/utils";
 
 const STATUS_CONFIG = {
   scheduled: {
@@ -82,10 +83,10 @@ function MatchDetails({ match }) {
   const statusConfig = STATUS_CONFIG[match.status] || STATUS_CONFIG.scheduled;
   const StatusIcon = statusConfig.icon;
 
-  const team1Logo = match.team1?.logo?.light || match.team1?.logo?.dark;
-  const team2Logo = match.team2?.logo?.light || match.team2?.logo?.dark;
-  const gameLogo = match.game?.logo?.light || match.game?.logo?.dark;
-  const tournamentLogo = match.tournament?.logo?.light || match.tournament?.logo?.dark;
+  const team1Logo = getImgUrl(match.team1?.logo?.light) || getImgUrl(match.team1?.logo?.dark);
+  const team2Logo = getImgUrl(match.team2?.logo?.light) || getImgUrl(match.team2?.logo?.dark);
+  const gameLogo = getImgUrl(match.game?.logo?.light) || getImgUrl(match.game?.logo?.dark);
+  const tournamentLogo = getImgUrl(match.tournament?.logo?.light) || getImgUrl(match.tournament?.logo?.dark);
 
   const formatDate = (date) => {
     if (!date) return "-";
@@ -538,7 +539,7 @@ function MatchDetails({ match }) {
                   <div key={index} className="space-y-3">
                     <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-white/5">
                       {lineup.team?.logo?.light && (
-                        <img src={lineup.team.logo.light} alt={lineup.team.name} className="size-6 rounded" />
+                        <img src={getImgUrl(lineup.team.logo.light)} alt={lineup.team.name} className="size-6 rounded" />
                       )}
                       <span className="font-medium text-gray-900 dark:text-white">{lineup.team?.name}</span>
                     </div>
@@ -547,7 +548,7 @@ function MatchDetails({ match }) {
                         <div key={player._id || player.id} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-white/5">
                           <div className="size-10 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                             {player.photo?.light ? (
-                              <img src={player.photo.light} alt={player.nickname || player.fullName || 'Player'} className="size-full object-cover" />
+                              <img src={getImgUrl(player.photo.light)} alt={player.nickname || player.fullName || 'Player'} className="size-full object-cover" />
                             ) : (
                               <Users className="size-5 text-gray-400 dark:text-gray-500" />
                             )}

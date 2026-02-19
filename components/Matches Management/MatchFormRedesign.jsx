@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { getImgUrl } from "@/lib/utils";
 import { useFormik } from "formik";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -485,8 +486,8 @@ function MatchFormRedesign({
                   teamId={formik.values.team1}
                   teamName={teamsOptions.find((t) => t.id === formik.values.team1)?.name}
                   teamLogo={
-                    teamsOptions.find((t) => t.id === formik.values.team1)?.logo?.light ||
-                    teamsOptions.find((t) => t.id === formik.values.team1)?.logo?.dark
+                    getImgUrl(teamsOptions.find((t) => t.id === formik.values.team1)?.logo?.light) ||
+                    getImgUrl(teamsOptions.find((t) => t.id === formik.values.team1)?.logo?.dark)
                   }
                   selectedPlayers={formik.values.team1Lineup}
                   onSelectionChange={(players) => formik.setFieldValue("team1Lineup", players)}
@@ -497,8 +498,8 @@ function MatchFormRedesign({
                   teamId={formik.values.team2}
                   teamName={teamsOptions.find((t) => t.id === formik.values.team2)?.name}
                   teamLogo={
-                    teamsOptions.find((t) => t.id === formik.values.team2)?.logo?.light ||
-                    teamsOptions.find((t) => t.id === formik.values.team2)?.logo?.dark
+                    getImgUrl(teamsOptions.find((t) => t.id === formik.values.team2)?.logo?.light) ||
+                    getImgUrl(teamsOptions.find((t) => t.id === formik.values.team2)?.logo?.dark)
                   }
                   selectedPlayers={formik.values.team2Lineup}
                   onSelectionChange={(players) => formik.setFieldValue("team2Lineup", players)}
@@ -559,13 +560,13 @@ function MatchFormRedesign({
               label={`${teamsOptions.find((t) => t.id === formik.values.team1)?.name || t("team1") || "Team 1"} ${t("score") || "Score"}`}
               name="team1Score"
               formik={formik}
-              teamLogo={teamsOptions.find((t) => t.id === formik.values.team1)?.logo?.light}
+              teamLogo={getImgUrl(teamsOptions.find((t) => t.id === formik.values.team1)?.logo?.light)}
             />
             <ScoreInputField
               label={`${teamsOptions.find((t) => t.id === formik.values.team2)?.name || t("team2") || "Team 2"} ${t("score") || "Score"}`}
               name="team2Score"
               formik={formik}
-              teamLogo={teamsOptions.find((t) => t.id === formik.values.team2)?.logo?.light}
+              teamLogo={getImgUrl(teamsOptions.find((t) => t.id === formik.values.team2)?.logo?.light)}
             />
           </FormRow>
         </FormSection>
@@ -1107,7 +1108,7 @@ function TournamentSelectField({
                   <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-amber-500/10 flex items-center justify-center">
                     {selectedTournament.logo?.light ? (
                       <img
-                        src={selectedTournament.logo.light}
+                        src={getImgUrl(selectedTournament.logo.light)}
                         alt={selectedTournament.name}
                         className="w-full h-full object-cover"
                       />
@@ -1181,7 +1182,7 @@ function TournamentSelectField({
                   >
                     <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-[#252a3d]">
                       {tournament.logo?.light ? (
-                        <img src={tournament.logo.light} alt={tournament.name} className="w-full h-full object-cover" />
+                        <img src={getImgUrl(tournament.logo.light)} alt={tournament.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <Trophy className="size-4 text-gray-600 dark:text-gray-400" />
@@ -1264,7 +1265,7 @@ function EventSelectField({
                   <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-purple-500/10 flex items-center justify-center">
                     {selectedEvent.logo?.light ? (
                       <img
-                        src={selectedEvent.logo.light}
+                        src={getImgUrl(selectedEvent.logo.light)}
                         alt={selectedEvent.name}
                         className="w-full h-full object-cover"
                       />
@@ -1338,7 +1339,7 @@ function EventSelectField({
                   >
                     <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-[#252a3d]">
                       {event.logo?.light ? (
-                        <img src={event.logo.light} alt={event.name} className="w-full h-full object-cover" />
+                        <img src={getImgUrl(event.logo.light)} alt={event.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <CalendarDays className="size-4 text-gray-600 dark:text-gray-400" />
@@ -1418,7 +1419,7 @@ function GameSelectField({ label, name, games, formik, placeholder, searchPlaceh
                 <>
                   <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-green-primary/10 flex items-center justify-center">
                     {selectedGame.logo?.light ? (
-                      <img src={selectedGame.logo.light} alt={selectedGame.name} className="w-full h-full object-cover" />
+                      <img src={getImgUrl(selectedGame.logo.light)} alt={selectedGame.name} className="w-full h-full object-cover" />
                     ) : (
                       <Gamepad2 className="size-4 text-green-primary" />
                     )}
@@ -1487,7 +1488,7 @@ function GameSelectField({ label, name, games, formik, placeholder, searchPlaceh
                   >
                     <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-[#252a3d]">
                       {game.logo?.light ? (
-                        <img src={game.logo.light} alt={game.name} className="w-full h-full object-cover" />
+                        <img src={getImgUrl(game.logo.light)} alt={game.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <Gamepad2 className="size-4 text-gray-600 dark:text-gray-400" />
@@ -1562,7 +1563,7 @@ function TeamSelectField({ label, name, teams, formik, placeholder, searchPlaceh
                 <>
                   <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-blue-500/10 flex items-center justify-center">
                     {selectedTeam.logo?.light ? (
-                      <img src={selectedTeam.logo.light} alt={selectedTeam.name} className="w-full h-full object-cover" />
+                      <img src={getImgUrl(selectedTeam.logo.light)} alt={selectedTeam.name} className="w-full h-full object-cover" />
                     ) : (
                       <Users className="size-4 text-blue-500" />
                     )}
@@ -1631,7 +1632,7 @@ function TeamSelectField({ label, name, teams, formik, placeholder, searchPlaceh
                   >
                     <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-[#252a3d]">
                       {team.logo?.light ? (
-                        <img src={team.logo.light} alt={team.name} className="w-full h-full object-cover" />
+                        <img src={getImgUrl(team.logo.light)} alt={team.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <Users className="size-4 text-gray-600 dark:text-gray-400" />

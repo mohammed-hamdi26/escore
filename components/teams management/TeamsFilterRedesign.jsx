@@ -35,6 +35,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import Image from "next/image";
+import { getImgUrl } from "@/lib/utils";
 
 const STATUS_OPTIONS = [
   { value: "", label: "allTeams", icon: ListFilter, color: "text-gray-500" },
@@ -245,7 +246,7 @@ function TeamsFilterRedesign({ games = [], countries = [] }) {
                         <>
                           {selectedGame.logo?.light || selectedGame.logo?.dark ? (
                             <Image
-                              src={selectedGame.logo.light || selectedGame.logo.dark}
+                              src={getImgUrl(selectedGame.logo.light) || getImgUrl(selectedGame.logo.dark)}
                               alt={selectedGame.name}
                               width={20}
                               height={20}
@@ -305,7 +306,7 @@ function TeamsFilterRedesign({ games = [], countries = [] }) {
                           >
                             {game.logo?.light || game.logo?.dark ? (
                               <Image
-                                src={game.logo.light || game.logo.dark}
+                                src={getImgUrl(game.logo.light) || getImgUrl(game.logo.dark)}
                                 alt={game.name}
                                 width={20}
                                 height={20}

@@ -1,5 +1,6 @@
 "use client";
 
+import { getImgUrl } from "@/lib/utils";
 import { Link, useRouter } from "@/i18n/navigation";
 import { Button } from "../ui/button";
 import { format } from "date-fns";
@@ -101,13 +102,13 @@ function TransferDetails({ transfer }) {
                     {transfer.fromTeam.logo ? (
                       <>
                         <img
-                          src={transfer.fromTeam.logo.light || transfer.fromTeam.logo}
+                          src={getImgUrl(transfer.fromTeam.logo.light) || getImgUrl(transfer.fromTeam.logo)}
                           alt={transfer.fromTeam.name}
                           className="size-20 rounded-xl object-contain dark:hidden"
                         />
                         {transfer.fromTeam.logo.dark && (
                           <img
-                            src={transfer.fromTeam.logo.dark}
+                            src={getImgUrl(transfer.fromTeam.logo.dark)}
                             alt={transfer.fromTeam.name}
                             className="size-20 rounded-xl object-contain hidden dark:block"
                           />
@@ -134,7 +135,7 @@ function TransferDetails({ transfer }) {
               <div className="flex flex-col items-center">
                 {transfer.player?.photo ? (
                   <img
-                    src={transfer.player.photo.light || transfer.player.photo}
+                    src={getImgUrl(transfer.player.photo.light) || getImgUrl(transfer.player.photo)}
                     alt={transfer.player.nickname}
                     className="size-24 rounded-full object-cover border-4 border-green-primary/20"
                   />
@@ -162,13 +163,13 @@ function TransferDetails({ transfer }) {
                     {transfer.toTeam.logo ? (
                       <>
                         <img
-                          src={transfer.toTeam.logo.light || transfer.toTeam.logo}
+                          src={getImgUrl(transfer.toTeam.logo.light) || getImgUrl(transfer.toTeam.logo)}
                           alt={transfer.toTeam.name}
                           className="size-20 rounded-xl object-contain dark:hidden"
                         />
                         {transfer.toTeam.logo.dark && (
                           <img
-                            src={transfer.toTeam.logo.dark}
+                            src={getImgUrl(transfer.toTeam.logo.dark)}
                             alt={transfer.toTeam.name}
                             className="size-20 rounded-xl object-contain hidden dark:block"
                           />
@@ -305,7 +306,7 @@ function TransferDetails({ transfer }) {
               <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 dark:bg-[#1a1d2e]">
                 {transfer.player.photo ? (
                   <img
-                    src={transfer.player.photo.light || transfer.player.photo}
+                    src={getImgUrl(transfer.player.photo.light) || getImgUrl(transfer.player.photo)}
                     alt={transfer.player.nickname}
                     className="size-12 rounded-full object-cover"
                   />

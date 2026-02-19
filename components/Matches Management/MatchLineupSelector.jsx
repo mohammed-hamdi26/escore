@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Users, User, Loader2 } from "lucide-react";
 import { fetchPlayersByTeam } from "@/app/[locale]/_Lib/actions";
+import { getImgUrl } from "@/lib/utils";
 
 function MatchLineupSelector({
   teamId,
@@ -77,7 +78,7 @@ function MatchLineupSelector({
           <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 dark:bg-[#232838] flex items-center justify-center">
             {teamLogo ? (
               <Image
-                src={teamLogo}
+                src={getImgUrl(teamLogo)}
                 width={32}
                 height={32}
                 alt={teamName || "Team"}
@@ -139,7 +140,7 @@ function MatchLineupSelector({
           {players?.map((player) => {
             const playerId = player.id || player._id;
             const isSelected = selectedPlayers.includes(playerId);
-            const photoUrl = player?.photo?.light || player?.photo?.dark;
+            const photoUrl = getImgUrl(player?.photo?.light) || getImgUrl(player?.photo?.dark);
 
             return (
               <label

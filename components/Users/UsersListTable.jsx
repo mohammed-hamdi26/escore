@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
+import { getImgUrl } from "@/lib/utils";
 
 export default function UsersListTable({ users, meta }) {
   const [isLoading, setIsLoading] = useState(null);
@@ -119,7 +120,7 @@ export default function UsersListTable({ users, meta }) {
               <div className="flex items-center gap-3">
                 {user.avatar?.light ? (
                   <img
-                    src={user.avatar.light}
+                    src={getImgUrl(user.avatar.light)}
                     alt=""
                     className="size-12 rounded-xl object-cover ring-2 ring-gray-100 dark:ring-white/10"
                   />

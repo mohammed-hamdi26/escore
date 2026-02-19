@@ -42,6 +42,7 @@ import {
   ENTITIES,
   ACTIONS,
 } from "@/contexts/PermissionsContext";
+import { getImgUrl } from "@/lib/utils";
 
 function formatDate(date) {
   if (!date) return "—";
@@ -72,8 +73,8 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
   const { hasPermission } = usePermissions();
   const canUpdate = hasPermission(ENTITIES.CLUB, ACTIONS.UPDATE);
 
-  const clubLogo = club?.logo?.light || club?.logo?.dark;
-  const clubCover = club?.coverImage?.light || club?.coverImage?.dark;
+  const clubLogo = getImgUrl(club?.logo?.light) || getImgUrl(club?.logo?.dark);
+  const clubCover = getImgUrl(club?.coverImage?.light) || getImgUrl(club?.coverImage?.dark);
   const countryFlag = club?.country?.code
     ? `https://flagcdn.com/w40/${club.country.code.toLowerCase()}.png`
     : null;
@@ -323,8 +324,8 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                   {club.teams.slice(0, 5).map((entry, index) => {
                     const team = entry.team || {};
                     const game = entry.game || {};
-                    const teamLogo = team.logo?.light || team.logo?.dark;
-                    const gameLogo = game.logo?.light || game.logo?.dark;
+                    const teamLogo = getImgUrl(team.logo?.light) || getImgUrl(team.logo?.dark);
+                    const gameLogo = getImgUrl(game.logo?.light) || getImgUrl(game.logo?.dark);
                     return (
                       <div
                         key={index}
@@ -399,7 +400,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           <div className="space-y-1.5">
                             <div className="aspect-square rounded-xl bg-white border border-gray-200 flex items-center justify-center p-4 overflow-hidden">
                               <img
-                                src={club.logo.light}
+                                src={getImgUrl(club.logo.light)}
                                 alt="Logo Light"
                                 className="max-w-full max-h-full object-contain"
                               />
@@ -414,7 +415,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           <div className="space-y-1.5">
                             <div className="aspect-square rounded-xl bg-[#1a1d2e] border border-white/10 flex items-center justify-center p-4 overflow-hidden">
                               <img
-                                src={club.logo.dark}
+                                src={getImgUrl(club.logo.dark)}
                                 alt="Logo Dark"
                                 className="max-w-full max-h-full object-contain"
                               />
@@ -440,7 +441,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           <div className="space-y-1.5">
                             <div className="aspect-video rounded-xl bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
                               <img
-                                src={club.coverImage.light}
+                                src={getImgUrl(club.coverImage.light)}
                                 alt="Cover Light"
                                 className="w-full h-full object-cover"
                               />
@@ -455,7 +456,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           <div className="space-y-1.5">
                             <div className="aspect-video rounded-xl bg-[#1a1d2e] border border-white/10 flex items-center justify-center overflow-hidden">
                               <img
-                                src={club.coverImage.dark}
+                                src={getImgUrl(club.coverImage.dark)}
                                 alt="Cover Dark"
                                 className="w-full h-full object-cover"
                               />
@@ -629,7 +630,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                       {selectedTeamObj ? (
                         <span className="flex items-center gap-2 truncate">
                           {selectedTeamObj.logo?.light ? (
-                            <img src={selectedTeamObj.logo.light} alt="" className="size-5 rounded object-contain" />
+                            <img src={getImgUrl(selectedTeamObj.logo.light)} alt="" className="size-5 rounded object-contain" />
                           ) : (
                             <Users className="size-4 text-muted-foreground shrink-0" />
                           )}
@@ -657,7 +658,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           {filteredTeams.length > 0 ? (
                             filteredTeams.map((team) => {
                               const teamGame = team.game;
-                              const gameLogo = teamGame?.logo?.light || teamGame?.logo?.dark;
+                              const gameLogo = getImgUrl(teamGame?.logo?.light) || getImgUrl(teamGame?.logo?.dark);
                               return (
                               <CommandItem
                                 key={team.id}
@@ -670,7 +671,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                                 className="flex items-center gap-2 cursor-pointer"
                               >
                                 {team.logo?.light ? (
-                                  <img src={team.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                  <img src={getImgUrl(team.logo.light)} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                 ) : (
                                   <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                     <Users className="size-3.5 text-muted-foreground" />
@@ -704,7 +705,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                   <Gamepad2 className="size-3.5" />
                   <span>{t("game") || "Game"}:</span>
                   {(selectedTeamGame.logo?.light || selectedTeamGame.logo?.dark) && (
-                    <img src={selectedTeamGame.logo.light || selectedTeamGame.logo.dark} alt="" className="size-4 rounded" />
+                    <img src={getImgUrl(selectedTeamGame.logo.light) || getImgUrl(selectedTeamGame.logo.dark)} alt="" className="size-4 rounded" />
                   )}
                   <span className="font-medium text-foreground">{selectedTeamGame.name}</span>
                 </div>
@@ -856,8 +857,8 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                 {Object.values(teamGroups).map((group) => {
                   const teamData = group.team || {};
                   const gameData = group.game || {};
-                  const teamLogo = teamData.logo?.light || teamData.logo?.dark;
-                  const gameLogo = gameData.logo?.light || gameData.logo?.dark;
+                  const teamLogo = getImgUrl(teamData.logo?.light) || getImgUrl(teamData.logo?.dark);
+                  const gameLogo = getImgUrl(gameData.logo?.light) || getImgUrl(gameData.logo?.dark);
                   return (
                     <div key={teamData.id || "unknown"}>
                       <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/5">
@@ -873,7 +874,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                       <div className="space-y-1.5">
                         {group.players.map((entry, idx) => {
                           const player = entry.player || {};
-                          const playerPhoto = player.photo?.light || player.photo?.dark;
+                          const playerPhoto = getImgUrl(player.photo?.light) || getImgUrl(player.photo?.dark);
                           return (
                             <div key={idx} className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-muted/30 transition-colors">
                               {playerPhoto ? (
@@ -960,7 +961,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           {selectedPlayerGameObj ? (
                             <span className="flex items-center gap-2 truncate">
                               {selectedPlayerGameObj.logo?.light ? (
-                                <img src={selectedPlayerGameObj.logo.light} alt="" className="size-5 rounded object-contain" />
+                                <img src={getImgUrl(selectedPlayerGameObj.logo.light)} alt="" className="size-5 rounded object-contain" />
                               ) : (
                                 <Gamepad2 className="size-4 text-muted-foreground shrink-0" />
                               )}
@@ -999,7 +1000,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
                                     {game.logo?.light ? (
-                                      <img src={game.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                      <img src={getImgUrl(game.logo.light)} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                     ) : (
                                       <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                         <Gamepad2 className="size-3.5 text-muted-foreground" />
@@ -1037,7 +1038,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           {selectedPlayerObj ? (
                             <span className="flex items-center gap-2 truncate">
                               {(selectedPlayerObj.photo?.light || selectedPlayerObj.photo?.dark) ? (
-                                <img src={selectedPlayerObj.photo.light || selectedPlayerObj.photo.dark} alt="" className="size-5 rounded-full object-cover" />
+                                <img src={getImgUrl(selectedPlayerObj.photo.light) || getImgUrl(selectedPlayerObj.photo.dark)} alt="" className="size-5 rounded-full object-cover" />
                               ) : (
                                 <User className="size-4 text-muted-foreground shrink-0" />
                               )}
@@ -1075,7 +1076,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
                                     {(p.photo?.light || p.photo?.dark) ? (
-                                      <img src={p.photo.light || p.photo.dark} alt="" className="size-6 rounded-full object-cover" />
+                                      <img src={getImgUrl(p.photo.light) || getImgUrl(p.photo.dark)} alt="" className="size-6 rounded-full object-cover" />
                                     ) : (
                                       <div className="size-6 rounded-full bg-muted/30 flex items-center justify-center">
                                         <User className="size-3.5 text-muted-foreground" />
@@ -1126,7 +1127,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                 {individualPlayers.map((entry, index) => {
                   const player = entry.player || {};
                   const game = entry.game || {};
-                  const playerPhoto = player.photo?.light || player.photo?.dark;
+                  const playerPhoto = getImgUrl(player.photo?.light) || getImgUrl(player.photo?.dark);
 
                   return (
                     <div

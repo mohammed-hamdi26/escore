@@ -14,6 +14,7 @@ import {
 import { updateParticipantResults } from "@/app/[locale]/_Lib/actions";
 import TimeInput from "@/components/ui/TimeInput";
 import toast from "react-hot-toast";
+import { getImgUrl } from "@/lib/utils";
 
 function ParticipantResultsEditor({ match, tournament, onSaved }) {
   const t = useTranslations("MatchDetails");
@@ -262,7 +263,7 @@ function ParticipantResultsEditor({ match, tournament, onSaved }) {
                   <div className="flex items-center gap-2">
                     {row.logo?.light ? (
                       <img
-                        src={row.logo.light}
+                        src={getImgUrl(row.logo.light)}
                         alt={row.name}
                         className="size-6 rounded object-cover"
                       />

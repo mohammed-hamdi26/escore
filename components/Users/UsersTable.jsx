@@ -1,4 +1,5 @@
 "use client";
+import { getImgUrl } from "@/lib/utils";
 import { deleteUser } from "@/app/[locale]/_Lib/actions";
 import Table from "@/components/ui app/Table";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,7 @@ function UsersTable({ users, meta }) {
             <Table.Cell className="flex gap-4 items-center">
               {user.avatar && (
                 <img
-                  src={user.avatar.light}
+                  src={getImgUrl(user.avatar.light)}
                   width={30}
                   height={30}
                   alt=""

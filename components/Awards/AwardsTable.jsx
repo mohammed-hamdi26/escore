@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Spinner } from "../ui/spinner";
+import { getImgUrl } from "@/lib/utils";
 
 function AwardsTable({ awards, games, awardsType, idUser }) {
   const t = useTranslations("Awards");
@@ -72,8 +73,8 @@ function AwardsTable({ awards, games, awardsType, idUser }) {
       {/* Awards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {awards.map((award) => {
-          const awardImage = award.image?.light || award.image?.dark || award.icon;
-          const gameImage = award.game?.logo?.light || award.game?.logo?.dark;
+          const awardImage = getImgUrl(award.image?.light) || getImgUrl(award.image?.dark) || getImgUrl(award.icon);
+          const gameImage = getImgUrl(award.game?.logo?.light) || getImgUrl(award.game?.logo?.dark);
 
           return (
             <div

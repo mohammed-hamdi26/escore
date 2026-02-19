@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
+import { getImgUrl } from "@/lib/utils";
 
 const STATUS_COLORS = {
   upcoming: "bg-blue-500/10 text-blue-500 border-blue-500/20",
@@ -52,7 +53,7 @@ function EventCard({ event, viewMode = "grid", onDelete, t }) {
   const canEdit = hasPermission(ENTITIES.EVENT, ACTIONS.UPDATE);
   const canDelete = hasPermission(ENTITIES.EVENT, ACTIONS.DELETE);
 
-  const eventLogo = event.logo?.light || event.logo?.dark;
+  const eventLogo = getImgUrl(event.logo?.light) || getImgUrl(event.logo?.dark);
   const countryFlag = event.country?.code
     ? `https://flagcdn.com/24x18/${event.country.code.toLowerCase()}.png`
     : null;

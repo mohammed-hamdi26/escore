@@ -17,6 +17,7 @@ import {
   Clock,
   Image as ImageIcon,
 } from "lucide-react";
+import { getImgUrl } from "@/lib/utils";
 
 function GamesDetails({ game }) {
   const t = useTranslations("GamesDetails");
@@ -58,7 +59,7 @@ function GamesDetails({ game }) {
               <div className="flex-shrink-0">
                 {game.logo?.light ? (
                   <img
-                    src={game.logo.light}
+                    src={getImgUrl(game.logo.light)}
                     alt={game.name}
                     className="size-24 rounded-2xl object-cover ring-2 ring-white/10"
                   />
@@ -129,7 +130,7 @@ function GamesDetails({ game }) {
                       <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                       <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
                         <img
-                          src={game.logo.light}
+                          src={getImgUrl(game.logo.light)}
                           alt="Logo Light"
                           className="w-full h-full object-contain"
                         />
@@ -141,7 +142,7 @@ function GamesDetails({ game }) {
                       <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                       <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
                         <img
-                          src={game.logo.dark}
+                          src={getImgUrl(game.logo.dark)}
                           alt="Logo Dark"
                           className="w-full h-full object-contain"
                         />
@@ -161,7 +162,7 @@ function GamesDetails({ game }) {
                         <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                         <div className="aspect-video w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
                           <img
-                            src={game.coverImage.light}
+                            src={getImgUrl(game.coverImage.light)}
                             alt="Cover Light"
                             className="w-full h-full object-cover"
                           />
@@ -173,7 +174,7 @@ function GamesDetails({ game }) {
                         <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                         <div className="aspect-video w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
                           <img
-                            src={game.coverImage.dark}
+                            src={getImgUrl(game.coverImage.dark)}
                             alt="Cover Dark"
                             className="w-full h-full object-cover"
                           />

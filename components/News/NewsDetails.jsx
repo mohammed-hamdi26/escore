@@ -32,6 +32,7 @@ import {
   Loader2,
   Image as ImageIcon,
 } from "lucide-react";
+import { getImgUrl } from "@/lib/utils";
 
 function NewsDetails({ news }) {
   const t = useTranslations("NewsDetails");
@@ -142,7 +143,7 @@ function NewsDetails({ news }) {
             {news.coverImage?.light && (
               <div className="relative aspect-[2/1] w-full">
                 <img
-                  src={news.coverImage.light}
+                  src={getImgUrl(news.coverImage.light)}
                   alt={news.title}
                   className="w-full h-full object-cover"
                 />
@@ -193,7 +194,7 @@ function NewsDetails({ news }) {
               <div className="flex items-center gap-3">
                 {news.authorImage?.light ? (
                   <img
-                    src={news.authorImage.light}
+                    src={getImgUrl(news.authorImage.light)}
                     alt={news.authorName}
                     className="size-10 rounded-full object-cover"
                   />
@@ -287,7 +288,7 @@ function NewsDetails({ news }) {
                     <p className="text-sm text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                     <div className="aspect-[2/1] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
                       <img
-                        src={news.coverImage.light}
+                        src={getImgUrl(news.coverImage.light)}
                         alt="Cover Light"
                         className="w-full h-full object-cover"
                       />
@@ -299,7 +300,7 @@ function NewsDetails({ news }) {
                     <p className="text-sm text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                     <div className="aspect-[2/1] w-full rounded-xl ring-1 ring-gray-200 dark:ring-white/10 overflow-hidden">
                       <img
-                        src={news.coverImage.dark}
+                        src={getImgUrl(news.coverImage.dark)}
                         alt="Cover Dark"
                         className="w-full h-full object-cover"
                       />
@@ -323,7 +324,7 @@ function NewsDetails({ news }) {
               <div className="flex items-center gap-3">
                 {news.game.logo?.light ? (
                   <img
-                    src={news.game.logo.light}
+                    src={getImgUrl(news.game.logo.light)}
                     alt={news.game.name}
                     className="size-12 rounded-xl object-cover"
                   />
@@ -352,7 +353,7 @@ function NewsDetails({ news }) {
               <div className="flex items-center gap-3">
                 {news.tournament.logo?.light ? (
                   <img
-                    src={news.tournament.logo.light}
+                    src={getImgUrl(news.tournament.logo.light)}
                     alt={news.tournament.name}
                     className="size-12 rounded-xl object-cover"
                   />
@@ -381,7 +382,7 @@ function NewsDetails({ news }) {
               <div className="flex items-center gap-3">
                 {news.team.logo?.light ? (
                   <img
-                    src={news.team.logo.light}
+                    src={getImgUrl(news.team.logo.light)}
                     alt={news.team.name}
                     className="size-12 rounded-xl object-cover"
                   />
@@ -410,7 +411,7 @@ function NewsDetails({ news }) {
               <div className="flex items-center gap-3">
                 {news.player.image?.light ? (
                   <img
-                    src={news.player.image.light}
+                    src={getImgUrl(news.player.image.light)}
                     alt={news.player.nickname || news.player.fullName || 'Player'}
                     className="size-12 rounded-full object-cover"
                   />
@@ -440,7 +441,7 @@ function NewsDetails({ news }) {
                 <div className="text-center">
                   {news.match.team1?.logo?.light ? (
                     <img
-                      src={news.match.team1.logo.light}
+                      src={getImgUrl(news.match.team1.logo.light)}
                       alt={news.match.team1.name}
                       className="size-10 rounded-lg object-cover mx-auto mb-1"
                     />
@@ -455,7 +456,7 @@ function NewsDetails({ news }) {
                 <div className="text-center">
                   {news.match.team2?.logo?.light ? (
                     <img
-                      src={news.match.team2.logo.light}
+                      src={getImgUrl(news.match.team2.logo.light)}
                       alt={news.match.team2.name}
                       className="size-10 rounded-lg object-cover mx-auto mb-1"
                     />

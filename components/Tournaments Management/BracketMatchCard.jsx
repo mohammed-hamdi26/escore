@@ -1,6 +1,7 @@
 "use client";
 
 import { Trophy } from "lucide-react";
+import { getImgUrl } from "@/lib/utils";
 
 const STATUS_COLORS = {
   scheduled: "border-gray-500/30 bg-gray-500/5",
@@ -38,7 +39,7 @@ function TeamRow({ team, score, isWinner, isBye }) {
       <div className="flex items-center gap-2 min-w-0 flex-1">
         {team.logo?.light ? (
           <img
-            src={team.logo.light}
+            src={getImgUrl(team.logo.light)}
             alt={team.name}
             className="size-5 rounded object-cover flex-shrink-0"
           />
@@ -115,7 +116,7 @@ function BracketMatchCard({ match }) {
                     {p.placement ? `#${p.placement}` : "-"}
                   </span>
                   {logo?.light ? (
-                    <img src={logo.light} alt={name} className="size-4 rounded object-cover shrink-0" />
+                    <img src={getImgUrl(logo.light)} alt={name} className="size-4 rounded object-cover shrink-0" />
                   ) : (
                     <div className="size-4 rounded bg-muted flex items-center justify-center shrink-0">
                       <Trophy className="size-2.5 text-muted-foreground" />

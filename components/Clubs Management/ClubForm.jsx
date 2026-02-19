@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { getImgUrl } from "@/lib/utils";
 import Image from "next/image";
 import {
   Building2,
@@ -643,10 +644,10 @@ function ClubForm({ formType = "add", submit, club, countries = [] }) {
       region: club?.region || "",
       founded: formatDateToLocal(club?.founded),
       websiteUrl: club?.websiteUrl || "",
-      logoLight: club?.logo?.light || "",
-      logoDark: club?.logo?.dark || "",
-      coverImageLight: club?.coverImage?.light || "",
-      coverImageDark: club?.coverImage?.dark || "",
+      logoLight: getImgUrl(club?.logo?.light) || "",
+      logoDark: getImgUrl(club?.logo?.dark) || "",
+      coverImageLight: getImgUrl(club?.coverImage?.light) || "",
+      coverImageDark: getImgUrl(club?.coverImage?.dark) || "",
     },
     validationSchema,
     validateOnChange: true,

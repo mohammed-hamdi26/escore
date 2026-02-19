@@ -29,6 +29,7 @@ import {
 import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
+import { getImgUrl } from "@/lib/utils";
 
 function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -40,8 +41,8 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
   const canUpdate = hasPermission(ENTITIES.PLAYER, ACTIONS.UPDATE);
   const canDelete = hasPermission(ENTITIES.PLAYER, ACTIONS.DELETE);
 
-  const playerImage = player.photo?.light || player.photo?.dark;
-  const teamImage = player.team?.logo?.light || player.team?.logo?.dark;
+  const playerImage = getImgUrl(player.photo?.light) || getImgUrl(player.photo?.dark);
+  const teamImage = getImgUrl(player.team?.logo?.light) || getImgUrl(player.team?.logo?.dark);
 
   // Calculate age from dateOfBirth
   const calculateAge = (dateOfBirth) => {
@@ -123,7 +124,7 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
               <Badge className="bg-black/70 backdrop-blur-sm text-white border-0 gap-1.5">
                 {player.game.logo?.light ? (
                   <img
-                    src={player.game.logo.light}
+                    src={getImgUrl(player.game.logo.light)}
                     alt={player.game.name}
                     className="size-3.5 rounded"
                   />
@@ -340,7 +341,7 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
             <Badge className="bg-muted/50 text-foreground border-0 gap-1.5">
               {player.game.logo?.light ? (
                 <img
-                  src={player.game.logo.light}
+                  src={getImgUrl(player.game.logo.light)}
                   alt={player.game.name}
                   className="size-3.5 rounded"
                 />

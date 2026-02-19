@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { getImgUrl } from "@/lib/utils";
 import { Button } from "../ui/button";
 import {
   Loader2,
@@ -46,8 +47,8 @@ function AvatarForm({ t, setOpen, avatar, onSuccess }) {
   const formik = useFormik({
     initialValues: {
       name: avatar?.name || "",
-      lightImage: avatar?.image?.light || "",
-      darkImage: avatar?.image?.dark || "",
+      lightImage: getImgUrl(avatar?.image?.light) || "",
+      darkImage: getImgUrl(avatar?.image?.dark) || "",
     },
     validationSchema,
     onSubmit: async (values) => {

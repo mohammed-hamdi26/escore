@@ -1,8 +1,9 @@
 import Image from "next/image";
 import { Users } from "lucide-react";
+import { getImgUrl } from "@/lib/utils";
 
 function TeamLineupHeader({ team, playersCount }) {
-  const logoUrl = team?.logo?.light || team?.logo?.dark;
+  const logoUrl = getImgUrl(team?.logo?.light) || getImgUrl(team?.logo?.dark);
 
   return (
     <div className="flex items-center gap-6 mb-8">

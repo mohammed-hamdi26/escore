@@ -1,5 +1,6 @@
 "use client";
 
+import { getImgUrl } from "@/lib/utils";
 import { useFormik } from "formik";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
@@ -314,7 +315,7 @@ function TransfersForm({
                       <>
                         {selectedPlayer.photo && (
                           <img
-                            src={selectedPlayer.photo.light || selectedPlayer.photo}
+                            src={getImgUrl(selectedPlayer.photo.light) || getImgUrl(selectedPlayer.photo)}
                             alt=""
                             className="size-6 rounded-full object-cover"
                           />
@@ -359,7 +360,7 @@ function TransfersForm({
                             />
                             {player.photo && (
                               <img
-                                src={player.photo.light || player.photo}
+                                src={getImgUrl(player.photo.light) || getImgUrl(player.photo)}
                                 alt=""
                                 className="size-6 rounded-full mr-2 object-cover"
                               />
@@ -399,7 +400,7 @@ function TransfersForm({
                       <>
                         {selectedGame.logo && (
                           <img
-                            src={selectedGame.logo.light || selectedGame.logo.dark}
+                            src={getImgUrl(selectedGame.logo.light) || getImgUrl(selectedGame.logo.dark)}
                             alt=""
                             className="size-6 rounded object-contain"
                           />
@@ -442,7 +443,7 @@ function TransfersForm({
                             />
                             {game.logo && (
                               <img
-                                src={game.logo.light || game.logo.dark}
+                                src={getImgUrl(game.logo.light) || getImgUrl(game.logo.dark)}
                                 alt=""
                                 className="size-6 rounded mr-2 object-contain"
                               />
@@ -488,7 +489,7 @@ function TransfersForm({
                       <>
                         {selectedFromTeam.logo && (
                           <img
-                            src={selectedFromTeam.logo.light || selectedFromTeam.logo.dark}
+                            src={getImgUrl(selectedFromTeam.logo.light) || getImgUrl(selectedFromTeam.logo.dark)}
                             alt=""
                             className="size-6 rounded object-contain"
                           />
@@ -547,7 +548,7 @@ function TransfersForm({
                             />
                             {team.logo && (
                               <img
-                                src={team.logo.light || team.logo.dark}
+                                src={getImgUrl(team.logo.light) || getImgUrl(team.logo.dark)}
                                 alt=""
                                 className="size-6 rounded mr-2 object-contain"
                               />
@@ -586,7 +587,7 @@ function TransfersForm({
                       <>
                         {selectedToTeam.logo && (
                           <img
-                            src={selectedToTeam.logo.light || selectedToTeam.logo.dark}
+                            src={getImgUrl(selectedToTeam.logo.light) || getImgUrl(selectedToTeam.logo.dark)}
                             alt=""
                             className="size-6 rounded object-contain"
                           />
@@ -644,7 +645,7 @@ function TransfersForm({
                             />
                             {team.logo && (
                               <img
-                                src={team.logo.light || team.logo.dark}
+                                src={getImgUrl(team.logo.light) || getImgUrl(team.logo.dark)}
                                 alt=""
                                 className="size-6 rounded mr-2 object-contain"
                               />

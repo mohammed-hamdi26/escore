@@ -6,6 +6,7 @@ import { useState, useRef } from "react";
 import InputApp from "../ui app/InputApp";
 import SelectInput from "../ui app/SelectInput";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
+import { getImgUrl } from "@/lib/utils";
 import { Button } from "../ui/button";
 import {
   addFavoriteCharacter,
@@ -56,8 +57,8 @@ function FavoriteCharacterForm({
   const formik = useFormik({
     initialValues: {
       name: character?.name || "",
-      imageLight: character?.image?.light || "",
-      imageDark: character?.image?.dark || "",
+      imageLight: getImgUrl(character?.image?.light) || "",
+      imageDark: getImgUrl(character?.image?.dark) || "",
       game: character?.game?.id || character?.game?._id || "",
     },
     onSubmit: async (values) => {
@@ -212,7 +213,7 @@ function FavoriteCharacterForm({
             /* Image Preview */
             <div className={`relative aspect-square ${bgGradient}`}>
               <img
-                src={value}
+                src={getImgUrl(value)}
                 alt={label}
                 className="w-full h-full object-contain p-4"
                 onError={(e) => {
@@ -354,7 +355,7 @@ function FavoriteCharacterForm({
         <div className="flex items-center gap-3 p-3 bg-green-primary/10 rounded-lg border border-green-primary/20">
           {(selectedGame.logo?.light || selectedGame.logo?.dark) && (
             <img
-              src={selectedGame.logo?.light || selectedGame.logo?.dark}
+              src={getImgUrl(selectedGame.logo?.light) || getImgUrl(selectedGame.logo?.dark)}
               alt={selectedGame.name}
               className="size-8 rounded object-cover"
             />

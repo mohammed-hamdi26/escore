@@ -32,6 +32,7 @@ import {
 import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
+import { getImgUrl } from "@/lib/utils";
 
 function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +44,7 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
   const canUpdate = hasPermission(ENTITIES.TEAM, ACTIONS.UPDATE);
   const canDelete = hasPermission(ENTITIES.TEAM, ACTIONS.DELETE);
 
-  const teamLogo = team.logo?.light || team.logo?.dark;
+  const teamLogo = getImgUrl(team.logo?.light) || getImgUrl(team.logo?.dark);
 
   // Get country flag
   const countryFlag = team.country?.code
@@ -278,7 +279,7 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
               >
                 {team.game.logo?.light ? (
                   <img
-                    src={team.game.logo.light}
+                    src={getImgUrl(team.game.logo.light)}
                     alt={team.game.name}
                     className="size-3.5 rounded"
                   />
@@ -370,7 +371,7 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
               >
                 {team.game.logo?.light ? (
                   <img
-                    src={team.game.logo.light}
+                    src={getImgUrl(team.game.logo.light)}
                     alt={team.game.name}
                     className="size-3.5 rounded"
                   />

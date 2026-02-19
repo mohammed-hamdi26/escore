@@ -28,6 +28,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { useTranslations } from "next-intl";
+import { getImgUrl } from "@/lib/utils";
 
 export default function TransfersFilter({ games = [], players = [], teams = [] }) {
   const pathname = usePathname();
@@ -206,7 +207,7 @@ export default function TransfersFilter({ games = [], players = [], teams = [] }
                         <>
                           {games.find((g) => (g.id || g._id) === currentGame)?.logo && (
                             <img
-                              src={games.find((g) => (g.id || g._id) === currentGame)?.logo?.light || games.find((g) => (g.id || g._id) === currentGame)?.logo?.dark}
+                              src={getImgUrl(games.find((g) => (g.id || g._id) === currentGame)?.logo?.light) || getImgUrl(games.find((g) => (g.id || g._id) === currentGame)?.logo?.dark)}
                               alt=""
                               className="size-5 rounded object-contain"
                             />
@@ -247,7 +248,7 @@ export default function TransfersFilter({ games = [], players = [], teams = [] }
                         </CommandItem>
                         {filteredGames.map((game) => {
                           const gameId = game.id || game._id;
-                          const gameLogo = game.logo?.light || game.logo?.dark;
+                          const gameLogo = getImgUrl(game.logo?.light) || getImgUrl(game.logo?.dark);
                           return (
                             <CommandItem
                               key={gameId}
@@ -300,7 +301,7 @@ export default function TransfersFilter({ games = [], players = [], teams = [] }
                         <>
                           {teams.find((t) => (t.id || t._id) === currentTeam)?.logo && (
                             <img
-                              src={teams.find((t) => (t.id || t._id) === currentTeam)?.logo?.light || teams.find((t) => (t.id || t._id) === currentTeam)?.logo?.dark}
+                              src={getImgUrl(teams.find((t) => (t.id || t._id) === currentTeam)?.logo?.light) || getImgUrl(teams.find((t) => (t.id || t._id) === currentTeam)?.logo?.dark)}
                               alt=""
                               className="size-5 rounded object-contain"
                             />
@@ -341,7 +342,7 @@ export default function TransfersFilter({ games = [], players = [], teams = [] }
                         </CommandItem>
                         {filteredTeams.map((team) => {
                           const teamId = team.id || team._id;
-                          const teamLogo = team.logo?.light || team.logo?.dark;
+                          const teamLogo = getImgUrl(team.logo?.light) || getImgUrl(team.logo?.dark);
                           return (
                             <CommandItem
                               key={teamId}

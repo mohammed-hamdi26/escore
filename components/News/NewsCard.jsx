@@ -29,6 +29,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
+import { getImgUrl } from "@/lib/utils";
 
 function NewsCard({
   news,
@@ -45,8 +46,8 @@ function NewsCard({
 
   const isPublished =
     news.publishedAt && new Date(news.publishedAt) <= new Date();
-  const coverImage = news.coverImage?.light || news.coverImage?.dark;
-  const gameImage = news.game?.logo?.light || news.game?.logo?.dark;
+  const coverImage = getImgUrl(news.coverImage?.light) || getImgUrl(news.coverImage?.dark);
+  const gameImage = getImgUrl(news.game?.logo?.light) || getImgUrl(news.game?.logo?.dark);
 
   const handleAction = async (action, actionName) => {
     setIsLoading(true);

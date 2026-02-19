@@ -24,6 +24,7 @@ import TextAreaInput from "../ui app/TextAreaInput";
 import MatchLineupSelector from "./MatchLineupSelector";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
+import { getImgUrl } from "@/lib/utils";
 
 const validateSchema = Yup.object({
   date: Yup.date().required("Match date is required"),
@@ -378,10 +379,10 @@ function MatchesFrom({
                     teamsOptions.find((t) => t.id === formik.values.team1)?.name
                   }
                   teamLogo={
-                    teamsOptions.find((t) => t.id === formik.values.team1)?.logo
-                      ?.light ||
-                    teamsOptions.find((t) => t.id === formik.values.team1)?.logo
-                      ?.dark
+                    getImgUrl(teamsOptions.find((t) => t.id === formik.values.team1)?.logo
+                      ?.light) ||
+                    getImgUrl(teamsOptions.find((t) => t.id === formik.values.team1)?.logo
+                      ?.dark)
                   }
                   selectedPlayers={formik.values.team1Lineup}
                   onSelectionChange={(players) =>
@@ -396,10 +397,10 @@ function MatchesFrom({
                     teamsOptions.find((t) => t.id === formik.values.team2)?.name
                   }
                   teamLogo={
-                    teamsOptions.find((t) => t.id === formik.values.team2)?.logo
-                      ?.light ||
-                    teamsOptions.find((t) => t.id === formik.values.team2)?.logo
-                      ?.dark
+                    getImgUrl(teamsOptions.find((t) => t.id === formik.values.team2)?.logo
+                      ?.light) ||
+                    getImgUrl(teamsOptions.find((t) => t.id === formik.values.team2)?.logo
+                      ?.dark)
                   }
                   selectedPlayers={formik.values.team2Lineup}
                   onSelectionChange={(players) =>

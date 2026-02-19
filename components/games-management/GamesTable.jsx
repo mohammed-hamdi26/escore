@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import DropMenu from "../ui app/DropMenu";
 import { EllipsisVertical, Eye, Power, PowerOff, Gamepad2 } from "lucide-react";
 import { format } from "date-fns";
+import { getImgUrl } from "@/lib/utils";
 
 const columns = [
   { id: "name", header: "Name" },
@@ -69,7 +70,7 @@ export default function GamesTable({ games, pagination }) {
             <Table.Cell className="flex gap-3 items-center">
               {game?.logo?.light ? (
                 <img
-                  src={game.logo.light}
+                  src={getImgUrl(game.logo.light)}
                   alt={game.name}
                   className="size-10 rounded-lg object-cover"
                 />

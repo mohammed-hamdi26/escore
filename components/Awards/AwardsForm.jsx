@@ -6,6 +6,7 @@ import { useState, useRef } from "react";
 import InputApp from "../ui app/InputApp";
 import SelectInput from "../ui app/SelectInput";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
+import { getImgUrl } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { addAward, editAward, uploadPhoto } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
@@ -46,8 +47,8 @@ function AwardsForm({ awardsType, award, games, tournaments, id, t, setOpen }) {
   const formik = useFormik({
     initialValues: {
       name: award?.name || "",
-      imageLight: award?.image?.light || "",
-      imageDark: award?.image?.dark || award?.image?.iconDark || "",
+      imageLight: getImgUrl(award?.image?.light) || "",
+      imageDark: getImgUrl(award?.image?.dark) || getImgUrl(award?.image?.iconDark) || "",
       game: award?.game?.id || award?.game?._id || "",
     },
     onSubmit: async (values) => {
@@ -197,7 +198,7 @@ function AwardsForm({ awardsType, award, games, tournaments, id, t, setOpen }) {
             /* Image Preview */
             <div className={`relative aspect-square ${bgGradient}`}>
               <img
-                src={value}
+                src={getImgUrl(value)}
                 alt={label}
                 className="w-full h-full object-contain p-4"
                 onError={(e) => {
@@ -339,7 +340,7 @@ function AwardsForm({ awardsType, award, games, tournaments, id, t, setOpen }) {
         <div className="flex items-center gap-3 p-3 bg-green-primary/10 rounded-lg border border-green-primary/20">
           {(selectedGame.logo?.light || selectedGame.logo?.dark) && (
             <img
-              src={selectedGame.logo?.light || selectedGame.logo?.dark}
+              src={getImgUrl(selectedGame.logo?.light) || getImgUrl(selectedGame.logo?.dark)}
               alt={selectedGame.name}
               className="size-8 rounded object-cover"
             />

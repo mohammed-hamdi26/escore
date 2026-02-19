@@ -32,6 +32,7 @@ import {
   confirmStageAdvancementAction,
   updateStageVisibilityAction,
 } from "@/app/[locale]/_Lib/actions";
+import { getImgUrl } from "@/lib/utils";
 
 function BracketView({ tournament }) {
   const t = useTranslations("TournamentDetails");
@@ -863,7 +864,7 @@ function BracketView({ tournament }) {
                                       >
                                         {team.logo?.light ? (
                                           <img
-                                            src={team.logo.light}
+                                            src={getImgUrl(team.logo.light)}
                                             alt={team.name}
                                             className="size-4 rounded"
                                           />
@@ -972,7 +973,7 @@ function BracketView({ tournament }) {
                           <GripVertical className="size-4 text-muted-foreground" />
                           {team.logo?.light ? (
                             <img
-                              src={team.logo.light}
+                              src={getImgUrl(team.logo.light)}
                               alt={team.name}
                               className="size-6 rounded object-cover"
                             />
@@ -1386,7 +1387,7 @@ function BracketView({ tournament }) {
                                 >
                                   {team.logo?.light ? (
                                     <img
-                                      src={team.logo.light}
+                                      src={getImgUrl(team.logo.light)}
                                       alt={team.name}
                                       className="size-5 rounded"
                                     />
@@ -1553,7 +1554,7 @@ function BracketView({ tournament }) {
                           <GripVertical className="size-4 text-muted-foreground" />
                           {team.logo?.light ? (
                             <img
-                              src={team.logo.light}
+                              src={getImgUrl(team.logo.light)}
                               alt={team.name}
                               className="size-6 rounded object-cover"
                             />
@@ -1776,7 +1777,7 @@ function BracketView({ tournament }) {
                   </span>
                   {team.logo?.light ? (
                     <img
-                      src={team.logo.light}
+                      src={getImgUrl(team.logo.light)}
                       alt={team.name}
                       className="size-6 rounded object-cover"
                     />
@@ -2322,7 +2323,7 @@ function BracketView({ tournament }) {
                                           </span>
                                           {logo?.light ? (
                                             <img
-                                              src={logo.light}
+                                              src={getImgUrl(logo.light)}
                                               alt={team?.name}
                                               className="size-5 rounded object-cover"
                                             />

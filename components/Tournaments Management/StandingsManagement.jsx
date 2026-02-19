@@ -37,6 +37,7 @@ import {
 } from "@/app/[locale]/_Lib/actions";
 import { TimeCell } from "@/components/ui/TimeInput";
 import { formatTimeMs, formatPenalty } from "@/lib/timeUtils";
+import { getImgUrl } from "@/lib/utils";
 
 // Position styling
 const getPositionStyle = (position, isQualified, isEliminated) => {
@@ -569,8 +570,8 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                 {sortedStandings.map((standing) => {
                   const isEditing = editingId === standing.id;
                   const teamLogo = isPlayerBased
-                    ? (standing.player?.photo?.light || standing.player?.photo?.dark)
-                    : (standing.team?.logo?.light || standing.team?.logo?.dark);
+                    ? (getImgUrl(standing.player?.photo?.light) || getImgUrl(standing.player?.photo?.dark))
+                    : (getImgUrl(standing.team?.logo?.light) || getImgUrl(standing.team?.logo?.dark));
                   const entityName = isPlayerBased
                     ? (standing.player?.nickname || standing.player?.name)
                     : standing.team?.name;

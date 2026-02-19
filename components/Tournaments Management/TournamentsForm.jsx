@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
+import { getImgUrl } from "@/lib/utils";
 import FormSection from "../ui app/FormSection";
 import FormRow from "../ui app/FormRow";
 import ImageUpload from "../ui app/ImageUpload";
@@ -166,15 +167,15 @@ export default function TournamentsForm({
       prizePool: tournament?.prizePool || "",
       currency: tournament?.currency || "USD",
       status: tournament?.status || "upcoming",
-      logoLight: tournament?.logo?.light || "",
-      logoDark: tournament?.logo?.dark || "",
-      coverImageLight: tournament?.coverImage?.light || "",
-      coverImageDark: tournament?.coverImage?.dark || "",
+      logoLight: getImgUrl(tournament?.logo?.light) || "",
+      logoDark: getImgUrl(tournament?.logo?.dark) || "",
+      coverImageLight: getImgUrl(tournament?.coverImage?.light) || "",
+      coverImageDark: getImgUrl(tournament?.coverImage?.dark) || "",
       country: tournament?.country?.name || "",
       gamesData: tournament?.games || [],
       teamsData: tournament?.teams || [],
-      knockoutImageLight: tournament?.bracketImage?.light || "",
-      knockoutImageDark: tournament?.bracketImage?.dark || "",
+      knockoutImageLight: getImgUrl(tournament?.bracketImage?.light) || "",
+      knockoutImageDark: getImgUrl(tournament?.bracketImage?.dark) || "",
       tier: tournament?.tier || "",
       format: tournament?.format || "",
       rules: tournament?.rules || "",
@@ -1406,7 +1407,7 @@ function MultiSelectField({ label, name, formik, searchAction, required }) {
                   >
                     {game.logo?.light ? (
                       <img
-                        src={game.logo.light}
+                        src={getImgUrl(game.logo.light)}
                         alt={game.name}
                         className="size-6 rounded object-cover"
                       />
@@ -2143,7 +2144,7 @@ function TeamSelectField({ label, name, formik, searchAction }) {
     await formik.setFieldValue(name, newValue);
   };
 
-  const getLogoUrl = (team) => team.logo?.light || team.logo?.dark || null;
+  const getLogoUrl = (team) => getImgUrl(team.logo?.light) || getImgUrl(team.logo?.dark) || null;
 
   return (
     <div className="space-y-3">
@@ -2346,7 +2347,7 @@ function PlayerSelectField({ label, name, formik, searchAction }) {
     await formik.setFieldValue(name, newValue);
   };
 
-  const getPhotoUrl = (player) => player.photo?.light || player.photo?.dark || player.photo || null;
+  const getPhotoUrl = (player) => getImgUrl(player.photo?.light) || getImgUrl(player.photo?.dark) || getImgUrl(player.photo) || null;
 
   return (
     <div className="space-y-3">

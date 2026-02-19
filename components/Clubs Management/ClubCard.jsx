@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
+import { getImgUrl } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
 import {
   Edit,
@@ -42,7 +43,7 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
   const canUpdate = hasPermission(ENTITIES.CLUB, ACTIONS.UPDATE);
   const canDelete = hasPermission(ENTITIES.CLUB, ACTIONS.DELETE);
 
-  const clubLogo = club.logo?.light || club.logo?.dark;
+  const clubLogo = getImgUrl(club.logo?.light) || getImgUrl(club.logo?.dark);
 
   const countryFlag = club.country?.code
     ? `https://flagcdn.com/24x18/${club.country.code.toLowerCase()}.png`

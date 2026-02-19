@@ -30,6 +30,7 @@ import {
   EyeOff,
   Send,
 } from "lucide-react";
+import { getImgUrl } from "@/lib/utils";
 
 // Status badge colors
 const STATUS_COLORS = {
@@ -163,7 +164,7 @@ function NewsTable({ news, pagination, games }) {
                 <div className="flex items-center gap-3 min-w-0">
                   {article?.coverImage?.light ? (
                     <img
-                      src={article.coverImage.light}
+                      src={getImgUrl(article.coverImage.light)}
                       alt={article.title}
                       className="size-12 rounded-lg object-cover flex-shrink-0"
                     />
@@ -186,7 +187,7 @@ function NewsTable({ news, pagination, games }) {
                 <div className="flex items-center gap-2">
                   {article.authorImage?.light ? (
                     <img
-                      src={article.authorImage.light}
+                      src={getImgUrl(article.authorImage.light)}
                       alt={article.authorName}
                       className="size-7 rounded-full object-cover"
                     />

@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { editLinks, uploadPhoto } from "@/app/[locale]/_Lib/actions";
+import { getImgUrl } from "@/lib/utils";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
@@ -93,8 +94,8 @@ function LinksForm({ players, teams, id, linksType = "players", link, setOpen })
   const formik = useFormik({
     initialValues: {
       name: link?.name || "",
-      icon: link?.image?.light || "",
-      iconDark: link?.image?.dark || link?.image?.iconDark || "",
+      icon: getImgUrl(link?.image?.light) || "",
+      iconDark: getImgUrl(link?.image?.dark) || getImgUrl(link?.image?.iconDark) || "",
       url: link?.url || "",
       isActive: link?.isActive !== undefined ? link.isActive : true,
     },

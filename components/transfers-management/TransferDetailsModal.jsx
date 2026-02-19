@@ -8,6 +8,7 @@ import { FeaturedBadge } from "./TransfersBadges";
 import { getTransferByIdAction } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { getImgUrl } from "@/lib/utils";
 
 export default function TransferDetailsModal({ transferId, onClose }) {
   const t = useTranslations("TransfersManagement");
@@ -88,7 +89,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
                   <>
                     {transfer.fromTeam.logo && (
                       <Image
-                        src={transfer.fromTeam.logo.light || transfer.fromTeam.logo}
+                        src={getImgUrl(transfer.fromTeam.logo.light) || getImgUrl(transfer.fromTeam.logo)}
                         alt={transfer.fromTeam.name}
                         width={48}
                         height={48}
@@ -97,7 +98,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
                     )}
                     {transfer.fromTeam.logo?.dark && (
                       <Image
-                        src={transfer.fromTeam.logo.dark}
+                        src={getImgUrl(transfer.fromTeam.logo.dark)}
                         alt={transfer.fromTeam.name}
                         width={48}
                         height={48}
@@ -123,7 +124,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
                   <>
                     {transfer.toTeam.logo && (
                       <Image
-                        src={transfer.toTeam.logo.light || transfer.toTeam.logo}
+                        src={getImgUrl(transfer.toTeam.logo.light) || getImgUrl(transfer.toTeam.logo)}
                         alt={transfer.toTeam.name}
                         width={48}
                         height={48}
@@ -132,7 +133,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
                     )}
                     {transfer.toTeam.logo?.dark && (
                       <Image
-                        src={transfer.toTeam.logo.dark}
+                        src={getImgUrl(transfer.toTeam.logo.dark)}
                         alt={transfer.toTeam.name}
                         width={48}
                         height={48}
@@ -154,7 +155,7 @@ export default function TransferDetailsModal({ transferId, onClose }) {
               <div className="flex items-center gap-3">
                 {transfer.player?.photo && (
                   <Image
-                    src={transfer.player.photo.light || transfer.player.photo}
+                    src={getImgUrl(transfer.player.photo.light) || getImgUrl(transfer.player.photo)}
                     alt={transfer.player.nickname}
                     width={40}
                     height={40}

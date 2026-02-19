@@ -32,6 +32,7 @@ import {
   Swords,
 } from "lucide-react";
 import BracketView from "./BracketView";
+import { getImgUrl } from "@/lib/utils";
 
 // Status badge colors
 const STATUS_CONFIG = {
@@ -119,7 +120,7 @@ function TournamentDetails({ tournament }) {
               <div className="flex-shrink-0">
                 {tournament.logo?.light ? (
                   <img
-                    src={tournament.logo.light}
+                    src={getImgUrl(tournament.logo.light)}
                     alt={tournament.name}
                     className="size-24 rounded-2xl object-cover ring-2 ring-white/10"
                   />
@@ -276,7 +277,7 @@ function TournamentDetails({ tournament }) {
                         <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                         <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
                           <img
-                            src={tournament.logo.light}
+                            src={getImgUrl(tournament.logo.light)}
                             alt="Logo Light"
                             className="w-full h-full object-contain"
                           />
@@ -288,7 +289,7 @@ function TournamentDetails({ tournament }) {
                         <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                         <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
                           <img
-                            src={tournament.logo.dark}
+                            src={getImgUrl(tournament.logo.dark)}
                             alt="Logo Dark"
                             className="w-full h-full object-contain"
                           />
@@ -309,7 +310,7 @@ function TournamentDetails({ tournament }) {
                         <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                         <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
                           <img
-                            src={tournament.coverImage.light}
+                            src={getImgUrl(tournament.coverImage.light)}
                             alt="Cover Light"
                             className="w-full h-full object-cover"
                           />
@@ -321,7 +322,7 @@ function TournamentDetails({ tournament }) {
                         <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                         <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
                           <img
-                            src={tournament.coverImage.dark}
+                            src={getImgUrl(tournament.coverImage.dark)}
                             alt="Cover Dark"
                             className="w-full h-full object-cover"
                           />
@@ -342,7 +343,7 @@ function TournamentDetails({ tournament }) {
                         <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                         <div className="aspect-video w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
                           <img
-                            src={tournament.bracketImage.light}
+                            src={getImgUrl(tournament.bracketImage.light)}
                             alt="Bracket Light"
                             className="w-full h-full object-cover"
                           />
@@ -354,7 +355,7 @@ function TournamentDetails({ tournament }) {
                         <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                         <div className="aspect-video w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
                           <img
-                            src={tournament.bracketImage.dark}
+                            src={getImgUrl(tournament.bracketImage.dark)}
                             alt="Bracket Dark"
                             className="w-full h-full object-cover"
                           />
@@ -424,7 +425,7 @@ function TournamentDetails({ tournament }) {
                   >
                     {player.photo?.light ? (
                       <img
-                        src={player.photo.light}
+                        src={getImgUrl(player.photo.light)}
                         alt={player.nickname || player.name}
                         className="size-8 rounded-full object-cover"
                       />

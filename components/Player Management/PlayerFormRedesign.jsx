@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
+import { getImgUrl } from "@/lib/utils";
 import { searchTeams, searchGames, searchTournaments } from "@/app/[locale]/_Lib/actions";
 import { useFormik } from "formik";
 import {
@@ -104,8 +105,8 @@ function PlayerFormRedesign({
         ? formatDateToLocal(player.dateOfBirth)
         : "2000-01-01",
       country: player?.country?.name || "",
-      photoLight: player?.photo?.light || "",
-      photoDark: player?.photo?.dark || "",
+      photoLight: getImgUrl(player?.photo?.light) || "",
+      photoDark: getImgUrl(player?.photo?.dark) || "",
       tournaments: player?.tournaments?.map(t => t.id || t._id) || [],
       gameRosters: player?.gameRosters?.length > 0
         ? player.gameRosters.map(r => ({
@@ -942,7 +943,7 @@ function GameSelectField({
                   <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-green-primary/10 flex items-center justify-center">
                     {selectedGame.logo?.light ? (
                       <img
-                        src={selectedGame.logo.light}
+                        src={getImgUrl(selectedGame.logo.light)}
                         alt={selectedGame.name}
                         className="w-full h-full object-cover"
                       />
@@ -1024,7 +1025,7 @@ function GameSelectField({
                     >
                       <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
                         {game.logo?.light ? (
-                          <img src={game.logo.light} alt={game.name} className="w-full h-full object-cover" />
+                          <img src={getImgUrl(game.logo.light)} alt={game.name} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Gamepad2 className="size-4 text-muted-foreground" />
@@ -1189,7 +1190,7 @@ function TeamSelectField({
                   <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-blue-500/10 flex items-center justify-center">
                     {selectedTeam.logo?.light ? (
                       <img
-                        src={selectedTeam.logo.light}
+                        src={getImgUrl(selectedTeam.logo.light)}
                         alt={selectedTeam.name}
                         className="w-full h-full object-cover"
                       />
@@ -1279,7 +1280,7 @@ function TeamSelectField({
                       <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
                         {team.logo?.light ? (
                           <img
-                            src={team.logo.light}
+                            src={getImgUrl(team.logo.light)}
                             alt={team.name}
                             className="w-full h-full object-cover"
                           />
@@ -1476,7 +1477,7 @@ function TournamentMultiSelectField({
                   >
                     {tournament.logo?.light && (
                       <img
-                        src={tournament.logo.light}
+                        src={getImgUrl(tournament.logo.light)}
                         alt={tournament.name}
                         className="size-4 rounded object-cover"
                       />
@@ -1578,7 +1579,7 @@ function TournamentMultiSelectField({
                       <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
                         {tournament.logo?.light ? (
                           <img
-                            src={tournament.logo.light}
+                            src={getImgUrl(tournament.logo.light)}
                             alt={tournament.name}
                             className="w-full h-full object-cover"
                           />

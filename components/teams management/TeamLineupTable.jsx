@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, User, Trash2, Loader2 } from "lucide-react";
 import { removePlayerFromTeam } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import { getImgUrl } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -100,7 +101,7 @@ function TeamLineupTable({ players, teamId }) {
           </thead>
           <tbody>
             {players.map((player) => {
-              const photoUrl = player?.photo?.light || player?.photo?.dark;
+              const photoUrl = getImgUrl(player?.photo?.light) || getImgUrl(player?.photo?.dark);
               const age = calculateAge(player?.dateOfBirth);
 
               return (

@@ -54,6 +54,7 @@ import {
   recordClubResult,
   removeClubResult,
 } from "@/app/[locale]/_Lib/actions";
+import { getImgUrl } from "@/lib/utils";
 
 // Status config with icons (for header badges)
 const STATUS_CONFIG = {
@@ -133,7 +134,7 @@ function EventDetails({
   // Expanded standings
   const [expandedStanding, setExpandedStanding] = useState(null);
 
-  const eventLogo = event.logo?.light || event.logo?.dark;
+  const eventLogo = getImgUrl(event.logo?.light) || getImgUrl(event.logo?.dark);
 
   const statusConfig = STATUS_CONFIG[event.status] || STATUS_CONFIG.upcoming;
   const StatusIcon = statusConfig.icon;
@@ -503,7 +504,7 @@ function EventDetails({
                           <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                           <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
                             <img
-                              src={event.logo.light}
+                              src={getImgUrl(event.logo.light)}
                               alt="Logo Light"
                               className="w-full h-full object-contain"
                             />
@@ -515,7 +516,7 @@ function EventDetails({
                           <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                           <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
                             <img
-                              src={event.logo.dark}
+                              src={getImgUrl(event.logo.dark)}
                               alt="Logo Dark"
                               className="w-full h-full object-contain"
                             />
@@ -536,7 +537,7 @@ function EventDetails({
                           <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                           <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
                             <img
-                              src={event.coverImage.light}
+                              src={getImgUrl(event.coverImage.light)}
                               alt="Cover Light"
                               className="w-full h-full object-cover"
                             />
@@ -548,7 +549,7 @@ function EventDetails({
                           <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                           <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
                             <img
-                              src={event.coverImage.dark}
+                              src={getImgUrl(event.coverImage.dark)}
                               alt="Cover Dark"
                               className="w-full h-full object-cover"
                             />
@@ -718,7 +719,7 @@ function EventDetails({
                         className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-green-primary/10 transition-colors text-left cursor-pointer"
                       >
                         {tr.logo?.light ? (
-                          <img src={tr.logo.light} alt="" className="size-8 rounded-lg object-contain bg-muted/50 p-0.5" />
+                          <img src={getImgUrl(tr.logo.light)} alt="" className="size-8 rounded-lg object-contain bg-muted/50 p-0.5" />
                         ) : (
                           <div className="size-8 rounded-lg bg-muted/50 flex items-center justify-center">
                             <Trophy className="size-4 text-muted-foreground" />
@@ -751,7 +752,7 @@ function EventDetails({
                     <div className="p-4 flex items-center gap-4">
                       {tournament.logo?.light ? (
                         <img
-                          src={tournament.logo.light}
+                          src={getImgUrl(tournament.logo.light)}
                           alt=""
                           className="size-14 rounded-xl object-contain bg-muted/30 ring-1 ring-gray-200 dark:ring-white/10 p-1"
                         />
@@ -865,7 +866,7 @@ function EventDetails({
                                     {selectedClubObj ? (
                                       <span className="flex items-center gap-2 truncate">
                                         {selectedClubObj.logo?.light ? (
-                                          <img src={selectedClubObj.logo.light} alt="" className="size-5 rounded object-contain" />
+                                          <img src={getImgUrl(selectedClubObj.logo.light)} alt="" className="size-5 rounded object-contain" />
                                         ) : (
                                           <Building2 className="size-4 text-muted-foreground shrink-0" />
                                         )}
@@ -904,7 +905,7 @@ function EventDetails({
                                               className="flex items-center gap-2 cursor-pointer"
                                             >
                                               {c.logo?.light ? (
-                                                <img src={c.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                                <img src={getImgUrl(c.logo.light)} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                               ) : (
                                                 <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                                   <Building2 className="size-3.5 text-muted-foreground" />
@@ -943,7 +944,7 @@ function EventDetails({
                                       {selectedTeamObj ? (
                                         <span className="flex items-center gap-2 truncate">
                                           {selectedTeamObj.team?.logo?.light ? (
-                                            <img src={selectedTeamObj.team.logo.light} alt="" className="size-5 rounded object-contain" />
+                                            <img src={getImgUrl(selectedTeamObj.team.logo.light)} alt="" className="size-5 rounded object-contain" />
                                           ) : (
                                             <Users className="size-4 text-muted-foreground shrink-0" />
                                           )}
@@ -984,7 +985,7 @@ function EventDetails({
                                                   className="flex items-center gap-2 cursor-pointer"
                                                 >
                                                   {ct.team?.logo?.light ? (
-                                                    <img src={ct.team.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                                    <img src={getImgUrl(ct.team.logo.light)} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                                   ) : (
                                                     <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                                       <Users className="size-3.5 text-muted-foreground" />
@@ -1040,7 +1041,7 @@ function EventDetails({
                               <div className="flex items-center gap-3">
                                 {assignment.club?.logo?.light ? (
                                   <img
-                                    src={assignment.club.logo.light}
+                                    src={getImgUrl(assignment.club.logo.light)}
                                     alt=""
                                     className="size-8 rounded-lg object-contain bg-muted/30 p-0.5"
                                   />
@@ -1134,7 +1135,7 @@ function EventDetails({
                     ...clubTeamsForResult.map((ct) => ({
                       id: ct.team?.id || ct.team,
                       name: ct.team?.name || "Team",
-                      logo: ct.team?.logo?.light,
+                      logo: getImgUrl(ct.team?.logo?.light),
                       type: "Team",
                       gameLabel: ct.game?.name || "",
                       icon: Users,
@@ -1142,7 +1143,7 @@ function EventDetails({
                     ...clubPlayersForResult.map((cp) => ({
                       id: cp.player?.id || cp.player,
                       name: cp.player?.name || cp.player?.nickname || "Player",
-                      logo: cp.player?.logo?.light,
+                      logo: getImgUrl(cp.player?.logo?.light),
                       type: "Player",
                       gameLabel: cp.game?.name || "",
                       icon: User,
@@ -1184,7 +1185,7 @@ function EventDetails({
                               {selectedResultTournament ? (
                                 <span className="flex items-center gap-2 truncate">
                                   {selectedResultTournament.logo?.light ? (
-                                    <img src={selectedResultTournament.logo.light} alt="" className="size-5 rounded object-contain" />
+                                    <img src={getImgUrl(selectedResultTournament.logo.light)} alt="" className="size-5 rounded object-contain" />
                                   ) : (
                                     <Trophy className="size-4 text-muted-foreground shrink-0" />
                                   )}
@@ -1221,7 +1222,7 @@ function EventDetails({
                                       className="flex items-center gap-2 cursor-pointer"
                                     >
                                       {tr.logo?.light ? (
-                                        <img src={tr.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                        <img src={getImgUrl(tr.logo.light)} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                       ) : (
                                         <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                           <Trophy className="size-3.5 text-muted-foreground" />
@@ -1260,7 +1261,7 @@ function EventDetails({
                               {selectedResultClub ? (
                                 <span className="flex items-center gap-2 truncate">
                                   {selectedResultClub.logo?.light ? (
-                                    <img src={selectedResultClub.logo.light} alt="" className="size-5 rounded object-contain" />
+                                    <img src={getImgUrl(selectedResultClub.logo.light)} alt="" className="size-5 rounded object-contain" />
                                   ) : (
                                     <Building2 className="size-4 text-muted-foreground shrink-0" />
                                   )}
@@ -1299,7 +1300,7 @@ function EventDetails({
                                       className="flex items-center gap-2 cursor-pointer"
                                     >
                                       {c.logo?.light ? (
-                                        <img src={c.logo.light} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                        <img src={getImgUrl(c.logo.light)} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                       ) : (
                                         <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                           <Building2 className="size-3.5 text-muted-foreground" />
@@ -1545,7 +1546,7 @@ function EventDetails({
                       <tbody>
                         {standings.map((standing) => {
                           const clubLogo =
-                            standing.club?.logo?.light || standing.club?.logo?.dark;
+                            getImgUrl(standing.club?.logo?.light) || getImgUrl(standing.club?.logo?.dark);
                           const isExpanded = expandedStanding === standing.id;
                           return (
                             <React.Fragment key={standing.id}>
@@ -1630,7 +1631,7 @@ function EventDetails({
                                           <div className="flex items-center gap-3">
                                             {result.game?.logo?.light ? (
                                               <img
-                                                src={result.game.logo.light}
+                                                src={getImgUrl(result.game.logo.light)}
                                                 alt=""
                                                 className="size-5 object-contain"
                                               />
