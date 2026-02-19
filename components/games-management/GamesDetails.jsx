@@ -18,6 +18,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 function GamesDetails({ game }) {
   const t = useTranslations("GamesDetails");
@@ -58,9 +59,11 @@ function GamesDetails({ game }) {
               {/* Logo */}
               <div className="flex-shrink-0">
                 {game.logo?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(game.logo.light)}
                     alt={game.name}
+                    width={96}
+                    height={96}
                     className="size-24 rounded-2xl object-cover ring-2 ring-white/10"
                   />
                 ) : (
@@ -129,9 +132,12 @@ function GamesDetails({ game }) {
                     <div className="space-y-2">
                       <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                       <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
-                        <img
+                        <Image
                           src={getImgUrl(game.logo.light)}
                           alt="Logo Light"
+                          width={0}
+                          height={0}
+                          sizes="100vw"
                           className="w-full h-full object-contain"
                         />
                       </div>
@@ -141,9 +147,12 @@ function GamesDetails({ game }) {
                     <div className="space-y-2">
                       <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                       <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
-                        <img
+                        <Image
                           src={getImgUrl(game.logo.dark)}
                           alt="Logo Dark"
+                          width={0}
+                          height={0}
+                          sizes="100vw"
                           className="w-full h-full object-contain"
                         />
                       </div>
@@ -161,9 +170,12 @@ function GamesDetails({ game }) {
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                         <div className="aspect-video w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
-                          <img
+                          <Image
                             src={getImgUrl(game.coverImage.light)}
                             alt="Cover Light"
+                            width={0}
+                            height={0}
+                            sizes="100vw"
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -173,9 +185,12 @@ function GamesDetails({ game }) {
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                         <div className="aspect-video w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
-                          <img
+                          <Image
                             src={getImgUrl(game.coverImage.dark)}
                             alt="Cover Dark"
+                            width={0}
+                            height={0}
+                            sizes="100vw"
                             className="w-full h-full object-cover"
                           />
                         </div>

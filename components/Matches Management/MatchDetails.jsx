@@ -33,6 +33,7 @@ import { startMatch, updateMatchStatus, updateMatchResult } from "@/app/[locale]
 import MultiParticipantMatchView from "./MultiParticipantMatchView";
 import toast from "react-hot-toast";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 const STATUS_CONFIG = {
   scheduled: {
@@ -272,7 +273,7 @@ function MatchDetails({ match }) {
                 {/* Game */}
                 <div className="flex items-center gap-2">
                   {gameLogo ? (
-                    <img src={gameLogo} alt={match.game?.name} className="size-8 rounded" />
+                    <Image src={gameLogo} alt={match.game?.name} width={32} height={32} className="size-8 rounded" />
                   ) : (
                     <Gamepad2 className="size-8 text-gray-400 dark:text-gray-500" />
                   )}
@@ -285,7 +286,7 @@ function MatchDetails({ match }) {
                     <span className="text-gray-400 dark:text-gray-500">/</span>
                     <div className="flex items-center gap-2">
                       {tournamentLogo ? (
-                        <img src={tournamentLogo} alt={match.tournament?.name} className="size-6 rounded" />
+                        <Image src={tournamentLogo} alt={match.tournament?.name} width={24} height={24} className="size-6 rounded" />
                       ) : (
                         <Trophy className="size-5 text-gray-400 dark:text-gray-500" />
                       )}
@@ -310,7 +311,7 @@ function MatchDetails({ match }) {
                 <div className="flex-1 text-center">
                   <div className="size-24 mx-auto mb-4 rounded-2xl bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                     {team1Logo ? (
-                      <img src={team1Logo} alt={match.team1?.name} className="size-20 object-contain" />
+                      <Image src={team1Logo} alt={match.team1?.name} width={80} height={80} className="size-20 object-contain" />
                     ) : (
                       <Users className="size-12 text-gray-400 dark:text-gray-500" />
                     )}
@@ -346,7 +347,7 @@ function MatchDetails({ match }) {
                 <div className="flex-1 text-center">
                   <div className="size-24 mx-auto mb-4 rounded-2xl bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                     {team2Logo ? (
-                      <img src={team2Logo} alt={match.team2?.name} className="size-20 object-contain" />
+                      <Image src={team2Logo} alt={match.team2?.name} width={80} height={80} className="size-20 object-contain" />
                     ) : (
                       <Users className="size-12 text-gray-400 dark:text-gray-500" />
                     )}
@@ -407,7 +408,7 @@ function MatchDetails({ match }) {
                   <div className="flex items-center gap-3">
                     <div className="size-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                       {team1Logo ? (
-                        <img src={team1Logo} alt={match.team1?.name} className="size-8 object-contain" />
+                        <Image src={team1Logo} alt={match.team1?.name} width={32} height={32} className="size-8 object-contain" />
                       ) : (
                         <Users className="size-5 text-gray-400 dark:text-gray-500" />
                       )}
@@ -452,7 +453,7 @@ function MatchDetails({ match }) {
                   <div className="flex items-center gap-3">
                     <div className="size-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                       {team2Logo ? (
-                        <img src={team2Logo} alt={match.team2?.name} className="size-8 object-contain" />
+                        <Image src={team2Logo} alt={match.team2?.name} width={32} height={32} className="size-8 object-contain" />
                       ) : (
                         <Users className="size-5 text-gray-400 dark:text-gray-500" />
                       )}
@@ -539,7 +540,7 @@ function MatchDetails({ match }) {
                   <div key={index} className="space-y-3">
                     <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-white/5">
                       {lineup.team?.logo?.light && (
-                        <img src={getImgUrl(lineup.team.logo.light, "thumbnail")} alt={lineup.team.name} className="size-6 rounded" />
+                        <Image src={getImgUrl(lineup.team.logo.light, "thumbnail")} alt={lineup.team.name} width={24} height={24} className="size-6 rounded" />
                       )}
                       <span className="font-medium text-gray-900 dark:text-white">{lineup.team?.name}</span>
                     </div>
@@ -548,7 +549,7 @@ function MatchDetails({ match }) {
                         <div key={player._id || player.id} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-white/5">
                           <div className="size-10 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                             {player.photo?.light ? (
-                              <img src={getImgUrl(player.photo.light, "thumbnail")} alt={player.nickname || player.fullName || 'Player'} className="size-full object-cover" />
+                              <Image src={getImgUrl(player.photo.light, "thumbnail")} alt={player.nickname || player.fullName || 'Player'} width={40} height={40} className="size-full object-cover" />
                             ) : (
                               <Users className="size-5 text-gray-400 dark:text-gray-500" />
                             )}
@@ -560,7 +561,7 @@ function MatchDetails({ match }) {
                             )}
                           </div>
                           {player.country?.flag && (
-                            <img src={player.country.flag} alt={player.country.name} className="size-5 rounded-sm" />
+                            <Image src={player.country.flag} alt={player.country.name} width={20} height={20} className="size-5 rounded-sm" />
                           )}
                         </div>
                       ))}

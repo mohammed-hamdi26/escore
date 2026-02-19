@@ -119,9 +119,11 @@ function TournamentDetails({ tournament }) {
               {/* Logo */}
               <div className="flex-shrink-0">
                 {tournament.logo?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(tournament.logo.light)}
                     alt={tournament.name}
+                    width={96}
+                    height={96}
                     className="size-24 rounded-2xl object-cover ring-2 ring-white/10"
                   />
                 ) : (
@@ -276,9 +278,12 @@ function TournamentDetails({ tournament }) {
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                         <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
-                          <img
+                          <Image
                             src={getImgUrl(tournament.logo.light)}
                             alt="Logo Light"
+                            width={0}
+                            height={0}
+                            sizes="100vw"
                             className="w-full h-full object-contain"
                           />
                         </div>
@@ -288,9 +293,12 @@ function TournamentDetails({ tournament }) {
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                         <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
-                          <img
+                          <Image
                             src={getImgUrl(tournament.logo.dark)}
                             alt="Logo Dark"
+                            width={0}
+                            height={0}
+                            sizes="100vw"
                             className="w-full h-full object-contain"
                           />
                         </div>
@@ -309,9 +317,12 @@ function TournamentDetails({ tournament }) {
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                         <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
-                          <img
+                          <Image
                             src={getImgUrl(tournament.coverImage.light)}
                             alt="Cover Light"
+                            width={0}
+                            height={0}
+                            sizes="100vw"
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -321,9 +332,12 @@ function TournamentDetails({ tournament }) {
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                         <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
-                          <img
+                          <Image
                             src={getImgUrl(tournament.coverImage.dark)}
                             alt="Cover Dark"
+                            width={0}
+                            height={0}
+                            sizes="100vw"
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -342,9 +356,12 @@ function TournamentDetails({ tournament }) {
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                         <div className="aspect-video w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
-                          <img
+                          <Image
                             src={getImgUrl(tournament.bracketImage.light)}
                             alt="Bracket Light"
+                            width={0}
+                            height={0}
+                            sizes="100vw"
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -354,9 +371,12 @@ function TournamentDetails({ tournament }) {
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                         <div className="aspect-video w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
-                          <img
+                          <Image
                             src={getImgUrl(tournament.bracketImage.dark)}
                             alt="Bracket Dark"
+                            width={0}
+                            height={0}
+                            sizes="100vw"
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -424,9 +444,11 @@ function TournamentDetails({ tournament }) {
                     className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/30 dark:bg-[#1a1d2e]"
                   >
                     {player.photo?.light ? (
-                      <img
+                      <Image
                         src={getImgUrl(player.photo.light, "thumbnail")}
                         alt={player.nickname || player.name}
+                        width={32}
+                        height={32}
                         className="size-8 rounded-full object-cover"
                       />
                     ) : (
@@ -457,9 +479,11 @@ function TournamentDetails({ tournament }) {
             {tournament.country && (
               <div className="flex items-center gap-3 mb-2">
                 {tournament.country.flag && (
-                  <img
+                  <Image
                     src={tournament.country.flag}
                     alt={tournament.country.name}
+                    width={24}
+                    height={24}
                     className="size-6 rounded"
                   />
                 )}

@@ -55,6 +55,7 @@ import {
   removeClubResult,
 } from "@/app/[locale]/_Lib/actions";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 // Status config with icons (for header badges)
 const STATUS_CONFIG = {
@@ -302,9 +303,11 @@ function EventDetails({
           {/* Logo */}
           <div className="flex-shrink-0">
             {eventLogo ? (
-              <img
+              <Image
                 src={eventLogo}
                 alt={event.name}
+                width={96}
+                height={96}
                 className="size-24 rounded-2xl object-cover ring-2 ring-white/10"
               />
             ) : (
@@ -503,9 +506,12 @@ function EventDetails({
                         <div className="space-y-2">
                           <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                           <div className="aspect-square w-full rounded-xl bg-white p-2 ring-1 ring-gray-200 overflow-hidden">
-                            <img
+                            <Image
                               src={getImgUrl(event.logo.light)}
                               alt="Logo Light"
+                              width={0}
+                              height={0}
+                              sizes="100vw"
                               className="w-full h-full object-contain"
                             />
                           </div>
@@ -515,9 +521,12 @@ function EventDetails({
                         <div className="space-y-2">
                           <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                           <div className="aspect-square w-full rounded-xl bg-[#1a1d2e] p-2 ring-1 ring-white/10 overflow-hidden">
-                            <img
+                            <Image
                               src={getImgUrl(event.logo.dark)}
                               alt="Logo Dark"
+                              width={0}
+                              height={0}
+                              sizes="100vw"
                               className="w-full h-full object-contain"
                             />
                           </div>
@@ -536,9 +545,12 @@ function EventDetails({
                         <div className="space-y-2">
                           <p className="text-xs text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                           <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
-                            <img
+                            <Image
                               src={getImgUrl(event.coverImage.light)}
                               alt="Cover Light"
+                              width={0}
+                              height={0}
+                              sizes="100vw"
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -548,9 +560,12 @@ function EventDetails({
                         <div className="space-y-2">
                           <p className="text-xs text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                           <div className="aspect-[3/2] w-full rounded-xl ring-1 ring-white/10 overflow-hidden">
-                            <img
+                            <Image
                               src={getImgUrl(event.coverImage.dark)}
                               alt="Cover Dark"
+                              width={0}
+                              height={0}
+                              sizes="100vw"
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -607,9 +622,11 @@ function EventDetails({
               {event.country && (
                 <div className="flex items-center gap-3 mb-2">
                   {event.country.flag && (
-                    <img
+                    <Image
                       src={event.country.flag}
                       alt={event.country.name}
+                      width={24}
+                      height={24}
                       className="size-6 rounded"
                     />
                   )}
@@ -719,7 +736,7 @@ function EventDetails({
                         className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-green-primary/10 transition-colors text-left cursor-pointer"
                       >
                         {tr.logo?.light ? (
-                          <img src={getImgUrl(tr.logo.light, "thumbnail")} alt="" className="size-8 rounded-lg object-contain bg-muted/50 p-0.5" />
+                          <Image src={getImgUrl(tr.logo.light, "thumbnail")} alt="" width={32} height={32} className="size-8 rounded-lg object-contain bg-muted/50 p-0.5" />
                         ) : (
                           <div className="size-8 rounded-lg bg-muted/50 flex items-center justify-center">
                             <Trophy className="size-4 text-muted-foreground" />
@@ -751,9 +768,11 @@ function EventDetails({
                     {/* Tournament Header */}
                     <div className="p-4 flex items-center gap-4">
                       {tournament.logo?.light ? (
-                        <img
+                        <Image
                           src={getImgUrl(tournament.logo.light, "thumbnail")}
                           alt=""
+                          width={56}
+                          height={56}
                           className="size-14 rounded-xl object-contain bg-muted/30 ring-1 ring-gray-200 dark:ring-white/10 p-1"
                         />
                       ) : (
@@ -866,7 +885,7 @@ function EventDetails({
                                     {selectedClubObj ? (
                                       <span className="flex items-center gap-2 truncate">
                                         {selectedClubObj.logo?.light ? (
-                                          <img src={getImgUrl(selectedClubObj.logo.light, "thumbnail")} alt="" className="size-5 rounded object-contain" />
+                                          <Image src={getImgUrl(selectedClubObj.logo.light, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded object-contain" />
                                         ) : (
                                           <Building2 className="size-4 text-muted-foreground shrink-0" />
                                         )}
@@ -905,7 +924,7 @@ function EventDetails({
                                               className="flex items-center gap-2 cursor-pointer"
                                             >
                                               {c.logo?.light ? (
-                                                <img src={getImgUrl(c.logo.light, "thumbnail")} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                                <Image src={getImgUrl(c.logo.light, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                               ) : (
                                                 <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                                   <Building2 className="size-3.5 text-muted-foreground" />
@@ -944,7 +963,7 @@ function EventDetails({
                                       {selectedTeamObj ? (
                                         <span className="flex items-center gap-2 truncate">
                                           {selectedTeamObj.team?.logo?.light ? (
-                                            <img src={getImgUrl(selectedTeamObj.team.logo.light, "thumbnail")} alt="" className="size-5 rounded object-contain" />
+                                            <Image src={getImgUrl(selectedTeamObj.team.logo.light, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded object-contain" />
                                           ) : (
                                             <Users className="size-4 text-muted-foreground shrink-0" />
                                           )}
@@ -985,7 +1004,7 @@ function EventDetails({
                                                   className="flex items-center gap-2 cursor-pointer"
                                                 >
                                                   {ct.team?.logo?.light ? (
-                                                    <img src={getImgUrl(ct.team.logo.light, "thumbnail")} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                                    <Image src={getImgUrl(ct.team.logo.light, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                                   ) : (
                                                     <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                                       <Users className="size-3.5 text-muted-foreground" />
@@ -1040,9 +1059,11 @@ function EventDetails({
                             >
                               <div className="flex items-center gap-3">
                                 {assignment.club?.logo?.light ? (
-                                  <img
+                                  <Image
                                     src={getImgUrl(assignment.club.logo.light, "thumbnail")}
                                     alt=""
+                                    width={32}
+                                    height={32}
                                     className="size-8 rounded-lg object-contain bg-muted/30 p-0.5"
                                   />
                                 ) : (
@@ -1185,7 +1206,7 @@ function EventDetails({
                               {selectedResultTournament ? (
                                 <span className="flex items-center gap-2 truncate">
                                   {selectedResultTournament.logo?.light ? (
-                                    <img src={getImgUrl(selectedResultTournament.logo.light, "thumbnail")} alt="" className="size-5 rounded object-contain" />
+                                    <Image src={getImgUrl(selectedResultTournament.logo.light, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded object-contain" />
                                   ) : (
                                     <Trophy className="size-4 text-muted-foreground shrink-0" />
                                   )}
@@ -1222,7 +1243,7 @@ function EventDetails({
                                       className="flex items-center gap-2 cursor-pointer"
                                     >
                                       {tr.logo?.light ? (
-                                        <img src={getImgUrl(tr.logo.light, "thumbnail")} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                        <Image src={getImgUrl(tr.logo.light, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                       ) : (
                                         <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                           <Trophy className="size-3.5 text-muted-foreground" />
@@ -1261,7 +1282,7 @@ function EventDetails({
                               {selectedResultClub ? (
                                 <span className="flex items-center gap-2 truncate">
                                   {selectedResultClub.logo?.light ? (
-                                    <img src={getImgUrl(selectedResultClub.logo.light, "thumbnail")} alt="" className="size-5 rounded object-contain" />
+                                    <Image src={getImgUrl(selectedResultClub.logo.light, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded object-contain" />
                                   ) : (
                                     <Building2 className="size-4 text-muted-foreground shrink-0" />
                                   )}
@@ -1300,7 +1321,7 @@ function EventDetails({
                                       className="flex items-center gap-2 cursor-pointer"
                                     >
                                       {c.logo?.light ? (
-                                        <img src={getImgUrl(c.logo.light, "thumbnail")} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                        <Image src={getImgUrl(c.logo.light, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                       ) : (
                                         <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                           <Building2 className="size-3.5 text-muted-foreground" />
@@ -1338,7 +1359,7 @@ function EventDetails({
                               {selectedEntity ? (
                                 <span className="flex items-center gap-2 truncate">
                                   {selectedEntity.logo ? (
-                                    <img src={selectedEntity.logo} alt="" className="size-5 rounded object-contain" />
+                                    <Image src={selectedEntity.logo} alt="" width={20} height={20} className="size-5 rounded object-contain" />
                                   ) : (
                                     <selectedEntity.icon className="size-4 text-muted-foreground shrink-0" />
                                   )}
@@ -1392,7 +1413,7 @@ function EventDetails({
                                         className="flex items-center gap-2 cursor-pointer"
                                       >
                                         {entity.logo ? (
-                                          <img src={entity.logo} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                          <Image src={entity.logo} alt="" width={24} height={24} className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                         ) : (
                                           <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                             <Users className="size-3.5 text-muted-foreground" />
@@ -1432,7 +1453,7 @@ function EventDetails({
                                         className="flex items-center gap-2 cursor-pointer"
                                       >
                                         {entity.logo ? (
-                                          <img src={entity.logo} alt="" className="size-6 rounded-full object-contain bg-muted/30 p-0.5" />
+                                          <Image src={entity.logo} alt="" width={24} height={24} className="size-6 rounded-full object-contain bg-muted/30 p-0.5" />
                                         ) : (
                                           <div className="size-6 rounded-full bg-muted/30 flex items-center justify-center">
                                             <User className="size-3.5 text-muted-foreground" />
@@ -1559,9 +1580,11 @@ function EventDetails({
                                 <td className="py-3 px-2">
                                   <div className="flex items-center gap-2">
                                     {clubLogo ? (
-                                      <img
+                                      <Image
                                         src={clubLogo}
                                         alt=""
+                                        width={24}
+                                        height={24}
                                         className="size-6 object-contain"
                                       />
                                     ) : (
@@ -1630,9 +1653,11 @@ function EventDetails({
                                         >
                                           <div className="flex items-center gap-3">
                                             {result.game?.logo?.light ? (
-                                              <img
+                                              <Image
                                                 src={getImgUrl(result.game.logo.light, "thumbnail")}
                                                 alt=""
+                                                width={20}
+                                                height={20}
                                                 className="size-5 object-contain"
                                               />
                                             ) : (

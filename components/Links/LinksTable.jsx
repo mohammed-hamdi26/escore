@@ -25,6 +25,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Spinner } from "../ui/spinner";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 function LinksTable({ links, numOfLinks, idUser, linksType = "players" }) {
   const t = useTranslations("Links");
@@ -116,9 +117,11 @@ function LinksTable({ links, numOfLinks, idUser, linksType = "players" }) {
               <div className="flex items-center justify-between p-4 border-b border-white/5">
                 <div className="flex items-center gap-3 min-w-0">
                   {linkImage ? (
-                    <img
+                    <Image
                       src={linkImage}
                       alt={link.name}
+                      width={40}
+                      height={40}
                       className="size-10 rounded-lg object-contain bg-white/5 p-1"
                       onError={(e) => {
                         e.target.style.display = "none";

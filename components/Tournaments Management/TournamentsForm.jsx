@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";

@@ -22,6 +22,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Spinner } from "../ui/spinner";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 function FavoriteCharacterTable({
   favoriteCharacterFor,
@@ -88,9 +89,11 @@ function FavoriteCharacterTable({
               {/* Character Image */}
               <div className="relative aspect-square bg-gradient-to-br from-[#1a1f2e] to-[#0F1017]">
                 {characterImage ? (
-                  <img
+                  <Image
                     src={characterImage}
                     alt={character.name}
+                    width={200}
+                    height={200}
                     className="w-full h-full object-contain p-4"
                     onError={(e) => {
                       e.target.style.display = "none";
@@ -107,9 +110,11 @@ function FavoriteCharacterTable({
                   <div className="absolute top-2 left-2">
                     <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1.5">
                       {gameImage ? (
-                        <img
+                        <Image
                           src={gameImage}
                           alt={character.game.name}
+                          width={16}
+                          height={16}
                           className="size-4 rounded object-cover"
                         />
                       ) : (

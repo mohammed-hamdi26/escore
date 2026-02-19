@@ -30,6 +30,7 @@ import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -107,10 +108,11 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
         {/* Player Image */}
         <div className="relative aspect-[4/3] bg-gradient-to-br from-[#1a1d2e] to-[#12141c]">
           {playerImage ? (
-            <img
+            <Image
               src={playerImage}
               alt={player.nickname || player.fullName || 'Player'}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -123,9 +125,11 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
             <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3">
               <Badge className="bg-black/70 backdrop-blur-sm text-white border-0 gap-1.5">
                 {player.game.logo?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(player.game.logo.light, "medium")}
                     alt={player.game.name}
+                    width={14}
+                    height={14}
                     className="size-3.5 rounded"
                   />
                 ) : (
@@ -141,9 +145,11 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
             <div className="absolute bottom-3 left-3 rtl:left-auto rtl:right-3">
               <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1.5">
                 {teamImage ? (
-                  <img
+                  <Image
                     src={teamImage}
                     alt={player.team.name}
+                    width={20}
+                    height={20}
                     className="size-5 rounded"
                   />
                 ) : (
@@ -247,9 +253,11 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
               {player.nickname || player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown'}
             </h3>
             {countryFlag && (
-              <img
+              <Image
                 src={countryFlag}
                 alt={player.country?.name || player.country?.code}
+                width={20}
+                height={20}
                 className="size-5 rounded-sm object-cover"
               />
             )}
@@ -297,10 +305,11 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
         {/* Player Image */}
         <div className="relative size-16 rounded-xl overflow-hidden bg-gradient-to-br from-[#1a1d2e] to-[#12141c] flex-shrink-0">
           {playerImage ? (
-            <img
+            <Image
               src={playerImage}
               alt={player.nickname || player.fullName || 'Player'}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -316,9 +325,11 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
               {player.nickname || player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown'}
             </h3>
             {countryFlag && (
-              <img
+              <Image
                 src={countryFlag}
                 alt={player.country?.name || player.country?.code}
+                width={16}
+                height={16}
                 className="size-4 rounded-sm object-cover"
               />
             )}
@@ -340,9 +351,11 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
           {player.game && (
             <Badge className="bg-muted/50 text-foreground border-0 gap-1.5">
               {player.game.logo?.light ? (
-                <img
+                <Image
                   src={getImgUrl(player.game.logo.light, "medium")}
                   alt={player.game.name}
+                  width={14}
+                  height={14}
                   className="size-3.5 rounded"
                 />
               ) : (
@@ -354,9 +367,11 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
           {player.team ? (
             <div className="flex items-center gap-1.5">
               {teamImage ? (
-                <img
+                <Image
                   src={teamImage}
                   alt={player.team.name}
+                  width={20}
+                  height={20}
                   className="size-5 rounded"
                 />
               ) : (

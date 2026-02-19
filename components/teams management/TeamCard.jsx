@@ -33,6 +33,7 @@ import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -97,10 +98,11 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
         {/* Logo Area */}
         <div className="relative aspect-[4/3] bg-gradient-to-b from-[#1a1d2e] to-[#12141c] flex items-center justify-center p-4">
           {teamLogo ? (
-            <img
+            <Image
               src={teamLogo}
               alt={team.name}
-              className="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-300"
+              fill
+              className="object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-300"
             />
           ) : (
             <div className="size-20 rounded-xl bg-white/5 flex items-center justify-center">
@@ -227,9 +229,11 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
                   {team.name}
                 </h3>
                 {countryFlag && (
-                  <img
+                  <Image
                     src={countryFlag}
                     alt={team.country?.name || team.country?.code}
+                    width={20}
+                    height={20}
                     className="size-5 rounded-sm object-cover ring-1 ring-white/10"
                   />
                 )}
@@ -278,9 +282,11 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
                 className="text-xs gap-1.5 bg-white/5 hover:bg-white/10 border-0"
               >
                 {team.game.logo?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(team.game.logo.light, "medium")}
                     alt={team.game.name}
+                    width={14}
+                    height={14}
                     className="size-3.5 rounded"
                   />
                 ) : (
@@ -305,10 +311,11 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
         {/* Team Logo */}
         <div className="relative size-16 rounded-xl overflow-hidden bg-gradient-to-br from-[#1a1d2e] to-[#12141c] flex-shrink-0 ring-1 ring-white/10">
           {teamLogo ? (
-            <img
+            <Image
               src={teamLogo}
               alt={team.name}
-              className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-300"
+              fill
+              className="object-contain p-2 group-hover:scale-110 transition-transform duration-300"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -324,9 +331,11 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
               {team.name}
             </h3>
             {countryFlag && (
-              <img
+              <Image
                 src={countryFlag}
                 alt={team.country?.name || team.country?.code}
+                width={16}
+                height={16}
                 className="size-4 rounded-sm object-cover ring-1 ring-white/10"
               />
             )}
@@ -370,9 +379,11 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
                 className="text-xs gap-1.5 bg-white/5 border-0"
               >
                 {team.game.logo?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(team.game.logo.light, "medium")}
                     alt={team.game.name}
+                    width={14}
+                    height={14}
                     className="size-3.5 rounded"
                   />
                 ) : (

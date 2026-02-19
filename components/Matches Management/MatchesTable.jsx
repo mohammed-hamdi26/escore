@@ -36,6 +36,7 @@ import {
 import { format } from "date-fns";
 import { Badge } from "../ui/badge";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 // Status badge component
 function StatusBadge({ status }) {
@@ -174,7 +175,7 @@ function MatchesTable({ matches, columns, players, pagination }) {
               ) : (
                 <>
                   {match?.team1?.logo?.light && (
-                    <img
+                    <Image
                       width={28}
                       height={28}
                       src={getImgUrl(match?.team1?.logo?.light, "thumbnail")}
@@ -206,7 +207,7 @@ function MatchesTable({ matches, columns, players, pagination }) {
               ) : (
                 <>
                   {match?.team2?.logo?.light && (
-                    <img
+                    <Image
                       width={28}
                       height={28}
                       src={getImgUrl(match?.team2?.logo?.light, "thumbnail")}

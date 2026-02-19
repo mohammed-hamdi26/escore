@@ -28,6 +28,7 @@ import {
 } from "../ui/dropdown-menu";
 import { deleteTransfer } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -96,14 +97,18 @@ function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
             <div className="flex flex-col items-center text-center flex-1">
               {fromTeamLogo ? (
                 <>
-                  <img
+                  <Image
                     src={fromTeamLogo}
                     alt={transfer.fromTeam?.name || ""}
+                    width={48}
+                    height={48}
                     className="size-12 rounded-lg object-contain dark:hidden"
                   />
-                  <img
+                  <Image
                     src={fromTeamLogoDark || fromTeamLogo}
                     alt={transfer.fromTeam?.name || ""}
+                    width={48}
+                    height={48}
                     className="size-12 rounded-lg object-contain hidden dark:block"
                   />
                 </>
@@ -120,9 +125,11 @@ function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
             {/* Player & Arrow */}
             <div className="flex flex-col items-center">
               {playerPhoto ? (
-                <img
+                <Image
                   src={playerPhoto}
                   alt={transfer.player?.nickname || ""}
+                  width={64}
+                  height={64}
                   className="size-16 rounded-full object-cover border-2 border-green-primary/30 shadow-sm"
                 />
               ) : (
@@ -137,14 +144,18 @@ function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
             <div className="flex flex-col items-center text-center flex-1">
               {toTeamLogo ? (
                 <>
-                  <img
+                  <Image
                     src={toTeamLogo}
                     alt={transfer.toTeam?.name || ""}
+                    width={48}
+                    height={48}
                     className="size-12 rounded-lg object-contain dark:hidden"
                   />
-                  <img
+                  <Image
                     src={toTeamLogoDark || toTeamLogo}
                     alt={transfer.toTeam?.name || ""}
+                    width={48}
+                    height={48}
                     className="size-12 rounded-lg object-contain hidden dark:block"
                   />
                 </>
@@ -219,7 +230,7 @@ function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
             {transfer.game && (
               <div className="flex items-center gap-1.5">
                 {gameLogo ? (
-                  <img src={gameLogo} alt={transfer.game.name} className="size-4 rounded" />
+                  <Image src={gameLogo} alt={transfer.game.name} width={16} height={16} className="size-4 rounded" />
                 ) : (
                   <Gamepad2 className="size-3.5" />
                 )}
@@ -260,10 +271,11 @@ function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
         {/* Player Photo */}
         <div className="relative size-14 sm:size-16 rounded-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 dark:from-[#1a1d2e] dark:to-[#12141c] flex-shrink-0 border border-gray-200 dark:border-transparent">
           {playerPhoto ? (
-            <img
+            <Image
               src={playerPhoto}
               alt={transfer.player?.nickname || ""}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -294,7 +306,7 @@ function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
           {transfer.game && (
             <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-foreground text-sm">
               {gameLogo ? (
-                <img src={gameLogo} alt={transfer.game.name} className="size-3.5 rounded" />
+                <Image src={gameLogo} alt={transfer.game.name} width={14} height={14} className="size-3.5 rounded" />
               ) : (
                 <Gamepad2 className="size-3.5" />
               )}

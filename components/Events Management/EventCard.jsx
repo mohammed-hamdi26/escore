@@ -24,6 +24,7 @@ import {
 } from "../ui/dropdown-menu";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 const STATUS_COLORS = {
   upcoming: "bg-blue-500/10 text-blue-500 border-blue-500/20",
@@ -61,11 +62,13 @@ function EventCard({ event, viewMode = "grid", onDelete, t }) {
   if (viewMode === "list") {
     return (
       <div className="group flex items-center gap-4 p-3 rounded-xl bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-200">
-        <div className="shrink-0 size-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
+        <div className="relative shrink-0 size-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
           {eventLogo ? (
-            <img
+            <Image
               src={eventLogo}
               alt={event.name}
+              width={40}
+              height={40}
               className="size-10 object-contain"
             />
           ) : (
@@ -169,9 +172,11 @@ function EventCard({ event, viewMode = "grid", onDelete, t }) {
       {/* Header with logo */}
       <div className="relative h-32 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-white/5 dark:to-white/[0.02] flex items-center justify-center">
         {eventLogo ? (
-          <img
+          <Image
             src={eventLogo}
             alt={event.name}
+            width={80}
+            height={80}
             className="size-20 object-contain transition-transform duration-300 group-hover:scale-110"
           />
         ) : (
@@ -265,9 +270,11 @@ function EventCard({ event, viewMode = "grid", onDelete, t }) {
             <MapPin className="size-3" />
             <span className="truncate">{event.location}</span>
             {countryFlag && (
-              <img
+              <Image
                 src={countryFlag}
                 alt={event.country?.name}
+                width={16}
+                height={16}
                 className="size-4 rounded-sm"
               />
             )}

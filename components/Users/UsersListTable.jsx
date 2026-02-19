@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 export default function UsersListTable({ users, meta }) {
   const [isLoading, setIsLoading] = useState(null);
@@ -119,9 +120,11 @@ export default function UsersListTable({ users, meta }) {
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
                 {user.avatar?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(user.avatar.light, "thumbnail")}
                     alt=""
+                    width={48}
+                    height={48}
                     className="size-12 rounded-xl object-cover ring-2 ring-gray-100 dark:ring-white/10"
                   />
                 ) : (

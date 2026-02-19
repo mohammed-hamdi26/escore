@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { getImgUrl } from "@/lib/utils";
 import { deleteUser } from "@/app/[locale]/_Lib/actions";
 import Table from "@/components/ui app/Table";
@@ -18,7 +19,7 @@ function UsersTable({ users, meta }) {
           <Table.Row grid_cols={"grid-cols-[0.5fr_2fr]"} key={user.id}>
             <Table.Cell className="flex gap-4 items-center">
               {user.avatar && (
-                <img
+                <Image
                   src={getImgUrl(user.avatar.light, "thumbnail")}
                   width={30}
                   height={30}

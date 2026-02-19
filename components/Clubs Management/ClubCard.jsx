@@ -33,6 +33,7 @@ import {
   ENTITIES,
   ACTIONS,
 } from "@/contexts/PermissionsContext";
+import Image from "next/image";
 
 function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -88,10 +89,11 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
         {/* Logo Area */}
         <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-50 dark:from-[#1a1d2e] dark:to-[#12141c] flex items-center justify-center p-4">
           {clubLogo ? (
-            <img
+            <Image
               src={clubLogo}
               alt={club.name}
-              className="w-full h-full object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-300"
+              fill
+              className="object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-300 p-4"
             />
           ) : (
             <div className="size-20 rounded-xl bg-gray-200/50 dark:bg-white/5 flex items-center justify-center">
@@ -196,9 +198,11 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
                   {club.name}
                 </h3>
                 {countryFlag && (
-                  <img
+                  <Image
                     src={countryFlag}
                     alt={club.country?.name || club.country?.code}
+                    width={20}
+                    height={20}
                     className="size-5 rounded-sm object-cover ring-1 ring-gray-200 dark:ring-white/10"
                   />
                 )}
@@ -248,12 +252,13 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
       className="group rounded-xl p-4 bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-200 cursor-pointer flex items-center gap-4"
     >
       {/* Logo */}
-      <div className="size-12 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden shrink-0">
+      <div className="relative size-12 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden shrink-0">
         {clubLogo ? (
-          <img
+          <Image
             src={clubLogo}
             alt={club.name}
-            className="size-full object-contain"
+            fill
+            className="object-contain"
           />
         ) : (
           <Building2 className="size-6 text-muted-foreground/40" />
@@ -272,9 +277,11 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
             </span>
           )}
           {countryFlag && (
-            <img
+            <Image
               src={countryFlag}
               alt={club.country?.name}
+              width={16}
+              height={16}
               className="size-4 rounded-sm object-cover"
             />
           )}

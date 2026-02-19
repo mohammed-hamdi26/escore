@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import DropMenu from "../ui app/DropMenu";
 import { Award, EllipsisVertical, Link2 } from "lucide-react";
 import { getFirst10Words } from "@/app/[locale]/_Lib/helps";
+import Image from "next/image";
 
 export default function TeamsTable({ teams, columns, pagination }) {
   const t = useTranslations("TeamsTable");
@@ -28,7 +29,7 @@ export default function TeamsTable({ teams, columns, pagination }) {
         {teams.map((team) => (
           <Table.Row key={team.id} grid_cols="grid-cols-[0.5fr_0.5fr_1fr_2fr]">
             <Table.Cell className="flex gap-2 items-center">
-              {team?.logo && <img width={30} src={team?.logo} alt="" />}{" "}
+              {team?.logo && <Image width={30} height={30} src={team?.logo} alt="" />}{" "}
               {team?.name}
             </Table.Cell>
             <Table.Cell>{team?.region}</Table.Cell>

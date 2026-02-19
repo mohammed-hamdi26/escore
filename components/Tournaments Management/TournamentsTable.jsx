@@ -28,6 +28,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 // Status badge colors
 const STATUS_COLORS = {
@@ -196,9 +197,11 @@ function TournamentsTable({ tournaments, pagination, games }) {
                 {/* Tournament Name & Logo */}
                 <div className="flex items-center gap-3 min-w-0">
                   {tournament?.logo?.light ? (
-                    <img
+                    <Image
                       src={getImgUrl(tournament.logo.light, "thumbnail")}
                       alt={tournament.name}
+                      width={40}
+                      height={40}
                       className="size-10 rounded-lg object-cover flex-shrink-0"
                     />
                   ) : (

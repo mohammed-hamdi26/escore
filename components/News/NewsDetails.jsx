@@ -33,6 +33,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 function NewsDetails({ news }) {
   const t = useTranslations("NewsDetails");
@@ -142,9 +143,12 @@ function NewsDetails({ news }) {
             {/* Cover Image - 2:1 aspect ratio (newsCover) */}
             {news.coverImage?.light && (
               <div className="relative aspect-[2/1] w-full">
-                <img
+                <Image
                   src={getImgUrl(news.coverImage.light)}
                   alt={news.title}
+                  width={0}
+                  height={0}
+                  sizes="100vw"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -193,9 +197,11 @@ function NewsDetails({ news }) {
               {/* Author */}
               <div className="flex items-center gap-3">
                 {news.authorImage?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(news.authorImage.light, "medium")}
                     alt={news.authorName}
+                    width={40}
+                    height={40}
                     className="size-10 rounded-full object-cover"
                   />
                 ) : (
@@ -287,9 +293,12 @@ function NewsDetails({ news }) {
                   <div className="space-y-2">
                     <p className="text-sm text-muted-foreground">{t("lightMode") || "Light Mode"}</p>
                     <div className="aspect-[2/1] w-full rounded-xl ring-1 ring-gray-200 overflow-hidden">
-                      <img
+                      <Image
                         src={getImgUrl(news.coverImage.light)}
                         alt="Cover Light"
+                        width={0}
+                        height={0}
+                        sizes="100vw"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -299,9 +308,12 @@ function NewsDetails({ news }) {
                   <div className="space-y-2">
                     <p className="text-sm text-muted-foreground">{t("darkMode") || "Dark Mode"}</p>
                     <div className="aspect-[2/1] w-full rounded-xl ring-1 ring-gray-200 dark:ring-white/10 overflow-hidden">
-                      <img
+                      <Image
                         src={getImgUrl(news.coverImage.dark)}
                         alt="Cover Dark"
+                        width={0}
+                        height={0}
+                        sizes="100vw"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -323,9 +335,11 @@ function NewsDetails({ news }) {
               </h3>
               <div className="flex items-center gap-3">
                 {news.game.logo?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(news.game.logo.light, "thumbnail")}
                     alt={news.game.name}
+                    width={48}
+                    height={48}
                     className="size-12 rounded-xl object-cover"
                   />
                 ) : (
@@ -352,9 +366,11 @@ function NewsDetails({ news }) {
               </h3>
               <div className="flex items-center gap-3">
                 {news.tournament.logo?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(news.tournament.logo.light, "thumbnail")}
                     alt={news.tournament.name}
+                    width={48}
+                    height={48}
                     className="size-12 rounded-xl object-cover"
                   />
                 ) : (
@@ -381,9 +397,11 @@ function NewsDetails({ news }) {
               </h3>
               <div className="flex items-center gap-3">
                 {news.team.logo?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(news.team.logo.light, "thumbnail")}
                     alt={news.team.name}
+                    width={48}
+                    height={48}
                     className="size-12 rounded-xl object-cover"
                   />
                 ) : (
@@ -410,9 +428,11 @@ function NewsDetails({ news }) {
               </h3>
               <div className="flex items-center gap-3">
                 {news.player.image?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(news.player.image.light, "thumbnail")}
                     alt={news.player.nickname || news.player.fullName || 'Player'}
+                    width={48}
+                    height={48}
                     className="size-12 rounded-full object-cover"
                   />
                 ) : (
@@ -440,9 +460,11 @@ function NewsDetails({ news }) {
               <div className="flex items-center justify-center gap-3">
                 <div className="text-center">
                   {news.match.team1?.logo?.light ? (
-                    <img
+                    <Image
                       src={getImgUrl(news.match.team1.logo.light, "thumbnail")}
                       alt={news.match.team1.name}
+                      width={40}
+                      height={40}
                       className="size-10 rounded-lg object-cover mx-auto mb-1"
                     />
                   ) : (
@@ -455,9 +477,11 @@ function NewsDetails({ news }) {
                 <span className="text-lg font-bold text-muted-foreground">vs</span>
                 <div className="text-center">
                   {news.match.team2?.logo?.light ? (
-                    <img
+                    <Image
                       src={getImgUrl(news.match.team2.logo.light, "thumbnail")}
                       alt={news.match.team2.name}
+                      width={40}
+                      height={40}
                       className="size-10 rounded-lg object-cover mx-auto mb-1"
                     />
                   ) : (

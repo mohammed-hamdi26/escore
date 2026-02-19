@@ -30,6 +30,7 @@ import {
 import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 function NewsCard({
   news,
@@ -77,10 +78,11 @@ function NewsCard({
         {/* Cover Image */}
         <div className="relative aspect-[16/9] bg-gradient-to-br from-[#1a1d2e] to-[#12141c]">
           {coverImage ? (
-            <img
+            <Image
               src={coverImage}
               alt={news.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -277,7 +279,7 @@ function NewsCard({
           {news.game && (
             <div className="flex items-center gap-1.5 mb-2">
               {gameImage ? (
-                <img src={gameImage} alt={news.game.name} className="size-4 rounded" />
+                <Image src={gameImage} alt={news.game.name} width={16} height={16} className="size-4 rounded" />
               ) : (
                 <Gamepad2 className="size-4 text-muted-foreground" />
               )}
@@ -321,10 +323,11 @@ function NewsCard({
         {/* Cover Image */}
         <div className="relative size-16 sm:size-20 rounded-xl overflow-hidden bg-gradient-to-br from-[#1a1d2e] to-[#12141c] flex-shrink-0">
           {coverImage ? (
-            <img
+            <Image
               src={coverImage}
               alt={news.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -364,7 +367,7 @@ function NewsCard({
           {news.game && (
             <Badge className="bg-muted/50 text-foreground border-0 gap-1.5">
               {gameImage ? (
-                <img src={gameImage} alt={news.game.name} className="size-3.5 rounded" />
+                <Image src={gameImage} alt={news.game.name} width={14} height={14} className="size-3.5 rounded" />
               ) : (
                 <Gamepad2 className="size-3.5" />
               )}

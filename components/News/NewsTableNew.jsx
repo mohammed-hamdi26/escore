@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 const columns = [
   { id: "title", header: "Title" },
@@ -116,9 +117,11 @@ function NewsTableNew({ news, pagination, games = [] }) {
             <Table.Row key={newsId} grid_cols="grid-cols-[2fr_1fr_1fr_0.8fr_0.6fr_2fr]">
               <Table.Cell className="flex gap-3 items-center">
                 {newsItem?.coverImage?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(newsItem.coverImage.light, "thumbnail")}
                     alt={newsItem.title}
+                    width={40}
+                    height={40}
                     className="size-10 rounded-lg object-cover"
                   />
                 ) : (
@@ -136,9 +139,11 @@ function NewsTableNew({ news, pagination, games = [] }) {
 
               <Table.Cell className="flex gap-2 items-center">
                 {newsItem?.authorImage?.light ? (
-                  <img
+                  <Image
                     src={getImgUrl(newsItem.authorImage.light, "thumbnail")}
                     alt={newsItem.authorName}
+                    width={24}
+                    height={24}
                     className="size-6 rounded-full object-cover"
                   />
                 ) : (

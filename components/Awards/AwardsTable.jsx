@@ -23,6 +23,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Spinner } from "../ui/spinner";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 function AwardsTable({ awards, games, awardsType, idUser }) {
   const t = useTranslations("Awards");
@@ -84,9 +85,11 @@ function AwardsTable({ awards, games, awardsType, idUser }) {
               {/* Award Image */}
               <div className="relative aspect-square bg-gradient-to-br from-amber-900/20 to-[#0F1017]">
                 {awardImage ? (
-                  <img
+                  <Image
                     src={awardImage}
                     alt={award.name}
+                    width={200}
+                    height={200}
                     className="w-full h-full object-contain p-4"
                     onError={(e) => {
                       e.target.style.display = "none";
@@ -103,9 +106,11 @@ function AwardsTable({ awards, games, awardsType, idUser }) {
                   <div className="absolute top-2 left-2">
                     <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1.5">
                       {gameImage ? (
-                        <img
+                        <Image
                           src={gameImage}
                           alt={award.game.name}
+                          width={16}
+                          height={16}
                           className="size-4 rounded object-cover"
                         />
                       ) : (

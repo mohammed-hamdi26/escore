@@ -13,6 +13,7 @@ import DropMenu from "../ui app/DropMenu";
 import { EllipsisVertical, Eye, Power, PowerOff, Gamepad2 } from "lucide-react";
 import { format } from "date-fns";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 const columns = [
   { id: "name", header: "Name" },
@@ -69,9 +70,11 @@ export default function GamesTable({ games, pagination }) {
           <Table.Row key={game.id || game._id} grid_cols="grid-cols-[1.5fr_1fr_0.8fr_0.8fr_2fr]">
             <Table.Cell className="flex gap-3 items-center">
               {game?.logo?.light ? (
-                <img
+                <Image
                   src={getImgUrl(game.logo.light, "thumbnail")}
                   alt={game.name}
+                  width={40}
+                  height={40}
                   className="size-10 rounded-lg object-cover"
                 />
               ) : (

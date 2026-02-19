@@ -43,6 +43,7 @@ import {
   ACTIONS,
 } from "@/contexts/PermissionsContext";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 function formatDate(date) {
   if (!date) return "—";
@@ -191,9 +192,11 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
           {/* Logo */}
           <div className="flex-shrink-0">
             {clubLogo ? (
-              <img
+              <Image
                 src={clubLogo}
                 alt={club.name}
+                width={96}
+                height={96}
                 className="size-24 rounded-2xl object-contain ring-2 ring-white/10 bg-white/5 p-1"
               />
             ) : (
@@ -215,9 +218,11 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                 </Badge>
               )}
               {countryFlag && (
-                <img
+                <Image
                   src={countryFlag}
                   alt={club.country?.name}
+                  width={24}
+                  height={24}
                   className="size-6 rounded-sm object-cover ring-1 ring-white/10"
                 />
               )}
@@ -332,9 +337,11 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                         className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         {teamLogo ? (
-                          <img
+                          <Image
                             src={teamLogo}
                             alt={team.name}
+                            width={32}
+                            height={32}
                             className="size-8 rounded-lg object-contain bg-white/5 p-0.5"
                           />
                         ) : (
@@ -346,9 +353,11 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           {team.name || "Unknown Team"}
                         </span>
                         {gameLogo && (
-                          <img
+                          <Image
                             src={gameLogo}
                             alt={game.name}
+                            width={20}
+                            height={20}
                             className="size-5 rounded"
                           />
                         )}
@@ -399,9 +408,12 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                         {club.logo?.light && (
                           <div className="space-y-1.5">
                             <div className="aspect-square rounded-xl bg-white border border-gray-200 flex items-center justify-center p-4 overflow-hidden">
-                              <img
+                              <Image
                                 src={getImgUrl(club.logo.light)}
                                 alt="Logo Light"
+                                width={0}
+                                height={0}
+                                sizes="100vw"
                                 className="max-w-full max-h-full object-contain"
                               />
                             </div>
@@ -414,9 +426,12 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                         {club.logo?.dark && (
                           <div className="space-y-1.5">
                             <div className="aspect-square rounded-xl bg-[#1a1d2e] border border-white/10 flex items-center justify-center p-4 overflow-hidden">
-                              <img
+                              <Image
                                 src={getImgUrl(club.logo.dark)}
                                 alt="Logo Dark"
+                                width={0}
+                                height={0}
+                                sizes="100vw"
                                 className="max-w-full max-h-full object-contain"
                               />
                             </div>
@@ -440,9 +455,12 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                         {club.coverImage?.light && (
                           <div className="space-y-1.5">
                             <div className="aspect-video rounded-xl bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
-                              <img
+                              <Image
                                 src={getImgUrl(club.coverImage.light)}
                                 alt="Cover Light"
+                                width={0}
+                                height={0}
+                                sizes="100vw"
                                 className="w-full h-full object-cover"
                               />
                             </div>
@@ -455,9 +473,12 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                         {club.coverImage?.dark && (
                           <div className="space-y-1.5">
                             <div className="aspect-video rounded-xl bg-[#1a1d2e] border border-white/10 flex items-center justify-center overflow-hidden">
-                              <img
+                              <Image
                                 src={getImgUrl(club.coverImage.dark)}
                                 alt="Cover Dark"
+                                width={0}
+                                height={0}
+                                sizes="100vw"
                                 className="w-full h-full object-cover"
                               />
                             </div>
@@ -531,9 +552,11 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                 {club.country?.name && (
                   <div className="flex items-center gap-3 mb-3">
                     {countryFlag && (
-                      <img
+                      <Image
                         src={countryFlag}
                         alt={club.country.name}
+                        width={32}
+                        height={32}
                         className="size-8 rounded object-cover ring-1 ring-white/10"
                       />
                     )}
@@ -630,7 +653,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                       {selectedTeamObj ? (
                         <span className="flex items-center gap-2 truncate">
                           {selectedTeamObj.logo?.light ? (
-                            <img src={getImgUrl(selectedTeamObj.logo.light, "thumbnail")} alt="" className="size-5 rounded object-contain" />
+                            <Image src={getImgUrl(selectedTeamObj.logo.light, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded object-contain" />
                           ) : (
                             <Users className="size-4 text-muted-foreground shrink-0" />
                           )}
@@ -671,7 +694,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                                 className="flex items-center gap-2 cursor-pointer"
                               >
                                 {team.logo?.light ? (
-                                  <img src={getImgUrl(team.logo.light, "thumbnail")} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                  <Image src={getImgUrl(team.logo.light, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                 ) : (
                                   <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                     <Users className="size-3.5 text-muted-foreground" />
@@ -679,7 +702,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                                 )}
                                 <span className="flex-1 truncate">{team.name}</span>
                                 {gameLogo && (
-                                  <img src={gameLogo} alt={teamGame?.name} className="size-4 rounded opacity-60" />
+                                  <Image src={gameLogo} alt={teamGame?.name} width={16} height={16} className="size-4 rounded opacity-60" />
                                 )}
                                 <span className="text-xs text-muted-foreground truncate max-w-[80px]">{teamGame?.name}</span>
                                 {selectedTeam === team.id && (
@@ -705,7 +728,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                   <Gamepad2 className="size-3.5" />
                   <span>{t("game") || "Game"}:</span>
                   {(selectedTeamGame.logo?.light || selectedTeamGame.logo?.dark) && (
-                    <img src={getImgUrl(selectedTeamGame.logo.light, "thumbnail") || getImgUrl(selectedTeamGame.logo.dark, "thumbnail")} alt="" className="size-4 rounded" />
+                    <Image src={getImgUrl(selectedTeamGame.logo.light, "thumbnail") || getImgUrl(selectedTeamGame.logo.dark, "thumbnail")} alt="" width={16} height={16} className="size-4 rounded" />
                   )}
                   <span className="font-medium text-foreground">{selectedTeamGame.name}</span>
                 </div>
@@ -747,9 +770,11 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                     className="glass rounded-xl p-4 border border-white/5 flex items-center gap-4"
                   >
                     {teamLogo ? (
-                      <img
+                      <Image
                         src={teamLogo}
                         alt={team.name}
+                        width={40}
+                        height={40}
                         className="size-10 rounded-lg object-contain bg-white/5 p-1"
                       />
                     ) : (
@@ -763,9 +788,11 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                       </h4>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
                         {gameLogo && (
-                          <img
+                          <Image
                             src={gameLogo}
                             alt={game.name}
+                            width={16}
+                            height={16}
                             className="size-4 rounded"
                           />
                         )}
@@ -863,12 +890,12 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                     <div key={teamData.id || "unknown"}>
                       <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/5">
                         {teamLogo ? (
-                          <img src={teamLogo} alt={teamData.name} className="size-6 rounded object-contain" />
+                          <Image src={teamLogo} alt={teamData.name} width={24} height={24} className="size-6 rounded object-contain" />
                         ) : (
                           <Users className="size-4 text-muted-foreground" />
                         )}
                         <span className="text-sm font-medium text-foreground">{teamData.name || "Unknown Team"}</span>
-                        {gameLogo && <img src={gameLogo} alt={gameData.name} className="size-4 rounded opacity-60" />}
+                        {gameLogo && <Image src={gameLogo} alt={gameData.name} width={16} height={16} className="size-4 rounded opacity-60" />}
                         <span className="text-xs text-muted-foreground">{gameData.name}</span>
                       </div>
                       <div className="space-y-1.5">
@@ -878,7 +905,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           return (
                             <div key={idx} className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-muted/30 transition-colors">
                               {playerPhoto ? (
-                                <img src={playerPhoto} alt={player.nickname} className="size-8 rounded-full object-cover" />
+                                <Image src={playerPhoto} alt={player.nickname} width={32} height={32} className="size-8 rounded-full object-cover" />
                               ) : (
                                 <div className="size-8 rounded-full bg-white/5 flex items-center justify-center">
                                   <User className="size-4 text-muted-foreground" />
@@ -961,7 +988,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           {selectedPlayerGameObj ? (
                             <span className="flex items-center gap-2 truncate">
                               {selectedPlayerGameObj.logo?.light ? (
-                                <img src={getImgUrl(selectedPlayerGameObj.logo.light, "thumbnail")} alt="" className="size-5 rounded object-contain" />
+                                <Image src={getImgUrl(selectedPlayerGameObj.logo.light, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded object-contain" />
                               ) : (
                                 <Gamepad2 className="size-4 text-muted-foreground shrink-0" />
                               )}
@@ -1000,7 +1027,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
                                     {game.logo?.light ? (
-                                      <img src={getImgUrl(game.logo.light, "thumbnail")} alt="" className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                      <Image src={getImgUrl(game.logo.light, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                     ) : (
                                       <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
                                         <Gamepad2 className="size-3.5 text-muted-foreground" />
@@ -1038,7 +1065,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           {selectedPlayerObj ? (
                             <span className="flex items-center gap-2 truncate">
                               {(selectedPlayerObj.photo?.light || selectedPlayerObj.photo?.dark) ? (
-                                <img src={getImgUrl(selectedPlayerObj.photo.light, "thumbnail") || getImgUrl(selectedPlayerObj.photo.dark, "thumbnail")} alt="" className="size-5 rounded-full object-cover" />
+                                <Image src={getImgUrl(selectedPlayerObj.photo.light, "thumbnail") || getImgUrl(selectedPlayerObj.photo.dark, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded-full object-cover" />
                               ) : (
                                 <User className="size-4 text-muted-foreground shrink-0" />
                               )}
@@ -1076,7 +1103,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
                                     {(p.photo?.light || p.photo?.dark) ? (
-                                      <img src={getImgUrl(p.photo.light, "thumbnail") || getImgUrl(p.photo.dark, "thumbnail")} alt="" className="size-6 rounded-full object-cover" />
+                                      <Image src={getImgUrl(p.photo.light, "thumbnail") || getImgUrl(p.photo.dark, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded-full object-cover" />
                                     ) : (
                                       <div className="size-6 rounded-full bg-muted/30 flex items-center justify-center">
                                         <User className="size-3.5 text-muted-foreground" />
@@ -1135,9 +1162,11 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                       className="glass rounded-xl p-4 border border-white/5 flex items-center gap-4"
                     >
                       {playerPhoto ? (
-                        <img
+                        <Image
                           src={playerPhoto}
                           alt={player.nickname || player.name}
+                          width={40}
+                          height={40}
                           className="size-10 rounded-full object-cover"
                         />
                       ) : (

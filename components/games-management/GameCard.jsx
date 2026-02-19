@@ -27,6 +27,7 @@ import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 import { getImgUrl } from "@/lib/utils";
+import Image from "next/image";
 
 function GameCard({ game, onDelete, onToggleActive, t, viewMode = "grid" }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -69,17 +70,19 @@ function GameCard({ game, onDelete, onToggleActive, t, viewMode = "grid" }) {
         {/* Cover/Logo Image */}
         <div className="relative aspect-[16/9] bg-gradient-to-br from-[#1a1d2e] to-[#12141c]">
           {coverImage ? (
-            <img
+            <Image
               src={coverImage}
               alt={game.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : gameImage ? (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a1d2e] to-[#12141c]">
-              <img
+            <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a1d2e] to-[#12141c]">
+              <Image
                 src={gameImage}
                 alt={game.name}
-                className="max-w-[60%] max-h-[60%] object-contain"
+                fill
+                className="object-contain p-[20%]"
               />
             </div>
           ) : (
@@ -187,9 +190,11 @@ function GameCard({ game, onDelete, onToggleActive, t, viewMode = "grid" }) {
           {/* Logo and Name */}
           <div className="flex items-center gap-3 mb-2">
             {gameImage && (
-              <img
+              <Image
                 src={gameImage}
                 alt={game.name}
+                width={32}
+                height={32}
                 className="size-8 rounded-lg object-contain"
               />
             )}
@@ -234,10 +239,11 @@ function GameCard({ game, onDelete, onToggleActive, t, viewMode = "grid" }) {
         {/* Game Image */}
         <div className="relative size-16 rounded-xl overflow-hidden bg-gradient-to-br from-[#1a1d2e] to-[#12141c] flex-shrink-0">
           {gameImage ? (
-            <img
+            <Image
               src={gameImage}
               alt={game.name}
-              className="w-full h-full object-contain p-2"
+              fill
+              className="object-contain p-2"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

@@ -41,6 +41,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { startMatch, updateMatchStatus, updateMatchResult } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
+import Image from "next/image";
 
 const STATUS_CONFIG = {
   scheduled: {
@@ -253,7 +254,7 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
             {/* Game Badge */}
             <div className="flex items-center gap-2">
               {gameLogo ? (
-                <img src={gameLogo} alt={match.game?.name} className="size-5 rounded" />
+                <Image src={gameLogo} alt={match.game?.name} width={20} height={20} className="size-5 rounded" />
               ) : (
                 <Gamepad2 className="size-5 text-muted-foreground" />
               )}
@@ -337,9 +338,9 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
           <div className="flex items-center justify-between gap-4">
             {/* Team 1 */}
             <div className="flex-1 text-center">
-              <div className="size-16 mx-auto mb-2 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
+              <div className="relative size-16 mx-auto mb-2 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                 {team1Logo ? (
-                  <img src={team1Logo} alt={match.team1?.name} className="size-12 object-contain" />
+                  <Image src={team1Logo} alt={match.team1?.name} width={48} height={48} className="size-12 object-contain" />
                 ) : (
                   <Users className="size-8 text-muted-foreground" />
                 )}
@@ -390,9 +391,9 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
 
             {/* Team 2 */}
             <div className="flex-1 text-center">
-              <div className="size-16 mx-auto mb-2 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
+              <div className="relative size-16 mx-auto mb-2 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
                 {team2Logo ? (
-                  <img src={team2Logo} alt={match.team2?.name} className="size-12 object-contain" />
+                  <Image src={team2Logo} alt={match.team2?.name} width={48} height={48} className="size-12 object-contain" />
                 ) : (
                   <Users className="size-8 text-muted-foreground" />
                 )}
@@ -462,9 +463,9 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
     >
       <div className="flex items-center gap-4 p-4">
         {/* Game Logo */}
-        <div className="size-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
+        <div className="relative size-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
           {gameLogo ? (
-            <img src={gameLogo} alt={match.game?.name} className="size-6 object-contain" />
+            <Image src={gameLogo} alt={match.game?.name} width={24} height={24} className="size-6 object-contain" />
           ) : (
             <Gamepad2 className="size-5 text-muted-foreground" />
           )}
@@ -475,7 +476,7 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
           {/* Team 1 */}
           <div className="flex items-center gap-2">
             {team1Logo && (
-              <img src={team1Logo} alt={match.team1?.name} className="size-6 rounded" />
+              <Image src={team1Logo} alt={match.team1?.name} width={24} height={24} className="size-6 rounded" />
             )}
             <span className="font-medium truncate max-w-[100px]">{match.team1?.name}</span>
             {match.status === "live" ? (
@@ -512,7 +513,7 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
           {/* Team 2 */}
           <div className="flex items-center gap-2">
             {team2Logo && (
-              <img src={team2Logo} alt={match.team2?.name} className="size-6 rounded" />
+              <Image src={team2Logo} alt={match.team2?.name} width={24} height={24} className="size-6 rounded" />
             )}
             <span className="font-medium truncate max-w-[100px]">{match.team2?.name}</span>
             {match.status === "live" ? (
