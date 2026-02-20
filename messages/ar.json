@@ -3158,7 +3158,11 @@
     "individualPlayers": "اللاعبون الفرديون",
     "noIndividualPlayers": "لا يوجد لاعبون فرديون مضافون لهذا النادي",
     "teamLabel": "فريق",
-    "individualLabel": "فردي"
+    "individualLabel": "فردي",
+    "socialLinks": "روابط التواصل",
+    "manageSocialLinks": "إدارة روابط التواصل",
+    "manageLinks": "إدارة الروابط",
+    "noSocialLinks": "لم تتم إضافة روابط تواصل بعد"
   },
   "eventList": {
     "title": "إدارة الأحداث",

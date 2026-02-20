@@ -11,7 +11,7 @@ import LinksForm from "./LinksForm";
 import LinksTable from "./LinksTable";
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { ArrowLeft, Link2, Plus, User, Users, Trophy, Calendar } from "lucide-react";
+import { ArrowLeft, Link2, Plus, User, Users, Trophy, Calendar, Building2 } from "lucide-react";
 
 function LinksPageContainer({
   players,
@@ -50,7 +50,9 @@ function LinksPageContainer({
               </h1>
               {playerName && (
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  {linkType === "events" ? (
+                  {linkType === "clubs" ? (
+                    <Building2 className="size-3" />
+                  ) : linkType === "events" ? (
                     <Calendar className="size-3" />
                   ) : linkType === "tournaments" ? (
                     <Trophy className="size-3" />

@@ -24,6 +24,7 @@ import {
   ChevronDown,
   Search,
   Check,
+  Link2,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -612,6 +613,58 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                 </a>
               </div>
             )}
+
+            {/* Social Links */}
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Link2 className="size-5 text-green-primary" />
+                {t("socialLinks") || "Social Links"}
+              </h3>
+              {club.socialLinks?.length > 0 ? (
+                <div className="space-y-2 mb-4">
+                  {club.socialLinks.map((link, index) => (
+                    <a
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-muted/50 dark:hover:bg-[#1a1d2e] transition-colors group"
+                    >
+                      {link.image?.light ? (
+                        <img
+                          src={getImgUrl(link.image.light)}
+                          alt={link.name}
+                          className="size-6 rounded object-contain"
+                        />
+                      ) : (
+                        <div className="size-6 rounded bg-green-primary/10 flex items-center justify-center">
+                          <Link2 className="size-3.5 text-green-primary" />
+                        </div>
+                      )}
+                      <span className="text-sm text-foreground truncate flex-1">
+                        {link.name}
+                      </span>
+                      <ExternalLink className="size-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground mb-4">
+                  {t("noSocialLinks") || "No social links added yet"}
+                </p>
+              )}
+              {canUpdate && (
+                <Link href={`/dashboard/clubs-management/links/${club.id}`}>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 border-green-primary/30 text-green-primary hover:bg-green-primary/10"
+                  >
+                    <Link2 className="size-4" />
+                    {t("manageLinks") || "Manage Links"}
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}

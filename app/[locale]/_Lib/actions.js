@@ -10,6 +10,7 @@ import { getAwardsTeam, getTeamsLinks, getTeams } from "./teamsApi";
 import { getGames } from "./gamesApi";
 import { getTournamentLinks, getTournaments } from "./tournamentsApi";
 import { getEventLinks } from "./eventsApi";
+import { getClubsLinks } from "./clubsApi";
 
 // login
 export async function login(userData) {
@@ -1695,6 +1696,8 @@ export async function editLinks(typeEdit, id, data) {
       socialLinks = await getTournamentLinks(id);
     } else if (typeEdit === "events") {
       socialLinks = await getEventLinks(id);
+    } else if (typeEdit === "clubs") {
+      socialLinks = await getClubsLinks(id);
     }
 
     const isLinkExist = socialLinks.find((link) => link.id === data.id);
@@ -1714,6 +1717,8 @@ export async function editLinks(typeEdit, id, data) {
       revalidatePathStr = `${locale}/dashboard/tournaments-management/links/${id}`;
     } else if (typeEdit === "events") {
       revalidatePathStr = `${locale}/dashboard/events-management/links/${id}`;
+    } else if (typeEdit === "clubs") {
+      revalidatePathStr = `${locale}/dashboard/clubs-management/links/${id}`;
     }
     revalidatePath(revalidatePathStr);
     return res.data;
@@ -1736,6 +1741,8 @@ export async function deleteLink(typeEdit, id, linkId) {
       socialLinks = await getTournamentLinks(id);
     } else if (typeEdit === "events") {
       socialLinks = await getEventLinks(id);
+    } else if (typeEdit === "clubs") {
+      socialLinks = await getClubsLinks(id);
     }
 
     const isLinkExist = socialLinks.find((link) => link.id === linkId);
@@ -1756,6 +1763,8 @@ export async function deleteLink(typeEdit, id, linkId) {
       revalidatePathStr = `${locale}/dashboard/tournaments-management/links/${id}`;
     } else if (typeEdit === "events") {
       revalidatePathStr = `${locale}/dashboard/events-management/links/${id}`;
+    } else if (typeEdit === "clubs") {
+      revalidatePathStr = `${locale}/dashboard/clubs-management/links/${id}`;
     }
     revalidatePath(revalidatePathStr);
     return res.data;

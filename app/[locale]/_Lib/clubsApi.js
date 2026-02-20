@@ -45,6 +45,16 @@ export async function getClub(id) {
   }
 }
 
+export async function getClubsLinks(id) {
+  try {
+    const res = await apiClient.get(`/clubs/${id}`);
+    return res.data?.data?.socialLinks || [];
+  } catch (e) {
+    console.error("Error fetching club links:", e);
+    return [];
+  }
+}
+
 export async function getActiveClubs() {
   try {
     const res = await apiClient.get("/clubs/active");

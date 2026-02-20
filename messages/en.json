@@ -3239,7 +3239,11 @@
     "individualPlayers": "Individual Players",
     "noIndividualPlayers": "No individual players added to this club",
     "teamLabel": "team",
-    "individualLabel": "individual"
+    "individualLabel": "individual",
+    "socialLinks": "Social Links",
+    "manageSocialLinks": "Manage Social Links",
+    "manageLinks": "Manage Links",
+    "noSocialLinks": "No social links added yet"
   },
   "eventList": {
     "title": "Events Management",
