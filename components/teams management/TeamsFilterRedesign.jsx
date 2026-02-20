@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import {
   Search,
   Filter,
@@ -82,21 +82,22 @@ function TeamsFilterRedesign({ games = [], countries = [] }) {
   // Count active filters
   const activeFiltersCount = [currentGame, currentCountry, currentRegion, currentStatus].filter(Boolean).length;
 
-  // Debounced search
-  useEffect(() => {
-    const timer = setTimeout(() => {
+  // Debounced search via ref (no useEffect to avoid resetting page on navigation)
+  const searchTimeoutRef = useRef(null);
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => {
       const params = new URLSearchParams(searchParams);
-      if (searchTerm) {
-        params.set("search", searchTerm);
+      if (value) {
+        params.set("search", value);
       } else {
         params.delete("search");
       }
       params.set("page", "1");
       router.push(`${pathname}?${params.toString()}`);
     }, 400);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm, pathname, router, searchParams]);
+  };
 
   const updateParams = useCallback(
     (key, value) => {
@@ -179,13 +180,13 @@ function TeamsFilterRedesign({ games = [], countries = [] }) {
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder={t("searchPlaceholder") || "Search teams..."}
             className="w-full h-10 pl-10 rtl:pl-4 rtl:pr-10 pr-4 rounded-xl bg-gray-100 dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all"
           />
           {searchTerm && (
             <button
-              onClick={() => setSearchTerm("")}
+              onClick={() => handleSearchChange("")}
               className="absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
             >
               <X className="size-4" />
