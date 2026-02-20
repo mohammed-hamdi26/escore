@@ -239,13 +239,17 @@ function EventDetails({
     }
     setIsLoading(true);
     try {
-      await recordClubResult(event.id, {
+      const result = await recordClubResult(event.id, {
         tournament: resultTournament,
         club: resultClub,
         placement: Number(resultPlacement),
         teamOrPlayer: resultTeamOrPlayer,
         teamOrPlayerModel: resultModel,
       });
+      if (!result.success) {
+        toast.error(result.error || t("recordError") || "Failed to record result");
+        return;
+      }
       toast.success(t("resultRecorded") || "Result recorded successfully");
       setShowRecordModal(false);
       setResultTournament("");
@@ -264,7 +268,11 @@ function EventDetails({
     if (!confirm(t("confirmRemoveResult") || "Remove this result?")) return;
     setIsLoading(true);
     try {
-      await removeClubResult(event.id, clubId, tournamentId);
+      const result = await removeClubResult(event.id, clubId, tournamentId);
+      if (!result.success) {
+        toast.error(result.error || t("removeResultError") || "Failed to remove result");
+        return;
+      }
       toast.success(t("resultRemoved") || "Result removed");
       router.refresh();
     } catch (error) {

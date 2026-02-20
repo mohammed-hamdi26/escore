@@ -2101,7 +2101,12 @@ export async function recordClubResult(eventId, data) {
     revalidatePath(`/${locale}/dashboard/events-management/view/${eventId}`);
     return { success: true };
   } catch (e) {
-    throw new Error(e.response?.data?.message || "Error recording result");
+    const msg = e.response?.data?.message;
+    const fieldErrors = e.response?.data?.errors;
+    const errorMsg = fieldErrors?.length
+      ? `${msg}: ${fieldErrors.map((err) => `${err.field}: ${err.message}`).join(", ")}`
+      : msg || "Error recording result";
+    return { success: false, error: errorMsg };
   }
 }
 
@@ -2114,6 +2119,11 @@ export async function removeClubResult(eventId, clubId, tournamentId) {
     revalidatePath(`/${locale}/dashboard/events-management/view/${eventId}`);
     return { success: true };
   } catch (e) {
-    throw new Error(e.response?.data?.message || "Error removing result");
+    const msg = e.response?.data?.message;
+    const fieldErrors = e.response?.data?.errors;
+    const errorMsg = fieldErrors?.length
+      ? `${msg}: ${fieldErrors.map((err) => `${err.field}: ${err.message}`).join(", ")}`
+      : msg || "Error removing result";
+    return { success: false, error: errorMsg };
   }
 }
