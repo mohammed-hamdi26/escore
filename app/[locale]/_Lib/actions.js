@@ -9,6 +9,7 @@ import { getPlayers, getPlayersLinks } from "./palyerApi";
 import { getAwardsTeam, getTeamsLinks, getTeams } from "./teamsApi";
 import { getGames } from "./gamesApi";
 import { getTournamentLinks, getTournaments } from "./tournamentsApi";
+import { getEventLinks } from "./eventsApi";
 
 // login
 export async function login(userData) {
@@ -1692,11 +1693,11 @@ export async function editLinks(typeEdit, id, data) {
       socialLinks = await getTeamsLinks(id);
     } else if (typeEdit === "tournaments") {
       socialLinks = await getTournamentLinks(id);
+    } else if (typeEdit === "events") {
+      socialLinks = await getEventLinks(id);
     }
 
-    console.log(socialLinks);
     const isLinkExist = socialLinks.find((link) => link.id === data.id);
-    console.log(isLinkExist);
     if (isLinkExist) {
       socialLinks = socialLinks.filter((link) => link.id !== data.id);
     }
@@ -1711,6 +1712,8 @@ export async function editLinks(typeEdit, id, data) {
       revalidatePathStr = `${locale}/dashboard/teams-management/links/${id}`;
     } else if (typeEdit === "tournaments") {
       revalidatePathStr = `${locale}/dashboard/tournaments-management/links/${id}`;
+    } else if (typeEdit === "events") {
+      revalidatePathStr = `${locale}/dashboard/events-management/links/${id}`;
     }
     revalidatePath(revalidatePathStr);
     return res.data;
@@ -1731,9 +1734,9 @@ export async function deleteLink(typeEdit, id, linkId) {
       socialLinks = await getTeamsLinks(id);
     } else if (typeEdit === "tournaments") {
       socialLinks = await getTournamentLinks(id);
+    } else if (typeEdit === "events") {
+      socialLinks = await getEventLinks(id);
     }
-
-    console.log(socialLinks);
 
     const isLinkExist = socialLinks.find((link) => link.id === linkId);
 
@@ -1751,6 +1754,8 @@ export async function deleteLink(typeEdit, id, linkId) {
       revalidatePathStr = `${locale}/dashboard/teams-management/links/${id}`;
     } else if (typeEdit === "tournaments") {
       revalidatePathStr = `${locale}/dashboard/tournaments-management/links/${id}`;
+    } else if (typeEdit === "events") {
+      revalidatePathStr = `${locale}/dashboard/events-management/links/${id}`;
     }
     revalidatePath(revalidatePathStr);
     return res.data;

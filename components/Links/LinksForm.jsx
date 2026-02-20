@@ -32,42 +32,42 @@ import ImageCropper from "../ui app/ImageCropper";
 const SOCIAL_PRESETS = [
   {
     name: "Twitter / X",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/5/53/X_logo_2023_original.svg",
+    icon: "/icons/social/x.svg",
     placeholder: "https://twitter.com/username",
   },
   {
     name: "Discord",
-    icon: "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png",
+    icon: "/icons/social/discord.svg",
     placeholder: "https://discord.gg/invite",
   },
   {
     name: "YouTube",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg",
+    icon: "/icons/social/youtube.svg",
     placeholder: "https://youtube.com/@channel",
   },
   {
     name: "Twitch",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg",
+    icon: "/icons/social/twitch.svg",
     placeholder: "https://twitch.tv/username",
   },
   {
     name: "Instagram",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png",
+    icon: "/icons/social/instagram.svg",
     placeholder: "https://instagram.com/username",
   },
   {
     name: "TikTok",
-    icon: "https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg",
+    icon: "/icons/social/tiktok.svg",
     placeholder: "https://tiktok.com/@username",
   },
   {
     name: "Facebook",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg",
+    icon: "/icons/social/facebook.svg",
     placeholder: "https://facebook.com/page",
   },
   {
     name: "LinkedIn",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png",
+    icon: "/icons/social/linkedin.svg",
     placeholder: "https://linkedin.com/in/username",
   },
 ];

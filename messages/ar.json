@@ -3358,7 +3358,10 @@
     "searchTeamsPlayers": "بحث عن فرق أو لاعبين...",
     "players": "اللاعبين",
     "noTeamsOrPlayers": "لا يوجد فرق أو لاعبين في هذا النادي",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "socialLinks": "الروابط الاجتماعية",
+    "manageSocialLinks": "إدارة روابط التواصل الاجتماعي لهذا الحدث",
+    "manageLinks": "إدارة الروابط"
   },
   "EventsFilter": {
     "title": "إدارة الفعاليات",

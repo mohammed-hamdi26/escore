@@ -113,6 +113,16 @@ export async function getEventStandings(eventId, params = {}) {
   }
 }
 
+export async function getEventLinks(id) {
+  try {
+    const res = await apiClient.get(`/events/${id}`);
+    return res.data?.data?.socialLinks || [];
+  } catch (e) {
+    console.error("Error fetching event links:", e);
+    return [];
+  }
+}
+
 export async function getClubStandingDetail(eventId, clubId) {
   try {
     const res = await apiClient.get(
