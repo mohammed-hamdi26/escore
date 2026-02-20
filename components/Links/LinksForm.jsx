@@ -32,42 +32,42 @@ import ImageCropper from "../ui app/ImageCropper";
 const SOCIAL_PRESETS = [
   {
     name: "Twitter / X",
-    icon: "/icons/social/x.svg",
+    icon: "https://dashboard.escore.app/icons/social/x.svg",
     placeholder: "https://twitter.com/username",
   },
   {
     name: "Discord",
-    icon: "/icons/social/discord.svg",
+    icon: "https://dashboard.escore.app/icons/social/discord.svg",
     placeholder: "https://discord.gg/invite",
   },
   {
     name: "YouTube",
-    icon: "/icons/social/youtube.svg",
+    icon: "https://dashboard.escore.app/icons/social/youtube.svg",
     placeholder: "https://youtube.com/@channel",
   },
   {
     name: "Twitch",
-    icon: "/icons/social/twitch.svg",
+    icon: "https://dashboard.escore.app/icons/social/twitch.svg",
     placeholder: "https://twitch.tv/username",
   },
   {
     name: "Instagram",
-    icon: "/icons/social/instagram.svg",
+    icon: "https://dashboard.escore.app/icons/social/instagram.svg",
     placeholder: "https://instagram.com/username",
   },
   {
     name: "TikTok",
-    icon: "/icons/social/tiktok.svg",
+    icon: "https://dashboard.escore.app/icons/social/tiktok.svg",
     placeholder: "https://tiktok.com/@username",
   },
   {
     name: "Facebook",
-    icon: "/icons/social/facebook.svg",
+    icon: "https://dashboard.escore.app/icons/social/facebook.svg",
     placeholder: "https://facebook.com/page",
   },
   {
     name: "LinkedIn",
-    icon: "/icons/social/linkedin.svg",
+    icon: "https://dashboard.escore.app/icons/social/linkedin.svg",
     placeholder: "https://linkedin.com/in/username",
   },
 ];
