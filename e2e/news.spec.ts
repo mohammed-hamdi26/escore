@@ -7,7 +7,7 @@ test.describe('News Management', () => {
   });
 
   test('should navigate to news list page', async ({ page }) => {
-    await page.goto('/en/dashboard/news-management');
+    await page.goto('/en/dashboard/news');
     await page.waitForLoadState('networkidle');
 
     const pageContent = page.locator('body');
@@ -16,7 +16,7 @@ test.describe('News Management', () => {
   });
 
   test('should display news table or list', async ({ page }) => {
-    await page.goto('/en/dashboard/news-management');
+    await page.goto('/en/dashboard/news');
     await page.waitForLoadState('networkidle');
 
     const hasContent = await page.locator('table, [class*="card"], [class*="list"], [class*="grid"]').first().isVisible().catch(() => false);
@@ -24,7 +24,7 @@ test.describe('News Management', () => {
   });
 
   test('should have add news button', async ({ page }) => {
-    await page.goto('/en/dashboard/news-management');
+    await page.goto('/en/dashboard/news');
     await page.waitForLoadState('networkidle');
 
     const addButton = page.locator('button, a').filter({ hasText: /add|new|create|\+/i }).first();
@@ -32,7 +32,7 @@ test.describe('News Management', () => {
   });
 
   test('should navigate to add news page', async ({ page }) => {
-    await page.goto('/en/dashboard/news-management/add');
+    await page.goto('/en/dashboard/news/add');
     await page.waitForLoadState('networkidle');
 
     const url = page.url();
@@ -41,7 +41,7 @@ test.describe('News Management', () => {
   });
 
   test('should view news details', async ({ page }) => {
-    await page.goto('/en/dashboard/news-management');
+    await page.goto('/en/dashboard/news');
     await page.waitForLoadState('networkidle');
 
     const viewButton = page.locator('button, a').filter({ hasText: /view|details|عرض/i }).first();
@@ -62,7 +62,7 @@ test.describe('News Management', () => {
   });
 
   test('should filter news by status', async ({ page }) => {
-    await page.goto('/en/dashboard/news-management');
+    await page.goto('/en/dashboard/news');
     await page.waitForLoadState('networkidle');
 
     const filtersButton = page.locator('button').filter({ hasText: /filters|فلاتر/i }).first();
@@ -90,7 +90,7 @@ test.describe('News Management', () => {
   });
 
   test('should search news', async ({ page }) => {
-    await page.goto('/en/dashboard/news-management');
+    await page.goto('/en/dashboard/news');
     await page.waitForLoadState('networkidle');
 
     const searchInput = page.locator('input[type="search"], input[placeholder*="search" i], input[placeholder*="بحث"]').first();

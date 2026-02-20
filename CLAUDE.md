@@ -57,7 +57,7 @@ import { PermissionGate } from "@/contexts/PermissionsContext";
     - `imageSpecs.js` — Image type → aspect ratio / size specs (mirrors backend)
     - `*Api.js` — Per-entity read-only data fetching (e.g., `palyerApi.js`, `teamsApi.js`)
   - `dashboard/` — Protected admin routes (requires session cookie)
-    - Entity management folders: `games-management/`, `player-management/`, `teams-management/`, `tournaments-management/`, `matches-management/`, `news-management/`, `clubs-management/`, `events-management/`, `transfers-management/`
+    - Entity management folders: `games-management/`, `player-management/`, `teams-management/`, `tournaments-management/`, `matches-management/`, `news/`, `clubs-management/`, `events-management/`, `transfers-management/`
     - `users/` — User management + content requests
     - `notifications/` — Send, templates, devices, history
     - `support-center/` — Support tickets

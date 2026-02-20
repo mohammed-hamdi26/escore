@@ -158,7 +158,7 @@ function NewsTable({ news, pagination, games }) {
             news.map((article) => (
               <div
                 key={article.id}
-                onClick={() => router.push(`/dashboard/news-management/view/${article.id}`)}
+                onClick={() => router.push(`/dashboard/news/view/${article.id}`)}
                 className="grid grid-cols-[2fr_1fr_1fr_0.7fr_0.7fr_0.7fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors cursor-pointer"
               >
                 {/* Title & Cover Image */}
@@ -285,12 +285,12 @@ function ActionsDropdown({ article, loadingId, onDelete, t }) {
 
   const handleEdit = () => {
     setIsOpen(false);
-    router.push(`/dashboard/news-management/edit/${article.id}`);
+    router.push(`/dashboard/news/edit/${article.id}`);
   };
 
   const handleView = () => {
     setIsOpen(false);
-    router.push(`/dashboard/news-management/view/${article.id}`);
+    router.push(`/dashboard/news/view/${article.id}`);
   };
 
   const handleToggleFeatured = async () => {
