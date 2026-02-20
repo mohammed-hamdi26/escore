@@ -163,7 +163,7 @@ function PlayerFormRedesign({
             dark: values.photoDark || values.photoLight,
           };
         }
-        if (values.tournaments && values.tournaments.length > 0) dataValues.tournaments = values.tournaments;
+        if (Array.isArray(values.tournaments)) dataValues.tournaments = values.tournaments;
         if (selectedCountry) {
           dataValues.country = {
             name: selectedCountry.label,

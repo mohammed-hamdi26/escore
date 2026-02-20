@@ -3237,7 +3237,9 @@
     "teamPlayers": "Team Players",
     "teamPlayersInfo": "Players from the club's teams",
     "individualPlayers": "Individual Players",
-    "noIndividualPlayers": "No individual players added to this club"
+    "noIndividualPlayers": "No individual players added to this club",
+    "teamLabel": "team",
+    "individualLabel": "individual"
   },
   "eventList": {
     "title": "Events Management",

@@ -3156,7 +3156,9 @@
     "teamPlayers": "لاعبو الفرق",
     "teamPlayersInfo": "اللاعبون من فرق النادي",
     "individualPlayers": "اللاعبون الفرديون",
-    "noIndividualPlayers": "لا يوجد لاعبون فرديون مضافون لهذا النادي"
+    "noIndividualPlayers": "لا يوجد لاعبون فرديون مضافون لهذا النادي",
+    "teamLabel": "فريق",
+    "individualLabel": "فردي"
   },
   "eventList": {
     "title": "إدارة الأحداث",
