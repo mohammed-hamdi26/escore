@@ -6,6 +6,6 @@ export async function getAppLinks() {
     return res.data.data;
   } catch (error) {
     console.error("Error fetching app links:", error);
-    throw error;
+    return [];
   }
 }

@@ -8,6 +8,6 @@ export async function getAvatars() {
     return res.data.data;
   } catch (error) {
     console.error("Error fetching avatars:", error);
-    throw error;
+    return [];
   }
 }
