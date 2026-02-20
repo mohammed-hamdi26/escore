@@ -3233,7 +3233,11 @@
     "noPlayersFound": "No players found",
     "selectPlayerAndGame": "Please select both player and game",
     "playerAdded": "Player added successfully",
-    "playerAddError": "Failed to add player"
+    "playerAddError": "Failed to add player",
+    "teamPlayers": "Team Players",
+    "teamPlayersInfo": "Players from the club's teams",
+    "individualPlayers": "Individual Players",
+    "noIndividualPlayers": "No individual players added to this club"
   },
   "eventList": {
     "title": "Events Management",

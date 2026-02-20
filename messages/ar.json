@@ -3152,7 +3152,11 @@
     "noPlayersFound": "لم يتم العثور على لاعبين",
     "selectPlayerAndGame": "يرجى اختيار اللاعب واللعبة",
     "playerAdded": "تم إضافة اللاعب بنجاح",
-    "playerAddError": "فشل في إضافة اللاعب"
+    "playerAddError": "فشل في إضافة اللاعب",
+    "teamPlayers": "لاعبو الفرق",
+    "teamPlayersInfo": "اللاعبون من فرق النادي",
+    "individualPlayers": "اللاعبون الفرديون",
+    "noIndividualPlayers": "لا يوجد لاعبون فرديون مضافون لهذا النادي"
   },
   "eventList": {
     "title": "إدارة الأحداث",
