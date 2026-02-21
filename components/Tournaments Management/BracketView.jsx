@@ -345,12 +345,16 @@ function BracketView({ tournament }) {
           })),
         };
       } else if (bracketType === "custom") {
-        // Custom bracket payload — no seeds needed
+        // Custom bracket payload — build rounds array from count + bestOf
+        const roundsArray = Array.from({ length: customRounds }, (_, i) => ({
+          name: `Round ${i + 1}`,
+          bestOf: customBestOf,
+          matches: [{}], // at least 1 empty match per round
+        }));
         payload = {
           bracketType: "custom",
           customConfig: {
-            rounds: customRounds,
-            defaultBestOf: customBestOf,
+            rounds: roundsArray,
           },
         };
       } else {
