@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Trophy, Search, X, Loader2, Check } from "lucide-react";
+import { Trophy, Search, X, Loader2, Check, UserMinus } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 import { assignTeamToCustomMatchAction } from "@/app/[locale]/_Lib/actions";
+import { showSuccess } from "@/lib/bracket-toast";
 
 export default function TeamAssignmentDialog({
   open,
@@ -17,13 +18,23 @@ export default function TeamAssignmentDialog({
 }) {
   const t = useTranslations("TournamentDetails");
   const [search, setSearch] = useState("");
-  const [assigning, setAssigning] = useState(null); // teamId being assigned
+  const [assigning, setAssigning] = useState(null);
   const [clearing, setClearing] = useState(false);
   const [error, setError] = useState(null);
+  const searchRef = useRef(null);
 
   const tournamentId = tournament.id || tournament._id;
   const matchId = match.id || match._id;
   const isPlayer = participationType === "player";
+
+  // Auto-focus search on open
+  useEffect(() => {
+    if (open) {
+      setSearch("");
+      setError(null);
+      setTimeout(() => searchRef.current?.focus(), 100);
+    }
+  }, [open]);
 
   // Get current assignment for this slot
   const currentEntity = isPlayer
@@ -38,15 +49,18 @@ export default function TeamAssignmentDialog({
   const currentEntityId = currentEntity?.id || currentEntity?._id;
   const otherEntityId = otherEntity?.id || otherEntity?._id;
 
-  // Get list of participants
+  // Get list of participants with debounced search
   const participants = useMemo(() => {
     const list = isPlayer
       ? tournament.players || []
       : tournament.teams || [];
 
+    if (!search.trim()) return list;
+
+    const q = search.toLowerCase();
     return list.filter((p) => {
       const name = p.name || p.nickname || "";
-      return name.toLowerCase().includes(search.toLowerCase());
+      return name.toLowerCase().includes(q);
     });
   }, [tournament, isPlayer, search]);
 
@@ -60,6 +74,7 @@ export default function TeamAssignmentDialog({
         { slot, teamId: entityId }
       );
       if (result.success) {
+        showSuccess(t("teamAssigned") || "Team assigned");
         onAssign();
       } else {
         setError(result.error);
@@ -79,12 +94,33 @@ export default function TeamAssignmentDialog({
         { slot, teamId: null }
       );
       if (result.success) {
+        showSuccess(t("teamUnassigned") || "Team unassigned");
         onAssign();
       } else {
         setError(result.error);
       }
     } finally {
       setClearing(false);
+    }
+  };
+
+  const dialogRef = useRef(null);
+
+  // Focus trap
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") onOpenChange(false);
+    if (e.key === "Tab" && dialogRef.current) {
+      const focusable = dialogRef.current.querySelectorAll(
+        'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
     }
   };
 
@@ -95,8 +131,15 @@ export default function TeamAssignmentDialog({
     : slot === "team1" ? "Team 1" : "Team 2";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-background rounded-xl max-w-md w-full mx-4 border border-gray-200 dark:border-gray-700 shadow-xl max-h-[80vh] flex flex-col">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onKeyDown={handleKeyDown}
+      onClick={(e) => { if (e.target === e.currentTarget) onOpenChange(false); }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={isPlayer ? t("assignPlayer") || "Assign Player" : t("assignTeam") || "Assign Team"}
+    >
+      <div ref={dialogRef} className="bg-background rounded-xl max-w-md w-full mx-4 border border-gray-200 dark:border-gray-700 shadow-xl max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-sm font-semibold text-foreground">
@@ -108,17 +151,62 @@ export default function TeamAssignmentDialog({
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="p-1 rounded hover:bg-muted transition-colors"
+            className="p-2 sm:p-1 rounded hover:bg-muted active:bg-muted/80 transition-colors"
+            aria-label={t("close") || "Close"}
           >
             <X className="size-4 text-muted-foreground" />
           </button>
         </div>
+
+        {/* Current Assignment Display */}
+        {currentEntity && (
+          <div className="px-3 pt-3">
+            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-green-primary/5 border border-green-primary/20">
+              {(isPlayer ? currentEntity.photo : currentEntity.logo)?.light ? (
+                <img
+                  src={getImgUrl(
+                    (isPlayer ? currentEntity.photo : currentEntity.logo).light,
+                    "thumbnail"
+                  )}
+                  alt={currentEntity.name || currentEntity.nickname}
+                  className="size-6 rounded object-cover flex-shrink-0"
+                />
+              ) : (
+                <div className="size-6 rounded bg-muted flex items-center justify-center flex-shrink-0">
+                  <Trophy className="size-3.5 text-muted-foreground" />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <span className="text-xs font-medium text-green-primary truncate block">
+                  {currentEntity.name || currentEntity.nickname}
+                </span>
+                <span className="text-[10px] text-green-primary/60">
+                  {t("currentlyAssigned") || "Currently assigned"}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleClear}
+                disabled={clearing}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] rounded text-red-500 hover:bg-red-500/10 transition-colors"
+              >
+                {clearing ? (
+                  <Loader2 className="size-3 animate-spin" />
+                ) : (
+                  <UserMinus className="size-3" />
+                )}
+                {t("remove") || "Remove"}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Search */}
         <div className="p-3 border-b border-gray-200 dark:border-gray-700">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <input
+              ref={searchRef}
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -128,38 +216,18 @@ export default function TeamAssignmentDialog({
                   ? t("searchPlayers") || "Search players..."
                   : t("searchTeams") || "Search teams..."
               }
-              autoFocus
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-muted transition-colors"
               >
                 <X className="size-3 text-muted-foreground" />
               </button>
             )}
           </div>
         </div>
-
-        {/* Clear Slot button */}
-        {currentEntityId && (
-          <div className="px-3 pt-2">
-            <button
-              type="button"
-              onClick={handleClear}
-              disabled={clearing}
-              className="w-full flex items-center justify-center gap-1 px-3 py-1.5 text-xs rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 transition-colors"
-            >
-              {clearing ? (
-                <Loader2 className="size-3 animate-spin" />
-              ) : (
-                <X className="size-3" />
-              )}
-              {t("clearSlot") || "Clear Slot"}
-            </button>
-          </div>
-        )}
 
         {/* Error */}
         {error && (
@@ -168,8 +236,8 @@ export default function TeamAssignmentDialog({
           </div>
         )}
 
-        {/* Participant list */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-1">
+        {/* Participant list — scrollable with max height */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-1 max-h-[300px] scroll-shadow">
           {participants.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-xs text-muted-foreground">
@@ -177,6 +245,15 @@ export default function TeamAssignmentDialog({
                   ? t("noSearchResults") || "No results found"
                   : t("noTeamsRegistered") || "No teams registered for this tournament"}
               </p>
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="mt-2 text-xs text-green-primary hover:text-green-primary/80"
+                >
+                  {t("clearSearch") || "Clear search"}
+                </button>
+              )}
             </div>
           ) : (
             participants.map((entity) => {
@@ -193,12 +270,13 @@ export default function TeamAssignmentDialog({
                   type="button"
                   onClick={() => !isOtherSlot && handleAssign(entityId)}
                   disabled={isOtherSlot || assigning}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+                  aria-label={`${isCurrent ? `${t("currentlyAssigned") || "Currently assigned"}: ` : ""}${name}${isOtherSlot ? ` (${t("assignedToOther") || "Assigned to other slot"})` : ""}`}
+                  className={`w-full flex items-center gap-3 px-3 py-3 sm:py-2.5 min-h-[48px] sm:min-h-0 rounded-lg text-sm transition-all ${
                     isCurrent
                       ? "bg-green-primary/10 border border-green-primary"
                       : isOtherSlot
                       ? "bg-muted/20 border border-transparent opacity-50 cursor-not-allowed"
-                      : "bg-background border border-gray-200 dark:border-gray-700 hover:border-green-primary/50"
+                      : "bg-background border border-gray-200 dark:border-gray-700 hover:border-green-primary/50 active:bg-green-primary/5"
                   }`}
                 >
                   {logo?.light ? (
@@ -219,8 +297,8 @@ export default function TeamAssignmentDialog({
                     <Check className="size-4 text-green-primary flex-shrink-0" />
                   )}
                   {isOtherSlot && (
-                    <span className="text-[10px] text-muted-foreground">
-                      ({slot === "team1" || slot === "player1" ? slotLabel.replace("1", "2") : slotLabel.replace("2", "1")})
+                    <span className="text-[10px] text-muted-foreground flex-shrink-0">
+                      {t("assignedToOther") || "Assigned to other slot"}
                     </span>
                   )}
                   {isAssigningThis && (

@@ -17,6 +17,7 @@ import {
 } from "@/app/[locale]/_Lib/actions";
 import TeamAssignmentDialog from "./TeamAssignmentDialog";
 import MatchResultDialog from "./MatchResultDialog";
+import ConfirmationDialog from "./shared/ConfirmationDialog";
 
 export default function CustomMatchRow({
   match,
@@ -116,7 +117,8 @@ export default function CustomMatchRow({
           type="button"
           onClick={() => !isLocked && setAssignSlot(slot)}
           disabled={isLocked}
-          className="flex items-center gap-2 px-3 py-2 w-full text-left transition-colors hover:bg-muted/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-3 py-2 min-h-[44px] sm:min-h-0 w-full text-left transition-colors hover:bg-muted/30 active:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label={`${t("clickToAssign") || "Assign"} ${slot === (isPlayer ? "player1" : "team1") ? "1" : "2"}`}
         >
           <UserPlus className="size-4 text-muted-foreground/50" />
           <span className="text-xs text-muted-foreground italic">
@@ -138,7 +140,8 @@ export default function CustomMatchRow({
         type="button"
         onClick={() => !isLocked && setAssignSlot(slot)}
         disabled={isLocked}
-        className={`flex items-center gap-2 px-3 py-2 w-full text-left transition-colors hover:bg-muted/30 disabled:cursor-default ${
+        aria-label={`${name}${isWinner ? ` (${t("winner") || "Winner"})` : ""}. ${t("clickToAssign") || "Click to reassign"}`}
+        className={`flex items-center gap-2 px-3 py-2 min-h-[44px] sm:min-h-0 w-full text-left transition-colors hover:bg-muted/30 active:bg-muted/50 disabled:cursor-default ${
           isWinner ? "bg-green-500/10" : ""
         }`}
       >
@@ -169,22 +172,31 @@ export default function CustomMatchRow({
       <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden bg-background/50 group">
         {/* Match header */}
         <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-white/5">
-          <span className="text-[10px] text-muted-foreground font-medium">
-            {match.matchLabel || `M${match.matchNumber || matchIndex + 1}`}
-          </span>
+          <div className="flex items-center gap-1.5">
+            {/* Match number badge */}
+            <span className="text-[10px] font-bold text-green-primary bg-green-primary/10 px-1.5 py-0.5 rounded">
+              #{matchIndex + 1}
+            </span>
+            <span className="text-[10px] text-muted-foreground font-medium">
+              {match.matchLabel || `M${match.matchNumber || matchIndex + 1}`}
+            </span>
+          </div>
           <div className="flex items-center gap-1">
             {match.bestOf > 1 && (
               <span className="text-[10px] text-muted-foreground">
                 Bo{match.bestOf}
               </span>
             )}
+            {/* Always visible controls */}
             {!isLocked && (
-              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-0.5">
                 <button
                   type="button"
                   onClick={() => handleReorder(-1)}
                   disabled={isFirst || reordering}
-                  className="p-0.5 rounded hover:bg-muted disabled:opacity-30 transition-colors"
+                  className="p-1.5 sm:p-1 min-w-[36px] min-h-[36px] sm:min-w-[24px] sm:min-h-[24px] rounded hover:bg-muted active:bg-muted/80 disabled:opacity-30 transition-colors flex items-center justify-center"
+                  title={t("moveUp") || "Move up"}
+                  aria-label={t("moveUp") || "Move match up"}
                 >
                   <ChevronUp className="size-3 text-muted-foreground" />
                 </button>
@@ -192,7 +204,9 @@ export default function CustomMatchRow({
                   type="button"
                   onClick={() => handleReorder(1)}
                   disabled={isLast || reordering}
-                  className="p-0.5 rounded hover:bg-muted disabled:opacity-30 transition-colors"
+                  className="p-1.5 sm:p-1 min-w-[36px] min-h-[36px] sm:min-w-[24px] sm:min-h-[24px] rounded hover:bg-muted active:bg-muted/80 disabled:opacity-30 transition-colors flex items-center justify-center"
+                  title={t("moveDown") || "Move down"}
+                  aria-label={t("moveDown") || "Move match down"}
                 >
                   <ChevronDown className="size-3 text-muted-foreground" />
                 </button>
@@ -200,7 +214,9 @@ export default function CustomMatchRow({
                   type="button"
                   onClick={() => setShowDeleteConfirm(true)}
                   disabled={deleting}
-                  className="p-0.5 rounded hover:bg-red-500/10 transition-colors"
+                  className="p-1.5 sm:p-1 min-w-[36px] min-h-[36px] sm:min-w-[24px] sm:min-h-[24px] rounded hover:bg-red-500/10 active:bg-red-500/20 transition-colors flex items-center justify-center"
+                  title={t("deleteMatch") || "Delete match"}
+                  aria-label={t("deleteMatch") || "Delete match"}
                 >
                   <Trash2 className="size-3 text-red-500/70" />
                 </button>
@@ -218,7 +234,8 @@ export default function CustomMatchRow({
             type="button"
             onClick={() => !isLocked && setShowResultDialog(true)}
             disabled={isLocked || (!entity1 && !entity2)}
-            className="w-full px-3 py-1 text-center bg-muted/10 hover:bg-muted/20 transition-colors disabled:cursor-default disabled:hover:bg-muted/10"
+            aria-label={hasResult ? `${t("editResult") || "Edit result"}: ${team1Score}-${team2Score}` : t("setResult") || "Set result"}
+            className="w-full px-3 py-1.5 min-h-[36px] sm:min-h-0 sm:py-1 text-center bg-muted/10 hover:bg-muted/20 active:bg-muted/30 transition-colors disabled:cursor-default disabled:hover:bg-muted/10"
           >
             {hasResult ? (
               <span className="text-xs font-mono font-bold">
@@ -243,37 +260,27 @@ export default function CustomMatchRow({
         </div>
       </div>
 
-      {/* Delete Confirmation */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-background rounded-xl p-6 max-w-sm mx-4 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-foreground mb-2">
-              {t("deleteMatch") || "Delete Match"}
-            </h3>
-            <p className="text-xs text-muted-foreground mb-4">
-              {t("deleteMatchConfirm") || "Delete this match?"}
-            </p>
-            <div className="flex gap-2 justify-end">
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-3 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 text-foreground hover:bg-muted transition-colors"
-              >
-                {t("cancel") || "Cancel"}
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={deleting}
-                className="px-3 py-1.5 text-xs rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors flex items-center gap-1"
-              >
-                {deleting && <Loader2 className="size-3 animate-spin" />}
-                {t("delete") || "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Delete Confirmation — contextual */}
+      <ConfirmationDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title={t("deleteMatch") || "Delete Match"}
+        description={
+          hasResult
+            ? (t("deleteMatchWithResult") || "Delete this match? The recorded result ({score1}-{score2}) will be lost.")
+                .replace("{score1}", String(team1Score))
+                .replace("{score2}", String(team2Score))
+            : entity1 && entity2
+            ? (t("deleteMatchBetween") || "Delete the match between {team1} and {team2}?")
+                .replace("{team1}", entity1.name || entity1.nickname || "Unknown")
+                .replace("{team2}", entity2.name || entity2.nickname || "Unknown")
+            : t("deleteEmptyMatch") || "Delete this empty match?"
+        }
+        confirmLabel={t("delete") || "Delete"}
+        onConfirm={handleDelete}
+        variant="destructive"
+        loading={deleting}
+      />
 
       {/* Team Assignment Dialog */}
       {assignSlot && (

@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Loader2, CheckCircle2 } from "lucide-react";
 import {
   addCustomRoundAction,
   completeCustomBracketAction,
 } from "@/app/[locale]/_Lib/actions";
+import { showSuccess } from "@/lib/bracket-toast";
 import CustomRoundCard from "./CustomRoundCard";
+import InlineError from "./shared/InlineError";
+import ConfirmationDialog from "./shared/ConfirmationDialog";
 
 export default function CustomBracketEditor({
   tournament,
@@ -22,9 +25,21 @@ export default function CustomBracketEditor({
   const [newRoundBestOf, setNewRoundBestOf] = useState(1);
   const [completing, setCompleting] = useState(false);
   const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
+  const roundNameRef = useRef(null);
 
   const tournamentId = tournament.id || tournament._id;
   const isLocked = bracketData?.bracketStatus === "completed";
+
+  // Auto-focus round name input when form opens
+  useEffect(() => {
+    if (showAddForm && roundNameRef.current) {
+      roundNameRef.current.focus();
+    }
+  }, [showAddForm]);
+
+  const roundNameError = newRoundName.length > 100
+    ? (t("roundNameTooLong") || "Round name must be under 100 characters")
+    : null;
 
   // Parse and organize bracket data: group matches by bracketRound
   const roundsData = useMemo(() => {
@@ -60,10 +75,12 @@ export default function CustomBracketEditor({
 
       const result = await addCustomRoundAction(tournamentId, data);
       if (result.success) {
-        setShowAddForm(false);
         setNewRoundName("");
         setNewRoundBestOf(1);
+        showSuccess(t("roundAdded") || "Round added");
         await onRefresh();
+        // Keep form open for successive adds, re-focus
+        if (roundNameRef.current) roundNameRef.current.focus();
       }
     } finally {
       setAddingRound(false);
@@ -116,21 +133,45 @@ export default function CustomBracketEditor({
         </div>
       )}
 
-      {/* Add Round Form */}
-      {showAddForm && (
-        <div className="mb-4 p-4 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] border border-gray-200 dark:border-gray-700">
-          <div className="flex flex-wrap items-end gap-3">
+      {/* Add Round Form — Animated */}
+      <div
+        className={`transition-all duration-300 ease-in-out overflow-hidden ${
+          showAddForm ? "max-h-48 opacity-100 mb-4" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="p-4 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] border border-gray-200 dark:border-gray-700">
+          <div
+            className="flex flex-wrap items-end gap-3"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !addingRound && !roundNameError) handleAddRound();
+              if (e.key === "Escape") {
+                setShowAddForm(false);
+                setNewRoundName("");
+                setNewRoundBestOf(1);
+              }
+            }}
+          >
             <div>
               <label className="block text-xs text-muted-foreground mb-1">
                 {t("roundName") || "Round Name"}
               </label>
               <input
+                ref={roundNameRef}
                 type="text"
                 value={newRoundName}
                 onChange={(e) => setNewRoundName(e.target.value)}
-                className="px-3 py-1.5 rounded-lg bg-background border border-gray-300 dark:border-gray-600 text-foreground text-sm w-48"
-                placeholder={t("optional") || "Optional"}
+                maxLength={100}
+                className={`px-3 py-1.5 rounded-lg bg-background border text-foreground text-sm w-48 ${
+                  roundNameError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                }`}
+                placeholder={t("roundNamePlaceholder") || "e.g., Quarter Finals, Week 1"}
               />
+              <div className="flex items-center justify-between mt-1">
+                <InlineError error={roundNameError} />
+                <span className="text-[10px] text-muted-foreground">
+                  {newRoundName.length}/100
+                </span>
+              </div>
             </div>
             <div>
               <label className="block text-xs text-muted-foreground mb-1">
@@ -157,11 +198,11 @@ export default function CustomBracketEditor({
               <button
                 type="button"
                 onClick={handleAddRound}
-                disabled={addingRound}
-                className="px-3 py-1.5 text-xs rounded-lg bg-green-primary text-white hover:bg-green-primary/90 transition-colors flex items-center gap-1"
+                disabled={addingRound || !!roundNameError}
+                className="px-3 py-1.5 text-xs rounded-lg bg-green-primary text-white hover:bg-green-primary/90 transition-colors flex items-center gap-1 disabled:opacity-50"
               >
                 {addingRound && <Loader2 className="size-3 animate-spin" />}
-                {t("add") || "Add"}
+                {t("addRound") || "Add Round"}
               </button>
               <button
                 type="button"
@@ -177,7 +218,7 @@ export default function CustomBracketEditor({
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Rounds — Horizontal scroll */}
       {roundsData.length === 0 ? (
@@ -187,8 +228,8 @@ export default function CustomBracketEditor({
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto pb-4">
-          <div className="flex gap-6 min-w-fit">
+        <div className="overflow-x-auto pb-4 sm:block">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:min-w-fit">
             {roundsData.map((rd, index) => (
               <CustomRoundCard
                 key={rd.round}
@@ -208,36 +249,27 @@ export default function CustomBracketEditor({
       )}
 
       {/* Complete Bracket Confirmation */}
-      {showCompleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-background rounded-xl p-6 max-w-sm mx-4 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-foreground mb-2">
-              {t("completeBracket") || "Complete Bracket"}
-            </h3>
-            <p className="text-xs text-muted-foreground mb-4">
-              {t("completeBracketConfirm") || "Mark this bracket as completed? This cannot be undone."}
-            </p>
-            <div className="flex gap-2 justify-end">
-              <button
-                type="button"
-                onClick={() => setShowCompleteConfirm(false)}
-                className="px-3 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 text-foreground hover:bg-muted transition-colors"
-              >
-                {t("cancel") || "Cancel"}
-              </button>
-              <button
-                type="button"
-                onClick={handleComplete}
-                disabled={completing}
-                className="px-3 py-1.5 text-xs rounded-lg bg-purple-500 text-white hover:bg-purple-600 transition-colors flex items-center gap-1"
-              >
-                {completing && <Loader2 className="size-3 animate-spin" />}
-                {t("complete") || "Complete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmationDialog
+        open={showCompleteConfirm}
+        onOpenChange={setShowCompleteConfirm}
+        title={t("completeBracket") || "Complete Bracket"}
+        description={(() => {
+          const allMatches = bracketData?.matches || [];
+          const totalCount = allMatches.length;
+          const completedCount = allMatches.filter((m) => m.status === "completed" || m.result?.winner).length;
+          const incompleteCount = totalCount - completedCount;
+          if (incompleteCount > 0) {
+            return (t("completeBracketIncomplete") || "There are {incomplete} matches without results out of {total} total. Are you sure you want to mark the bracket as completed?")
+              .replace("{incomplete}", String(incompleteCount))
+              .replace("{total}", String(totalCount));
+          }
+          return (t("completeBracketAllDone") || "All {total} matches have results. Mark the bracket as completed? This cannot be undone.")
+            .replace("{total}", String(totalCount));
+        })()}
+        confirmLabel={t("complete") || "Complete"}
+        onConfirm={handleComplete}
+        loading={completing}
+      />
     </div>
   );
 }

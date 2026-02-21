@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import {
   MoreVertical,
@@ -10,6 +10,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  GripVertical,
 } from "lucide-react";
 import {
   updateCustomRoundAction,
@@ -17,7 +18,10 @@ import {
   addCustomMatchAction,
   reorderCustomBracketAction,
 } from "@/app/[locale]/_Lib/actions";
+import { showSuccess } from "@/lib/bracket-toast";
 import CustomMatchRow from "./CustomMatchRow";
+import InlineError from "./shared/InlineError";
+import ConfirmationDialog from "./shared/ConfirmationDialog";
 
 export default function CustomRoundCard({
   round,
@@ -40,8 +44,18 @@ export default function CustomRoundCard({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [addingMatch, setAddingMatch] = useState(false);
   const [reordering, setReordering] = useState(false);
+  const editNameRef = useRef(null);
 
   const tournamentId = tournament.id || tournament._id;
+
+  const editNameError = editing && editName.length > 100
+    ? (t("roundNameTooLong") || "Round name must be under 100 characters")
+    : null;
+
+  // Auto-focus edit input
+  useEffect(() => {
+    if (editing && editNameRef.current) editNameRef.current.focus();
+  }, [editing]);
 
   const handleSaveEdit = async () => {
     setSaving(true);
@@ -57,6 +71,7 @@ export default function CustomRoundCard({
           data
         );
         if (result.success) {
+          showSuccess(t("roundUpdated") || "Round updated");
           await onRefresh();
         }
       }
@@ -118,20 +133,36 @@ export default function CustomRoundCard({
 
   return (
     <>
-      <div className="flex flex-col min-w-[260px] w-[280px]">
+      <div className="flex flex-col w-full sm:min-w-[260px] sm:w-[280px]">
         {/* Round Header */}
         <div className="mb-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] border border-gray-200 dark:border-gray-700">
           {editing ? (
-            /* Inline Edit Form */
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                className="w-full px-2 py-1 rounded-lg bg-background border border-gray-300 dark:border-gray-600 text-foreground text-sm"
-                placeholder={t("roundName") || "Round name"}
-                autoFocus
-              />
+            /* Inline Edit Form — visually distinct */
+            <div
+              className="space-y-2 p-2 -m-2 rounded-lg bg-muted/50 border border-dashed border-green-primary/40"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !saving && !editNameError) handleSaveEdit();
+                if (e.key === "Escape") {
+                  setEditing(false);
+                  setEditName(round.name);
+                  setEditBestOf(round.bestOf || 1);
+                }
+              }}
+            >
+              <div>
+                <input
+                  ref={editNameRef}
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  maxLength={100}
+                  className={`w-full px-2 py-1 rounded-lg bg-background border text-foreground text-sm ${
+                    editNameError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                  }`}
+                  placeholder={t("roundName") || "Round name"}
+                />
+                <InlineError error={editNameError} />
+              </div>
               <div className="flex gap-1">
                 {[1, 3, 5, 7].map((n) => (
                   <button
@@ -152,8 +183,8 @@ export default function CustomRoundCard({
                 <button
                   type="button"
                   onClick={handleSaveEdit}
-                  disabled={saving}
-                  className="px-3 py-1 text-xs rounded-lg bg-green-primary text-white hover:bg-green-primary/90 transition-colors flex items-center gap-1"
+                  disabled={saving || !!editNameError}
+                  className="px-3 py-1 text-xs rounded-lg bg-green-primary text-white hover:bg-green-primary/90 transition-colors flex items-center gap-1 disabled:opacity-50"
                 >
                   {saving && <Loader2 className="size-3 animate-spin" />}
                   {t("save") || "Save"}
@@ -175,24 +206,29 @@ export default function CustomRoundCard({
             /* Round Info Display */
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
-                {/* Reorder arrows */}
+                {/* Reorder — always visible */}
                 {!isLocked && (
-                  <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center gap-0.5">
+                    <GripVertical className="size-3.5 text-muted-foreground/50" />
                     <button
                       type="button"
                       onClick={() => handleReorderRound(-1)}
                       disabled={isFirst || reordering}
-                      className="p-0.5 rounded hover:bg-muted disabled:opacity-30 transition-colors"
+                      className="p-1.5 min-w-[36px] min-h-[36px] sm:min-w-[28px] sm:min-h-[28px] rounded hover:bg-muted active:bg-muted/80 disabled:opacity-30 transition-colors flex items-center justify-center"
+                      title={t("moveLeft") || "Move left"}
+                      aria-label={`${t("moveLeft") || "Move left"}: ${round.name}`}
                     >
-                      <ChevronLeft className="size-3 text-muted-foreground" />
+                      <ChevronLeft className="size-3.5 text-muted-foreground" />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleReorderRound(1)}
                       disabled={isLast || reordering}
-                      className="p-0.5 rounded hover:bg-muted disabled:opacity-30 transition-colors"
+                      className="p-1.5 min-w-[36px] min-h-[36px] sm:min-w-[28px] sm:min-h-[28px] rounded hover:bg-muted active:bg-muted/80 disabled:opacity-30 transition-colors flex items-center justify-center"
+                      title={t("moveRight") || "Move right"}
+                      aria-label={`${t("moveRight") || "Move right"}: ${round.name}`}
                     >
-                      <ChevronRight className="size-3 text-muted-foreground" />
+                      <ChevronRight className="size-3.5 text-muted-foreground" />
                     </button>
                   </div>
                 )}
@@ -218,7 +254,10 @@ export default function CustomRoundCard({
                   <button
                     type="button"
                     onClick={() => setShowMenu(!showMenu)}
-                    className="p-1 rounded hover:bg-muted transition-colors"
+                    className="p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 sm:p-1 rounded hover:bg-muted active:bg-muted/80 transition-colors flex items-center justify-center"
+                    aria-label={`${t("roundActions") || "Actions"}: ${round.name}`}
+                    aria-expanded={showMenu}
+                    aria-haspopup="true"
                   >
                     <MoreVertical className="size-4 text-muted-foreground" />
                   </button>
@@ -235,7 +274,8 @@ export default function CustomRoundCard({
                             setShowMenu(false);
                             setEditing(true);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted transition-colors"
+                          className="w-full flex items-center gap-2 px-3 py-2.5 min-h-[44px] sm:min-h-0 sm:py-2 text-xs text-foreground hover:bg-muted active:bg-muted/80 transition-colors"
+                          aria-label={`${t("editRound") || "Edit"} ${round.name}`}
                         >
                           <Pencil className="size-3" />
                           {t("editRound") || "Edit Round"}
@@ -246,7 +286,8 @@ export default function CustomRoundCard({
                             setShowMenu(false);
                             setShowDeleteConfirm(true);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-500/10 transition-colors"
+                          className="w-full flex items-center gap-2 px-3 py-2.5 min-h-[44px] sm:min-h-0 sm:py-2 text-xs text-red-500 hover:bg-red-500/10 active:bg-red-500/20 transition-colors"
+                          aria-label={`${t("deleteRound") || "Delete"} ${round.name}`}
                         >
                           <Trash2 className="size-3" />
                           {t("deleteRound") || "Delete Round"}
@@ -304,38 +345,19 @@ export default function CustomRoundCard({
       </div>
 
       {/* Delete Round Confirmation */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-background rounded-xl p-6 max-w-sm mx-4 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-foreground mb-2">
-              {t("deleteRound") || "Delete Round"}
-            </h3>
-            <p className="text-xs text-muted-foreground mb-4">
-              {(t("deleteRoundConfirm") || "Delete \"{name}\" and all its {count} matches?")
-                .replace("{name}", round.name)
-                .replace("{count}", matches.length)}
-            </p>
-            <div className="flex gap-2 justify-end">
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-3 py-1.5 text-xs rounded-lg border border-gray-300 dark:border-gray-600 text-foreground hover:bg-muted transition-colors"
-              >
-                {t("cancel") || "Cancel"}
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={deleting}
-                className="px-3 py-1.5 text-xs rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors flex items-center gap-1"
-              >
-                {deleting && <Loader2 className="size-3 animate-spin" />}
-                {t("delete") || "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmationDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title={`${t("deleteRound") || "Delete Round"}: ${round.name}`}
+        description={
+          (t("deleteRoundDesc") || "This will permanently delete this round and its {count} matches. Teams assigned to these matches will be unassigned.")
+            .replace("{count}", String(matches.length))
+        }
+        confirmLabel={t("deleteRound") || "Delete Round"}
+        onConfirm={handleDelete}
+        variant="destructive"
+        loading={deleting}
+      />
     </>
   );
 }

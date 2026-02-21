@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Trophy } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 
@@ -9,11 +10,11 @@ const STATUS_COLORS = {
   completed: "border-purple-500/30 bg-purple-500/5",
 };
 
-function TeamRow({ team, score, isWinner, isBye }) {
+function TeamRow({ team, score, isWinner, isBye, t }) {
   if (isBye) {
     return (
       <div className="flex items-center justify-between px-3 py-2 opacity-40">
-        <span className="text-xs text-muted-foreground italic">BYE</span>
+        <span className="text-xs text-muted-foreground italic">{t("bye") || "BYE"}</span>
         <span className="text-xs text-muted-foreground">-</span>
       </div>
     );
@@ -22,7 +23,7 @@ function TeamRow({ team, score, isWinner, isBye }) {
   if (!team) {
     return (
       <div className="flex items-center justify-between px-3 py-2 opacity-50">
-        <span className="text-xs text-muted-foreground italic">TBD</span>
+        <span className="text-xs text-muted-foreground italic">{t("tbd") || "TBD"}</span>
         <span className="text-xs text-muted-foreground">-</span>
       </div>
     );
@@ -68,6 +69,7 @@ function TeamRow({ team, score, isWinner, isBye }) {
 }
 
 function BracketMatchCard({ match }) {
+  const t = useTranslations("TournamentDetails");
   const statusColor = STATUS_COLORS[match.status] || STATUS_COLORS.scheduled;
 
   // Multi-participant match rendering
@@ -88,12 +90,12 @@ function BracketMatchCard({ match }) {
           </span>
           {match.status === "live" && (
             <span className="text-[10px] text-green-500 font-bold uppercase animate-pulse">
-              LIVE
+              {t("live") || "LIVE"}
             </span>
           )}
           {match.status === "completed" && (
             <span className="text-[10px] text-purple-500 font-medium">
-              Final
+              {t("final") || "Final"}
             </span>
           )}
         </div>
@@ -103,7 +105,7 @@ function BracketMatchCard({ match }) {
           {top3.map((p, i) => {
             const entity = p.team || p.player;
             const logo = entity?.logo || entity?.photo;
-            const name = entity?.name || entity?.nickname || "Unknown";
+            const name = entity?.name || entity?.nickname || (t("unknown") || "Unknown");
             return (
               <div key={entity?.id || i} className="flex items-center justify-between px-3 py-1.5">
                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
@@ -138,7 +140,7 @@ function BracketMatchCard({ match }) {
         {remaining > 0 && (
           <div className="px-3 py-1 bg-muted/20 border-t border-white/5">
             <span className="text-[10px] text-muted-foreground">
-              +{remaining} more
+              +{remaining} {t("more") || "more"}
             </span>
           </div>
         )}
@@ -165,19 +167,19 @@ function BracketMatchCard({ match }) {
       <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-white/5">
         <span className="text-[10px] text-muted-foreground font-medium">
           {match.isResetMatch
-            ? "GF Reset"
+            ? (t("gfReset") || "GF Reset")
             : match.group
             ? `${match.group}`
             : match.round || match.roundName || `R${match.bracketRound}`}
         </span>
         {match.status === "live" && (
           <span className="text-[10px] text-green-500 font-bold uppercase animate-pulse">
-            LIVE
+            {t("live") || "LIVE"}
           </span>
         )}
         {match.status === "completed" && (
           <span className="text-[10px] text-purple-500 font-medium">
-            Final
+            {t("final") || "Final"}
           </span>
         )}
       </div>
@@ -189,12 +191,14 @@ function BracketMatchCard({ match }) {
           score={team1Score}
           isWinner={isTeam1Winner}
           isBye={false}
+          t={t}
         />
         <TeamRow
           team={match.team2}
           score={team2Score}
           isWinner={isTeam2Winner}
           isBye={match.isBye}
+          t={t}
         />
       </div>
 
