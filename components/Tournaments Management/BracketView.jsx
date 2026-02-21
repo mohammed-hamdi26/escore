@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "../ui/button";
 import BracketMatchCard from "./BracketMatchCard";
+import CustomBracketEditor from "./CustomBracketEditor";
 import {
   Trophy,
   Trash2,
@@ -21,6 +22,7 @@ import {
   Layers,
   Crosshair,
   Target,
+  Wrench,
 } from "lucide-react";
 import {
   getBracketAction,
@@ -68,6 +70,10 @@ function BracketView({ tournament }) {
   });
   const [advancingRound, setAdvancingRound] = useState(false);
   const [advancingBRRound, setAdvancingBRRound] = useState(false);
+
+  // Custom bracket config
+  const [customRounds, setCustomRounds] = useState(1);
+  const [customBestOf, setCustomBestOf] = useState(1);
 
   // Multi-stage states
   const [isMultiStage, setIsMultiStage] = useState(false);
@@ -337,6 +343,15 @@ function BracketView({ tournament }) {
             advancementRule: s.advancementRule,
             config: s.config,
           })),
+        };
+      } else if (bracketType === "custom") {
+        // Custom bracket payload — no seeds needed
+        payload = {
+          bracketType: "custom",
+          customConfig: {
+            rounds: customRounds,
+            defaultBestOf: customBestOf,
+          },
         };
       } else {
         // Single bracket payload
@@ -1044,6 +1059,11 @@ function BracketView({ tournament }) {
                         label: t("battleRoyaleBracket") || "Battle Royale",
                         desc: t("battleRoyaleDesc") || "Multi-participant lobbies with elimination rounds",
                       },
+                      {
+                        value: "custom",
+                        label: t("customBracket") || "Custom",
+                        desc: t("customBracketDesc") || "Fully manual bracket with free structure",
+                      },
                     ].map((opt) => (
                       <button
                         key={opt.value}
@@ -1414,7 +1434,50 @@ function BracketView({ tournament }) {
                   </div>
                 )}
 
+                {/* Custom Bracket Config */}
+                {bracketType === "custom" && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        {t("numberOfRounds") || "Number of Rounds"}
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={customRounds}
+                        onChange={(e) =>
+                          setCustomRounds(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))
+                        }
+                        className="w-full px-3 py-2 rounded-lg bg-background border border-gray-300 dark:border-gray-600 text-foreground text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        {t("defaultBestOf") || "Default Best Of"}
+                      </label>
+                      <div className="flex gap-2">
+                        {[1, 3, 5, 7].map((n) => (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => setCustomBestOf(n)}
+                            className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
+                              customBestOf === n
+                                ? "border-green-primary bg-green-primary/10 text-green-primary"
+                                : "border-gray-300 dark:border-gray-600 text-muted-foreground hover:border-green-primary/50"
+                            }`}
+                          >
+                            Bo{n}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Best Of */}
+                {bracketType !== "custom" && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     {t("defaultBestOf") || "Default Best Of"}
@@ -1436,8 +1499,10 @@ function BracketView({ tournament }) {
                     ))}
                   </div>
                 </div>
+                )}
 
                 {/* Advanced Best-of Per Round */}
+                {bracketType !== "custom" && (
                 <div>
                   <button
                     type="button"
@@ -1505,8 +1570,10 @@ function BracketView({ tournament }) {
                     </div>
                   )}
                 </div>
+                )}
 
-                {/* Auto Advance */}
+                {/* Auto Advance — hide for custom */}
+                {bracketType !== "custom" && (
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="block text-sm font-medium text-foreground">
@@ -1531,9 +1598,10 @@ function BracketView({ tournament }) {
                     />
                   </button>
                 </div>
+                )}
 
-                {/* Seed Order — hide for round robin */}
-                {bracketType !== "round_robin" && (
+                {/* Seed Order — hide for round robin and custom */}
+                {bracketType !== "round_robin" && bracketType !== "custom" && (
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
                       {t("seedOrder") || "Seed Order"}
@@ -1595,7 +1663,7 @@ function BracketView({ tournament }) {
             {/* Generate Button */}
             <Button
               onClick={handleGenerate}
-              disabled={generating || seeds.length < 2}
+              disabled={generating || (bracketType !== "custom" && seeds.length < 2)}
               className="w-full gap-2 bg-green-primary hover:bg-green-primary/90 text-white"
             >
               {generating ? (
@@ -1625,6 +1693,7 @@ function BracketView({ tournament }) {
     swiss: t("swissSystem") || "Swiss System",
     battle_royale: t("battleRoyaleBracket") || "Battle Royale",
     multi_stage: t("multiStage") || "Multi-Stage",
+    custom: t("customBracket") || "Custom",
   };
 
   // Check if current stage is completed and next stage exists
@@ -1893,8 +1962,15 @@ function BracketView({ tournament }) {
           </div>
         )}
 
-        {/* Multi-stage: Active Stage Content */}
-        {bracket.isMultiStage && bracket.stages ? (
+        {/* Custom Bracket — delegate to CustomBracketEditor */}
+        {bracket.bracketType === "custom" ? (
+          <CustomBracketEditor
+            tournament={tournament}
+            bracketData={bracket}
+            onRefresh={fetchBracket}
+            participationType={tournament.participationType || "team"}
+          />
+        ) : bracket.isMultiStage && bracket.stages ? (
           (() => {
             const activeStage = bracket.stages.find(
               (s) => s.stageOrder === activeStageTab

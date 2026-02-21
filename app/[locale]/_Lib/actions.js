@@ -1531,6 +1531,238 @@ export async function updateStageVisibilityAction(tournamentId, stageOrder, isVi
   }
 }
 
+// custom bracket management
+export async function addCustomRoundAction(tournamentId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/custom/rounds`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Add custom round error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error adding round";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function updateCustomRoundAction(tournamentId, round, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/tournaments/${tournamentId}/bracket/custom/rounds/${round}`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Update custom round error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error updating round";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function deleteCustomRoundAction(tournamentId, round) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(
+      `/tournaments/${tournamentId}/bracket/custom/rounds/${round}`
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true };
+  } catch (e) {
+    console.log("Delete custom round error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error deleting round",
+    };
+  }
+}
+
+export async function addCustomMatchAction(tournamentId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/custom/matches`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Add custom match error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error adding match";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function deleteCustomMatchAction(tournamentId, matchId) {
+  const locale = await getLocale();
+  try {
+    await apiClient.delete(
+      `/tournaments/${tournamentId}/bracket/custom/matches/${matchId}`
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true };
+  } catch (e) {
+    console.log("Delete custom match error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error deleting match",
+    };
+  }
+}
+
+export async function reorderCustomBracketAction(tournamentId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/tournaments/${tournamentId}/bracket/custom/reorder`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Reorder custom bracket error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error reordering bracket";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function assignTeamToCustomMatchAction(tournamentId, matchId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/tournaments/${tournamentId}/bracket/custom/matches/${matchId}/assign`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Assign team error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error assigning team";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function bulkAssignTeamsAction(tournamentId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/tournaments/${tournamentId}/bracket/custom/bulk-assign`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Bulk assign error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error bulk assigning teams";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function setCustomMatchResultAction(tournamentId, matchId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/tournaments/${tournamentId}/bracket/custom/matches/${matchId}/result`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Set match result error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error setting match result";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function linkCustomMatchAction(tournamentId, matchId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/tournaments/${tournamentId}/bracket/custom/matches/${matchId}/link`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Link match error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error linking match",
+    };
+  }
+}
+
+export async function completeCustomBracketAction(tournamentId) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/tournaments/${tournamentId}/bracket/custom/complete`
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Complete bracket error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error completing bracket",
+    };
+  }
+}
+
 // notifications
 export async function sendNotificationAction(data) {
   try {
