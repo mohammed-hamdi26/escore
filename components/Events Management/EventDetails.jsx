@@ -158,7 +158,7 @@ function EventDetails({
   // Filter available tournaments (not already linked to any event)
   const availableTournaments = allTournaments.filter(
     (t) =>
-      !t.parentEvent &&
+      (!t.parentEvents || t.parentEvents.length === 0) &&
       t.name?.toLowerCase().includes(tournamentSearch.toLowerCase())
   );
 

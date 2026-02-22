@@ -26,6 +26,7 @@ import {
   Eye,
   StarOff,
   Loader2,
+  CalendarDays,
 } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 import Image from "next/image";
@@ -215,6 +216,12 @@ function TournamentsTable({ tournaments, pagination, games }) {
                       {tournament.organizer || tournament.game?.name || "-"}
                     </p>
                   </div>
+                  {tournament.parentEvents?.length > 0 && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 text-[10px] font-medium flex-shrink-0" title="Linked to event">
+                      <CalendarDays className="size-3" />
+                      Event
+                    </span>
+                  )}
                   {tournament.isFeatured && (
                     <Star className="size-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                   )}

@@ -19,6 +19,7 @@ async function TournamentsPage({ searchParams }) {
       isFeatured,
       sortBy,
       sortOrder,
+      excludeEventLinked: "false",
     }),
     getGames({ limit: 100 }),
   ]);

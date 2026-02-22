@@ -18,6 +18,9 @@ export async function getTournaments(searchParams = {}) {
     if (searchParams.competitionType) params.set("competitionType", searchParams.competitionType);
     if (searchParams.isFeatured) params.set("isFeatured", searchParams.isFeatured);
 
+    // Event linking
+    if (searchParams.excludeEventLinked !== undefined) params.set("excludeEventLinked", searchParams.excludeEventLinked);
+
     // Sorting
     if (searchParams.sortBy) params.set("sortBy", searchParams.sortBy);
     if (searchParams.sortOrder) params.set("sortOrder", searchParams.sortOrder);
