@@ -1,13 +1,15 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Plus, Trash2, Trophy, CheckCircle, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Trophy, CheckCircle, AlertTriangle, Shuffle, Zap, X } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 import InlineError from "../shared/InlineError";
+import ConfirmationDialog from "../shared/ConfirmationDialog";
 
 function RoundRobinConfig({ config, onConfigChange, seeds }) {
   const t = useTranslations("TournamentDetails");
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const { bestOf = 1, groups = [{ name: "Group A", teamIds: [] }] } = config;
 
@@ -62,6 +64,40 @@ function RoundRobinConfig({ config, onConfigChange, seeds }) {
     return groups.findIndex((g) => g.teamIds.includes(teamId));
   };
 
+  // --- Auto-Distribute (round-robin style) ---
+  // Seed 1→A, 2→B, 3→C, 4→A, 5→B, 6→C, ...
+  const autoDistribute = () => {
+    const groupCount = groups.length;
+    if (groupCount === 0) return;
+    const newGroups = groups.map((g) => ({ ...g, teamIds: [] }));
+    seeds.forEach((team, index) => {
+      newGroups[index % groupCount].teamIds.push(team.id);
+    });
+    onConfigChange({ groups: newGroups });
+  };
+
+  // --- Snake Seed distribution ---
+  // Row 1: 1,2,3,4 → Row 2: 8,7,6,5 → Row 3: 9,10,11,12 → ...
+  const snakeSeedDistribute = () => {
+    const groupCount = groups.length;
+    if (groupCount === 0) return;
+    const newGroups = groups.map((g) => ({ ...g, teamIds: [] }));
+    seeds.forEach((team, index) => {
+      const row = Math.floor(index / groupCount);
+      const posInRow = index % groupCount;
+      const groupIndex = row % 2 === 0 ? posInRow : groupCount - 1 - posInRow;
+      newGroups[groupIndex].teamIds.push(team.id);
+    });
+    onConfigChange({ groups: newGroups });
+  };
+
+  // --- Clear All Assignments ---
+  const clearAllAssignments = () => {
+    const newGroups = groups.map((g) => ({ ...g, teamIds: [] }));
+    onConfigChange({ groups: newGroups });
+    setShowClearConfirm(false);
+  };
+
   return (
     <div className="space-y-4">
       {/* Best Of */}
@@ -102,6 +138,38 @@ function RoundRobinConfig({ config, onConfigChange, seeds }) {
             {t("addGroup") || "Add Group"}
           </button>
         </div>
+
+        {/* Quick Distribution Buttons */}
+        {seeds.length >= 2 && groups.length >= 1 && (
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <button
+              type="button"
+              onClick={autoDistribute}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-green-primary/30 bg-green-primary/5 text-green-primary text-xs font-medium hover:bg-green-primary/10 transition-colors"
+            >
+              <Shuffle className="size-3" />
+              {t("autoDistribute") || "Auto-Distribute"}
+            </button>
+            <button
+              type="button"
+              onClick={snakeSeedDistribute}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-blue-500/30 bg-blue-500/5 text-blue-500 text-xs font-medium hover:bg-blue-500/10 transition-colors"
+            >
+              <Zap className="size-3" />
+              {t("snakeSeed") || "Snake Seed"}
+            </button>
+            {assignedCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowClearConfirm(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/30 text-red-500 text-xs font-medium hover:bg-red-500/10 transition-colors"
+              >
+                <X className="size-3" />
+                {t("clearAll") || "Clear All"}
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Assignment Progress */}
         <div className="flex items-center gap-2 mb-3">
@@ -214,6 +282,17 @@ function RoundRobinConfig({ config, onConfigChange, seeds }) {
           })}
         </div>
       </div>
+
+      {/* Clear All Confirmation */}
+      <ConfirmationDialog
+        open={showClearConfirm}
+        onOpenChange={setShowClearConfirm}
+        title={t("clearAllAssignments") || "Clear All Assignments"}
+        description={t("clearAllAssignmentsDesc") || "Remove all teams from all groups? You can reassign them afterwards."}
+        confirmLabel={t("clearAll") || "Clear All"}
+        onConfirm={clearAllAssignments}
+        variant="destructive"
+      />
     </div>
   );
 }

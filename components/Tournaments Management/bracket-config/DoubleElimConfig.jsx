@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import HelpTooltip from "../shared/HelpTooltip";
 
 function DoubleElimConfig({ config, onConfigChange, availableRounds }) {
   const t = useTranslations("TournamentDetails");
@@ -43,8 +44,9 @@ function DoubleElimConfig({ config, onConfigChange, availableRounds }) {
       {/* Grand Finals Reset */}
       <div className="flex items-center justify-between">
         <div>
-          <label className="block text-sm font-medium text-foreground">
+          <label className="flex items-center gap-1 text-sm font-medium text-foreground">
             {t("grandFinalsReset") || "Grand Finals Reset"}
+            <HelpTooltip text={t("grandFinalsResetHelp") || "In double elimination, the Winners bracket finalist has a 1-life advantage. If the Losers bracket champion wins Grand Finals Match 1, a reset (Match 2) is played to decide the winner. Disabling this makes Grand Finals a single decisive match."} />
           </label>
           <p className="text-xs text-muted-foreground mt-0.5">
             {t("grandFinalsResetDesc") ||
@@ -159,8 +161,9 @@ function DoubleElimConfig({ config, onConfigChange, availableRounds }) {
       {/* Auto Advance */}
       <div className="flex items-center justify-between">
         <div>
-          <label className="block text-sm font-medium text-foreground">
+          <label className="flex items-center gap-1 text-sm font-medium text-foreground">
             {t("autoAdvance") || "Auto-Advance Winners"}
+            <HelpTooltip text={t("autoAdvanceHelp") || "When enabled, match winners are automatically placed into the next round. When disabled, you must manually advance teams after each match."} />
           </label>
           <p className="text-xs text-muted-foreground mt-0.5">
             {t("autoAdvanceDesc") ||

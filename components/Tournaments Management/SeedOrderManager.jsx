@@ -1,9 +1,26 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { ChevronDown, GripVertical, Trophy } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+import { GripVertical, Trophy } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 import InlineError from "./shared/InlineError";
+import DraggableSeedItem from "./shared/DraggableSeedItem";
 
 function SeedOrderManager({ seeds, onSeedsChange, participationType, minSeeds = 2 }) {
   const t = useTranslations("TournamentDetails");
@@ -12,16 +29,48 @@ function SeedOrderManager({ seeds, onSeedsChange, participationType, minSeeds = 
   const isValid = seedCount >= minSeeds;
   const label = isPlayerBased ? (t("playersCount") || "Players") : (t("teamsCount") || "Teams");
 
+  const [activeId, setActiveId] = useState(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragStart = useCallback((event) => {
+    setActiveId(event.active.id);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event) => {
+      const { active, over } = event;
+      setActiveId(null);
+
+      if (over && active.id !== over.id) {
+        const oldIndex = seeds.findIndex((s) => s.id === active.id);
+        const newIndex = seeds.findIndex((s) => s.id === over.id);
+        if (oldIndex !== -1 && newIndex !== -1) {
+          onSeedsChange(arrayMove(seeds, oldIndex, newIndex));
+        }
+      }
+    },
+    [seeds, onSeedsChange]
+  );
+
+  const handleDragCancel = useCallback(() => {
+    setActiveId(null);
+  }, []);
+
   const moveSeed = (index, direction) => {
-    const newSeeds = [...seeds];
     const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= newSeeds.length) return;
-    [newSeeds[index], newSeeds[targetIndex]] = [
-      newSeeds[targetIndex],
-      newSeeds[index],
-    ];
-    onSeedsChange(newSeeds);
+    if (targetIndex < 0 || targetIndex >= seeds.length) return;
+    onSeedsChange(arrayMove(seeds, index, targetIndex));
   };
+
+  const activeTeam = activeId ? seeds.find((s) => s.id === activeId) : null;
 
   return (
     <div>
@@ -54,54 +103,60 @@ function SeedOrderManager({ seeds, onSeedsChange, participationType, minSeeds = 
             : null
         }
       />
-      <div className="space-y-2 max-h-[400px] overflow-y-auto" role="list" aria-label={t("seedOrder") || "Seed order"}>
-        {seeds.map((team, index) => (
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <SortableContext
+          items={seeds.map((s) => s.id)}
+          strategy={verticalListSortingStrategy}
+        >
           <div
-            key={team.id}
-            role="listitem"
-            className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] border border-transparent hover:border-green-primary/20 active:bg-muted/50 transition-colors"
+            className="space-y-2 max-h-[400px] overflow-y-auto"
+            role="list"
+            aria-label={t("seedOrder") || "Seed order"}
           >
-            <span className="text-xs font-bold text-green-primary w-6 text-center">
-              #{index + 1}
-            </span>
-            <GripVertical className="size-4 text-muted-foreground" />
-            {team.logo?.light ? (
-              <img
-                src={getImgUrl(team.logo.light, "thumbnail")}
-                alt={team.name}
-                className="size-6 rounded object-cover"
+            {seeds.map((team, index) => (
+              <DraggableSeedItem
+                key={team.id}
+                team={team}
+                index={index}
+                totalCount={seeds.length}
+                onMoveUp={() => moveSeed(index, -1)}
+                onMoveDown={() => moveSeed(index, 1)}
+                isPlayerBased={isPlayerBased}
               />
-            ) : (
-              <div className="size-6 rounded bg-muted flex items-center justify-center">
-                <Trophy className="size-3 text-muted-foreground" />
-              </div>
-            )}
-            <span className="text-sm font-medium text-foreground flex-1 truncate">
-              {team.name}
-            </span>
-            <div className="flex gap-1">
-              <button
-                type="button"
-                onClick={() => moveSeed(index, -1)}
-                disabled={index === 0}
-                className="p-1.5 sm:p-1 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 rounded hover:bg-muted disabled:opacity-30 transition-colors flex items-center justify-center"
-                aria-label={`Move ${team.name} up to seed ${index}`}
-              >
-                <ChevronDown className="size-4 text-muted-foreground rotate-180" />
-              </button>
-              <button
-                type="button"
-                onClick={() => moveSeed(index, 1)}
-                disabled={index === seeds.length - 1}
-                className="p-1.5 sm:p-1 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 rounded hover:bg-muted disabled:opacity-30 transition-colors flex items-center justify-center"
-                aria-label={`Move ${team.name} down to seed ${index + 2}`}
-              >
-                <ChevronDown className="size-4 text-muted-foreground" />
-              </button>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+        <DragOverlay dropAnimation={null}>
+          {activeTeam ? (
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] border border-green-primary shadow-lg shadow-green-primary/20">
+              <span className="text-xs font-bold text-green-primary w-6 text-center">
+                #{seeds.findIndex((s) => s.id === activeTeam.id) + 1}
+              </span>
+              <GripVertical className="size-4 text-green-primary" />
+              {activeTeam.logo?.light ? (
+                <img
+                  src={getImgUrl(activeTeam.logo.light, "thumbnail")}
+                  alt={activeTeam.name}
+                  className="size-6 rounded object-cover"
+                />
+              ) : (
+                <div className="size-6 rounded bg-muted flex items-center justify-center">
+                  <Trophy className="size-3 text-muted-foreground" />
+                </div>
+              )}
+              <span className="text-sm font-medium text-foreground flex-1 truncate">
+                {activeTeam.name}
+              </span>
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 }

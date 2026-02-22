@@ -24,6 +24,7 @@ function ConfirmationDialog({
   loading = false,
 }) {
   const isDestructive = variant === "destructive";
+  const isRichContent = typeof description !== "string";
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -35,7 +36,11 @@ function ConfirmationDialog({
             )}
             {title}
           </AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          {isRichContent ? (
+            <div className="text-sm text-muted-foreground">{description}</div>
+          ) : (
+            <AlertDialogDescription>{description}</AlertDialogDescription>
+          )}
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>

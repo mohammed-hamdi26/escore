@@ -26,6 +26,7 @@ import MultiStageDisplay from "./bracket-display/MultiStageDisplay";
 import BracketSkeleton from "./BracketSkeleton";
 import BracketProgressBar from "./bracket-display/BracketProgressBar";
 import BracketQuickStats from "./bracket-display/BracketQuickStats";
+import BracketDisplayContainer from "./shared/BracketDisplayContainer";
 
 function BracketView({ tournament }) {
   const t = useTranslations("TournamentDetails");
@@ -253,6 +254,36 @@ function BracketView({ tournament }) {
     );
   }
 
+  // Extract flat rounds array for mobile view
+  const getMobileRounds = () => {
+    if (!bracket) return [];
+
+    switch (bracket.bracketType) {
+      case "single_elimination":
+        return bracket.rounds?.winners || [];
+      case "double_elimination": {
+        const all = [];
+        if (bracket.rounds?.winners) all.push(...bracket.rounds.winners);
+        if (bracket.rounds?.losers) all.push(...bracket.rounds.losers);
+        if (bracket.rounds?.grandFinals?.length > 0) {
+          all.push({
+            name: t("grandFinals") || "Grand Finals",
+            matches: bracket.rounds.grandFinals,
+          });
+        }
+        return all;
+      }
+      case "round_robin":
+        return bracket.groupStageRounds || [];
+      case "swiss":
+        return bracket.swissRounds || [];
+      case "battle_royale":
+        return bracket.battleRoyaleRounds || [];
+      default:
+        return bracket.rounds?.winners || [];
+    }
+  };
+
   // --- Render: Bracket exists — show display ---
 
   const renderBracketContent = () => {
@@ -344,7 +375,13 @@ function BracketView({ tournament }) {
         />
         <BracketQuickStats bracket={bracket} />
         <BracketProgressBar bracket={bracket} />
-        {renderBracketContent()}
+        {bracket.bracketType === "custom" ? (
+          renderBracketContent()
+        ) : (
+          <BracketDisplayContainer rounds={getMobileRounds()}>
+            {renderBracketContent()}
+          </BracketDisplayContainer>
+        )}
       </div>
     </div>
   );

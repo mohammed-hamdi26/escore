@@ -9,7 +9,10 @@ import {
   AlertTriangle,
   Layers,
   ChevronDown,
+  ChevronUp,
+  Eye,
   GripVertical,
+  Maximize2,
 } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 import BracketTypeSelector from "./BracketTypeSelector";
@@ -21,6 +24,15 @@ import SwissConfig from "./bracket-config/SwissConfig";
 import BattleRoyaleConfig from "./bracket-config/BattleRoyaleConfig";
 import CustomBracketConfig from "./bracket-config/CustomBracketConfig";
 import MultiStageConfig from "./bracket-config/MultiStageConfig";
+import ConfirmationDialog from "./shared/ConfirmationDialog";
+import BracketPreviewSummary from "./shared/BracketPreviewSummary";
+import BracketPreviewRenderer from "./bracket-display/BracketPreviewRenderer";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 
 function BracketGenerationForm({
   tournament,
@@ -60,6 +72,13 @@ function BracketGenerationForm({
   // Custom bracket config
   const [customRounds, setCustomRounds] = useState(1);
   const [customBestOf, setCustomBestOf] = useState(1);
+
+  // Confirmation dialog state
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // Bracket preview state
+  const [showPreview, setShowPreview] = useState(false);
+  const [showFullPreview, setShowFullPreview] = useState(false);
 
   // Multi-stage config
   const [stages, setStages] = useState([
@@ -217,9 +236,34 @@ function BracketGenerationForm({
     return payload;
   };
 
-  const handleGenerate = () => {
+  const handleGenerateClick = () => {
+    setShowConfirm(true);
+  };
+
+  const handleConfirmGenerate = () => {
+    setShowConfirm(false);
     const payload = buildPayload();
     onGenerate(payload);
+  };
+
+  // Get team count for confirmation preview
+  const getConfirmTeamCount = () => {
+    if (bracketType === "round_robin") {
+      return groups.flatMap((g) => g.teamIds).length;
+    }
+    return seeds.length;
+  };
+
+  // Build config object for the preview summary
+  const getConfirmConfig = () => {
+    if (isMultiStage) return { stages };
+    const base = { bestOf, autoAdvance };
+    if (bracketType === "double_elimination") base.grandFinalsReset = grandFinalsReset;
+    if (bracketType === "round_robin") base.groups = groups;
+    if (bracketType === "swiss") base.swissConfig = swissConfig;
+    if (bracketType === "battle_royale") base.battleRoyaleConfig = brConfig;
+    if (bracketType === "custom") { base.customRounds = customRounds; base.customBestOf = customBestOf; }
+    return base;
   };
 
   // --- Config Change Handlers ---
@@ -383,6 +427,7 @@ function BracketGenerationForm({
           <SwissConfig
             config={{ bestOf, swissConfig }}
             onConfigChange={handleSwissChange}
+            teamCount={seeds.length}
           />
         );
       case "battle_royale":
@@ -459,9 +504,49 @@ function BracketGenerationForm({
         </div>
       )}
 
+      {/* Bracket Preview */}
+      {!isMultiStage && bracketType !== "custom" && (
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={() => setShowPreview(!showPreview)}
+            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full"
+          >
+            <Eye className="size-4" />
+            <span>{t("previewBracketStructure") || "Preview Bracket Structure"}</span>
+            {showPreview ? <ChevronUp className="size-4 ml-auto" /> : <ChevronDown className="size-4 ml-auto" />}
+          </button>
+
+          {showPreview && (
+            <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-muted/10">
+              <div className="flex justify-end mb-2">
+                <button
+                  type="button"
+                  onClick={() => setShowFullPreview(true)}
+                  className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                  title={t("fullScreenPreview") || "Full screen preview"}
+                >
+                  <Maximize2 className="size-3" />
+                  {t("fullScreen") || "Full Screen"}
+                </button>
+              </div>
+              <BracketPreviewRenderer
+                bracketType={bracketType}
+                teamCount={bracketType === "round_robin" ? groups.flatMap((g) => g.teamIds).length : seeds.length}
+                config={{
+                  grandFinalsReset,
+                  groups,
+                  swissConfig,
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Generate Button */}
       <Button
-        onClick={handleGenerate}
+        onClick={handleGenerateClick}
         disabled={generating || !isFormValid}
         className="w-full gap-2 bg-green-primary hover:bg-green-primary/90 text-white"
         title={!isFormValid ? (t("fixBeforeGenerating") || "Fix issues before generating") : undefined}
@@ -478,6 +563,44 @@ function BracketGenerationForm({
           </>
         )}
       </Button>
+
+      {/* Full-Screen Bracket Preview Dialog */}
+      <Dialog open={showFullPreview} onOpenChange={setShowFullPreview}>
+        <DialogContent className="max-w-[90vw] max-h-[85vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="text-sm font-medium">
+              {t("bracketStructurePreview") || "Bracket Structure Preview"}
+            </DialogTitle>
+          </DialogHeader>
+          <BracketPreviewRenderer
+            bracketType={bracketType}
+            teamCount={bracketType === "round_robin" ? groups.flatMap((g) => g.teamIds).length : seeds.length}
+            config={{
+              grandFinalsReset,
+              groups,
+              swissConfig,
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Generation Confirmation Dialog */}
+      <ConfirmationDialog
+        open={showConfirm}
+        onOpenChange={setShowConfirm}
+        title={t("reviewBeforeGenerate") || "Review Before Generating"}
+        description={
+          <BracketPreviewSummary
+            bracketType={isMultiStage ? "multi_stage" : bracketType}
+            teamCount={getConfirmTeamCount()}
+            config={getConfirmConfig()}
+          />
+        }
+        confirmLabel={t("generateBracketBtn") || "Generate Bracket"}
+        cancelLabel={t("cancel") || "Cancel"}
+        onConfirm={handleConfirmGenerate}
+        loading={generating}
+      />
     </div>
   );
 }

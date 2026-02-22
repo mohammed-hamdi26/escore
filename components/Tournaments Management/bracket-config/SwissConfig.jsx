@@ -1,11 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import InlineError from "../shared/InlineError";
+import HelpTooltip from "../shared/HelpTooltip";
+import SwissWizard from "./SwissWizard";
 
-function SwissConfig({ config, onConfigChange }) {
+const SWISS_PRESETS = [
+  { labelKey: "presetCS2Major", fallback: "CS2 Major", totalRounds: 5, winsToQualify: 3, lossesToEliminate: 3 },
+  { labelKey: "presetValorant", fallback: "Valorant", totalRounds: 4, winsToQualify: 3, lossesToEliminate: 2 },
+  { labelKey: "presetSmall", fallback: "Small", totalRounds: 3, winsToQualify: 2, lossesToEliminate: 2 },
+];
+
+function SwissConfig({ config, onConfigChange, teamCount = 0 }) {
   const t = useTranslations("TournamentDetails");
+  const [mode, setMode] = useState("guided"); // "guided" | "manual"
 
   const {
     bestOf = 3,
@@ -19,6 +28,21 @@ function SwissConfig({ config, onConfigChange }) {
       swissConfig: { ...swissConfig, [field]: Math.min(parsed, 20) },
     });
   };
+
+  const applyPreset = (preset) => {
+    onConfigChange({
+      swissConfig: {
+        totalRounds: preset.totalRounds,
+        winsToQualify: preset.winsToQualify,
+        lossesToEliminate: preset.lossesToEliminate,
+      },
+    });
+  };
+
+  const isPresetActive = (preset) =>
+    swissConfig.totalRounds === preset.totalRounds &&
+    swissConfig.winsToQualify === preset.winsToQualify &&
+    swissConfig.lossesToEliminate === preset.lossesToEliminate;
 
   // --- Validation ---
   const fieldErrors = useMemo(() => {
@@ -60,70 +84,132 @@ function SwissConfig({ config, onConfigChange }) {
         </div>
       </div>
 
-      {/* Swiss Configuration */}
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-3">
-          {t("swissConfiguration") || "Swiss Configuration"}
-        </label>
-        <div className="grid grid-cols-3 gap-3">
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1">
-              {t("totalRounds") || "Total Rounds"}
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="20"
-              step="1"
-              value={swissConfig.totalRounds}
-              onChange={(e) => updateSwiss("totalRounds", e.target.value)}
-              className={`w-full px-3 py-2 rounded-lg bg-background border text-foreground text-sm ${
-                fieldErrors.totalRounds ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-              }`}
-            />
-            <InlineError error={fieldErrors.totalRounds} />
-          </div>
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1">
-              {t("winsToQualify") || "Wins to Qualify"}
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="20"
-              step="1"
-              value={swissConfig.winsToQualify}
-              onChange={(e) => updateSwiss("winsToQualify", e.target.value)}
-              className={`w-full px-3 py-2 rounded-lg bg-background border text-foreground text-sm ${
-                fieldErrors.winsToQualify ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-              }`}
-            />
-            <InlineError error={fieldErrors.winsToQualify} />
-          </div>
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1">
-              {t("lossesToEliminate") || "Losses to Eliminate"}
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="20"
-              step="1"
-              value={swissConfig.lossesToEliminate}
-              onChange={(e) => updateSwiss("lossesToEliminate", e.target.value)}
-              className={`w-full px-3 py-2 rounded-lg bg-background border text-foreground text-sm ${
-                fieldErrors.lossesToEliminate ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-              }`}
-            />
-            <InlineError error={fieldErrors.lossesToEliminate} />
-          </div>
-        </div>
-        <InlineError error={fieldErrors.cross} />
-        <p className="text-xs text-muted-foreground mt-2">
-          {t("swissConfigDesc") ||
-            "Teams paired by record each round. Configure thresholds for qualification and elimination."}
-        </p>
+      {/* Mode Toggle: Guided / Manual */}
+      <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/30 w-fit">
+        <button
+          type="button"
+          onClick={() => setMode("guided")}
+          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+            mode === "guided"
+              ? "bg-green-primary text-white shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {t("guidedSetup") || "Guided"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("manual")}
+          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+            mode === "manual"
+              ? "bg-green-primary text-white shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {t("manualSetup") || "Manual"}
+        </button>
       </div>
+
+      {mode === "guided" ? (
+        <SwissWizard
+          swissConfig={swissConfig}
+          teamCount={teamCount}
+          onConfigChange={onConfigChange}
+        />
+      ) : (
+        <>
+          {/* Swiss Presets */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              {t("swissPresets") || "Quick Presets"}
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {SWISS_PRESETS.map((preset) => (
+                <button
+                  key={preset.labelKey}
+                  type="button"
+                  onClick={() => applyPreset(preset)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                    isPresetActive(preset)
+                      ? "border-green-primary bg-green-primary/10 text-green-primary"
+                      : "border-gray-300 dark:border-gray-600 text-muted-foreground hover:border-green-primary/50"
+                  }`}
+                >
+                  {t(preset.labelKey) || preset.fallback} ({preset.totalRounds}-{preset.winsToQualify}-{preset.lossesToEliminate})
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Swiss Configuration */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-3">
+              {t("swissConfiguration") || "Swiss Configuration"}
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                  {t("totalRounds") || "Total Rounds"}
+                  <HelpTooltip text={t("totalRoundsHelp") || "Number of Swiss rounds. Each round pairs teams with similar win/loss records against each other."} />
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  step="1"
+                  value={swissConfig.totalRounds}
+                  onChange={(e) => updateSwiss("totalRounds", e.target.value)}
+                  className={`w-full px-3 py-2 rounded-lg bg-background border text-foreground text-sm ${
+                    fieldErrors.totalRounds ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                  }`}
+                />
+                <InlineError error={fieldErrors.totalRounds} />
+              </div>
+              <div>
+                <label className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                  {t("winsToQualify") || "Wins to Qualify"}
+                  <HelpTooltip text={t("winsToQualifyHelp") || "A team that reaches this many wins advances to the next stage, regardless of remaining rounds."} />
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  step="1"
+                  value={swissConfig.winsToQualify}
+                  onChange={(e) => updateSwiss("winsToQualify", e.target.value)}
+                  className={`w-full px-3 py-2 rounded-lg bg-background border text-foreground text-sm ${
+                    fieldErrors.winsToQualify ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                  }`}
+                />
+                <InlineError error={fieldErrors.winsToQualify} />
+              </div>
+              <div>
+                <label className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                  {t("lossesToEliminate") || "Losses to Eliminate"}
+                  <HelpTooltip text={t("lossesToEliminateHelp") || "A team that reaches this many losses is eliminated from the tournament."} />
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  step="1"
+                  value={swissConfig.lossesToEliminate}
+                  onChange={(e) => updateSwiss("lossesToEliminate", e.target.value)}
+                  className={`w-full px-3 py-2 rounded-lg bg-background border text-foreground text-sm ${
+                    fieldErrors.lossesToEliminate ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                  }`}
+                />
+                <InlineError error={fieldErrors.lossesToEliminate} />
+              </div>
+            </div>
+            <InlineError error={fieldErrors.cross} />
+            <p className="text-xs text-muted-foreground mt-2">
+              {t("swissConfigDesc") ||
+                "Teams paired by record each round. Configure thresholds for qualification and elimination."}
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 }

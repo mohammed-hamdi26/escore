@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import HelpTooltip from "../shared/HelpTooltip";
 
 function SingleElimConfig({ config, onConfigChange, availableRounds }) {
   const t = useTranslations("TournamentDetails");
@@ -126,8 +127,9 @@ function SingleElimConfig({ config, onConfigChange, availableRounds }) {
       {/* Auto Advance */}
       <div className="flex items-center justify-between">
         <div>
-          <label className="block text-sm font-medium text-foreground">
+          <label className="flex items-center gap-1 text-sm font-medium text-foreground">
             {t("autoAdvance") || "Auto-Advance Winners"}
+            <HelpTooltip text={t("autoAdvanceHelp") || "When enabled, match winners are automatically placed into the next round. When disabled, you must manually advance teams after each match."} />
           </label>
           <p className="text-xs text-muted-foreground mt-0.5">
             {t("autoAdvanceDesc") ||

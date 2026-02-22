@@ -18,6 +18,7 @@ import {
 import TeamAssignmentDialog from "./TeamAssignmentDialog";
 import MatchResultDialog from "./MatchResultDialog";
 import ConfirmationDialog from "./shared/ConfirmationDialog";
+import InlineScoreEditor from "./shared/InlineScoreEditor";
 
 export default function CustomMatchRow({
   match,
@@ -33,6 +34,7 @@ export default function CustomMatchRow({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [assignSlot, setAssignSlot] = useState(null); // "team1" | "team2" | null
   const [showResultDialog, setShowResultDialog] = useState(false);
+  const [inlineScore, setInlineScore] = useState(false);
 
   const tournamentId = tournament.id || tournament._id;
   const matchId = match.id || match._id;
@@ -229,32 +231,56 @@ export default function CustomMatchRow({
         <div className="divide-y divide-white/5">
           {renderSlot(entity1, isPlayer ? "player1" : "team1")}
 
-          {/* Score area — clickable */}
-          <button
-            type="button"
-            onClick={() => !isLocked && setShowResultDialog(true)}
-            disabled={isLocked || (!entity1 && !entity2)}
-            aria-label={hasResult ? `${t("editResult") || "Edit result"}: ${team1Score}-${team2Score}` : t("setResult") || "Set result"}
-            className="w-full px-3 py-1.5 min-h-[36px] sm:min-h-0 sm:py-1 text-center bg-muted/10 hover:bg-muted/20 active:bg-muted/30 transition-colors disabled:cursor-default disabled:hover:bg-muted/10"
-          >
-            {hasResult ? (
-              <span className="text-xs font-mono font-bold">
-                <span className={isEntity1Winner ? "text-green-500" : "text-foreground"}>
-                  {team1Score}
+          {/* Score area — click for inline edit, double-click for full dialog */}
+          {inlineScore ? (
+            <InlineScoreEditor
+              tournament={tournament}
+              match={match}
+              onResultSet={() => {
+                setInlineScore(false);
+                onRefresh();
+              }}
+              onCancel={() => setInlineScore(false)}
+              participationType={participationType}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                if (isLocked) return;
+                if (entity1 || entity2) {
+                  setInlineScore(true);
+                }
+              }}
+              onDoubleClick={() => {
+                if (isLocked) return;
+                setInlineScore(false);
+                setShowResultDialog(true);
+              }}
+              disabled={isLocked || (!entity1 && !entity2)}
+              aria-label={hasResult ? `${t("editResult") || "Edit result"}: ${team1Score}-${team2Score}` : t("setResult") || "Set result"}
+              title={entity1 || entity2 ? (t("clickToEditScore") || "Click to edit score, double-click for full editor") : undefined}
+              className="w-full px-3 py-1.5 min-h-[36px] sm:min-h-0 sm:py-1 text-center bg-muted/10 hover:bg-muted/20 active:bg-muted/30 transition-colors disabled:cursor-default disabled:hover:bg-muted/10"
+            >
+              {hasResult ? (
+                <span className="text-xs font-mono font-bold">
+                  <span className={isEntity1Winner ? "text-green-500" : "text-foreground"}>
+                    {team1Score}
+                  </span>
+                  <span className="text-muted-foreground mx-1">-</span>
+                  <span className={isEntity2Winner ? "text-green-500" : "text-foreground"}>
+                    {team2Score}
+                  </span>
                 </span>
-                <span className="text-muted-foreground mx-1">-</span>
-                <span className={isEntity2Winner ? "text-green-500" : "text-foreground"}>
-                  {team2Score}
+              ) : (
+                <span className="text-[10px] text-muted-foreground/50">
+                  {entity1 || entity2
+                    ? t("setResult") || "Set Result"
+                    : "-"}
                 </span>
-              </span>
-            ) : (
-              <span className="text-[10px] text-muted-foreground/50">
-                {entity1 || entity2
-                  ? t("setResult") || "Set Result"
-                  : "-"}
-              </span>
-            )}
-          </button>
+              )}
+            </button>
+          )}
 
           {renderSlot(entity2, isPlayer ? "player2" : "team2")}
         </div>

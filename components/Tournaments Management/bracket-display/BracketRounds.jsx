@@ -41,7 +41,7 @@ function RoundProgressBadge({ matches }) {
 
 function BracketRounds({ rounds }) {
   return (
-    <div className="overflow-x-auto pb-4">
+    <div className="pb-4">
       <div className="flex gap-8 min-w-fit">
         {rounds.map((round) => (
           <div key={`${round.name}-${round.round}`} className="flex flex-col">
