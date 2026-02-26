@@ -22,6 +22,7 @@ import {
   Eye,
   DollarSign,
   Hash,
+  Building2,
 } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 import Image from "next/image";
@@ -541,6 +542,43 @@ function PlayerDetails({ player }) {
               <p className="text-muted-foreground">{t("noGame") || "No game assigned"}</p>
             )}
           </div>
+
+          {/* Clubs */}
+          {player.clubs && player.clubs.length > 0 && (
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Building2 className="size-5 text-green-primary" />
+                {t("clubs") || "Clubs"}
+                <span className="text-xs bg-green-primary/10 text-green-primary px-2 py-0.5 rounded-full font-normal">
+                  {player.clubs.length}
+                </span>
+              </h3>
+              <div className="space-y-3">
+                {player.clubs.map((club) => (
+                  <Link
+                    key={club.id}
+                    href={`/dashboard/clubs-management/view/${club.id}`}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] hover:bg-muted/50 dark:hover:bg-[#1a1d2e]/80 transition-colors"
+                  >
+                    {club.logo?.light ? (
+                      <Image
+                        src={getImgUrl(club.logo.light, "thumbnail")}
+                        alt={club.name}
+                        width={40}
+                        height={40}
+                        className="size-10 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="size-10 rounded-lg bg-green-primary/10 flex items-center justify-center">
+                        <Building2 className="size-5 text-green-primary" />
+                      </div>
+                    )}
+                    <p className="font-medium text-foreground truncate">{club.name}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Stats */}
           <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">

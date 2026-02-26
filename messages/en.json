@@ -497,7 +497,8 @@
     "quickLinks": "Quick Links",
     "manageAwards": "Manage Awards",
     "manageLinks": "Manage Links",
-    "manageCharacters": "Manage Characters"
+    "manageCharacters": "Manage Characters",
+    "clubs": "Clubs"
   },
   "PlayersTable": {
     "Edit": "Edit",
