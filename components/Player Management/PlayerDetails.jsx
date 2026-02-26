@@ -461,21 +461,43 @@ function PlayerDetails({ player }) {
                     </div>
                     {/* Team */}
                     {roster.team ? (
-                      <div className="flex items-center gap-3 pl-2 border-l-2 border-blue-500/30 ml-1">
-                        {roster.team.logo?.light ? (
-                          <Image
-                            src={getImgUrl(roster.team.logo.light, "thumbnail")}
-                            alt={roster.team.name}
-                            width={32}
-                            height={32}
-                            className="size-8 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                            <Users className="size-4 text-blue-500" />
-                          </div>
+                      <div className="space-y-2 pl-2 border-l-2 border-blue-500/30 ml-1">
+                        <div className="flex items-center gap-3">
+                          {roster.team.logo?.light ? (
+                            <Image
+                              src={getImgUrl(roster.team.logo.light, "thumbnail")}
+                              alt={roster.team.name}
+                              width={32}
+                              height={32}
+                              className="size-8 rounded-lg object-cover"
+                            />
+                          ) : (
+                            <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                              <Users className="size-4 text-blue-500" />
+                            </div>
+                          )}
+                          <p className="text-sm font-medium text-foreground truncate">{roster.team.name}</p>
+                        </div>
+                        {/* Club */}
+                        {roster.team.club && (
+                          <Link
+                            href={`/dashboard/clubs-management/view/${roster.team.club.id}`}
+                            className="flex items-center gap-2 pl-11 hover:opacity-80 transition-opacity"
+                          >
+                            {roster.team.club.logo?.light ? (
+                              <Image
+                                src={getImgUrl(roster.team.club.logo.light, "thumbnail")}
+                                alt={roster.team.club.name}
+                                width={20}
+                                height={20}
+                                className="size-5 rounded object-cover"
+                              />
+                            ) : (
+                              <Building2 className="size-4 text-green-primary" />
+                            )}
+                            <span className="text-xs text-muted-foreground">{roster.team.club.name}</span>
+                          </Link>
                         )}
-                        <p className="text-sm font-medium text-foreground truncate">{roster.team.name}</p>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 pl-2 border-l-2 border-orange-500/30 ml-1">
@@ -514,21 +536,42 @@ function PlayerDetails({ player }) {
                   </div>
                 </div>
                 {player.team ? (
-                  <div className="flex items-center gap-3 pl-2 border-l-2 border-blue-500/30 ml-1">
-                    {player.team.logo?.light ? (
-                      <Image
-                        src={getImgUrl(player.team.logo.light, "thumbnail")}
-                        alt={player.team.name}
-                        width={32}
-                        height={32}
-                        className="size-8 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                        <Users className="size-4 text-blue-500" />
-                      </div>
+                  <div className="space-y-2 pl-2 border-l-2 border-blue-500/30 ml-1">
+                    <div className="flex items-center gap-3">
+                      {player.team.logo?.light ? (
+                        <Image
+                          src={getImgUrl(player.team.logo.light, "thumbnail")}
+                          alt={player.team.name}
+                          width={32}
+                          height={32}
+                          className="size-8 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                          <Users className="size-4 text-blue-500" />
+                        </div>
+                      )}
+                      <p className="text-sm font-medium text-foreground truncate">{player.team.name}</p>
+                    </div>
+                    {player.team.club && (
+                      <Link
+                        href={`/dashboard/clubs-management/view/${player.team.club.id}`}
+                        className="flex items-center gap-2 pl-11 hover:opacity-80 transition-opacity"
+                      >
+                        {player.team.club.logo?.light ? (
+                          <Image
+                            src={getImgUrl(player.team.club.logo.light, "thumbnail")}
+                            alt={player.team.club.name}
+                            width={20}
+                            height={20}
+                            className="size-5 rounded object-cover"
+                          />
+                        ) : (
+                          <Building2 className="size-4 text-green-primary" />
+                        )}
+                        <span className="text-xs text-muted-foreground">{player.team.club.name}</span>
+                      </Link>
                     )}
-                    <p className="text-sm font-medium text-foreground truncate">{player.team.name}</p>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 pl-2 border-l-2 border-orange-500/30 ml-1">
@@ -542,43 +585,6 @@ function PlayerDetails({ player }) {
               <p className="text-muted-foreground">{t("noGame") || "No game assigned"}</p>
             )}
           </div>
-
-          {/* Clubs */}
-          {player.clubs && player.clubs.length > 0 && (
-            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
-              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Building2 className="size-5 text-green-primary" />
-                {t("clubs") || "Clubs"}
-                <span className="text-xs bg-green-primary/10 text-green-primary px-2 py-0.5 rounded-full font-normal">
-                  {player.clubs.length}
-                </span>
-              </h3>
-              <div className="space-y-3">
-                {player.clubs.map((club) => (
-                  <Link
-                    key={club.id}
-                    href={`/dashboard/clubs-management/view/${club.id}`}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] hover:bg-muted/50 dark:hover:bg-[#1a1d2e]/80 transition-colors"
-                  >
-                    {club.logo?.light ? (
-                      <Image
-                        src={getImgUrl(club.logo.light, "thumbnail")}
-                        alt={club.name}
-                        width={40}
-                        height={40}
-                        className="size-10 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="size-10 rounded-lg bg-green-primary/10 flex items-center justify-center">
-                        <Building2 className="size-5 text-green-primary" />
-                      </div>
-                    )}
-                    <p className="font-medium text-foreground truncate">{club.name}</p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Stats */}
           <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
