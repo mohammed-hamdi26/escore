@@ -31,6 +31,7 @@ import { Spinner } from "../ui/spinner";
 import toast from "react-hot-toast";
 import { getImgUrl } from "@/lib/utils";
 import Image from "next/image";
+import SelectableCheckbox from "../ui app/SelectableCheckbox";
 
 function NewsCard({
   news,
@@ -40,6 +41,9 @@ function NewsCard({
   onUnpublish,
   t,
   viewMode = "grid",
+  isSelected = false,
+  onToggleSelect,
+  selectionMode = false,
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null);
@@ -73,10 +77,19 @@ function NewsCard({
     return (
       <div
         onClick={handleCardClick}
-        className="group glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer"
+        className={`group glass rounded-2xl overflow-hidden border transition-all cursor-pointer ${
+          isSelected
+            ? "border-green-primary ring-1 ring-green-primary/30"
+            : "border-transparent dark:border-white/5 hover:border-green-primary/30"
+        }`}
       >
         {/* Cover Image */}
         <div className="relative aspect-[16/9] bg-gradient-to-br from-[#1a1d2e] to-[#12141c]">
+          <SelectableCheckbox
+            checked={isSelected}
+            onCheckedChange={onToggleSelect}
+            selectionMode={selectionMode}
+          />
           {coverImage ? (
             <Image
               src={coverImage}
@@ -317,9 +330,20 @@ function NewsCard({
   return (
     <div
       onClick={handleCardClick}
-      className="group glass rounded-xl overflow-hidden border border-transparent dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer"
+      className={`group glass rounded-xl overflow-hidden border transition-all cursor-pointer ${
+        isSelected
+          ? "border-green-primary ring-1 ring-green-primary/30"
+          : "border-transparent dark:border-white/5 hover:border-green-primary/30"
+      }`}
     >
       <div className="flex items-center gap-4 p-4">
+        {/* Checkbox */}
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="relative top-auto left-auto"
+        />
         {/* Cover Image */}
         <div className="relative size-16 sm:size-20 rounded-xl overflow-hidden bg-gradient-to-br from-[#1a1d2e] to-[#12141c] flex-shrink-0">
           {coverImage ? (

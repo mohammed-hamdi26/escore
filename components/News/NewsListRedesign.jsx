@@ -21,8 +21,11 @@ import {
   publishNews,
   unpublishNews,
 } from "@/app/[locale]/_Lib/newsApi";
-import { deleteNew } from "@/app/[locale]/_Lib/actions";
+import { deleteNew, bulkDeleteNews } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
+import { useSelection } from "@/hooks/useSelection";
+import BulkActionBar from "../ui app/BulkActionBar";
+import BulkDeleteDialog from "../ui app/BulkDeleteDialog";
 
 function NewsListRedesign({ news, pagination, games = [], locale = "en" }) {
   const t = useTranslations("newsList");
@@ -31,6 +34,31 @@ function NewsListRedesign({ news, pagination, games = [], locale = "en" }) {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [viewMode, setViewMode] = useState("grid");
+
+  const pageItemIds = news.map((n) => n.id || n._id);
+  const selection = useSelection(pagination?.page);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const ids = Array.from(selection.selectedIds);
+      const result = await bulkDeleteNews(ids);
+      if (result.success) {
+        toast.success(`${result.deletedCount} news deleted`);
+        selection.deselectAll();
+        handleRefresh();
+      } else {
+        toast.error(result.error || "Failed to delete news");
+      }
+    } catch {
+      toast.error("Failed to delete news");
+    } finally {
+      setIsBulkDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
 
   const currentSort = searchParams.get("sortBy") || "";
   const currentOrder = searchParams.get("sortOrder") || "desc";
@@ -235,6 +263,9 @@ function NewsListRedesign({ news, pagination, games = [], locale = "en" }) {
               onUnpublish={handleUnpublish}
               t={t}
               viewMode={viewMode}
+              isSelected={selection.isSelected(item.id || item._id)}
+              onToggleSelect={() => selection.toggle(item.id || item._id)}
+              selectionMode={selection.selectionMode}
             />
           ))}
         </div>
@@ -246,6 +277,22 @@ function NewsListRedesign({ news, pagination, games = [], locale = "en" }) {
           <Pagination numPages={pagination.totalPages} />
         </div>
       )}
+
+      <BulkActionBar
+        count={selection.count}
+        onSelectAll={() => selection.selectAll(pageItemIds)}
+        onDeselectAll={selection.deselectAll}
+        onDelete={() => setShowDeleteDialog(true)}
+        isLoading={isBulkDeleting}
+      />
+
+      <BulkDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        count={selection.count}
+        onConfirm={handleBulkDelete}
+        isLoading={isBulkDeleting}
+      />
     </div>
   );
 }
