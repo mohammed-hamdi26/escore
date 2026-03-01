@@ -1,6 +1,7 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
@@ -27,6 +28,7 @@ import Image from "next/image";
 
 function TeamDetails({ team }) {
   const t = useTranslations("TeamDetails");
+  const router = useRouter();
 
   const formatDate = (date) => {
     if (!date) return "-";
@@ -56,12 +58,15 @@ function TeamDetails({ team }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/teams-management">
-            <Button variant="outline" size="sm" className="gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-              <ArrowLeft className="size-4" />
-              {t("back") || "Back"}
-            </Button>
-          </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+            onClick={() => router.back()}
+          >
+            <ArrowLeft className="size-4 rtl:rotate-180" />
+            {t("back") || "Back"}
+          </Button>
           <h1 className="text-2xl font-bold text-foreground">{t("title") || "Team Details"}</h1>
         </div>
         <Link href={`/dashboard/teams-management/edit/${team.id || team._id}`}>
@@ -419,6 +424,40 @@ function TeamDetails({ team }) {
 
         {/* Right Column - Sidebar */}
         <div className="space-y-6">
+          {/* Club */}
+          {team.club && (
+            <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Building2 className="size-5 text-green-primary" />
+                {t("club") || "Club"}
+              </h3>
+              <Link
+                href={`/dashboard/clubs-management/view/${team.club.id || team.club._id || team.club}`}
+                className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#1a1d2e] hover:bg-muted/50 dark:hover:bg-[#252a3d] transition-colors"
+              >
+                {(team.club.logo?.light || team.club.logo?.dark) ? (
+                  <Image
+                    src={getImgUrl(team.club.logo?.light, "thumbnail") || getImgUrl(team.club.logo?.dark, "thumbnail")}
+                    alt={team.club.name}
+                    width={40}
+                    height={40}
+                    className="size-10 rounded-xl object-contain"
+                  />
+                ) : (
+                  <div className="size-10 rounded-xl bg-green-primary/10 flex items-center justify-center">
+                    <Building2 className="size-5 text-green-primary" />
+                  </div>
+                )}
+                <div>
+                  <p className="font-semibold text-foreground">{team.club.name}</p>
+                  {team.club.slug && (
+                    <p className="text-sm text-muted-foreground">@{team.club.slug}</p>
+                  )}
+                </div>
+              </Link>
+            </div>
+          )}
+
           {/* Games */}
           <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">

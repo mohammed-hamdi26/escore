@@ -8,7 +8,6 @@ import {
   Trophy,
   Swords,
   Users,
-  UsersRound,
   ArrowRightLeft,
   Building2,
   CalendarDays,
@@ -60,12 +59,6 @@ function NavItems({ user, t }) {
       title: "Clubs",
       href: "/dashboard/clubs-management",
       isShowed: hasPermission(user, "Club"),
-    },
-    {
-      icon: <UsersRound />,
-      title: "Teams",
-      href: "/dashboard/teams-management",
-      isShowed: hasPermission(user, "Team"),
     },
     {
       icon: <Swords />,

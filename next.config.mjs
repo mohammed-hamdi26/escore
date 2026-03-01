@@ -13,9 +13,19 @@ const nextConfig = {
     return [
       {
         source:
-          "/dashboard/:slug(\\matches-management|player-management|teams-management|games-management)",
+          "/dashboard/:slug(\\matches-management|player-management|games-management)",
         destination: "/dashboard/:slug/add",
         permanent: true,
+      },
+      {
+        source: "/:locale(en|ar)/dashboard/teams-management/:path*",
+        destination: "/:locale/dashboard/clubs-management",
+        permanent: false,
+      },
+      {
+        source: "/dashboard/teams-management/:path*",
+        destination: "/dashboard/clubs-management",
+        permanent: false,
       },
       {
         source: "/:slug(en|ar)",

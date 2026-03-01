@@ -2211,6 +2211,22 @@ export async function addTeamToClub(clubId, teamData) {
   }
 }
 
+export async function createTeamFromClub(clubId, data) {
+  const locale = await getLocale();
+  try {
+    await apiClient.post(`/clubs/${clubId}/teams/create`, data);
+    revalidatePath(`/${locale}/dashboard/clubs-management/view/${clubId}`);
+    return { success: true };
+  } catch (e) {
+    const msg = e.response?.data?.message || "Error creating team";
+    const fieldErrors = e.response?.data?.errors;
+    if (fieldErrors?.length) {
+      throw new Error(`${msg}: ${fieldErrors.map((err) => `${err.field}: ${err.message}`).join(", ")}`);
+    }
+    throw new Error(msg);
+  }
+}
+
 export async function removeTeamFromClub(clubId, teamId) {
   const locale = await getLocale();
   try {

@@ -3365,7 +3365,18 @@
     "socialLinks": "روابط التواصل",
     "manageSocialLinks": "إدارة روابط التواصل",
     "manageLinks": "إدارة الروابط",
-    "noSocialLinks": "لم تتم إضافة روابط تواصل بعد"
+    "noSocialLinks": "لم تتم إضافة روابط تواصل بعد",
+    "createTeam": "إنشاء فريق",
+    "teamCreated": "تم إنشاء الفريق بنجاح",
+    "teamCreateError": "فشل في إنشاء الفريق",
+    "allGamesUsed": "جميع الألعاب لديها فريق بالفعل في هذا النادي",
+    "rolePlaceholder": "الدور (مثل: كاري، سبورت)",
+    "selectCoach": "اختر المدرب",
+    "coach": "المدرب",
+    "optional": "اختياري",
+    "game": "اللعبة",
+    "noTeamPlayersYet": "لا يوجد لاعبون في فرق هذا النادي بعد",
+    "addTeamsFirst": "أضف فرق لهذا النادي لرؤية لاعبيهم هنا"
   },
   "eventList": {
     "title": "إدارة الأحداث",

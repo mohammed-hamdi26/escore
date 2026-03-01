@@ -3446,7 +3446,18 @@
     "socialLinks": "Social Links",
     "manageSocialLinks": "Manage Social Links",
     "manageLinks": "Manage Links",
-    "noSocialLinks": "No social links added yet"
+    "noSocialLinks": "No social links added yet",
+    "createTeam": "Create Team",
+    "teamCreated": "Team created successfully",
+    "teamCreateError": "Failed to create team",
+    "allGamesUsed": "All games already have a team in this club",
+    "rolePlaceholder": "Role (e.g. Carry, Support)",
+    "selectCoach": "Select Coach",
+    "coach": "Coach",
+    "optional": "optional",
+    "game": "Game",
+    "noTeamPlayersYet": "The teams in this club don't have any players on their rosters yet",
+    "addTeamsFirst": "Add teams to this club to see their players here"
   },
   "eventList": {
     "title": "Events Management",

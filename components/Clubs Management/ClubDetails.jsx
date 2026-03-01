@@ -33,7 +33,7 @@ import { Command, CommandGroup, CommandItem, CommandList } from "../ui/command";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import {
-  addTeamToClub,
+  createTeamFromClub,
   removeTeamFromClub,
   addPlayerToClub,
   removePlayerFromClub,
@@ -61,9 +61,16 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
   const [activeTab, setActiveTab] = useState("info");
   const [isLoading, setIsLoading] = useState(false);
   const [showAddTeam, setShowAddTeam] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState("");
-  const [teamPopoverOpen, setTeamPopoverOpen] = useState(false);
-  const [teamSearch, setTeamSearch] = useState("");
+  // Create Team form state
+  const [selectedGame, setSelectedGame] = useState("");
+  const [gamePopoverOpen, setGamePopoverOpen] = useState(false);
+  const [gameSearch, setGameSearch] = useState("");
+  const [teamPlayers, setTeamPlayers] = useState([]); // [{ player: id, role: "" }]
+  const [addPlayerPopoverOpen, setAddPlayerPopoverOpen] = useState(false);
+  const [addPlayerSearch, setAddPlayerSearch] = useState("");
+  const [selectedCoach, setSelectedCoach] = useState("");
+  const [coachPopoverOpen, setCoachPopoverOpen] = useState(false);
+  const [coachSearch, setCoachSearch] = useState("");
   // Add Player state
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState("");
@@ -81,20 +88,30 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
     ? `https://flagcdn.com/w40/${club.country.code.toLowerCase()}.png`
     : null;
 
-  const handleAddTeam = async () => {
-    if (!selectedTeam) {
-      toast.error(t("selectTeam") || "Please select a team");
+  const handleCreateTeam = async () => {
+    if (!selectedGame) {
+      toast.error(t("selectGame") || "Please select a game");
       return;
     }
     setIsLoading(true);
     try {
-      await addTeamToClub(club.id, { team: selectedTeam });
-      toast.success(t("teamAdded") || "Team added successfully");
+      const allPlayers = [...teamPlayers];
+      if (selectedCoach) {
+        allPlayers.push({ player: selectedCoach, role: "Coach" });
+      }
+      const payload = {
+        game: selectedGame,
+        ...(allPlayers.length > 0 ? { players: allPlayers } : {}),
+      };
+      await createTeamFromClub(club.id, payload);
+      toast.success(t("teamCreated") || "Team created successfully");
       setShowAddTeam(false);
-      setSelectedTeam("");
+      setSelectedGame("");
+      setTeamPlayers([]);
+      setSelectedCoach("");
       router.refresh();
     } catch (error) {
-      toast.error(error.message || t("teamAddError") || "Failed to add team");
+      toast.error(error.message || t("teamCreateError") || "Failed to create team");
     } finally {
       setIsLoading(false);
     }
@@ -684,36 +701,64 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
             </div>
           )}
 
-          {/* Add Team Form */}
+          {/* Create Team Form */}
           {showAddTeam && (() => {
-            const filteredTeams = teams.filter((team) =>
-              team.name?.toLowerCase().includes(teamSearch.toLowerCase())
+            // Filter games that don't already have a team in this club
+            const existingGameIds = (club.teams || []).map((entry) => entry.game?.id || entry.game?._id || entry.game).filter(Boolean);
+            const availableGames = games.filter((g) => !existingGameIds.includes(g.id));
+            const filteredGames = availableGames.filter((g) =>
+              g.name?.toLowerCase().includes(gameSearch.toLowerCase())
             );
-            const selectedTeamObj = teams.find((t) => t.id === selectedTeam);
-            const selectedTeamGame = selectedTeamObj?.game;
+            const selectedGameObj = games.find((g) => g.id === selectedGame);
+
+            // Players filtered by selected game
+            const gamePlayers = selectedGame
+              ? players.filter((p) => {
+                  const pGameId = p.game?.id || p.game?._id || p.game;
+                  return pGameId === selectedGame;
+                })
+              : players;
+            const selectedPlayerIds = teamPlayers.map((tp) => tp.player);
+            const addablePlayers = gamePlayers.filter(
+              (p) => !selectedPlayerIds.includes(p.id) && p.id !== selectedCoach
+            );
+            const filteredAddPlayers = addablePlayers.filter((p) =>
+              (p.nickname || p.name || "").toLowerCase().includes(addPlayerSearch.toLowerCase())
+            );
+
+            // Coach candidates: players not already in the team roster
+            const coachCandidates = gamePlayers.filter(
+              (p) => !selectedPlayerIds.includes(p.id)
+            );
+            const filteredCoachCandidates = coachCandidates.filter((p) =>
+              (p.nickname || p.name || "").toLowerCase().includes(coachSearch.toLowerCase())
+            );
+            const selectedCoachObj = players.find((p) => p.id === selectedCoach);
+
             return (
-            <div className="rounded-xl p-4 border border-green-primary/20 bg-green-primary/5 dark:bg-green-primary/5 space-y-3">
+            <div className="rounded-xl p-4 border border-green-primary/20 bg-green-primary/5 dark:bg-green-primary/5 space-y-4">
+              {/* Game Selection */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground">
-                  {t("selectTeam") || "Select Team"}
+                  {t("selectGame") || "Select Game"} <span className="text-red-500">*</span>
                 </label>
-                <Popover open={teamPopoverOpen} onOpenChange={setTeamPopoverOpen}>
+                <Popover open={gamePopoverOpen} onOpenChange={setGamePopoverOpen}>
                   <PopoverTrigger asChild>
                     <button
                       type="button"
                       className="w-full h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 flex items-center justify-between gap-2 cursor-pointer"
                     >
-                      {selectedTeamObj ? (
+                      {selectedGameObj ? (
                         <span className="flex items-center gap-2 truncate">
-                          {selectedTeamObj.logo?.light ? (
-                            <Image src={getImgUrl(selectedTeamObj.logo.light, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded object-contain" />
+                          {selectedGameObj.logo?.light ? (
+                            <Image src={getImgUrl(selectedGameObj.logo.light, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded object-contain" />
                           ) : (
-                            <Users className="size-4 text-muted-foreground shrink-0" />
+                            <Gamepad2 className="size-4 text-muted-foreground shrink-0" />
                           )}
-                          <span className="truncate">{selectedTeamObj.name}</span>
+                          <span className="truncate">{selectedGameObj.name}</span>
                         </span>
                       ) : (
-                        <span className="text-muted-foreground">{t("selectTeam") || "Select Team"}</span>
+                        <span className="text-muted-foreground">{t("selectGame") || "Select Game"}</span>
                       )}
                       <ChevronDown className="size-4 text-muted-foreground shrink-0" />
                     </button>
@@ -723,50 +768,46 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                       <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
                         <Search className="size-4 text-muted-foreground shrink-0" />
                         <input
-                          value={teamSearch}
-                          onChange={(e) => setTeamSearch(e.target.value)}
-                          placeholder={t("searchTeams") || "Search teams..."}
+                          value={gameSearch}
+                          onChange={(e) => setGameSearch(e.target.value)}
+                          placeholder={t("searchGames") || "Search games..."}
                           className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
                         />
                       </div>
                       <CommandList className="max-h-[200px]">
                         <CommandGroup>
-                          {filteredTeams.length > 0 ? (
-                            filteredTeams.map((team) => {
-                              const teamGame = team.game;
-                              const gameLogo = getImgUrl(teamGame?.logo?.light, "thumbnail") || getImgUrl(teamGame?.logo?.dark, "thumbnail");
-                              return (
+                          {filteredGames.length > 0 ? (
+                            filteredGames.map((game) => (
                               <CommandItem
-                                key={team.id}
-                                value={team.name}
+                                key={game.id}
+                                value={game.name}
                                 onSelect={() => {
-                                  setSelectedTeam(team.id);
-                                  setTeamPopoverOpen(false);
-                                  setTeamSearch("");
+                                  setSelectedGame(game.id);
+                                  setTeamPlayers([]);
+                                  setSelectedCoach("");
+                                  setGamePopoverOpen(false);
+                                  setGameSearch("");
                                 }}
                                 className="flex items-center gap-2 cursor-pointer"
                               >
-                                {team.logo?.light ? (
-                                  <Image src={getImgUrl(team.logo.light, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded object-contain bg-muted/30 p-0.5" />
+                                {game.logo?.light ? (
+                                  <Image src={getImgUrl(game.logo.light, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded object-contain bg-muted/30 p-0.5" />
                                 ) : (
                                   <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
-                                    <Users className="size-3.5 text-muted-foreground" />
+                                    <Gamepad2 className="size-3.5 text-muted-foreground" />
                                   </div>
                                 )}
-                                <span className="flex-1 truncate">{team.name}</span>
-                                {gameLogo && (
-                                  <Image src={gameLogo} alt={teamGame?.name} width={16} height={16} className="size-4 rounded opacity-60" />
-                                )}
-                                <span className="text-xs text-muted-foreground truncate max-w-[80px]">{teamGame?.name}</span>
-                                {selectedTeam === team.id && (
+                                <span className="flex-1 truncate">{game.name}</span>
+                                {selectedGame === game.id && (
                                   <Check className="size-4 text-green-primary shrink-0" />
                                 )}
                               </CommandItem>
-                              );
-                            })
+                            ))
                           ) : (
                             <p className="text-sm text-muted-foreground text-center py-4">
-                              {t("noTeamsFound") || "No teams found"}
+                              {availableGames.length === 0
+                                ? (t("allGamesUsed") || "All games already have a team")
+                                : (t("noGamesFound") || "No games found")}
                             </p>
                           )}
                         </CommandGroup>
@@ -775,33 +816,222 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                   </PopoverContent>
                 </Popover>
               </div>
-              {/* Auto-resolved game badge */}
-              {selectedTeamGame && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Gamepad2 className="size-3.5" />
-                  <span>{t("game") || "Game"}:</span>
-                  {(selectedTeamGame.logo?.light || selectedTeamGame.logo?.dark) && (
-                    <Image src={getImgUrl(selectedTeamGame.logo.light, "thumbnail") || getImgUrl(selectedTeamGame.logo.dark, "thumbnail")} alt="" width={16} height={16} className="size-4 rounded" />
+
+              {/* Players Section */}
+              {selectedGame && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-muted-foreground">
+                      {t("playersTab") || "Players"} ({teamPlayers.length})
+                    </label>
+                    <Popover open={addPlayerPopoverOpen} onOpenChange={setAddPlayerPopoverOpen}>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="sm" className="h-7 text-xs gap-1 border-green-primary/30 text-green-primary hover:bg-green-primary/10">
+                          <Plus className="size-3" />
+                          {t("addPlayer") || "Add Player"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[280px] p-0" align="end">
+                        <Command>
+                          <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                            <Search className="size-4 text-muted-foreground shrink-0" />
+                            <input
+                              value={addPlayerSearch}
+                              onChange={(e) => setAddPlayerSearch(e.target.value)}
+                              placeholder={t("searchPlayers") || "Search players..."}
+                              className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                            />
+                          </div>
+                          <CommandList className="max-h-[200px]">
+                            <CommandGroup>
+                              {filteredAddPlayers.length > 0 ? (
+                                filteredAddPlayers.map((p) => (
+                                  <CommandItem
+                                    key={p.id}
+                                    value={p.nickname || p.name}
+                                    onSelect={() => {
+                                      setTeamPlayers((prev) => [...prev, { player: p.id, role: "" }]);
+                                      setAddPlayerPopoverOpen(false);
+                                      setAddPlayerSearch("");
+                                    }}
+                                    className="flex items-center gap-2 cursor-pointer"
+                                  >
+                                    {(p.photo?.light || p.photo?.dark) ? (
+                                      <Image src={getImgUrl(p.photo.light, "thumbnail") || getImgUrl(p.photo.dark, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded-full object-cover" />
+                                    ) : (
+                                      <div className="size-6 rounded-full bg-muted/30 flex items-center justify-center">
+                                        <User className="size-3.5 text-muted-foreground" />
+                                      </div>
+                                    )}
+                                    <span className="flex-1 truncate">{p.nickname || p.name}</span>
+                                  </CommandItem>
+                                ))
+                              ) : (
+                                <p className="text-sm text-muted-foreground text-center py-4">
+                                  {t("noPlayersFound") || "No players found"}
+                                </p>
+                              )}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {/* Selected Players List */}
+                  {teamPlayers.length > 0 && (
+                    <div className="space-y-1.5">
+                      {teamPlayers.map((tp, idx) => {
+                        const pObj = players.find((p) => p.id === tp.player);
+                        const pPhoto = getImgUrl(pObj?.photo?.light, "thumbnail") || getImgUrl(pObj?.photo?.dark, "thumbnail");
+                        return (
+                          <div key={tp.player} className="flex items-center gap-2 bg-muted/30 dark:bg-[#1a1d2e] rounded-lg px-3 py-2">
+                            {pPhoto ? (
+                              <Image src={pPhoto} alt="" width={24} height={24} className="size-6 rounded-full object-cover" />
+                            ) : (
+                              <div className="size-6 rounded-full bg-white/5 flex items-center justify-center">
+                                <User className="size-3.5 text-muted-foreground" />
+                              </div>
+                            )}
+                            <span className="text-sm text-foreground truncate min-w-0">
+                              {pObj?.nickname || pObj?.name || "Unknown"}
+                            </span>
+                            <input
+                              type="text"
+                              value={tp.role}
+                              onChange={(e) => {
+                                setTeamPlayers((prev) =>
+                                  prev.map((item, i) => i === idx ? { ...item, role: e.target.value } : item)
+                                );
+                              }}
+                              placeholder={t("rolePlaceholder") || "Role (e.g. Carry, Support)"}
+                              className="flex-1 h-8 px-2 rounded-md bg-muted/50 dark:bg-[#252a3d] text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-green-primary/50 min-w-[100px]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setTeamPlayers((prev) => prev.filter((_, i) => i !== idx))}
+                              className="size-6 rounded hover:bg-red-500/20 flex items-center justify-center transition-colors"
+                            >
+                              <Trash2 className="size-3.5 text-red-400" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   )}
-                  <span className="font-medium text-foreground">{selectedTeamGame.name}</span>
                 </div>
               )}
-              <div className="flex justify-end gap-2">
+
+              {/* Coach Selection */}
+              {selectedGame && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    {t("coach") || "Coach"} ({t("optional") || "optional"})
+                  </label>
+                  {selectedCoachObj ? (
+                    <div className="flex items-center gap-2 bg-muted/30 dark:bg-[#1a1d2e] rounded-lg px-3 py-2">
+                      {(selectedCoachObj.photo?.light || selectedCoachObj.photo?.dark) ? (
+                        <Image src={getImgUrl(selectedCoachObj.photo.light, "thumbnail") || getImgUrl(selectedCoachObj.photo.dark, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded-full object-cover" />
+                      ) : (
+                        <div className="size-6 rounded-full bg-white/5 flex items-center justify-center">
+                          <User className="size-3.5 text-muted-foreground" />
+                        </div>
+                      )}
+                      <span className="text-sm text-foreground truncate flex-1">{selectedCoachObj.nickname || selectedCoachObj.name}</span>
+                      <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs">{t("coach") || "Coach"}</Badge>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCoach("")}
+                        className="size-6 rounded hover:bg-red-500/20 flex items-center justify-center transition-colors"
+                      >
+                        <Trash2 className="size-3.5 text-red-400" />
+                      </button>
+                    </div>
+                  ) : (
+                    <Popover open={coachPopoverOpen} onOpenChange={setCoachPopoverOpen}>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          className="w-full h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 flex items-center justify-between gap-2 cursor-pointer"
+                        >
+                          <span className="text-muted-foreground">{t("selectCoach") || "Select Coach"}</span>
+                          <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[280px] p-0" align="start">
+                        <Command>
+                          <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
+                            <Search className="size-4 text-muted-foreground shrink-0" />
+                            <input
+                              value={coachSearch}
+                              onChange={(e) => setCoachSearch(e.target.value)}
+                              placeholder={t("searchPlayers") || "Search players..."}
+                              className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                            />
+                          </div>
+                          <CommandList className="max-h-[200px]">
+                            <CommandGroup>
+                              {filteredCoachCandidates.length > 0 ? (
+                                filteredCoachCandidates.map((p) => (
+                                  <CommandItem
+                                    key={p.id}
+                                    value={p.nickname || p.name}
+                                    onSelect={() => {
+                                      setSelectedCoach(p.id);
+                                      setCoachPopoverOpen(false);
+                                      setCoachSearch("");
+                                    }}
+                                    className="flex items-center gap-2 cursor-pointer"
+                                  >
+                                    {(p.photo?.light || p.photo?.dark) ? (
+                                      <Image src={getImgUrl(p.photo.light, "thumbnail") || getImgUrl(p.photo.dark, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded-full object-cover" />
+                                    ) : (
+                                      <div className="size-6 rounded-full bg-muted/30 flex items-center justify-center">
+                                        <User className="size-3.5 text-muted-foreground" />
+                                      </div>
+                                    )}
+                                    <span className="flex-1 truncate">{p.nickname || p.name}</span>
+                                    {selectedCoach === p.id && (
+                                      <Check className="size-4 text-green-primary shrink-0" />
+                                    )}
+                                  </CommandItem>
+                                ))
+                              ) : (
+                                <p className="text-sm text-muted-foreground text-center py-4">
+                                  {t("noPlayersFound") || "No players found"}
+                                </p>
+                              )}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex justify-end gap-2 pt-1">
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setShowAddTeam(false)}
+                  onClick={() => {
+                    setShowAddTeam(false);
+                    setSelectedGame("");
+                    setTeamPlayers([]);
+                    setSelectedCoach("");
+                  }}
                 >
                   {t("cancel") || "Cancel"}
                 </Button>
                 <Button
                   size="sm"
-                  onClick={handleAddTeam}
-                  disabled={isLoading || !selectedTeam}
+                  onClick={handleCreateTeam}
+                  disabled={isLoading || !selectedGame}
                   className="bg-green-primary hover:bg-green-primary/80 gap-1"
                 >
                   {isLoading ? <Loader2 className="size-4 animate-spin mr-1" /> : <Plus className="size-4 mr-1" />}
-                  {t("add") || "Add"}
+                  {t("createTeam") || "Create Team"}
                 </Button>
               </div>
             </div>
@@ -814,6 +1044,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
               {club.teams.map((entry, index) => {
                 const team = entry.team || {};
                 const game = entry.game || {};
+                const teamId = team.id || team._id;
                 const teamLogo = getImgUrl(team.logo?.light, "medium") || getImgUrl(team.logo?.dark, "medium");
                 const gameLogo = getImgUrl(game.logo?.light, "thumbnail") || getImgUrl(game.logo?.dark, "thumbnail");
 
@@ -822,45 +1053,50 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                     key={index}
                     className="glass rounded-xl p-4 border border-white/5 flex items-center gap-4"
                   >
-                    {teamLogo ? (
-                      <Image
-                        src={teamLogo}
-                        alt={team.name}
-                        width={40}
-                        height={40}
-                        className="size-10 rounded-lg object-contain bg-white/5 p-1"
-                      />
-                    ) : (
-                      <div className="size-10 rounded-lg bg-white/5 flex items-center justify-center">
-                        <Users className="size-5 text-muted-foreground" />
+                    <Link
+                      href={`/dashboard/teams-management/view/${teamId}`}
+                      className="flex items-center gap-4 flex-1 min-w-0 hover:opacity-80 transition-opacity"
+                    >
+                      {teamLogo ? (
+                        <Image
+                          src={teamLogo}
+                          alt={team.name}
+                          width={40}
+                          height={40}
+                          className="size-10 rounded-lg object-contain bg-white/5 p-1"
+                        />
+                      ) : (
+                        <div className="size-10 rounded-lg bg-white/5 flex items-center justify-center">
+                          <Users className="size-5 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-foreground truncate">
+                          {team.name || "Unknown Team"}
+                        </h4>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                          {gameLogo && (
+                            <Image
+                              src={gameLogo}
+                              alt={game.name}
+                              width={16}
+                              height={16}
+                              className="size-4 rounded"
+                            />
+                          )}
+                          <span>{game.name || "Unknown Game"}</span>
+                          {entry.joinedDate && (
+                            <>
+                              <span>·</span>
+                              <span>
+                                {t("joined") || "Joined"}{" "}
+                                {formatDate(entry.joinedDate)}
+                              </span>
+                            </>
+                          )}
+                        </div>
                       </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-foreground truncate">
-                        {team.name || "Unknown Team"}
-                      </h4>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                        {gameLogo && (
-                          <Image
-                            src={gameLogo}
-                            alt={game.name}
-                            width={16}
-                            height={16}
-                            className="size-4 rounded"
-                          />
-                        )}
-                        <span>{game.name || "Unknown Game"}</span>
-                        {entry.joinedDate && (
-                          <>
-                            <span>·</span>
-                            <span>
-                              {t("joined") || "Joined"}{" "}
-                              {formatDate(entry.joinedDate)}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                    </Link>
                     <Badge
                       className={
                         entry.isActive !== false
@@ -872,13 +1108,22 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                         ? t("active") || "Active"
                         : t("inactive") || "Inactive"}
                     </Badge>
+                    <Link href={`/dashboard/teams-management/view/${teamId}`}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-green-primary hover:text-green-primary hover:bg-green-primary/10"
+                      >
+                        <Eye className="size-4" />
+                      </Button>
+                    </Link>
                     {canUpdate && (
                       <Button
                         variant="ghost"
                         size="icon"
                         className="size-8 text-red-400 hover:text-red-500 hover:bg-red-500/10"
                         onClick={() =>
-                          handleRemoveTeam(team.id || team._id)
+                          handleRemoveTeam(teamId)
                         }
                         disabled={isLoading}
                       >
