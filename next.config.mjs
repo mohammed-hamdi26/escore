@@ -18,16 +18,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: "/:locale(en|ar)/dashboard/teams-management/:path*",
-        destination: "/:locale/dashboard/clubs-management",
-        permanent: false,
-      },
-      {
-        source: "/dashboard/teams-management/:path*",
-        destination: "/dashboard/clubs-management",
-        permanent: false,
-      },
-      {
         source: "/:slug(en|ar)",
         destination: "/:slug/dashboard",
         permanent: true,
