@@ -35,8 +35,6 @@ import toast from "react-hot-toast";
 import {
   createTeamFromClub,
   removeTeamFromClub,
-  addPlayerToClub,
-  removePlayerFromClub,
 } from "@/app/[locale]/_Lib/actions";
 import {
   usePermissions,
@@ -72,13 +70,6 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
   const [coachPopoverOpen, setCoachPopoverOpen] = useState(false);
   const [coachSearch, setCoachSearch] = useState("");
   // Add Player state
-  const [showAddPlayer, setShowAddPlayer] = useState(false);
-  const [selectedPlayer, setSelectedPlayer] = useState("");
-  const [selectedPlayerGame, setSelectedPlayerGame] = useState("");
-  const [playerPopoverOpen, setPlayerPopoverOpen] = useState(false);
-  const [playerGamePopoverOpen, setPlayerGamePopoverOpen] = useState(false);
-  const [playerSearch, setPlayerSearch] = useState("");
-  const [playerGameSearch, setPlayerGameSearch] = useState("");
   const { hasPermission } = usePermissions();
   const canUpdate = hasPermission(ENTITIES.CLUB, ACTIONS.UPDATE);
 
@@ -134,49 +125,6 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
     }
   };
 
-  const handleAddPlayer = async () => {
-    if (!selectedPlayer || !selectedPlayerGame) {
-      toast.error(t("selectPlayerAndGame") || "Please select both player and game");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      await addPlayerToClub(club.id, {
-        player: selectedPlayer,
-        game: selectedPlayerGame,
-      });
-      toast.success(t("playerAdded") || "Player added successfully");
-      setShowAddPlayer(false);
-      setSelectedPlayer("");
-      setSelectedPlayerGame("");
-      router.refresh();
-    } catch (error) {
-      toast.error(error.message || t("playerAddError") || "Failed to add player");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRemovePlayer = async (playerId) => {
-    if (
-      !confirm(
-        t("confirmRemovePlayer") || "Remove this player from the club?"
-      )
-    )
-      return;
-    setIsLoading(true);
-    try {
-      await removePlayerFromClub(club.id, playerId);
-      toast.success(t("playerRemoved") || "Player removed");
-      router.refresh();
-    } catch (error) {
-      toast.error(
-        error.message || t("playerRemoveError") || "Failed to remove player"
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const tabs = [
     { id: "info", label: t("overview") || "Overview", icon: Eye },
@@ -541,11 +489,6 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                     <span className="text-lg font-bold text-foreground">
                       {club.players?.length || 0}
                     </span>
-                    {club.players?.length > 0 && (
-                      <div className="text-xs text-muted-foreground">
-                        {club.players.filter(p => p.type === "team_member").length} {t("teamLabel") || "team"} / {club.players.filter(p => p.type !== "team_member").length} {t("individualLabel") || "individual"}
-                      </div>
-                    )}
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -1147,7 +1090,6 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
 
       {activeTab === "players" && (() => {
         const teamPlayers = (club.players || []).filter(p => p.type === "team_member");
-        const individualPlayers = (club.players || []).filter(p => p.type !== "team_member");
 
         // Group team players by team
         const teamGroups = {};
@@ -1230,282 +1172,6 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
             )}
           </div>
 
-          {/* Individual Players Section (manual) */}
-          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <User className="size-5 text-green-primary" />
-                <h3 className="text-lg font-semibold text-foreground">
-                  {t("individualPlayers") || "Individual Players"}
-                </h3>
-                <span className="text-xs bg-green-primary/10 text-green-primary px-2 py-0.5 rounded-full">
-                  {individualPlayers.length}
-                </span>
-              </div>
-              {canUpdate && (
-                <Button
-                  className="bg-green-primary hover:bg-green-primary/80 gap-2"
-                  size="sm"
-                  onClick={() => setShowAddPlayer(!showAddPlayer)}
-                >
-                  <Plus className="size-4" />
-                  {t("addPlayer") || "Add Player"}
-                </Button>
-              )}
-            </div>
-
-            {/* Add Player Form */}
-            {showAddPlayer && (() => {
-              const selectedPlayerGameObj = games.find((g) => g.id === selectedPlayerGame);
-              const filteredPlayerGames = games.filter((g) =>
-                g.name?.toLowerCase().includes(playerGameSearch.toLowerCase())
-              );
-              const availablePlayers = players.filter(
-                (p) =>
-                  !selectedPlayerGame ||
-                  p.game?.id === selectedPlayerGame || p.game?._id === selectedPlayerGame || p.game === selectedPlayerGame
-              );
-              const filteredPlayers = availablePlayers.filter((p) =>
-                (p.nickname || p.name || "").toLowerCase().includes(playerSearch.toLowerCase())
-              );
-              const selectedPlayerObj = players.find((p) => p.id === selectedPlayer);
-              return (
-              <div className="rounded-xl p-4 border border-green-primary/20 bg-green-primary/5 dark:bg-green-primary/5 space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Game Popover */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-muted-foreground">
-                      {t("selectGame") || "Select Game"}
-                    </label>
-                    <Popover open={playerGamePopoverOpen} onOpenChange={setPlayerGamePopoverOpen}>
-                      <PopoverTrigger asChild>
-                        <button
-                          type="button"
-                          className="w-full h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 flex items-center justify-between gap-2 cursor-pointer"
-                        >
-                          {selectedPlayerGameObj ? (
-                            <span className="flex items-center gap-2 truncate">
-                              {selectedPlayerGameObj.logo?.light ? (
-                                <Image src={getImgUrl(selectedPlayerGameObj.logo.light, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded object-contain" />
-                              ) : (
-                                <Gamepad2 className="size-4 text-muted-foreground shrink-0" />
-                              )}
-                              <span className="truncate">{selectedPlayerGameObj.name}</span>
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">{t("selectGame") || "Select Game"}</span>
-                          )}
-                          <ChevronDown className="size-4 text-muted-foreground shrink-0" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[280px] p-0" align="start">
-                        <Command>
-                          <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
-                            <Search className="size-4 text-muted-foreground shrink-0" />
-                            <input
-                              value={playerGameSearch}
-                              onChange={(e) => setPlayerGameSearch(e.target.value)}
-                              placeholder={t("searchGames") || "Search games..."}
-                              className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
-                            />
-                          </div>
-                          <CommandList className="max-h-[200px]">
-                            <CommandGroup>
-                              {filteredPlayerGames.length > 0 ? (
-                                filteredPlayerGames.map((game) => (
-                                  <CommandItem
-                                    key={game.id}
-                                    value={game.name}
-                                    onSelect={() => {
-                                      setSelectedPlayerGame(game.id);
-                                      setSelectedPlayer("");
-                                      setPlayerGamePopoverOpen(false);
-                                      setPlayerGameSearch("");
-                                    }}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    {game.logo?.light ? (
-                                      <Image src={getImgUrl(game.logo.light, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded object-contain bg-muted/30 p-0.5" />
-                                    ) : (
-                                      <div className="size-6 rounded bg-muted/30 flex items-center justify-center">
-                                        <Gamepad2 className="size-3.5 text-muted-foreground" />
-                                      </div>
-                                    )}
-                                    <span className="flex-1 truncate">{game.name}</span>
-                                    {selectedPlayerGame === game.id && (
-                                      <Check className="size-4 text-green-primary shrink-0" />
-                                    )}
-                                  </CommandItem>
-                                ))
-                              ) : (
-                                <p className="text-sm text-muted-foreground text-center py-4">
-                                  {t("noGamesFound") || "No games found"}
-                                </p>
-                              )}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-
-                  {/* Player Popover */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-muted-foreground">
-                      {t("selectPlayer") || "Select Player"}
-                    </label>
-                    <Popover open={playerPopoverOpen} onOpenChange={setPlayerPopoverOpen}>
-                      <PopoverTrigger asChild>
-                        <button
-                          type="button"
-                          className="w-full h-11 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 flex items-center justify-between gap-2 cursor-pointer"
-                        >
-                          {selectedPlayerObj ? (
-                            <span className="flex items-center gap-2 truncate">
-                              {(selectedPlayerObj.photo?.light || selectedPlayerObj.photo?.dark) ? (
-                                <Image src={getImgUrl(selectedPlayerObj.photo.light, "thumbnail") || getImgUrl(selectedPlayerObj.photo.dark, "thumbnail")} alt="" width={20} height={20} className="size-5 rounded-full object-cover" />
-                              ) : (
-                                <User className="size-4 text-muted-foreground shrink-0" />
-                              )}
-                              <span className="truncate">{selectedPlayerObj.nickname || selectedPlayerObj.name}</span>
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">{t("selectPlayer") || "Select Player"}</span>
-                          )}
-                          <ChevronDown className="size-4 text-muted-foreground shrink-0" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[280px] p-0" align="start">
-                        <Command>
-                          <div className="flex items-center border-b border-gray-200 dark:border-white/10 px-3">
-                            <Search className="size-4 text-muted-foreground shrink-0" />
-                            <input
-                              value={playerSearch}
-                              onChange={(e) => setPlayerSearch(e.target.value)}
-                              placeholder={t("searchPlayers") || "Search players..."}
-                              className="flex h-10 w-full bg-transparent py-3 px-2 text-sm outline-none placeholder:text-muted-foreground"
-                            />
-                          </div>
-                          <CommandList className="max-h-[200px]">
-                            <CommandGroup>
-                              {filteredPlayers.length > 0 ? (
-                                filteredPlayers.map((p) => (
-                                  <CommandItem
-                                    key={p.id}
-                                    value={p.nickname || p.name}
-                                    onSelect={() => {
-                                      setSelectedPlayer(p.id);
-                                      setPlayerPopoverOpen(false);
-                                      setPlayerSearch("");
-                                    }}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    {(p.photo?.light || p.photo?.dark) ? (
-                                      <Image src={getImgUrl(p.photo.light, "thumbnail") || getImgUrl(p.photo.dark, "thumbnail")} alt="" width={24} height={24} className="size-6 rounded-full object-cover" />
-                                    ) : (
-                                      <div className="size-6 rounded-full bg-muted/30 flex items-center justify-center">
-                                        <User className="size-3.5 text-muted-foreground" />
-                                      </div>
-                                    )}
-                                    <span className="flex-1 truncate">{p.nickname || p.name}</span>
-                                    {selectedPlayer === p.id && (
-                                      <Check className="size-4 text-green-primary shrink-0" />
-                                    )}
-                                  </CommandItem>
-                                ))
-                              ) : (
-                                <p className="text-sm text-muted-foreground text-center py-4">
-                                  {t("noPlayersFound") || "No players found"}
-                                </p>
-                              )}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowAddPlayer(false)}
-                  >
-                    {t("cancel") || "Cancel"}
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleAddPlayer}
-                    disabled={isLoading || !selectedPlayer || !selectedPlayerGame}
-                    className="bg-green-primary hover:bg-green-primary/80 gap-1"
-                  >
-                    {isLoading ? <Loader2 className="size-4 animate-spin mr-1" /> : <Plus className="size-4 mr-1" />}
-                    {t("add") || "Add"}
-                  </Button>
-                </div>
-              </div>
-              );
-            })()}
-
-            {individualPlayers.length > 0 ? (
-              <div className="space-y-2">
-                {individualPlayers.map((entry, index) => {
-                  const player = entry.player || {};
-                  const game = entry.game || {};
-                  const playerPhoto = getImgUrl(player.photo?.light, "thumbnail") || getImgUrl(player.photo?.dark, "thumbnail");
-
-                  return (
-                    <div
-                      key={index}
-                      className="glass rounded-xl p-4 border border-white/5 flex items-center gap-4"
-                    >
-                      {playerPhoto ? (
-                        <Image
-                          src={playerPhoto}
-                          alt={player.nickname || player.name}
-                          width={40}
-                          height={40}
-                          className="size-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="size-10 rounded-full bg-white/5 flex items-center justify-center">
-                          <User className="size-5 text-muted-foreground" />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-foreground truncate">
-                          {player.nickname || player.name || "Unknown Player"}
-                        </h4>
-                        <p className="text-xs text-muted-foreground">
-                          {game.name || "Unknown Game"}
-                        </p>
-                      </div>
-                      {canUpdate && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-8 text-red-400 hover:text-red-500 hover:bg-red-500/10"
-                          onClick={() =>
-                            handleRemovePlayer(player.id || player._id)
-                          }
-                          disabled={isLoading}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="py-6 text-center">
-                <User className="size-10 mx-auto mb-2 text-muted-foreground opacity-40" />
-                <p className="text-sm text-muted-foreground">
-                  {t("noIndividualPlayers") || "No individual players added. Add solo players who aren't part of any team."}
-                </p>
-              </div>
-            )}
-          </div>
         </div>
         );
       })()}
