@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
 import FormSection from "../ui app/FormSection";
 import FormRow from "../ui app/FormRow";
+import RichTextEditor from "../ui app/RichTextEditor";
 import ImageUpload from "../ui app/ImageUpload";
 import { Calendar as CalendarComponent } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -28,7 +29,7 @@ import {
 const validationSchema = yup.object({
   name: yup.string().required("Game name is required").max(100, "Name must be at most 100 characters"),
 
-  description: yup.string().max(2000, "Description must be at most 2000 characters"),
+  description: yup.string().max(50000, "Description too long"),
   logoLight: yup.mixed(),
   logoDark: yup.mixed(),
   coverImageLight: yup.mixed(),
@@ -155,24 +156,14 @@ export default function GamesForm({
         </FormRow>
 
         {/* Description */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-            <FileText className="size-4" />
-            {t("description") || "Description"}
-          </label>
-          <textarea
-            name="description"
-            value={formik.values.description}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder={t("enterDescription") || "Enter game description"}
-            rows={4}
-            className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-[#1a1d2e] border-0 text-sm text-gray-900 dark:text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all resize-none"
-          />
-          {formik.touched.description && formik.errors.description && (
-            <p className="text-sm text-red-500">{formik.errors.description}</p>
-          )}
-        </div>
+        <RichTextEditor
+          name="description"
+          formik={formik}
+          label={t("description") || "Description"}
+          placeholder={t("enterDescription") || "Enter game description"}
+          minHeight="200px"
+          required={false}
+        />
 
         <FormRow>
           {/* Release Date - Enhanced */}

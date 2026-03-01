@@ -56,6 +56,7 @@ import {
 } from "@/app/[locale]/_Lib/actions";
 import { getImgUrl } from "@/lib/utils";
 import Image from "next/image";
+import HtmlContent from "../ui app/HtmlContent";
 
 // Status config with icons (for header badges)
 const STATUS_CONFIG = {
@@ -429,7 +430,7 @@ function EventDetails({
                 {t("description") || "Description"}
               </h3>
               {event.description ? (
-                <p className="text-muted-foreground whitespace-pre-wrap">{event.description}</p>
+                <HtmlContent content={event.description} className="text-muted-foreground" />
               ) : (
                 <p className="text-muted-foreground italic">{t("noDescription") || "No description provided"}</p>
               )}

@@ -72,7 +72,7 @@ const CURRENCY_OPTIONS = [
 const validateSchema = yup.object({
   name: yup.string().required("Tournament name is required"),
   organizer: yup.string(),
-  description: yup.string(),
+  description: yup.string().max(50000),
   startDate: yup
     .string()
     .required("Start date is required")
@@ -456,12 +456,13 @@ export default function TournamentsForm({
         </FormRow>
 
         {/* Description */}
-        <TextAreaField
-          label={t("Description")}
+        <RichTextEditor
           name="description"
-          placeholder={t("Enter tournament description")}
           formik={formik}
-          rows={3}
+          label={t("Description") || "Description"}
+          placeholder={t("Enter tournament description") || "Enter tournament description"}
+          minHeight="200px"
+          required={false}
         />
 
         <FormRow cols={3}>

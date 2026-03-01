@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import BracketView from "./BracketView";
 import { getImgUrl } from "@/lib/utils";
+import HtmlContent from "../ui app/HtmlContent";
 
 // Status badge colors
 const STATUS_CONFIG = {
@@ -211,7 +212,7 @@ function TournamentDetails({ tournament }) {
                 <FileText className="size-5 text-green-primary" />
                 {t("description") || "Description"}
               </h3>
-              <p className="text-muted-foreground whitespace-pre-wrap">{tournament.description}</p>
+              <HtmlContent content={tournament.description} className="text-muted-foreground" />
             </div>
           )}
 

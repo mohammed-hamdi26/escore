@@ -10,6 +10,7 @@ export default function RichTextEditor({
   placeholder,
   error,
   minHeight = "400px",
+  required = true,
 }) {
   const t = useTranslations("RichTextEditor");
   const { resolvedTheme } = useTheme();
@@ -319,7 +320,7 @@ export default function RichTextEditor({
       <div className="space-y-2">
         {label && (
           <label className="text-sm font-medium text-muted-foreground">
-            {label} <span className="text-red-500">*</span>
+            {label} {required && <span className="text-red-500">*</span>}
           </label>
         )}
         <div
@@ -338,7 +339,7 @@ export default function RichTextEditor({
     <div className="space-y-2">
       {label && (
         <label className="text-sm font-medium text-muted-foreground">
-          {label} <span className="text-red-500">*</span>
+          {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
 

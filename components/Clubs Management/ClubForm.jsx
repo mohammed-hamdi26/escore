@@ -30,6 +30,7 @@ import { Button } from "../ui/button";
 import FormSection from "../ui app/FormSection";
 import FormRow from "../ui app/FormRow";
 import ImageUpload from "../ui app/ImageUpload";
+import RichTextEditor from "../ui app/RichTextEditor";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar as CalendarComponent } from "../ui/calendar";
 
@@ -38,7 +39,7 @@ import { Calendar as CalendarComponent } from "../ui/calendar";
 const validationSchema = yup.object({
   name: yup.string().required("nameRequired").max(100, "nameTooLong"),
   shortName: yup.string().max(50, "shortNameTooLong"),
-  description: yup.string().max(5000, "descriptionTooLong"),
+  description: yup.string().max(50000, "descriptionTooLong"),
   country: yup.string(),
   region: yup.string(),
   founded: yup.string(),
@@ -758,14 +759,13 @@ function ClubForm({ formType = "add", submit, club, countries = [] }) {
             />
           </FormRow>
 
-          <TextAreaField
-            label={t("description") || "Description"}
+          <RichTextEditor
             name="description"
-            placeholder={
-              t("descriptionPlaceholder") || "Enter club description"
-            }
             formik={formik}
-            rows={4}
+            label={t("description") || "Description"}
+            placeholder={t("descriptionPlaceholder") || "Enter club description"}
+            minHeight="200px"
+            required={false}
           />
         </FormSection>
 

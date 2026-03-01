@@ -40,6 +40,7 @@ import * as yup from "yup";
 import FormSection from "../ui app/FormSection";
 import FormRow from "../ui app/FormRow";
 import ImageUpload from "../ui app/ImageUpload";
+import RichTextEditor from "../ui app/RichTextEditor";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar as CalendarComponent } from "../ui/calendar";
 import { Button } from "../ui/button";
@@ -65,7 +66,7 @@ const CURRENCY_OPTIONS = [
 
 const validationSchema = yup.object({
   name: yup.string().required("nameRequired").max(200, "nameTooLong"),
-  description: yup.string().max(5000, "descriptionTooLong"),
+  description: yup.string().max(50000, "descriptionTooLong"),
   country: yup.string(),
   location: yup.string().max(200),
   startDate: yup.string().required("startDateRequired"),
@@ -1008,12 +1009,13 @@ function EventForm({ event, submit, formType = "add", countries = [] }) {
             />
           </FormRow>
 
-          <TextAreaField
-            label={t("description") || "Description"}
+          <RichTextEditor
             name="description"
-            placeholder={t("descriptionPlaceholder") || "Enter description"}
             formik={formik}
-            rows={3}
+            label={t("description") || "Description"}
+            placeholder={t("descriptionPlaceholder") || "Enter event description"}
+            minHeight="200px"
+            required={false}
           />
 
           <FormRow cols={2}>

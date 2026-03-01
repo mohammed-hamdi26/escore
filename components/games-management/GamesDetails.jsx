@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 import Image from "next/image";
+import HtmlContent from "../ui app/HtmlContent";
 
 function GamesDetails({ game }) {
   const t = useTranslations("GamesDetails");
@@ -113,7 +114,7 @@ function GamesDetails({ game }) {
                 <FileText className="size-5 text-green-primary" />
                 {t("description") || "Description"}
               </h3>
-              <p className="text-muted-foreground whitespace-pre-wrap">{game.description}</p>
+              <HtmlContent content={game.description} className="text-muted-foreground" />
             </div>
           )}
 

@@ -38,6 +38,7 @@ import { Button } from "../ui/button";
 import FormSection from "../ui app/FormSection";
 import FormRow from "../ui app/FormRow";
 import ImageUpload from "../ui app/ImageUpload";
+import RichTextEditor from "../ui app/RichTextEditor";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar as CalendarComponent } from "../ui/calendar";
 import Image from "next/image";
@@ -59,7 +60,7 @@ const validationSchema = yup.object({
   photoLight: yup.mixed(),
   photoDark: yup.mixed(),
   tournaments: yup.array().of(yup.string()),
-  bio: yup.string().max(2000, "bioTooLong"),
+  bio: yup.string().max(50000, "bioTooLong"),
   ranking: yup.number().min(0, "rankingMin").integer("rankingInteger").nullable(),
   marketValue: yup.number().min(0, "marketValueMin").nullable(),
 });
@@ -382,13 +383,13 @@ function PlayerFormRedesign({
           </span>
         }
       >
-        <TextAreaField
-          label={t("bio")}
+        <RichTextEditor
           name="bio"
-          placeholder={t("bioPlaceholder")}
           formik={formik}
-          rows={4}
-          hint={t("bioHint")}
+          label={t("bio") || "Bio"}
+          placeholder={t("bioPlaceholder") || "Enter player bio"}
+          minHeight="200px"
+          required={false}
         />
       </FormSection>
 

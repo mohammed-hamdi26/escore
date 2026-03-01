@@ -43,6 +43,7 @@ import {
 } from "@/contexts/PermissionsContext";
 import { getImgUrl } from "@/lib/utils";
 import Image from "next/image";
+import HtmlContent from "../ui app/HtmlContent";
 
 function formatDate(date) {
   if (!date) return "—";
@@ -271,9 +272,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                 {t("description") || "Description"}
               </h3>
               {club.description ? (
-                <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                  {club.description}
-                </p>
+                <HtmlContent content={club.description} className="text-foreground leading-relaxed" />
               ) : (
                 <p className="text-muted-foreground italic">
                   {t("noDescription") || "No description available"}
