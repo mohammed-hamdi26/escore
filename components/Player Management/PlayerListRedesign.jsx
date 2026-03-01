@@ -16,9 +16,13 @@ import { Button } from "../ui/button";
 import PlayerCard from "./PlayerCard";
 import PlayersFilter from "./PlayersFilter";
 import Pagination from "../ui app/Pagination";
-import { deletePlayer } from "@/app/[locale]/_Lib/actions";
+import { deletePlayer, bulkDeletePlayers } from "@/app/[locale]/_Lib/actions";
 import { useState } from "react";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
+import { useSelection } from "@/hooks/useSelection";
+import BulkActionBar from "../ui app/BulkActionBar";
+import BulkDeleteDialog from "../ui app/BulkDeleteDialog";
+import toast from "react-hot-toast";
 
 function PlayerListRedesign({ players, pagination, games = [], teams = [] }) {
   const t = useTranslations("playerList");
@@ -29,6 +33,32 @@ function PlayerListRedesign({ players, pagination, games = [], teams = [] }) {
   const [viewMode, setViewMode] = useState("grid"); // grid or list
   const { hasPermission } = usePermissions();
   const canCreate = hasPermission(ENTITIES.PLAYER, ACTIONS.CREATE);
+  const canDelete = hasPermission(ENTITIES.PLAYER, ACTIONS.DELETE);
+
+  const pageItemIds = players.map((p) => p.id);
+  const selection = useSelection(pagination?.page);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const ids = Array.from(selection.selectedIds);
+      const result = await bulkDeletePlayers(ids);
+      if (result.success) {
+        toast.success(`${result.deletedCount} players deleted`);
+        selection.deselectAll();
+        handleRefresh();
+      } else {
+        toast.error(result.error || "Failed to delete players");
+      }
+    } catch {
+      toast.error("Failed to delete players");
+    } finally {
+      setIsBulkDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
 
   const currentSort = searchParams.get("sortBy") || "";
   const currentOrder = searchParams.get("sortOrder") || "asc";
@@ -198,6 +228,9 @@ function PlayerListRedesign({ players, pagination, games = [], teams = [] }) {
               onDelete={handleDelete}
               t={t}
               viewMode={viewMode}
+              isSelected={selection.isSelected(player.id)}
+              onToggleSelect={() => selection.toggle(player.id)}
+              selectionMode={selection.selectionMode}
             />
           ))}
         </div>
@@ -209,6 +242,25 @@ function PlayerListRedesign({ players, pagination, games = [], teams = [] }) {
           <Pagination numPages={pagination.totalPages} />
         </div>
       )}
+
+      {canDelete && (
+        <BulkActionBar
+          count={selection.count}
+          onSelectAll={() => selection.selectAll(pageItemIds)}
+          onDeselectAll={selection.deselectAll}
+          onDelete={() => setShowDeleteDialog(true)}
+          canDelete={canDelete}
+          isLoading={isBulkDeleting}
+        />
+      )}
+
+      <BulkDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        count={selection.count}
+        onConfirm={handleBulkDelete}
+        isLoading={isBulkDeleting}
+      />
     </div>
   );
 }

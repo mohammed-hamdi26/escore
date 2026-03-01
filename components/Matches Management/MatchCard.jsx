@@ -42,6 +42,7 @@ import { startMatch, updateMatchStatus, updateMatchResult } from "@/app/[locale]
 import toast from "react-hot-toast";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 import Image from "next/image";
+import SelectableCheckbox from "../ui app/SelectableCheckbox";
 
 const STATUS_CONFIG = {
   scheduled: {
@@ -71,7 +72,7 @@ const STATUS_CONFIG = {
   },
 };
 
-function MatchCard({ match, viewMode = "grid", t, onDelete }) {
+function MatchCard({ match, viewMode = "grid", t, onDelete, isSelected, onToggleSelect, selectionMode }) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { hasPermission } = usePermissions();
@@ -246,8 +247,14 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
     return (
       <div
         onClick={handleCardClick}
-        className="group bg-white dark:bg-[#0f1118] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-green-primary/40 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-green-primary/10 dark:hover:shadow-green-primary/5"
+        className="group relative bg-white dark:bg-[#0f1118] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-green-primary/40 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-green-primary/10 dark:hover:shadow-green-primary/5"
       >
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="top-3 left-3 rtl:left-auto rtl:right-3 z-20"
+        />
         {/* Header with Game & Tournament */}
         <div className="relative p-4 bg-gradient-to-b from-gray-50 dark:from-[#1a1d2e] to-transparent">
           <div className="flex items-center justify-between gap-2">
@@ -459,9 +466,15 @@ function MatchCard({ match, viewMode = "grid", t, onDelete }) {
   return (
     <div
       onClick={handleCardClick}
-      className="group bg-white dark:bg-[#0f1118] rounded-xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-green-primary/40 transition-all duration-300 cursor-pointer"
+      className="group relative bg-white dark:bg-[#0f1118] rounded-xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-green-primary/40 transition-all duration-300 cursor-pointer"
     >
       <div className="flex items-center gap-4 p-4">
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="relative top-auto left-auto opacity-100 flex-shrink-0"
+        />
         {/* Game Logo */}
         <div className="relative size-10 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center flex-shrink-0">
           {gameLogo ? (

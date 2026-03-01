@@ -2389,3 +2389,104 @@ export async function removeClubResult(eventId, clubId, tournamentId) {
     return { success: false, error: errorMsg };
   }
 }
+
+// ==================== BULK DELETE ACTIONS ====================
+
+export async function bulkDeleteTeams(ids) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post("/teams/bulk-delete", { ids });
+    revalidatePath(`/${locale}/dashboard/clubs-management`);
+    return { success: true, deletedCount: res.data?.data?.deletedCount };
+  } catch (e) {
+    return { success: false, error: e.response?.data?.message || "Error deleting teams" };
+  }
+}
+
+export async function bulkDeletePlayers(ids) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post("/players/bulk-delete", { ids });
+    revalidatePath(`/${locale}/dashboard/players-management`);
+    return { success: true, deletedCount: res.data?.data?.deletedCount };
+  } catch (e) {
+    return { success: false, error: e.response?.data?.message || "Error deleting players" };
+  }
+}
+
+export async function bulkDeleteGames(ids) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post("/games/bulk-delete", { ids });
+    revalidatePath(`/${locale}/dashboard/games-management`);
+    return { success: true, deletedCount: res.data?.data?.deletedCount };
+  } catch (e) {
+    return { success: false, error: e.response?.data?.message || "Error deleting games" };
+  }
+}
+
+export async function bulkDeleteClubs(ids) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post("/clubs/bulk-delete", { ids });
+    revalidatePath(`/${locale}/dashboard/clubs-management`);
+    return { success: true, deletedCount: res.data?.data?.deletedCount };
+  } catch (e) {
+    return { success: false, error: e.response?.data?.message || "Error deleting clubs" };
+  }
+}
+
+export async function bulkDeleteEvents(ids) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post("/events/bulk-delete", { ids });
+    revalidatePath(`/${locale}/dashboard/events-management`);
+    return { success: true, deletedCount: res.data?.data?.deletedCount };
+  } catch (e) {
+    return { success: false, error: e.response?.data?.message || "Error deleting events" };
+  }
+}
+
+export async function bulkDeleteTournaments(ids) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post("/tournaments/bulk-delete", { ids });
+    revalidatePath(`/${locale}/dashboard/tournaments-management`);
+    return { success: true, deletedCount: res.data?.data?.deletedCount };
+  } catch (e) {
+    return { success: false, error: e.response?.data?.message || "Error deleting tournaments" };
+  }
+}
+
+export async function bulkDeleteMatches(ids) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post("/matches/bulk-delete", { ids });
+    revalidatePath(`/${locale}/dashboard/matches-management`);
+    return { success: true, deletedCount: res.data?.data?.deletedCount };
+  } catch (e) {
+    return { success: false, error: e.response?.data?.message || "Error deleting matches" };
+  }
+}
+
+export async function bulkDeleteNews(ids) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post("/news/bulk-delete", { ids });
+    revalidatePath(`/${locale}/dashboard/news-management`);
+    return { success: true, deletedCount: res.data?.data?.deletedCount };
+  } catch (e) {
+    return { success: false, error: e.response?.data?.message || "Error deleting news" };
+  }
+}
+
+export async function bulkDeleteTransfers(ids) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post("/transfers/bulk-delete", { ids });
+    revalidatePath(`/${locale}/dashboard/transfers-management`);
+    return { success: true, deletedCount: res.data?.data?.deletedCount };
+  } catch (e) {
+    return { success: false, error: e.response?.data?.message || "Error deleting transfers" };
+  }
+}

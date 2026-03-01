@@ -14,7 +14,11 @@ import {
   RefreshCw,
   Swords,
 } from "lucide-react";
-import { deleteMatch } from "@/app/[locale]/_Lib/actions";
+import { deleteMatch, bulkDeleteMatches } from "@/app/[locale]/_Lib/actions";
+import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
+import { useSelection } from "@/hooks/useSelection";
+import BulkActionBar from "../ui app/BulkActionBar";
+import BulkDeleteDialog from "../ui app/BulkDeleteDialog";
 import toast from "react-hot-toast";
 
 const SORT_OPTIONS = [
@@ -29,6 +33,33 @@ function MatchesListRedesign({ matches = [], pagination = {}, games = [], tourna
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [viewMode, setViewMode] = useState("grid");
+  const { hasPermission } = usePermissions();
+  const canDelete = hasPermission(ENTITIES.MATCH, ACTIONS.DELETE);
+
+  const pageItemIds = matches.map((m) => m.id);
+  const selection = useSelection(pagination?.page);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const ids = Array.from(selection.selectedIds);
+      const result = await bulkDeleteMatches(ids);
+      if (result.success) {
+        toast.success(`${result.deletedCount} matches deleted`);
+        selection.deselectAll();
+        handleRefresh();
+      } else {
+        toast.error(result.error || "Failed to delete matches");
+      }
+    } catch {
+      toast.error("Failed to delete matches");
+    } finally {
+      setIsBulkDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
 
   const currentSort = searchParams.get("sortBy") || "scheduledDate";
   const currentOrder = searchParams.get("sortOrder") || "desc";
@@ -147,6 +178,9 @@ function MatchesListRedesign({ matches = [], pagination = {}, games = [], tourna
               viewMode={viewMode}
               t={t}
               onDelete={handleDelete}
+              isSelected={selection.isSelected(match.id)}
+              onToggleSelect={() => selection.toggle(match.id)}
+              selectionMode={selection.selectionMode}
             />
           ))}
         </div>
@@ -162,6 +196,25 @@ function MatchesListRedesign({ matches = [], pagination = {}, games = [], tourna
 
       {/* Pagination */}
       {numPages > 1 && <Pagination numPages={numPages} />}
+
+      {canDelete && (
+        <BulkActionBar
+          count={selection.count}
+          onSelectAll={() => selection.selectAll(pageItemIds)}
+          onDeselectAll={selection.deselectAll}
+          onDelete={() => setShowDeleteDialog(true)}
+          canDelete={canDelete}
+          isLoading={isBulkDeleting}
+        />
+      )}
+
+      <BulkDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        count={selection.count}
+        onConfirm={handleBulkDelete}
+        isLoading={isBulkDeleting}
+      />
     </div>
   );
 }

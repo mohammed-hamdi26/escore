@@ -7,9 +7,13 @@ import { Button } from "../ui/button";
 import { format } from "date-fns";
 import TournamentsFilter from "./TournamentsFilter";
 import { useState } from "react";
-import { deleteTournament, toggleTournamentFeatured } from "@/app/[locale]/_Lib/actions";
+import { deleteTournament, toggleTournamentFeatured, bulkDeleteTournaments } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import { useSelection } from "@/hooks/useSelection";
+import BulkActionBar from "../ui app/BulkActionBar";
+import BulkDeleteDialog from "../ui app/BulkDeleteDialog";
+import { Checkbox } from "../ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Pencil,
@@ -71,6 +75,31 @@ function TournamentsTable({ tournaments, pagination, games }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const pageItemIds = tournaments.map((t) => t.id);
+  const selection = useSelection(pagination?.page);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const ids = Array.from(selection.selectedIds);
+      const result = await bulkDeleteTournaments(ids);
+      if (result.success) {
+        toast.success(`${result.deletedCount} tournaments deleted`);
+        selection.deselectAll();
+        router.refresh();
+      } else {
+        toast.error(result.error || "Failed to delete tournaments");
+      }
+    } catch {
+      toast.error("Failed to delete tournaments");
+    } finally {
+      setIsBulkDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
 
   const numPages = pagination?.totalPages || 1;
   const currentSort = searchParams.get("sortBy") || "";
@@ -135,7 +164,14 @@ function TournamentsTable({ tournaments, pagination, games }) {
       <div className="glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5">
         {/* Table Header */}
         <div className="bg-muted/50 dark:bg-[#1a1d2e] border-b border-border">
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4">
+          <div className="grid grid-cols-[auto_2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4">
+            <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                checked={selection.isAllSelected(pageItemIds)}
+                onCheckedChange={() => selection.toggleAll(pageItemIds)}
+                className="size-5"
+              />
+            </div>
             <button
               onClick={() => handleSort("name")}
               className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-start"
@@ -193,8 +229,17 @@ function TournamentsTable({ tournaments, pagination, games }) {
               <div
                 key={tournament.id}
                 onClick={() => router.push(`/dashboard/tournaments-management/view/${tournament.id}`)}
-                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors cursor-pointer"
+                className="grid grid-cols-[auto_2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors cursor-pointer"
               >
+                {/* Checkbox */}
+                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={selection.isSelected(tournament.id)}
+                    onCheckedChange={() => selection.toggle(tournament.id)}
+                    className="size-5"
+                  />
+                </div>
+
                 {/* Tournament Name & Logo */}
                 <div className="flex items-center gap-3 min-w-0">
                   {tournament?.logo?.light ? (
@@ -318,6 +363,22 @@ function TournamentsTable({ tournaments, pagination, games }) {
 
       {/* Pagination */}
       {numPages > 1 && <Pagination numPages={numPages} />}
+
+      <BulkActionBar
+        count={selection.count}
+        onSelectAll={() => selection.selectAll(pageItemIds)}
+        onDeselectAll={selection.deselectAll}
+        onDelete={() => setShowDeleteDialog(true)}
+        isLoading={isBulkDeleting}
+      />
+
+      <BulkDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        count={selection.count}
+        onConfirm={handleBulkDelete}
+        isLoading={isBulkDeleting}
+      />
     </div>
   );
 }

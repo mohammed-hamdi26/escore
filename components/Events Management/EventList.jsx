@@ -19,8 +19,12 @@ import { Link } from "@/i18n/navigation";
 import EventCard from "./EventCard";
 import EventsFilter from "./EventsFilter";
 import Pagination from "../ui app/Pagination";
-import { deleteEvent } from "@/app/[locale]/_Lib/actions";
+import { deleteEvent, bulkDeleteEvents } from "@/app/[locale]/_Lib/actions";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
+import { useSelection } from "@/hooks/useSelection";
+import BulkActionBar from "../ui app/BulkActionBar";
+import BulkDeleteDialog from "../ui app/BulkDeleteDialog";
+import toast from "react-hot-toast";
 
 function EventList({ events, pagination }) {
   const t = useTranslations("eventList");
@@ -31,6 +35,32 @@ function EventList({ events, pagination }) {
   const [viewMode, setViewMode] = useState("grid");
   const { hasPermission } = usePermissions();
   const canCreate = hasPermission(ENTITIES.EVENT, ACTIONS.CREATE);
+  const canDelete = hasPermission(ENTITIES.EVENT, ACTIONS.DELETE);
+
+  const pageItemIds = events.map((e) => e.id);
+  const selection = useSelection(pagination?.page);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const ids = Array.from(selection.selectedIds);
+      const result = await bulkDeleteEvents(ids);
+      if (result.success) {
+        toast.success(`${result.deletedCount} events deleted`);
+        selection.deselectAll();
+        handleRefresh();
+      } else {
+        toast.error(result.error || "Failed to delete events");
+      }
+    } catch {
+      toast.error("Failed to delete events");
+    } finally {
+      setIsBulkDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
 
   const currentSort = searchParams.get("sortBy") || "";
   const currentOrder = searchParams.get("sortOrder") || "asc";
@@ -167,6 +197,9 @@ function EventList({ events, pagination }) {
               viewMode={viewMode}
               onDelete={handleDelete}
               t={t}
+              isSelected={selection.isSelected(event.id)}
+              onToggleSelect={() => selection.toggle(event.id)}
+              selectionMode={selection.selectionMode}
             />
           ))}
         </div>
@@ -195,6 +228,25 @@ function EventList({ events, pagination }) {
 
       {/* Pagination */}
       {pagination.totalPages > 1 && <Pagination pagination={pagination} />}
+
+      {canDelete && (
+        <BulkActionBar
+          count={selection.count}
+          onSelectAll={() => selection.selectAll(pageItemIds)}
+          onDeselectAll={selection.deselectAll}
+          onDelete={() => setShowDeleteDialog(true)}
+          canDelete={canDelete}
+          isLoading={isBulkDeleting}
+        />
+      )}
+
+      <BulkDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        count={selection.count}
+        onConfirm={handleBulkDelete}
+        isLoading={isBulkDeleting}
+      />
     </div>
   );
 }

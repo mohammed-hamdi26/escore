@@ -34,8 +34,9 @@ import toast from "react-hot-toast";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 import { getImgUrl } from "@/lib/utils";
 import Image from "next/image";
+import SelectableCheckbox from "../ui app/SelectableCheckbox";
 
-function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
+function TeamCard({ team, onDelete, t, viewMode = "grid", isSelected, onToggleSelect, selectionMode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null);
   const router = useRouter();
@@ -95,6 +96,13 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
         onClick={handleCardClick}
         className="group relative glass rounded-2xl overflow-hidden border border-white/5 hover:border-green-primary/40 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-green-primary/5"
       >
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="top-3 left-3 rtl:left-auto rtl:right-3 z-20"
+        />
+
         {/* Logo Area */}
         <div className="relative aspect-[4/3] bg-gradient-to-b from-[#1a1d2e] to-[#12141c] flex items-center justify-center p-4">
           {teamLogo ? (
@@ -305,9 +313,17 @@ function TeamCard({ team, onDelete, t, viewMode = "grid" }) {
   return (
     <div
       onClick={handleCardClick}
-      className="group glass rounded-xl overflow-hidden border border-white/5 hover:border-green-primary/40 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-green-primary/5"
+      className="group relative glass rounded-xl overflow-hidden border border-white/5 hover:border-green-primary/40 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-green-primary/5"
     >
       <div className="flex items-center gap-4 p-4">
+        {/* Selection Checkbox */}
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="relative top-auto left-auto opacity-100 flex-shrink-0"
+        />
+
         {/* Team Logo */}
         <div className="relative size-16 rounded-xl overflow-hidden bg-gradient-to-br from-[#1a1d2e] to-[#12141c] flex-shrink-0 ring-1 ring-white/10">
           {teamLogo ? (

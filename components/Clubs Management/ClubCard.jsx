@@ -34,8 +34,9 @@ import {
   ACTIONS,
 } from "@/contexts/PermissionsContext";
 import Image from "next/image";
+import SelectableCheckbox from "../ui app/SelectableCheckbox";
 
-function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
+function ClubCard({ club, onDelete, t, viewMode = "grid", isSelected, onToggleSelect, selectionMode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null);
   const router = useRouter();
@@ -86,6 +87,13 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
         onClick={handleCardClick}
         className="group relative rounded-2xl overflow-hidden bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-green-primary/5"
       >
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="top-3 left-3 rtl:left-auto rtl:right-3 z-20"
+        />
+
         {/* Logo Area */}
         <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-50 dark:from-[#1a1d2e] dark:to-[#12141c] flex items-center justify-center p-4">
           {clubLogo ? (
@@ -249,8 +257,15 @@ function ClubCard({ club, onDelete, t, viewMode = "grid" }) {
   return (
     <div
       onClick={handleCardClick}
-      className="group rounded-xl p-4 bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-200 cursor-pointer flex items-center gap-4"
+      className="group relative rounded-xl p-4 bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-200 cursor-pointer flex items-center gap-4"
     >
+      <SelectableCheckbox
+        checked={isSelected}
+        onCheckedChange={onToggleSelect}
+        selectionMode={selectionMode}
+        className="relative top-auto left-auto opacity-100 flex-shrink-0"
+      />
+
       {/* Logo */}
       <div className="relative size-12 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden shrink-0">
         {clubLogo ? (

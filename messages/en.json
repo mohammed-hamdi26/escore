@@ -4142,5 +4142,18 @@
     "words": "words",
     "edit": "Edit",
     "preview": "Preview"
+  },
+  "bulk": {
+    "itemsSelected": "{count} items selected",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "deleteSelected": "Delete Selected",
+    "confirmTitle": "Delete {count} items?",
+    "confirmDescription": "This action cannot be undone. The selected items will be permanently deleted.",
+    "confirmDelete": "Delete",
+    "cancel": "Cancel",
+    "deleteSuccess": "{count} items deleted successfully",
+    "deleteError": "Failed to delete some items",
+    "deletePartial": "{deleted} of {total} items deleted"
   }
 }

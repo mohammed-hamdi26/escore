@@ -18,6 +18,11 @@ import { Button } from "../ui/button";
 import TransferCard from "./TransferCard";
 import TransfersFilter from "./TransfersFilter";
 import Pagination from "../ui app/Pagination";
+import { bulkDeleteTransfers } from "@/app/[locale]/_Lib/actions";
+import { useSelection } from "@/hooks/useSelection";
+import BulkActionBar from "../ui app/BulkActionBar";
+import BulkDeleteDialog from "../ui app/BulkDeleteDialog";
+import toast from "react-hot-toast";
 
 export default function TransfersTable({ transfers, pagination, games = [], players = [], teams = [] }) {
   const t = useTranslations("TransfersManagement");
@@ -26,6 +31,31 @@ export default function TransfersTable({ transfers, pagination, games = [], play
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [viewMode, setViewMode] = useState("grid");
+
+  const pageItemIds = transfers.map((t) => t.id);
+  const selection = useSelection(pagination?.page);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const ids = Array.from(selection.selectedIds);
+      const result = await bulkDeleteTransfers(ids);
+      if (result.success) {
+        toast.success(`${result.deletedCount} transfers deleted`);
+        selection.deselectAll();
+        router.refresh();
+      } else {
+        toast.error(result.error || "Failed to delete transfers");
+      }
+    } catch {
+      toast.error("Failed to delete transfers");
+    } finally {
+      setIsBulkDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
 
   const currentSort = searchParams.get("sortBy") || "";
   const currentOrder = searchParams.get("sortOrder") || "desc";
@@ -185,6 +215,9 @@ export default function TransfersTable({ transfers, pagination, games = [], play
               t={t}
               viewMode={viewMode}
               onRefresh={handleRefresh}
+              isSelected={selection.isSelected(transfer.id)}
+              onToggleSelect={() => selection.toggle(transfer.id)}
+              selectionMode={selection.selectionMode}
             />
           ))}
         </div>
@@ -196,6 +229,22 @@ export default function TransfersTable({ transfers, pagination, games = [], play
           <Pagination numPages={numPages} />
         </div>
       )}
+
+      <BulkActionBar
+        count={selection.count}
+        onSelectAll={() => selection.selectAll(pageItemIds)}
+        onDeselectAll={selection.deselectAll}
+        onDelete={() => setShowDeleteDialog(true)}
+        isLoading={isBulkDeleting}
+      />
+
+      <BulkDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        count={selection.count}
+        onConfirm={handleBulkDelete}
+        isLoading={isBulkDeleting}
+      />
     </div>
   );
 }

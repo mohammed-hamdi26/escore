@@ -16,12 +16,16 @@ import { Button } from "../ui/button";
 import ClubCard from "./ClubCard";
 import ClubsFilter from "./ClubsFilter";
 import Pagination from "../ui app/Pagination";
-import { deleteClub } from "@/app/[locale]/_Lib/actions";
+import { deleteClub, bulkDeleteClubs } from "@/app/[locale]/_Lib/actions";
 import {
   usePermissions,
   ENTITIES,
   ACTIONS,
 } from "@/contexts/PermissionsContext";
+import { useSelection } from "@/hooks/useSelection";
+import BulkActionBar from "../ui app/BulkActionBar";
+import BulkDeleteDialog from "../ui app/BulkDeleteDialog";
+import toast from "react-hot-toast";
 
 function ClubList({ clubs, pagination }) {
   const t = useTranslations("clubList");
@@ -32,6 +36,32 @@ function ClubList({ clubs, pagination }) {
   const [viewMode, setViewMode] = useState("grid");
   const { hasPermission } = usePermissions();
   const canCreate = hasPermission(ENTITIES.CLUB, ACTIONS.CREATE);
+  const canDelete = hasPermission(ENTITIES.CLUB, ACTIONS.DELETE);
+
+  const pageItemIds = clubs.map((c) => c.id);
+  const selection = useSelection(pagination?.page);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const ids = Array.from(selection.selectedIds);
+      const result = await bulkDeleteClubs(ids);
+      if (result.success) {
+        toast.success(`${result.deletedCount} clubs deleted`);
+        selection.deselectAll();
+        handleRefresh();
+      } else {
+        toast.error(result.error || "Failed to delete clubs");
+      }
+    } catch {
+      toast.error("Failed to delete clubs");
+    } finally {
+      setIsBulkDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
 
   const currentSort = searchParams.get("sortBy") || "";
   const currentOrder = searchParams.get("sortOrder") || "asc";
@@ -207,6 +237,9 @@ function ClubList({ clubs, pagination }) {
               onDelete={handleDelete}
               t={t}
               viewMode={viewMode}
+              isSelected={selection.isSelected(club.id)}
+              onToggleSelect={() => selection.toggle(club.id)}
+              selectionMode={selection.selectionMode}
             />
           ))}
         </div>
@@ -218,6 +251,25 @@ function ClubList({ clubs, pagination }) {
           <Pagination numPages={pagination.totalPages} />
         </div>
       )}
+
+      {canDelete && (
+        <BulkActionBar
+          count={selection.count}
+          onSelectAll={() => selection.selectAll(pageItemIds)}
+          onDeselectAll={selection.deselectAll}
+          onDelete={() => setShowDeleteDialog(true)}
+          canDelete={canDelete}
+          isLoading={isBulkDeleting}
+        />
+      )}
+
+      <BulkDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        count={selection.count}
+        onConfirm={handleBulkDelete}
+        isLoading={isBulkDeleting}
+      />
     </div>
   );
 }

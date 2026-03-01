@@ -3979,5 +3979,18 @@
     "words": "كلمة",
     "edit": "تحرير",
     "preview": "معاينة"
+  },
+  "bulk": {
+    "itemsSelected": "{count} عنصر محدد",
+    "selectAll": "تحديد الكل",
+    "deselectAll": "إلغاء التحديد",
+    "deleteSelected": "حذف المحدد",
+    "confirmTitle": "حذف {count} عنصر؟",
+    "confirmDescription": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف العناصر المحددة نهائياً.",
+    "confirmDelete": "حذف",
+    "cancel": "إلغاء",
+    "deleteSuccess": "تم حذف {count} عنصر بنجاح",
+    "deleteError": "فشل حذف بعض العناصر",
+    "deletePartial": "تم حذف {deleted} من {total} عنصر"
   }
 }

@@ -25,6 +25,7 @@ import {
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 import { getImgUrl } from "@/lib/utils";
 import Image from "next/image";
+import SelectableCheckbox from "../ui app/SelectableCheckbox";
 
 const STATUS_COLORS = {
   upcoming: "bg-blue-500/10 text-blue-500 border-blue-500/20",
@@ -49,7 +50,7 @@ function formatCurrency(amount, currency = "USD") {
   return `$${amount}`;
 }
 
-function EventCard({ event, viewMode = "grid", onDelete, t }) {
+function EventCard({ event, viewMode = "grid", onDelete, t, isSelected, onToggleSelect, selectionMode }) {
   const { hasPermission } = usePermissions();
   const canEdit = hasPermission(ENTITIES.EVENT, ACTIONS.UPDATE);
   const canDelete = hasPermission(ENTITIES.EVENT, ACTIONS.DELETE);
@@ -61,7 +62,13 @@ function EventCard({ event, viewMode = "grid", onDelete, t }) {
 
   if (viewMode === "list") {
     return (
-      <div className="group flex items-center gap-4 p-3 rounded-xl bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-200">
+      <div className="group relative flex items-center gap-4 p-3 rounded-xl bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-200">
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="relative top-auto left-auto opacity-100 flex-shrink-0"
+        />
         <div className="relative shrink-0 size-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
           {eventLogo ? (
             <Image
@@ -169,6 +176,12 @@ function EventCard({ event, viewMode = "grid", onDelete, t }) {
   // Grid view
   return (
     <div className="group relative rounded-2xl overflow-hidden bg-white dark:bg-[#1a1d2e] border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-green-primary/5">
+      <SelectableCheckbox
+        checked={isSelected}
+        onCheckedChange={onToggleSelect}
+        selectionMode={selectionMode}
+        className="top-3 left-3 rtl:left-auto rtl:right-3 z-20"
+      />
       {/* Header with logo */}
       <div className="relative h-32 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-white/5 dark:to-white/[0.02] flex items-center justify-center">
         {eventLogo ? (

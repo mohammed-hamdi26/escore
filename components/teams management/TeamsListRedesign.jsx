@@ -16,8 +16,12 @@ import { Button } from "../ui/button";
 import TeamCard from "./TeamCard";
 import TeamsFilterRedesign from "./TeamsFilterRedesign";
 import Pagination from "../ui app/Pagination";
-import { deleteTeam } from "@/app/[locale]/_Lib/actions";
+import { deleteTeam, bulkDeleteTeams } from "@/app/[locale]/_Lib/actions";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
+import { useSelection } from "@/hooks/useSelection";
+import BulkActionBar from "../ui app/BulkActionBar";
+import BulkDeleteDialog from "../ui app/BulkDeleteDialog";
+import toast from "react-hot-toast";
 
 function TeamsListRedesign({ teams, pagination, games = [], countries = [] }) {
   const t = useTranslations("teamList");
@@ -28,6 +32,32 @@ function TeamsListRedesign({ teams, pagination, games = [], countries = [] }) {
   const [viewMode, setViewMode] = useState("grid"); // grid or list
   const { hasPermission } = usePermissions();
   const canCreate = hasPermission(ENTITIES.TEAM, ACTIONS.CREATE);
+  const canDelete = hasPermission(ENTITIES.TEAM, ACTIONS.DELETE);
+
+  const pageItemIds = teams.map((t) => t.id);
+  const selection = useSelection(pagination?.page);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const ids = Array.from(selection.selectedIds);
+      const result = await bulkDeleteTeams(ids);
+      if (result.success) {
+        toast.success(`${result.deletedCount} teams deleted`);
+        selection.deselectAll();
+        handleRefresh();
+      } else {
+        toast.error(result.error || "Failed to delete teams");
+      }
+    } catch {
+      toast.error("Failed to delete teams");
+    } finally {
+      setIsBulkDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
 
   const currentSort = searchParams.get("sortBy") || "";
   const currentOrder = searchParams.get("sortOrder") || "asc";
@@ -208,6 +238,9 @@ function TeamsListRedesign({ teams, pagination, games = [], countries = [] }) {
               onDelete={handleDelete}
               t={t}
               viewMode={viewMode}
+              isSelected={selection.isSelected(team.id)}
+              onToggleSelect={() => selection.toggle(team.id)}
+              selectionMode={selection.selectionMode}
             />
           ))}
         </div>
@@ -219,6 +252,25 @@ function TeamsListRedesign({ teams, pagination, games = [], countries = [] }) {
           <Pagination numPages={pagination.totalPages} />
         </div>
       )}
+
+      {canDelete && (
+        <BulkActionBar
+          count={selection.count}
+          onSelectAll={() => selection.selectAll(pageItemIds)}
+          onDeselectAll={selection.deselectAll}
+          onDelete={() => setShowDeleteDialog(true)}
+          canDelete={canDelete}
+          isLoading={isBulkDeleting}
+        />
+      )}
+
+      <BulkDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        count={selection.count}
+        onConfirm={handleBulkDelete}
+        isLoading={isBulkDeleting}
+      />
     </div>
   );
 }

@@ -29,8 +29,9 @@ import {
 import { deleteTransfer } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import SelectableCheckbox from "../ui app/SelectableCheckbox";
 
-function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
+function TransferCard({ transfer, t, viewMode = "grid", onRefresh, isSelected, onToggleSelect, selectionMode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null);
   const router = useRouter();
@@ -88,8 +89,14 @@ function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
     return (
       <div
         onClick={handleCardClick}
-        className="group glass rounded-2xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer shadow-sm hover:shadow-md"
+        className="group relative glass rounded-2xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer shadow-sm hover:shadow-md"
       >
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="top-3 left-3 rtl:left-auto rtl:right-3 z-20"
+        />
         {/* Header with Teams Transfer Visual */}
         <div className="relative bg-gradient-to-br from-gray-100 to-gray-50 dark:from-[#1a1d2e] dark:to-[#12141c] p-6">
           <div className="flex items-center justify-between gap-4">
@@ -265,9 +272,15 @@ function TransferCard({ transfer, t, viewMode = "grid", onRefresh }) {
   return (
     <div
       onClick={handleCardClick}
-      className="group glass rounded-xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer shadow-sm hover:shadow-md"
+      className="group relative glass rounded-xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer shadow-sm hover:shadow-md"
     >
       <div className="flex items-center gap-4 p-4">
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="relative top-auto left-auto opacity-100 flex-shrink-0"
+        />
         {/* Player Photo */}
         <div className="relative size-14 sm:size-16 rounded-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 dark:from-[#1a1d2e] dark:to-[#12141c] flex-shrink-0 border border-gray-200 dark:border-transparent">
           {playerPhoto ? (

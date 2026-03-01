@@ -7,10 +7,14 @@ import { Button } from "../ui/button";
 import { format } from "date-fns";
 import NewsFilter from "./NewsFilter";
 import { useState } from "react";
-import { deleteNew } from "@/app/[locale]/_Lib/actions";
+import { deleteNew, bulkDeleteNews } from "@/app/[locale]/_Lib/actions";
 import { toggleNewsFeatured, publishNews, unpublishNews } from "@/app/[locale]/_Lib/newsApi";
 import toast from "react-hot-toast";
 import { useTranslations } from "next-intl";
+import { useSelection } from "@/hooks/useSelection";
+import BulkActionBar from "../ui app/BulkActionBar";
+import BulkDeleteDialog from "../ui app/BulkDeleteDialog";
+import { Checkbox } from "../ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Pencil,
@@ -41,6 +45,31 @@ const STATUS_COLORS = {
 
 function NewsTable({ news, pagination, games }) {
   const [loadingId, setLoadingId] = useState(null);
+  const pageItemIds = news.map((n) => n.id);
+  const selection = useSelection(pagination?.page);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const ids = Array.from(selection.selectedIds);
+      const result = await bulkDeleteNews(ids);
+      if (result.success) {
+        toast.success(`${result.deletedCount} news deleted`);
+        selection.deselectAll();
+        router.refresh();
+      } else {
+        toast.error(result.error || "Failed to delete news");
+      }
+    } catch {
+      toast.error("Failed to delete news");
+    } finally {
+      setIsBulkDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
+
   const t = useTranslations("NewsTable");
   const pathname = usePathname();
   const router = useRouter();
@@ -109,7 +138,14 @@ function NewsTable({ news, pagination, games }) {
       <div className="glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5">
         {/* Table Header */}
         <div className="bg-muted/50 dark:bg-[#1a1d2e] border-b border-border">
-          <div className="grid grid-cols-[2fr_1fr_1fr_0.7fr_0.7fr_0.7fr_auto] gap-4 px-6 py-4">
+          <div className="grid grid-cols-[auto_2fr_1fr_1fr_0.7fr_0.7fr_0.7fr_auto] gap-4 px-6 py-4">
+            <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                checked={selection.isAllSelected(pageItemIds)}
+                onCheckedChange={() => selection.toggleAll(pageItemIds)}
+                className="size-5"
+              />
+            </div>
             <button
               onClick={() => handleSort("title")}
               className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-start"
@@ -159,8 +195,17 @@ function NewsTable({ news, pagination, games }) {
               <div
                 key={article.id}
                 onClick={() => router.push(`/dashboard/news/view/${article.id}`)}
-                className="grid grid-cols-[2fr_1fr_1fr_0.7fr_0.7fr_0.7fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors cursor-pointer"
+                className="grid grid-cols-[auto_2fr_1fr_1fr_0.7fr_0.7fr_0.7fr_auto] gap-4 px-6 py-4 items-center hover:bg-muted/30 dark:hover:bg-[#252a3d] transition-colors cursor-pointer"
               >
+                {/* Checkbox */}
+                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={selection.isSelected(article.id)}
+                    onCheckedChange={() => selection.toggle(article.id)}
+                    className="size-5"
+                  />
+                </div>
+
                 {/* Title & Cover Image */}
                 <div className="flex items-center gap-3 min-w-0">
                   {article?.coverImage?.light ? (
@@ -270,6 +315,22 @@ function NewsTable({ news, pagination, games }) {
 
       {/* Pagination */}
       {numPages > 1 && <Pagination numPages={numPages} />}
+
+      <BulkActionBar
+        count={selection.count}
+        onSelectAll={() => selection.selectAll(pageItemIds)}
+        onDeselectAll={selection.deselectAll}
+        onDelete={() => setShowDeleteDialog(true)}
+        isLoading={isBulkDeleting}
+      />
+
+      <BulkDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        count={selection.count}
+        onConfirm={handleBulkDelete}
+        isLoading={isBulkDeleting}
+      />
     </div>
   );
 }

@@ -31,8 +31,9 @@ import toast from "react-hot-toast";
 import { usePermissions, ENTITIES, ACTIONS } from "@/contexts/PermissionsContext";
 import { getImgUrl } from "@/lib/utils";
 import Image from "next/image";
+import SelectableCheckbox from "../ui app/SelectableCheckbox";
 
-function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
+function PlayerCard({ player, onDelete, t, viewMode = "grid", isSelected, onToggleSelect, selectionMode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null);
   const router = useRouter();
@@ -103,8 +104,15 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
     return (
       <div
         onClick={handleCardClick}
-        className="group glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer"
+        className="group relative glass rounded-2xl overflow-hidden border border-transparent dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer"
       >
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="top-3 left-3 rtl:left-auto rtl:right-3 z-20"
+        />
+
         {/* Player Image */}
         <div className="relative aspect-[4/3] bg-gradient-to-br from-[#1a1d2e] to-[#12141c]">
           {playerImage ? (
@@ -299,9 +307,16 @@ function PlayerCard({ player, onDelete, t, viewMode = "grid" }) {
   return (
     <div
       onClick={handleCardClick}
-      className="group glass rounded-xl overflow-hidden border border-transparent dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer"
+      className="group relative glass rounded-xl overflow-hidden border border-transparent dark:border-white/5 hover:border-green-primary/30 transition-all cursor-pointer"
     >
       <div className="flex items-center gap-4 p-4">
+        <SelectableCheckbox
+          checked={isSelected}
+          onCheckedChange={onToggleSelect}
+          selectionMode={selectionMode}
+          className="relative top-auto left-auto opacity-100 flex-shrink-0"
+        />
+
         {/* Player Image */}
         <div className="relative size-16 rounded-xl overflow-hidden bg-gradient-to-br from-[#1a1d2e] to-[#12141c] flex-shrink-0">
           {playerImage ? (
