@@ -913,8 +913,14 @@ function GameSelectField({
     const clubGameIds = new Set(clubTeams.map((t) => t.game?.id || t.game?._id).filter(Boolean));
     const allKnownGames = [...initialGames, ...games];
 
-    // Get full game objects from known games, falling back to club team game objects
-    const gamesFromKnown = allKnownGames.filter((g) => clubGameIds.has(getGameId(g)));
+    // Get full game objects from known games, falling back to club team game objects (deduplicated)
+    const seenGameIds = new Set();
+    const gamesFromKnown = allKnownGames.filter((g) => {
+      const gid = getGameId(g);
+      if (!clubGameIds.has(gid) || seenGameIds.has(gid)) return false;
+      seenGameIds.add(gid);
+      return true;
+    });
     const knownIds = new Set(gamesFromKnown.map((g) => getGameId(g)));
     const gamesFromClub = clubTeams
       .filter((ct) => {
