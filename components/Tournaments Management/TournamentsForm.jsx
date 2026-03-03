@@ -247,17 +247,21 @@ export default function TournamentsForm({
           : null;
 
         // Convert dates to ISO datetime format for backend (preserving local date)
-        if (dataValues.startDate) {
-          const [year, month, day] = dataValues.startDate.split('-').map(Number);
-          // Create date at noon local time to avoid timezone edge cases
+        const toISODate = (dateStr) => {
+          if (!dateStr || typeof dateStr !== "string") return undefined;
+          // If already ISO format, return as-is
+          if (dateStr.includes("T")) return dateStr;
+          const [year, month, day] = dateStr.split("-").map(Number);
+          if (!year || !month || !day) return undefined;
           const date = new Date(year, month - 1, day, 12, 0, 0);
-          dataValues.startDate = date.toISOString();
+          if (isNaN(date.getTime())) return undefined;
+          return date.toISOString();
+        };
+        if (dataValues.startDate) {
+          dataValues.startDate = toISODate(dataValues.startDate);
         }
         if (dataValues.endDate) {
-          const [year, month, day] = dataValues.endDate.split('-').map(Number);
-          // Create date at noon local time to avoid timezone edge cases
-          const date = new Date(year, month - 1, day, 12, 0, 0);
-          dataValues.endDate = date.toISOString();
+          dataValues.endDate = toISODate(dataValues.endDate);
         }
 
         dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value || g._id || g);
