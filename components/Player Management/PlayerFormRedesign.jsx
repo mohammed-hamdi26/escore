@@ -2,13 +2,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { mappedArrayToSelectOptions } from "@/app/[locale]/_Lib/helps";
 import { getImgUrl } from "@/lib/utils";
-import { searchTeams, searchGames, searchTournaments } from "@/app/[locale]/_Lib/actions";
+import { searchClubs, fetchClubDetail, searchGames, searchTournaments } from "@/app/[locale]/_Lib/actions";
 import { useFormik } from "formik";
 import {
   User,
   Calendar,
   Image as ImageIcon,
   Users,
+  Building2,
   ArrowLeft,
   Save,
   Plus,
@@ -48,6 +49,7 @@ import Image from "next/image";
 const validationSchema = yup.object({
   fullName: yup.string().required("fullNameRequired").max(100, "fullNameTooLong"),
   nickname: yup.string().max(50, "nicknameTooLong"),
+  club: yup.string().nullable(),
   gameRosters: yup.array().of(
     yup.object({
       game: yup.string().required("gameRequired"),
@@ -70,22 +72,27 @@ function PlayerFormRedesign({
   submit,
   player,
   countries = [],
-  OptionsData: { teamsOptions = [], gamesOptions = [], tournamentsOptions = [] } = {},
+  OptionsData: { clubsOptions = [], gamesOptions = [], tournamentsOptions = [] } = {},
 }) {
   const t = useTranslations("playerForm");
   const router = useRouter();
 
-  // Track the selected team object (for filtering games by team)
-  const [selectedTeamObject, setSelectedTeamObject] = useState(() => {
+  // Derive initial club ID from player's team.club (populated ObjectId from backend)
+  const initialClubId = (() => {
     const rosters = player?.gameRosters?.length > 0
       ? player.gameRosters
       : (player?.game ? [{ game: player.game, team: player.team }] : []);
     if (rosters[0]?.team) {
-      const teamId = rosters[0].team?.id || rosters[0].team?._id || rosters[0].team;
-      return teamsOptions.find(t => (t.id || t._id) === teamId) || null;
+      // team.club is a raw ObjectId string from the backend populate
+      return rosters[0].team?.club?.id || rosters[0].team?.club?._id || rosters[0].team?.club || "";
     }
-    return null;
-  });
+    return "";
+  })();
+
+  // Club-related state
+  const [selectedClubObject, setSelectedClubObject] = useState(null);
+  const [clubTeams, setClubTeams] = useState([]);
+  const [isLoadingClubTeams, setIsLoadingClubTeams] = useState(false);
 
   // Helper function to format date to YYYY-MM-DD using local timezone
   const formatDateToLocal = (dateInput) => {
@@ -109,6 +116,7 @@ function PlayerFormRedesign({
       photoLight: getImgUrl(player?.photo?.light) || "",
       photoDark: getImgUrl(player?.photo?.dark) || "",
       tournaments: player?.tournaments?.map(t => t.id || t._id) || [],
+      club: initialClubId,
       gameRosters: player?.gameRosters?.length > 0
         ? player.gameRosters.map(r => ({
             game: r.game?.id || r.game?._id || r.game || "",
@@ -198,6 +206,63 @@ function PlayerFormRedesign({
     },
   });
 
+  // When club changes, fetch its full detail to get teams array
+  useEffect(() => {
+    const clubId = formik.values.club;
+    if (!clubId) {
+      setClubTeams([]);
+      setSelectedClubObject(null);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoadingClubTeams(true);
+
+    fetchClubDetail(clubId).then((clubDetail) => {
+      if (cancelled) return;
+      setIsLoadingClubTeams(false);
+      if (clubDetail) {
+        setSelectedClubObject(clubDetail);
+        setClubTeams(clubDetail.teams?.filter((t) => t.isActive !== false) || []);
+      }
+    });
+
+    return () => { cancelled = true; };
+  }, [formik.values.club]);
+
+  // Auto-resolve team when club and game are both selected
+  useEffect(() => {
+    const gameId = formik.values.gameRosters[0]?.game;
+    const clubId = formik.values.club;
+
+    if (!clubId || !gameId || clubTeams.length === 0) return;
+
+    const matchingEntry = clubTeams.find(
+      (t) => (t.game?.id || t.game?._id) === gameId
+    );
+
+    if (matchingEntry) {
+      const teamId = matchingEntry.team?.id || matchingEntry.team?._id;
+      if (formik.values.gameRosters[0]?.team !== teamId) {
+        formik.setFieldValue("gameRosters[0].team", teamId);
+      }
+    } else if (formik.values.gameRosters[0]?.team) {
+      formik.setFieldValue("gameRosters[0].team", "");
+    }
+  }, [formik.values.gameRosters[0]?.game, clubTeams]);
+
+  // On mount (edit mode): fetch club detail if player has a club
+  useEffect(() => {
+    if (formType === "edit" && initialClubId) {
+      fetchClubDetail(initialClubId).then((clubDetail) => {
+        if (clubDetail) {
+          setSelectedClubObject(clubDetail);
+          setClubTeams(clubDetail.teams?.filter((t) => t.isActive !== false) || []);
+        }
+      });
+    }
+  }, []);
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       {/* Basic Information */}
@@ -234,9 +299,9 @@ function PlayerFormRedesign({
         </FormRow>
       </FormSection>
 
-      {/* Game Rosters */}
+      {/* Club & Game */}
       <FormSection
-        title={t("teamAndGame")}
+        title={t("clubAndGame") || "Club & Game"}
         icon={<Gamepad2 className="size-5" />}
         badge={
           <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
@@ -246,26 +311,27 @@ function PlayerFormRedesign({
       >
         <div className="space-y-4">
           <FormRow cols={3}>
-            <TeamSelectField
-              label={t("team")}
-              name="gameRosters[0].team"
-              initialTeams={teamsOptions}
+            <ClubSelectField
+              label={t("club") || "Club"}
+              name="club"
+              initialClubs={clubsOptions}
               formik={formik}
-              placeholder={t("teamPlaceholder")}
-              searchPlaceholder={t("searchTeams") || "Search teams..."}
-              value={formik.values.gameRosters[0]?.team}
-              onChange={async (teamId, teamObj) => {
-                await formik.setFieldValue("gameRosters[0].team", teamId);
-                // Clear game when team changes (game options depend on team)
+              placeholder={t("clubPlaceholder") || "Select club (optional)"}
+              searchPlaceholder={t("searchClubs") || "Search clubs..."}
+              value={formik.values.club}
+              onChange={async (clubId) => {
+                await formik.setFieldValue("club", clubId);
+                // Clear game and team when club changes
                 await formik.setFieldValue("gameRosters[0].game", "");
-                setSelectedTeamObject(teamObj || null);
+                await formik.setFieldValue("gameRosters[0].team", "");
               }}
             />
             <GameSelectField
               label={t("mainGame")}
               name="gameRosters[0].game"
               initialGames={gamesOptions}
-              selectedTeam={selectedTeamObject}
+              selectedClub={selectedClubObject}
+              clubTeams={clubTeams}
               formik={formik}
               placeholder={t("mainGamePlaceholder")}
               searchPlaceholder={t("searchGames") || "Search games..."}
@@ -287,6 +353,25 @@ function PlayerFormRedesign({
               }}
             />
           </FormRow>
+
+          {/* Show auto-resolved team */}
+          {formik.values.gameRosters[0]?.team && clubTeams.length > 0 && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 dark:bg-[#1a1d2e] px-3 py-2 rounded-lg">
+              <Check className="size-3 text-green-500" />
+              <span>
+                {t("autoResolvedTeam") || "Auto-resolved team"}: {
+                  clubTeams.find((ct) => (ct.team?.id || ct.team?._id) === formik.values.gameRosters[0]?.team)?.team?.name || ""
+                }
+              </span>
+            </div>
+          )}
+
+          {isLoadingClubTeams && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="size-3 animate-spin" />
+              <span>{t("loading") || "Loading..."}</span>
+            </div>
+          )}
 
           {/* Validation error for the array */}
           {typeof formik.errors.gameRosters === 'string' && formik.touched.gameRosters && (
@@ -781,7 +866,8 @@ function GameSelectField({
   label,
   name,
   initialGames = [],
-  selectedTeam = null,
+  selectedClub = null,
+  clubTeams = [],
   formik,
   placeholder,
   searchPlaceholder,
@@ -817,42 +903,47 @@ function GameSelectField({
 
   const getGameId = (game) => game?.id || game?._id;
 
-  // If a team is selected, show only that team's game
-  const teamGame = selectedTeam?.game || null;
-  const hasTeamFilter = selectedTeam && teamGame;
+  // If a club is selected, show only games the club has teams for
+  const hasClubFilter = selectedClub && clubTeams.length > 0;
 
   // Determine the display list
   let displayGames;
-  if (hasTeamFilter) {
-    // Team has a single game - show only that game
-    if (teamGame?.name) {
-      // Full game object from team - use directly
-      displayGames = [teamGame];
-    } else {
-      // Just an ID - resolve from all known games
-      const teamGameId = teamGame?.id || teamGame?._id || teamGame;
-      const allKnownGames = [...initialGames, ...games];
-      const resolved = allKnownGames.find(g => getGameId(g) === teamGameId);
-      displayGames = resolved ? [resolved] : [];
-    }
+  if (hasClubFilter) {
+    // Extract unique game objects from the club's teams
+    const clubGameIds = new Set(clubTeams.map((t) => t.game?.id || t.game?._id).filter(Boolean));
+    const allKnownGames = [...initialGames, ...games];
+
+    // Get full game objects from known games, falling back to club team game objects
+    const gamesFromKnown = allKnownGames.filter((g) => clubGameIds.has(getGameId(g)));
+    const knownIds = new Set(gamesFromKnown.map((g) => getGameId(g)));
+    const gamesFromClub = clubTeams
+      .filter((ct) => {
+        const gid = ct.game?.id || ct.game?._id;
+        return gid && !knownIds.has(gid) && ct.game?.name;
+      })
+      .map((ct) => ct.game);
+
+    displayGames = [...gamesFromKnown, ...gamesFromClub];
   } else {
     displayGames = games;
   }
 
-  // Apply client search when team is selected
-  const filteredGames = displayGames?.filter(g => {
-    if (hasTeamFilter && search) {
+  // Apply client search when club is selected
+  const filteredGames = displayGames?.filter((g) => {
+    if (hasClubFilter && search) {
       return g.name?.toLowerCase().includes(search.toLowerCase()) ||
              g.slug?.toLowerCase().includes(search.toLowerCase());
     }
     return true;
   });
 
-  const selectedGame = [...initialGames, ...games, ...(teamGame?.name ? [teamGame] : [])].find((g) => getGameId(g) === value);
+  // Resolve selected game from all sources
+  const clubGameObjects = clubTeams.map((ct) => ct.game).filter((g) => g?.name);
+  const selectedGame = [...initialGames, ...games, ...clubGameObjects].find((g) => getGameId(g) === value);
 
-  // Fetch games from server (only when no team is selected)
+  // Fetch games from server (only when no club is selected)
   const fetchGames = useCallback(async (searchTerm, pageNum, reset = false) => {
-    if (selectedTeam) return; // Don't fetch from server when team is selected
+    if (selectedClub) return; // Don't fetch from server when club is selected
     setIsLoading(true);
     try {
       const { data, pagination } = await searchGames({ search: searchTerm, page: pageNum, limit: 15 });
@@ -872,36 +963,36 @@ function GameSelectField({
     } finally {
       setIsLoading(false);
     }
-  }, [selectedTeam]);
+  }, [selectedClub]);
 
-  // Load first page when popover opens (only if no team selected)
+  // Load first page when popover opens (only if no club selected)
   useEffect(() => {
-    if (isOpen && !selectedTeam) {
+    if (isOpen && !selectedClub) {
       fetchGames("", 1, true);
     }
     if (!isOpen) {
       setSearch("");
     }
-  }, [isOpen, selectedTeam]);
+  }, [isOpen, selectedClub]);
 
   // Debounced search
   useEffect(() => {
-    if (!isOpen || selectedTeam) return;
+    if (!isOpen || selectedClub) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       fetchGames(search, 1, true);
     }, 300);
     return () => clearTimeout(debounceRef.current);
-  }, [search, isOpen, selectedTeam]);
+  }, [search, isOpen, selectedClub]);
 
   // Infinite scroll
   const handleScroll = useCallback((e) => {
-    if (selectedTeam) return;
+    if (selectedClub) return;
     const { scrollTop, scrollHeight, clientHeight } = e.target;
     if (scrollHeight - scrollTop - clientHeight < 50 && hasMore && !isLoading) {
       fetchGames(search, page + 1);
     }
-  }, [hasMore, isLoading, page, search, selectedTeam, fetchGames]);
+  }, [hasMore, isLoading, page, search, selectedClub, fetchGames]);
 
   const handleSelect = async (game) => {
     if (externalOnChange) {
@@ -1059,11 +1150,11 @@ function GameSelectField({
   );
 }
 
-// Team Select Field (with pagination)
-function TeamSelectField({
+// Club Select Field (with pagination)
+function ClubSelectField({
   label,
   name,
-  initialTeams = [],
+  initialClubs = [],
   formik,
   placeholder,
   searchPlaceholder,
@@ -1072,7 +1163,7 @@ function TeamSelectField({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [teams, setTeams] = useState(initialTeams);
+  const [clubs, setClubs] = useState(initialClubs);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -1082,42 +1173,28 @@ function TeamSelectField({
   const value = externalValue !== undefined ? externalValue : formik.values[name];
   const t = useTranslations("playerForm");
 
-  const getNestedError = () => {
-    const error = formik.touched[name] && formik.errors[name];
-    if (error) return error;
-    const parts = name.replace(/\[(\d+)\]/g, '.$1').split('.');
-    let touchedVal = formik.touched;
-    let errorVal = formik.errors;
-    for (const part of parts) {
-      touchedVal = touchedVal?.[part];
-      errorVal = errorVal?.[part];
-    }
-    return touchedVal && errorVal ? errorVal : null;
-  };
-  const nestedError = getNestedError();
+  const getClubId = (club) => club?.id || club?._id;
 
-  const getTeamId = (team) => team?.id || team?._id;
+  const selectedClub = [...initialClubs, ...clubs].find((c) => getClubId(c) === value);
 
-  const selectedTeam = [...initialTeams, ...teams].find((t) => getTeamId(t) === value);
-
-  // Fetch teams from server
-  const fetchTeams = useCallback(async (searchTerm, pageNum, reset = false) => {
+  // Fetch clubs from server
+  const fetchClubs = useCallback(async (searchTerm, pageNum, reset = false) => {
     setIsLoading(true);
     try {
-      const { data, pagination } = await searchTeams({ search: searchTerm, page: pageNum, limit: 15 });
+      const { data, pagination } = await searchClubs({ search: searchTerm, page: pageNum, limit: 15 });
       if (reset) {
-        setTeams(data || []);
+        setClubs(data || []);
       } else {
-        setTeams(prev => {
-          const existingIds = new Set(prev.map(t => getTeamId(t)));
-          const newItems = (data || []).filter(t => !existingIds.has(getTeamId(t)));
+        setClubs((prev) => {
+          const existingIds = new Set(prev.map((c) => getClubId(c)));
+          const newItems = (data || []).filter((c) => !existingIds.has(getClubId(c)));
           return [...prev, ...newItems];
         });
       }
       setHasMore(pageNum < (pagination?.totalPages || 1));
       setPage(pageNum);
     } catch (e) {
-      console.error("Error fetching teams:", e);
+      console.error("Error fetching clubs:", e);
     } finally {
       setIsLoading(false);
     }
@@ -1126,7 +1203,7 @@ function TeamSelectField({
   // Load first page when popover opens
   useEffect(() => {
     if (isOpen) {
-      fetchTeams("", 1, true);
+      fetchClubs("", 1, true);
     }
     if (!isOpen) {
       setSearch("");
@@ -1138,7 +1215,7 @@ function TeamSelectField({
     if (!isOpen) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      fetchTeams(search, 1, true);
+      fetchClubs(search, 1, true);
     }, 300);
     return () => clearTimeout(debounceRef.current);
   }, [search, isOpen]);
@@ -1147,15 +1224,15 @@ function TeamSelectField({
   const handleScroll = useCallback((e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
     if (scrollHeight - scrollTop - clientHeight < 50 && hasMore && !isLoading) {
-      fetchTeams(search, page + 1);
+      fetchClubs(search, page + 1);
     }
-  }, [hasMore, isLoading, page, search, fetchTeams]);
+  }, [hasMore, isLoading, page, search, fetchClubs]);
 
-  const handleSelect = async (team) => {
+  const handleSelect = async (club) => {
     if (externalOnChange) {
-      externalOnChange(getTeamId(team), team);
+      externalOnChange(getClubId(club));
     } else {
-      await formik.setFieldValue(name, getTeamId(team));
+      await formik.setFieldValue(name, getClubId(club));
       await formik.setFieldTouched(name, true, true);
       formik.validateField(name);
     }
@@ -1166,7 +1243,7 @@ function TeamSelectField({
   const handleClear = async (e) => {
     e.stopPropagation();
     if (externalOnChange) {
-      externalOnChange("", null);
+      externalOnChange("");
     } else {
       await formik.setFieldValue(name, "");
       await formik.setFieldTouched(name, true, true);
@@ -1184,46 +1261,37 @@ function TeamSelectField({
           <div
             role="button"
             tabIndex={0}
-            className={`w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2 ${
-              nestedError ? "ring-2 ring-red-500 border-red-500" : ""
-            }`}
+            className="w-full h-12 px-4 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border border-transparent text-sm text-left rtl:text-right focus:outline-none focus:ring-2 focus:ring-green-primary/50 cursor-pointer transition-all hover:bg-muted dark:hover:bg-[#252a3d] flex items-center justify-between gap-2"
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              {selectedTeam ? (
+              {selectedClub ? (
                 <>
-                  <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-blue-500/10 flex items-center justify-center">
-                    {selectedTeam.logo?.light ? (
+                  <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-amber-500/10 flex items-center justify-center">
+                    {selectedClub.logo?.light ? (
                       <img
-                        src={getImgUrl(selectedTeam.logo.light, "thumbnail")}
-                        alt={selectedTeam.name}
+                        src={getImgUrl(selectedClub.logo.light, "thumbnail")}
+                        alt={selectedClub.name}
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <Users className="size-4 text-blue-500" />
+                      <Building2 className="size-4 text-amber-500" />
                     )}
                   </div>
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-foreground font-medium truncate">
-                      {selectedTeam.name}
-                    </span>
-                    {selectedTeam.game && (
-                      <span className="text-xs text-muted-foreground bg-muted dark:bg-[#252a3d] px-2 py-0.5 rounded">
-                        {selectedTeam.game.name || "1 game"}
-                      </span>
-                    )}
-                  </div>
+                  <span className="text-foreground font-medium truncate">
+                    {selectedClub.name}
+                  </span>
                 </>
               ) : (
                 <>
                   <div className="size-8 rounded-lg bg-muted dark:bg-[#252a3d] flex items-center justify-center flex-shrink-0">
-                    <Users className="size-4 text-muted-foreground" />
+                    <Building2 className="size-4 text-muted-foreground" />
                   </div>
                   <span className="text-muted-foreground">{placeholder}</span>
                 </>
               )}
             </div>
             <div className="flex items-center gap-1">
-              {selectedTeam && (
+              {selectedClub && (
                 <span
                   role="button"
                   tabIndex={0}
@@ -1261,55 +1329,44 @@ function TeamSelectField({
           </div>
 
           <div ref={listRef} className="max-h-64 overflow-y-auto p-2" onScroll={handleScroll}>
-            {teams?.length === 0 && !isLoading ? (
+            {clubs?.length === 0 && !isLoading ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
-                {t("noTeamsFound")}
+                {t("noClubsFound") || "No clubs found"}
               </div>
             ) : (
               <>
-                {teams?.map((team) => {
-                  const teamId = getTeamId(team);
-                  const isSelected = value === teamId;
+                {clubs?.map((club) => {
+                  const clubId = getClubId(club);
+                  const isSelected = value === clubId;
                   return (
                     <button
-                      key={teamId}
+                      key={clubId}
                       type="button"
-                      onClick={() => handleSelect(team)}
+                      onClick={() => handleSelect(club)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left rtl:text-right transition-colors ${
                         isSelected
-                          ? "bg-blue-500/10 text-blue-500"
+                          ? "bg-amber-500/10 text-amber-500"
                           : "hover:bg-muted dark:hover:bg-[#1a1d2e]"
                       }`}
                     >
                       <div className="size-8 rounded-lg overflow-hidden flex-shrink-0 bg-muted dark:bg-[#252a3d]">
-                        {team.logo?.light ? (
+                        {club.logo?.light ? (
                           <img
-                            src={getImgUrl(team.logo.light, "thumbnail")}
-                            alt={team.name}
+                            src={getImgUrl(club.logo.light, "thumbnail")}
+                            alt={club.name}
                             className="w-full h-full object-cover"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Users className="size-4 text-muted-foreground" />
+                            <Building2 className="size-4 text-muted-foreground" />
                           </div>
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <span
-                          className={`text-sm font-medium ${
-                            isSelected ? "text-blue-500" : "text-foreground"
-                          }`}
-                        >
-                          {team.name}
-                        </span>
-                      </div>
-                      {team.game && (
-                        <span className="text-xs text-muted-foreground bg-muted dark:bg-[#252a3d] px-2 py-0.5 rounded">
-                          {team.game.name || "1"}
-                        </span>
-                      )}
+                      <span className={`flex-1 text-sm font-medium ${isSelected ? "text-amber-500" : "text-foreground"}`}>
+                        {club.name}
+                      </span>
                       {isSelected && (
-                        <Check className="size-4 text-blue-500 flex-shrink-0" />
+                        <Check className="size-4 text-amber-500 flex-shrink-0" />
                       )}
                     </button>
                   );

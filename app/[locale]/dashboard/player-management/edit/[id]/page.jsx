@@ -2,18 +2,18 @@ import { editPlayer } from "@/app/[locale]/_Lib/actions";
 import { getCountries } from "@/app/[locale]/_Lib/countriesApi";
 import { getGames } from "@/app/[locale]/_Lib/gamesApi";
 import { getPlayer } from "@/app/[locale]/_Lib/palyerApi";
-import { getTeams } from "@/app/[locale]/_Lib/teamsApi";
+import { getClubs } from "@/app/[locale]/_Lib/clubsApi";
 import { getTournaments } from "@/app/[locale]/_Lib/tournamentsApi";
 import PlayerFormRedesign from "@/components/Player Management/PlayerFormRedesign";
 import { PlayerEditWrapper } from "@/components/Player Management/PlayerFormWrapper";
 
 async function page({ params }) {
   const { id } = await params;
-  const [countries, player, { data: teamsOptions }, { data: gamesOptions }, { data: tournamentsOptions }] =
+  const [countries, player, { data: clubsOptions }, { data: gamesOptions }, { data: tournamentsOptions }] =
     await Promise.all([
       getCountries(),
       getPlayer(id),
-      getTeams(),
+      getClubs(),
       getGames({ limit: 100 }),
       getTournaments({ size: 100 }),
     ]);
@@ -22,7 +22,7 @@ async function page({ params }) {
     <PlayerEditWrapper>
       <PlayerFormRedesign
         OptionsData={{
-          teamsOptions: teamsOptions || [],
+          clubsOptions: clubsOptions || [],
           gamesOptions: gamesOptions || [],
           tournamentsOptions: tournamentsOptions || [],
         }}

@@ -10,7 +10,7 @@ import { getAwardsTeam, getTeamsLinks, getTeams } from "./teamsApi";
 import { getGames } from "./gamesApi";
 import { getTournamentLinks, getTournaments } from "./tournamentsApi";
 import { getEventLinks } from "./eventsApi";
-import { getClubsLinks } from "./clubsApi";
+import { getClubs, getClub, getClubsLinks } from "./clubsApi";
 
 // login
 export async function login(userData) {
@@ -96,6 +96,19 @@ export async function searchPlayers({ search = "", page = 1, limit = 15 } = {}) 
 
 export async function searchTournaments({ search = "", page = 1, limit = 15 } = {}) {
   return getTournaments({ search, page, size: limit });
+}
+
+export async function searchClubs({ search = "", page = 1, limit = 15 } = {}) {
+  return getClubs({ search, page, size: limit });
+}
+
+export async function fetchClubDetail(clubId) {
+  if (!clubId) return null;
+  try {
+    return await getClub(clubId);
+  } catch {
+    return null;
+  }
 }
 
 // Helper function to clean undefined/empty values from data
