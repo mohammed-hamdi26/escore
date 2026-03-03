@@ -55,7 +55,7 @@ export default async function page() {
       title: "Teams Management",
       href: "/teams-management",
       icon: <TeamsManagement width="57" height="56" />,
-      isShowed: hasPermission(user, "Team"),
+      isShowed: false, // Hidden: teams are managed via Clubs
     },
     {
       title: "Matches Management",
