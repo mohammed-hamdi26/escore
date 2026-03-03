@@ -33,7 +33,7 @@ function BackPage() {
     const isIdPattern = /^[a-f0-9]{24}$|^[a-f0-9-]{36}$|^\d+$/.test(lastSegment);
 
     // If we're on /view/[id] or /edit/[id], go back to the management page (skip 2 levels)
-    if (isIdPattern && ["view", "edit", "details"].includes(secondLastSegment)) {
+    if (isIdPattern && ["view", "edit", "details", "lineups", "links", "awards", "favorites-characters", "standings"].includes(secondLastSegment)) {
       // Remove both the id and view/edit
       segments.pop(); // remove id
       segments.pop(); // remove view/edit
