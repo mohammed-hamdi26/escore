@@ -19,7 +19,6 @@ import {
   Phone,
   Shield,
   Gamepad2,
-  Users,
   Trophy,
   Newspaper,
   ArrowRightLeft,
@@ -82,15 +81,14 @@ function UserForm({
     { label: "Match", value: "AddMatchPermission", translationKey: "Match", icon: Swords, color: "text-indigo-500", bgColor: "bg-indigo-500/10" },
     { label: "Game", value: "AddGamePermission", translationKey: "Game", icon: Gamepad2, color: "text-purple-500", bgColor: "bg-purple-500/10" },
     { label: "Player", value: "AddPlayerPermission", translationKey: "Player", icon: User, color: "text-blue-500", bgColor: "bg-blue-500/10" },
-    { label: "Team", value: "AddTeamPermission", translationKey: "Team", icon: Users, color: "text-green-500", bgColor: "bg-green-500/10" },
+    { label: "Club", value: "AddClubPermission", translationKey: "Club", icon: Building2, color: "text-emerald-500", bgColor: "bg-emerald-500/10" },
     { label: "Tournament", value: "AddTournamentPermission", translationKey: "Tournament", icon: Trophy, color: "text-yellow-500", bgColor: "bg-yellow-500/10" },
+    { label: "Event", value: "AddEventPermission", translationKey: "Event", icon: CalendarDays, color: "text-violet-500", bgColor: "bg-violet-500/10" },
     { label: "News", value: "AddNewsPermission", translationKey: "News", icon: Newspaper, color: "text-pink-500", bgColor: "bg-pink-500/10" },
     { label: "Transfer", value: "AddTransferPermission", translationKey: "Transfer", icon: ArrowRightLeft, color: "text-orange-500", bgColor: "bg-orange-500/10" },
     { label: "Standing", value: "AddStandingPermission", translationKey: "Standing", icon: BarChart3, color: "text-cyan-500", bgColor: "bg-cyan-500/10" },
     { label: "Settings", value: "AddSettingsPermission", translationKey: "Settings", icon: Settings, color: "text-gray-500", bgColor: "bg-gray-500/10" },
     { label: "Support", value: "AddSupportPermission", translationKey: "Support", icon: HeadphonesIcon, color: "text-red-500", bgColor: "bg-red-500/10" },
-    { label: "Club", value: "AddClubPermission", translationKey: "Club", icon: Building2, color: "text-emerald-500", bgColor: "bg-emerald-500/10" },
-    { label: "Event", value: "AddEventPermission", translationKey: "Event", icon: CalendarDays, color: "text-violet-500", bgColor: "bg-violet-500/10" },
     { label: "User", value: "AddUserPermission", translationKey: "User", icon: UserCog, color: "text-slate-500", bgColor: "bg-slate-500/10" },
     { label: "Avatar", value: "AddAvatarPermission", translationKey: "Avatar", icon: CircleUserRound, color: "text-teal-500", bgColor: "bg-teal-500/10" },
   ];
@@ -106,14 +104,29 @@ function UserForm({
   const getInitialPermissionValues = () => {
     const values = {};
     if (user?.permissions && Array.isArray(user.permissions)) {
+      // If user has Team permission but not Club, treat it as Club permission
+      const teamPerm = user.permissions.find((p) => p.entity === "Team");
+      const clubPerm = user.permissions.find((p) => p.entity === "Club");
+      const mergedClubActions = [
+        ...new Set([
+          ...(clubPerm?.actions || []),
+          ...(teamPerm?.actions || []),
+        ]),
+      ];
+
       permissions.forEach((perm) => {
-        const userPerm = user.permissions.find((p) => p.entity === perm.label);
-        if (userPerm) {
+        if (perm.label === "Club" && mergedClubActions.length > 0) {
           values[perm.value] = true;
-          values["actions" + perm.value] = userPerm.actions || [];
+          values["actions" + perm.value] = mergedClubActions;
         } else {
-          values[perm.value] = false;
-          values["actions" + perm.value] = [];
+          const userPerm = user.permissions.find((p) => p.entity === perm.label);
+          if (userPerm) {
+            values[perm.value] = true;
+            values["actions" + perm.value] = userPerm.actions || [];
+          } else {
+            values[perm.value] = false;
+            values["actions" + perm.value] = [];
+          }
         }
       });
     } else {
@@ -164,6 +177,10 @@ function UserForm({
             };
             if (permissionsData.actions.length > 0) {
               permissionsUser.push(permissionsData);
+              // Auto-include Team permissions when Club is enabled (Team is managed through Club)
+              if (permissions[i].label === "Club") {
+                permissionsUser.push({ entity: "Team", actions: permissionsData.actions });
+              }
             }
           }
         }
@@ -259,8 +276,8 @@ function UserForm({
 
   const handleContentCreatorAccess = () => {
     setPermissionError("");
-    // Content creator preset: News, Match, Player, Team, Tournament, Transfer, Game, Standing, Club, Event with create/read/update
-    const contentPerms = ["AddNewsPermission", "AddMatchPermission", "AddPlayerPermission", "AddTeamPermission", "AddTournamentPermission", "AddTransferPermission", "AddGamePermission", "AddStandingPermission", "AddClubPermission", "AddEventPermission"];
+    // Content creator preset: News, Match, Player, Club, Tournament, Event, Transfer, Game, Standing with create/read/update
+    const contentPerms = ["AddNewsPermission", "AddMatchPermission", "AddPlayerPermission", "AddClubPermission", "AddTournamentPermission", "AddEventPermission", "AddTransferPermission", "AddGamePermission", "AddStandingPermission"];
     permissions.forEach((perm) => {
       if (contentPerms.includes(perm.value)) {
         formik.setFieldValue(perm.value, true);
