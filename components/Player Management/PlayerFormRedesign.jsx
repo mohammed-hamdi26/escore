@@ -173,8 +173,11 @@ function PlayerFormRedesign({
           };
         }
         if (values.bio) dataValues.bio = values.bio;
-        if (values.ranking) dataValues.ranking = Number(values.ranking);
-        if (values.marketValue !== "" && values.marketValue !== null) dataValues.marketValue = Number(values.marketValue);
+        // For number fields: send the value if filled, or null on edit to clear old data
+        dataValues.ranking = values.ranking ? Number(values.ranking) : (player ? null : undefined);
+        dataValues.marketValue = (values.marketValue !== "" && values.marketValue !== null && values.marketValue !== undefined)
+          ? Number(values.marketValue)
+          : (player ? null : undefined);
 
         await submit(dataValues);
 

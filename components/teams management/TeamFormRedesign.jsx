@@ -127,9 +127,10 @@ function TeamFormRedesign({
         if (values.description) dataValues.description = values.description;
         if (values.region) dataValues.region = values.region;
         if (values.foundedDate) dataValues.foundedDate = new Date(values.foundedDate).toISOString();
-        if (values.worldRanking !== "" && values.worldRanking !== null) {
-          dataValues.worldRanking = Number(values.worldRanking);
-        }
+        // Send the value if filled, or null on edit to clear old data
+        dataValues.worldRanking = (values.worldRanking !== "" && values.worldRanking !== null)
+          ? Number(values.worldRanking)
+          : (team ? null : undefined);
 
         // Add tournaments and players
         if (values.tournaments?.length > 0) {

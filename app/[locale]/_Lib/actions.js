@@ -98,10 +98,11 @@ export async function searchTournaments({ search = "", page = 1, limit = 15 } = 
   return getTournaments({ search, page, size: limit });
 }
 
-// Helper function to clean null/undefined values from data
+// Helper function to clean undefined/empty values from data
+// Keeps `null` — null means "explicitly clear this field" on the backend
 function cleanNullValues(data) {
   return Object.fromEntries(
-    Object.entries(data).filter(([_, v]) => v !== null && v !== undefined && v !== "")
+    Object.entries(data).filter(([_, v]) => v !== undefined && v !== "")
   );
 }
 

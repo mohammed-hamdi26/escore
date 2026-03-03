@@ -125,6 +125,17 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Hide number input spinners globally — prevents accidental scroll changes */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
 }
 .icon-transition {
   @apply text-[#289546] transition-colors duration-300 group-hover:text-white;

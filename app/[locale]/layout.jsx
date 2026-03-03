@@ -6,6 +6,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { getMessages } from "next-intl/server";
+import NumberInputScrollFix from "@/components/utils/NumberInputScrollFix";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default async function RootLayout({ children, params }) {
         >
           <NextIntlClientProvider locale={locale} messages={messages}>
             <Toaster position="top-center" />
+            <NumberInputScrollFix />
             {children}
           </NextIntlClientProvider>
         </ThemeProvider>

@@ -107,7 +107,7 @@ function TransfersForm({
       try {
         const dataValues = {
           ...values,
-          fee: values.fee ? Number(values.fee) : undefined,
+          fee: values.fee ? Number(values.fee) : (transfer ? null : undefined),
           fromTeam: values.fromTeam || undefined,
           toTeam: values.toTeam || undefined,
           game: values.game,
