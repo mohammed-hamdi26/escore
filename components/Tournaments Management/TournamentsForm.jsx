@@ -131,6 +131,15 @@ const validateSchema = yup.object({
     .required("Participation type is required"),
   playersData: yup.array().optional(),
   maxPlayers: yup.number().integer().positive().nullable().optional().transform((v, orig) => (orig === "" ? null : v)),
+  status: yup.string().optional(),
+  country: yup.string().nullable().optional(),
+  tier: yup.string().nullable().optional(),
+  format: yup.string().nullable().optional(),
+  rules: yup.string().nullable().optional(),
+  isOnline: yup.boolean().optional(),
+  isActive: yup.boolean().optional(),
+  isFeatured: yup.boolean().optional(),
+  prizeDistribution: yup.array().optional(),
 });
 
 // Compare formik values against initial values, return only changed keys
