@@ -301,7 +301,7 @@ export default function TournamentsForm({
 
         if (formType === "edit") {
           // PATCH mode: send only changed fields
-          const changedFields = getChangedFields(values, formik.initialValues);
+          const changedFields = getChangedFields(values, baselineRef.current || formik.initialValues);
           if (Object.keys(changedFields).length === 0) {
             toast.success(t("noChanges") || "No changes detected");
             return;
@@ -500,6 +500,20 @@ export default function TournamentsForm({
       formik.setFieldValue("participationType", "player");
     }
   }, [competitionTypeValue]);
+
+  // Capture baseline values AFTER all mount auto-adjustments settle
+  const baselineRef = useRef(null);
+  const baselineSet = useRef(false);
+  useEffect(() => {
+    if (formType === "edit" && !baselineSet.current) {
+      // Use requestAnimationFrame to ensure all mount effects have flushed
+      const raf = requestAnimationFrame(() => {
+        baselineRef.current = JSON.parse(JSON.stringify(formik.values));
+        baselineSet.current = true;
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [formik.values.status, formik.values.participationType]);
 
   // Auto-set scoringType to "placement" for battle royale
   useEffect(() => {
