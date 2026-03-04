@@ -386,6 +386,7 @@ export async function editTournament(tournamentData) {
     revalidatePath(
       `/${locale}/dashboard/tournaments/edit/${cleanData.id}`
     );
+    return { success: true };
   } catch (e) {
     console.log("Tournament update error:", e.response?.data || e.message);
     const msg = e.response?.data?.message || "Error in updating tournaments";
@@ -393,7 +394,6 @@ export async function editTournament(tournamentData) {
     const details = errors?.map((err) => `${err.field}: ${err.message}`).join(", ");
     return { success: false, error: details ? `${msg} — ${details}` : msg };
   }
-  redirect(`/${locale}/dashboard/tournaments-management`);
 }
 export async function deleteTournament(id) {
   const locale = await getLocale();

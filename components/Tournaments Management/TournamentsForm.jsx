@@ -433,17 +433,10 @@ export default function TournamentsForm({
         );
         router.push("/dashboard/tournaments-management");
       } catch (error) {
-        // NEXT_REDIRECT means the action succeeded and called redirect()
-        if (error?.digest?.includes("NEXT_REDIRECT") || error.toString().includes("NEXT_REDIRECT")) {
-          toast.success(
-            formType === "add"
-              ? t("The Tournament Added")
-              : t("The Tournament Edited")
-          );
+        if (error?.digest?.includes("NEXT_REDIRECT")) {
           throw error; // Re-throw to let Next.js handle the redirect
-        } else {
-          toast.error(error.message || "An error occurred");
         }
+        toast.error(error.message || "An error occurred");
       }
     },
   });
