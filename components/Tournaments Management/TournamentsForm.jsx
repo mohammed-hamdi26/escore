@@ -93,7 +93,8 @@ const validateSchema = yup.object({
   prizePool: yup
     .number()
     .min(0, "Prize pool must be positive")
-    .nullable(),
+    .nullable()
+    .transform((v, orig) => (orig === "" ? null : v)),
   currency: yup.string(),
   gamesData: yup
     .array()
@@ -108,9 +109,9 @@ const validateSchema = yup.object({
   knockoutImageLight: yup.mixed(),
   knockoutImageDark: yup.mixed(),
   scoringType: yup.string().oneOf(["win_loss", "placement"]).required(),
-  pointsPerWin: yup.number().min(0).max(100).nullable(),
-  pointsPerDraw: yup.number().min(0).max(100).nullable(),
-  pointsPerLoss: yup.number().min(0).max(100).nullable(),
+  pointsPerWin: yup.number().min(0).max(100).nullable().transform((v, orig) => (orig === "" ? null : v)),
+  pointsPerDraw: yup.number().min(0).max(100).nullable().transform((v, orig) => (orig === "" ? null : v)),
+  pointsPerLoss: yup.number().min(0).max(100).nullable().transform((v, orig) => (orig === "" ? null : v)),
   placementConfig: yup.object({
     placementPoints: yup.array().of(
       yup.object({
@@ -118,7 +119,7 @@ const validateSchema = yup.object({
         points: yup.number().min(0).required(),
       })
     ).min(1, "At least one placement entry is required"),
-    killPoints: yup.number().min(0).optional(),
+    killPoints: yup.number().min(0).optional().transform((v, orig) => (orig === "" ? null : v)),
   }).nullable().optional(),
   competitionType: yup
     .string()
@@ -129,7 +130,7 @@ const validateSchema = yup.object({
     .oneOf(["team", "player"])
     .required("Participation type is required"),
   playersData: yup.array().optional(),
-  maxPlayers: yup.number().integer().positive().nullable().optional(),
+  maxPlayers: yup.number().integer().positive().nullable().optional().transform((v, orig) => (orig === "" ? null : v)),
 });
 
 export default function TournamentsForm({
