@@ -151,7 +151,7 @@ function TournamentDetails({ tournament }) {
                   {/* Status Badge */}
                   <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${statusConfig.color}`}>
                     <StatusIcon className="size-4" />
-                    {t(tournament.status) || tournament.status}
+                    {tournament.status ? t(tournament.status) : "unknown"}
                   </span>
 
                   {/* Tier Badge */}
