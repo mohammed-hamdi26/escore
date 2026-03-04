@@ -133,6 +133,70 @@ const validateSchema = yup.object({
   maxPlayers: yup.number().integer().positive().nullable().optional().transform((v, orig) => (orig === "" ? null : v)),
 });
 
+// Compare formik values against initial values, return only changed keys
+function getChangedFields(values, initialValues) {
+  const changed = {};
+
+  // Simple fields: direct === comparison
+  const simpleFields = [
+    "name", "organizer", "location", "tier", "format", "rules",
+    "streamUrl", "websiteUrl", "currency", "description",
+    "isOnline", "isActive", "isFeatured", "startDate", "endDate",
+    "status", "country", "competitionType", "participationType",
+  ];
+  for (const f of simpleFields) {
+    if (values[f] !== initialValues[f]) changed[f] = values[f];
+  }
+
+  // Number fields: normalize "" to null before comparing
+  const numberFields = ["prizePool", "maxPlayers"];
+  for (const f of numberFields) {
+    const cur = values[f] === "" ? null : values[f];
+    const init = initialValues[f] === "" ? null : initialValues[f];
+    if (cur !== init) changed[f] = values[f];
+  }
+
+  // Image pairs: if either light or dark changed, include both
+  const imagePairs = [
+    ["logoLight", "logoDark"],
+    ["coverImageLight", "coverImageDark"],
+    ["knockoutImageLight", "knockoutImageDark"],
+  ];
+  for (const [light, dark] of imagePairs) {
+    if (values[light] !== initialValues[light] || values[dark] !== initialValues[dark]) {
+      changed[light] = values[light];
+      changed[dark] = values[dark];
+    }
+  }
+
+  // Array fields: compare by extracted sorted IDs
+  const arrayFields = ["gamesData", "teamsData", "playersData"];
+  for (const f of arrayFields) {
+    const extractIds = (arr) =>
+      (arr || []).map((item) => item?.id || item?.value || item?._id || item).sort().join(",");
+    if (extractIds(values[f]) !== extractIds(initialValues[f])) {
+      changed[f] = values[f];
+    }
+  }
+
+  // Standing config group: if any sub-field changed, include all
+  const standingFields = ["scoringType", "pointsPerWin", "pointsPerDraw", "pointsPerLoss"];
+  const placementChanged =
+    JSON.stringify(values.placementConfig) !== JSON.stringify(initialValues.placementConfig);
+  const standingChanged = standingFields.some((f) => values[f] !== initialValues[f]) || placementChanged;
+  if (standingChanged) {
+    for (const f of standingFields) changed[f] = values[f];
+    changed.placementConfig = values.placementConfig;
+  }
+
+  // Prize distribution: JSON comparison
+  if (JSON.stringify(values.prizeDistribution) !== JSON.stringify(initialValues.prizeDistribution)) {
+    changed.prizeDistribution = values.prizeDistribution;
+  }
+
+  return changed;
+}
+
 export default function TournamentsForm({
   tournament,
   submit,
@@ -213,45 +277,9 @@ export default function TournamentsForm({
     validationSchema: validateSchema,
     onSubmit: async (values) => {
       try {
-        let dataValues = tournament ? { id: tournament.id, ...values } : values;
-
-        const selectedCountry = countries.find((c) => c.label === dataValues.country);
-        dataValues.country = selectedCountry
-          ? {
-              name: selectedCountry.label,
-              code: selectedCountry.value,
-              flag: `https://flagcdn.com/w80/${selectedCountry.value.toLowerCase()}.png`,
-            }
-          : null;
-
-        // Build logo object
-        dataValues.logo = dataValues.logoLight
-          ? {
-              light: dataValues.logoLight,
-              dark: dataValues.logoDark || dataValues.logoLight,
-            }
-          : null;
-
-        // Build bracketImage object
-        dataValues.bracketImage = dataValues.knockoutImageLight
-          ? {
-              light: dataValues.knockoutImageLight,
-              dark: dataValues.knockoutImageDark || dataValues.knockoutImageLight,
-            }
-          : null;
-
-        // Build coverImage object
-        dataValues.coverImage = dataValues.coverImageLight
-          ? {
-              light: dataValues.coverImageLight,
-              dark: dataValues.coverImageDark || dataValues.coverImageLight,
-            }
-          : null;
-
-        // Convert dates to ISO datetime format for backend (preserving local date)
+        // Helper: convert date string to ISO
         const toISODate = (dateStr) => {
           if (!dateStr || typeof dateStr !== "string") return undefined;
-          // If already ISO format, return as-is
           if (dateStr.includes("T")) return dateStr;
           const [year, month, day] = dateStr.split("-").map(Number);
           if (!year || !month || !day) return undefined;
@@ -259,87 +287,130 @@ export default function TournamentsForm({
           if (isNaN(date.getTime())) return undefined;
           return date.toISOString();
         };
-        if (dataValues.startDate) {
-          dataValues.startDate = toISODate(dataValues.startDate);
-        }
-        if (dataValues.endDate) {
-          dataValues.endDate = toISODate(dataValues.endDate);
+
+        let dataValues;
+
+        if (formType === "edit") {
+          // PATCH mode: send only changed fields
+          const changedFields = getChangedFields(values, formik.initialValues);
+          if (Object.keys(changedFields).length === 0) {
+            toast.success(t("noChanges") || "No changes detected");
+            return;
+          }
+          dataValues = { id: tournament.id, ...changedFields };
+        } else {
+          // CREATE mode: send all fields
+          dataValues = { ...values };
         }
 
-        dataValues.games = dataValues?.gamesData.map((g) => g.id || g.value || g._id || g);
-        dataValues.teams = dataValues?.teamsData?.map((t) => t.id || t.value || t._id || t) || [];
+        // Transform country (only if in payload)
+        if ("country" in dataValues) {
+          const selectedCountry = countries.find((c) => c.label === dataValues.country);
+          dataValues.country = selectedCountry
+            ? {
+                name: selectedCountry.label,
+                code: selectedCountry.value,
+                flag: `https://flagcdn.com/w80/${selectedCountry.value.toLowerCase()}.png`,
+              }
+            : null;
+        }
+
+        // Build image objects (only if in payload)
+        if ("logoLight" in dataValues) {
+          dataValues.logo = dataValues.logoLight
+            ? { light: dataValues.logoLight, dark: dataValues.logoDark || dataValues.logoLight }
+            : null;
+        }
+        if ("knockoutImageLight" in dataValues) {
+          dataValues.bracketImage = dataValues.knockoutImageLight
+            ? { light: dataValues.knockoutImageLight, dark: dataValues.knockoutImageDark || dataValues.knockoutImageLight }
+            : null;
+        }
+        if ("coverImageLight" in dataValues) {
+          dataValues.coverImage = dataValues.coverImageLight
+            ? { light: dataValues.coverImageLight, dark: dataValues.coverImageDark || dataValues.coverImageLight }
+            : null;
+        }
+
+        // Convert dates (only if in payload)
+        if ("startDate" in dataValues) dataValues.startDate = toISODate(dataValues.startDate);
+        if ("endDate" in dataValues) dataValues.endDate = toISODate(dataValues.endDate);
+
+        // Transform arrays (only if in payload)
+        if ("gamesData" in dataValues) {
+          dataValues.games = dataValues.gamesData.map((g) => g.id || g.value || g._id || g);
+        }
+        if ("teamsData" in dataValues) {
+          dataValues.teams = dataValues.teamsData?.map((t) => t.id || t.value || t._id || t) || [];
+        }
 
         // Handle player tournaments
-        if (dataValues.participationType === "player") {
-          dataValues.players = dataValues?.playersData?.map((p) => p.id || p.value || p._id || p) || [];
-          if (dataValues.maxPlayers) dataValues.maxPlayers = parseInt(dataValues.maxPlayers);
-          else delete dataValues.maxPlayers;
-          delete dataValues.teams;
-        } else {
-          delete dataValues.players;
-          delete dataValues.maxPlayers;
+        if ("participationType" in dataValues || "playersData" in dataValues) {
+          const pType = dataValues.participationType || values.participationType;
+          if (pType === "player" && "playersData" in dataValues) {
+            dataValues.players = dataValues.playersData?.map((p) => p.id || p.value || p._id || p) || [];
+            if (dataValues.maxPlayers) dataValues.maxPlayers = parseInt(dataValues.maxPlayers);
+          }
         }
 
-        // Convert empty strings to null for optional number fields
-        if (dataValues.prizePool === "" || dataValues.prizePool === null) {
-          dataValues.prizePool = null;
+        // Handle prizePool
+        if ("prizePool" in dataValues) {
+          if (dataValues.prizePool === "" || dataValues.prizePool === null) {
+            dataValues.prizePool = null;
+          }
         }
 
-        // Convert empty strings to null for optional fields
-        if (!dataValues.streamUrl) delete dataValues.streamUrl;
-        if (!dataValues.websiteUrl) delete dataValues.websiteUrl;
-        if (!dataValues.format) delete dataValues.format;
-        if (!dataValues.rules) delete dataValues.rules;
-        if (!dataValues.description) delete dataValues.description;
-        if (!dataValues.location) delete dataValues.location;
-        if (!dataValues.organizer) delete dataValues.organizer;
-        if (!dataValues.tier) delete dataValues.tier;
-
-        // Build standingConfig object
-        if (dataValues.scoringType === "placement") {
-          dataValues.standingConfig = {
-            scoringType: "placement",
-            placementConfig: dataValues.placementConfig,
-          };
-        } else {
-          dataValues.standingConfig = {
-            scoringType: "win_loss",
-            pointsPerWin: parseInt(dataValues.pointsPerWin) || 3,
-            pointsPerDraw: parseInt(dataValues.pointsPerDraw) || 1,
-            pointsPerLoss: parseInt(dataValues.pointsPerLoss) || 0,
-          };
+        // Optional string fields: send null if cleared (was truthy → now falsy)
+        const optionalStringFields = ["streamUrl", "websiteUrl", "format", "rules", "description", "location", "organizer", "tier"];
+        for (const f of optionalStringFields) {
+          if (f in dataValues) {
+            if (!dataValues[f]) {
+              // In edit mode, send null to clear; in create mode, just delete
+              dataValues[f] = formType === "edit" ? null : undefined;
+            }
+          }
         }
 
-        // Build prizeDistribution array (filter out empty entries)
-        if (dataValues.prizeDistribution?.length > 0) {
-          dataValues.prizeDistribution = dataValues.prizeDistribution
-            .filter((p) => p.place && p.amount !== "" && p.amount !== null && p.amount !== undefined)
-            .map((p) => {
-              const entry = { place: parseInt(p.place), amount: parseFloat(p.amount) };
-              if (p.placeEnd && parseInt(p.placeEnd) > entry.place) {
-                entry.placeEnd = parseInt(p.placeEnd);
-              }
-              return entry;
-            });
-        } else {
-          delete dataValues.prizeDistribution;
+        // Build standingConfig (only if standing fields changed)
+        if ("scoringType" in dataValues) {
+          if (dataValues.scoringType === "placement") {
+            dataValues.standingConfig = {
+              scoringType: "placement",
+              placementConfig: dataValues.placementConfig,
+            };
+          } else {
+            dataValues.standingConfig = {
+              scoringType: "win_loss",
+              pointsPerWin: parseInt(dataValues.pointsPerWin) || 3,
+              pointsPerDraw: parseInt(dataValues.pointsPerDraw) || 1,
+              pointsPerLoss: parseInt(dataValues.pointsPerLoss) || 0,
+            };
+          }
         }
 
-        // Clean up temporary fields
-        delete dataValues.logoLight;
-        delete dataValues.logoDark;
-        delete dataValues.coverImageLight;
-        delete dataValues.coverImageDark;
-        delete dataValues.knockoutImageLight;
-        delete dataValues.knockoutImageDark;
-        delete dataValues.gamesData;
-        delete dataValues.teamsData;
-        delete dataValues.playersData;
-        delete dataValues.scoringType;
-        delete dataValues.pointsPerWin;
-        delete dataValues.pointsPerDraw;
-        delete dataValues.pointsPerLoss;
-        delete dataValues.placementConfig;
+        // Build prizeDistribution (only if changed)
+        if ("prizeDistribution" in dataValues) {
+          if (dataValues.prizeDistribution?.length > 0) {
+            dataValues.prizeDistribution = dataValues.prizeDistribution
+              .filter((p) => p.place && p.amount !== "" && p.amount !== null && p.amount !== undefined)
+              .map((p) => {
+                const entry = { place: parseInt(p.place), amount: parseFloat(p.amount) };
+                if (p.placeEnd && parseInt(p.placeEnd) > entry.place) entry.placeEnd = parseInt(p.placeEnd);
+                return entry;
+              });
+          } else {
+            dataValues.prizeDistribution = [];
+          }
+        }
+
+        // Clean up temporary form-only fields
+        const tempFields = [
+          "logoLight", "logoDark", "coverImageLight", "coverImageDark",
+          "knockoutImageLight", "knockoutImageDark", "gamesData", "teamsData",
+          "playersData", "scoringType", "pointsPerWin", "pointsPerDraw",
+          "pointsPerLoss", "placementConfig",
+        ];
+        for (const f of tempFields) delete dataValues[f];
 
         const result = await submit(dataValues);
         if (result?.success === false) {

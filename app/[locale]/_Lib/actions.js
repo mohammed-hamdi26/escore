@@ -379,7 +379,7 @@ export async function editTournament(tournamentData) {
   const locale = await getLocale();
   try {
     const cleanData = cleanNullValues(tournamentData);
-    const res = await apiClient.put(
+    const res = await apiClient.patch(
       `/tournaments/${cleanData.id}`,
       cleanData
     );
