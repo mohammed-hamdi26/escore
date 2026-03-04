@@ -99,8 +99,8 @@ const validateSchema = yup.object({
     .array()
     .test("games", "At least one game is required", (value) => value && value.length > 0),
   teamsData: yup.array().optional(),
-  streamUrl: yup.string().url("Must be a valid URL").nullable(),
-  websiteUrl: yup.string().url("Must be a valid URL").nullable(),
+  streamUrl: yup.string().nullable().transform((v) => (!v ? null : v)).url("Must be a valid URL"),
+  websiteUrl: yup.string().nullable().transform((v) => (!v ? null : v)).url("Must be a valid URL"),
   logoLight: yup.mixed(),
   logoDark: yup.mixed(),
   coverImageLight: yup.mixed(),
