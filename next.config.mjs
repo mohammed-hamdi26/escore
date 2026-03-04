@@ -59,6 +59,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "pub-9c715517261b4d3eb63eea5493c9f926.r2.dev",
       },
+      {
+        protocol: "https",
+        hostname: "ui-avatars.com",
+      },
       // {
       //   protocol: "https",
       //   hostname: "digitalhub.fifa.com",
