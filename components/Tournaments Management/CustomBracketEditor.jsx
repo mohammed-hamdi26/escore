@@ -7,7 +7,7 @@ import {
   addCustomRoundAction,
   completeCustomBracketAction,
 } from "@/app/[locale]/_Lib/actions";
-import { showSuccess } from "@/lib/bracket-toast";
+import { showSuccess, showError } from "@/lib/bracket-toast";
 import CustomRoundCard from "./CustomRoundCard";
 import InlineError from "./shared/InlineError";
 import ConfirmationDialog from "./shared/ConfirmationDialog";
@@ -44,23 +44,36 @@ export default function CustomBracketEditor({
   // Parse and organize bracket data: group matches by bracketRound
   const roundsData = useMemo(() => {
     const customRounds = bracketData?.customRounds || [];
-    const matches = bracketData?.matches || [];
+    const flatMatches = bracketData?.matches || [];
 
-    // Group matches by bracketRound
-    const matchesByRound = {};
-    matches.forEach((m) => {
-      const r = m.bracketRound;
-      if (!matchesByRound[r]) matchesByRound[r] = [];
-      matchesByRound[r].push(m);
-    });
+    // Primary: use customRounds + matches from backend response
+    if (customRounds.length > 0) {
+      const matchesByRound = {};
+      flatMatches.forEach((m) => {
+        const r = m.bracketRound;
+        if (!matchesByRound[r]) matchesByRound[r] = [];
+        matchesByRound[r].push(m);
+      });
 
-    // Map customRounds with their matches
-    return customRounds
-      .sort((a, b) => a.round - b.round)
-      .map((cr) => ({
-        ...cr,
-        matches: matchesByRound[cr.round] || [],
+      return customRounds
+        .sort((a, b) => a.round - b.round)
+        .map((cr) => ({
+          ...cr,
+          matches: matchesByRound[cr.round] || [],
+        }));
+    }
+
+    // Fallback: reconstruct from rounds.winners (backward compatibility)
+    if (bracketData?.rounds?.winners?.length > 0) {
+      return bracketData.rounds.winners.map((wr) => ({
+        round: wr.round,
+        name: wr.name,
+        bestOf: wr.matches?.[0]?.bestOf || 1,
+        matches: wr.matches || [],
       }));
+    }
+
+    return [];
   }, [bracketData]);
 
   const handleAddRound = async () => {
@@ -81,6 +94,8 @@ export default function CustomBracketEditor({
         await onRefresh();
         // Keep form open for successive adds, re-focus
         if (roundNameRef.current) roundNameRef.current.focus();
+      } else {
+        showError(result.error || t("addRoundError") || "Failed to add round");
       }
     } finally {
       setAddingRound(false);
@@ -94,6 +109,8 @@ export default function CustomBracketEditor({
       if (result.success) {
         setShowCompleteConfirm(false);
         await onRefresh();
+      } else {
+        showError(result.error || t("completeBracketError") || "Failed to complete bracket");
       }
     } finally {
       setCompleting(false);

@@ -205,6 +205,7 @@ export default function TournamentsForm({
       maxPlayers: tournament?.maxPlayers || "",
       prizeDistribution: tournament?.prizeDistribution?.map((p) => ({
         place: p.place,
+        placeEnd: p.placeEnd || "",
         amount: p.amount,
       })) || [],
     },
@@ -312,7 +313,13 @@ export default function TournamentsForm({
         if (dataValues.prizeDistribution?.length > 0) {
           dataValues.prizeDistribution = dataValues.prizeDistribution
             .filter((p) => p.place && p.amount !== "" && p.amount !== null && p.amount !== undefined)
-            .map((p) => ({ place: parseInt(p.place), amount: parseFloat(p.amount) }));
+            .map((p) => {
+              const entry = { place: parseInt(p.place), amount: parseFloat(p.amount) };
+              if (p.placeEnd && parseInt(p.placeEnd) > entry.place) {
+                entry.placeEnd = parseInt(p.placeEnd);
+              }
+              return entry;
+            });
         } else {
           delete dataValues.prizeDistribution;
         }
@@ -1156,8 +1163,12 @@ function PrizeDistributionField({ formik, currency }) {
   const prizes = formik.values.prizeDistribution || [];
 
   const addPrize = () => {
-    const nextPlace = prizes.length > 0 ? Math.max(...prizes.map((p) => p.place || 0)) + 1 : 1;
-    formik.setFieldValue("prizeDistribution", [...prizes, { place: nextPlace, amount: "" }]);
+    let nextPlace = 1;
+    if (prizes.length > 0) {
+      const last = prizes[prizes.length - 1];
+      nextPlace = (last.placeEnd || last.place || 0) + 1;
+    }
+    formik.setFieldValue("prizeDistribution", [...prizes, { place: nextPlace, placeEnd: "", amount: "" }]);
   };
 
   const removePrize = (index) => {
@@ -1170,14 +1181,31 @@ function PrizeDistributionField({ formik, currency }) {
   const updatePrize = (index, field, value) => {
     const updated = [...prizes];
     updated[index] = { ...updated[index], [field]: value };
+    // Auto-correct: if placeEnd < place, clear placeEnd
+    if (field === "placeEnd" && value && updated[index].place && parseInt(value) < parseInt(updated[index].place)) {
+      updated[index].placeEnd = updated[index].place;
+    }
+    if (field === "place" && updated[index].placeEnd && parseInt(updated[index].placeEnd) < parseInt(value)) {
+      updated[index].placeEnd = value;
+    }
     formik.setFieldValue("prizeDistribution", updated);
   };
 
-  const getPlaceLabel = (place) => {
-    if (place === 1) return "1st";
-    if (place === 2) return "2nd";
-    if (place === 3) return "3rd";
-    return `${place}th`;
+  const formatAmount = (num) => {
+    if (!num && num !== 0) return "";
+    return new Intl.NumberFormat("en-US").format(num);
+  };
+
+  const getOrdinal = (n) => {
+    if (n === 1) return "1st";
+    if (n === 2) return "2nd";
+    if (n === 3) return "3rd";
+    return `${n}th`;
+  };
+
+  const getPlaceLabel = (place, placeEnd) => {
+    if (!placeEnd || placeEnd === place) return getOrdinal(place);
+    return `${place}-${placeEnd}`;
   };
 
   return (
@@ -1194,27 +1222,39 @@ function PrizeDistributionField({ formik, currency }) {
               className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 dark:bg-[#141625] border border-border/50"
             >
               {/* Place badge */}
-              <div className={`flex items-center justify-center size-10 rounded-lg font-bold text-sm shrink-0 ${
-                prize.place === 1
+              <div className={`flex items-center justify-center min-w-10 px-2 h-10 rounded-lg font-bold text-sm shrink-0 ${
+                prize.place === 1 && (!prize.placeEnd || prize.placeEnd === 1)
                   ? "bg-yellow-500/15 text-yellow-500"
-                  : prize.place === 2
+                  : prize.place === 2 && (!prize.placeEnd || prize.placeEnd === 2)
                   ? "bg-gray-400/15 text-gray-400"
-                  : prize.place === 3
+                  : prize.place === 3 && (!prize.placeEnd || prize.placeEnd === 3)
                   ? "bg-orange-500/15 text-orange-500"
                   : "bg-muted text-muted-foreground"
               }`}>
-                {getPlaceLabel(prize.place)}
+                {getPlaceLabel(prize.place, prize.placeEnd)}
               </div>
 
-              {/* Place number input */}
-              <div className="w-20">
+              {/* Place range inputs */}
+              <div className="flex items-center gap-1">
                 <input
                   type="number"
                   min="1"
                   value={prize.place}
                   onChange={(e) => updatePrize(index, "place", parseInt(e.target.value) || "")}
-                  className="w-full h-10 px-3 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border border-border/50 text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-primary/50 text-foreground"
+                  className="w-16 h-10 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border border-border/50 text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-primary/50 text-foreground"
                   placeholder="#"
+                />
+                <span className="text-muted-foreground text-sm">-</span>
+                <input
+                  type="number"
+                  min="1"
+                  value={prize.placeEnd || ""}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    updatePrize(index, "placeEnd", val || "");
+                  }}
+                  className="w-16 h-10 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border border-border/50 text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-primary/50 text-foreground placeholder:text-muted-foreground/40"
+                  placeholder="To"
                 />
               </div>
 
@@ -1224,11 +1264,12 @@ function PrizeDistributionField({ formik, currency }) {
                   {currency}
                 </span>
                 <input
-                  type="number"
-                  min="0"
-                  step="any"
-                  value={prize.amount}
-                  onChange={(e) => updatePrize(index, "amount", e.target.value)}
+                  type="text"
+                  value={formatAmount(prize.amount)}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/[^0-9.]/g, "");
+                    updatePrize(index, "amount", raw ? parseFloat(raw) : "");
+                  }}
                   className="w-full h-10 pl-10 pr-4 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-green-primary/50 text-foreground placeholder:text-muted-foreground"
                   placeholder="Amount"
                 />

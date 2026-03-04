@@ -367,7 +367,10 @@ export async function addTournament(tournamentData) {
     const res = await apiClient.post("/tournaments", cleanData);
   } catch (e) {
     console.log("Tournament creation error:", e.response?.data || e.message);
-    throw new Error(e.response?.data?.message || "Error in adding tournament");
+    const msg = e.response?.data?.message || "Error in adding tournament";
+    const errors = e.response?.data?.errors;
+    const details = errors?.map((err) => `${err.field}: ${err.message}`).join(", ");
+    throw new Error(details ? `${msg} — ${details}` : msg);
   }
   redirect(`/${locale}/dashboard/tournaments-management`);
 }
@@ -385,7 +388,10 @@ export async function editTournament(tournamentData) {
     );
   } catch (e) {
     console.log("Tournament update error:", e.response?.data || e.message);
-    throw new Error(e.response?.data?.message || "Error in updating tournaments");
+    const msg = e.response?.data?.message || "Error in updating tournaments";
+    const errors = e.response?.data?.errors;
+    const details = errors?.map((err) => `${err.field}: ${err.message}`).join(", ");
+    throw new Error(details ? `${msg} — ${details}` : msg);
   }
   redirect(`/${locale}/dashboard/tournaments-management`);
 }

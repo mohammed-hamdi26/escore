@@ -22,12 +22,12 @@ function MultiStageConfig({ config, onConfigChange, seeds }) {
       if (index < stages.length - 1) {
         if (!stage.advancementRule?.type) errors.push(t("advancementRuleRequired") || "Advancement rule is required");
         if ((stage.advancementRule?.count || 0) < 1) errors.push(t("advancementCountMin") || "Teams to advance must be at least 1");
-        if (stage.advancementRule?.type === "top_n_per_group" && stage.bracketType !== "round_robin") {
-          errors.push(t("topPerGroupOnlyRR") || "Top N per group is only valid for round robin stages");
+        if (stage.advancementRule?.type === "top_n_per_group" && stage.bracketType !== "round_robin" && stage.bracketType !== "double_elimination") {
+          errors.push(t("topPerGroupOnlyGroupStages") || "Top N per group is only valid for stages with groups (Round Robin or Double Elimination)");
         }
       }
-      // RR group validation for first stage
-      if (stage.bracketType === "round_robin" && index === 0) {
+      // Group validation for first stage (RR or DE with groups)
+      if ((stage.bracketType === "round_robin" || stage.bracketType === "double_elimination") && index === 0) {
         const groups = stage.config?.groups || [];
         if (groups.length === 0) errors.push(t("needAtLeast1Group") || "At least 1 group required");
         for (const g of groups) {
@@ -328,9 +328,15 @@ function MultiStageConfig({ config, onConfigChange, seeds }) {
             </div>
           )}
 
-          {/* Round Robin Group Config (first stage only if RR) */}
-          {stage.bracketType === "round_robin" && stageIndex === 0 && (
+          {/* Group Config (first stage: RR or DE with groups / GSL format) */}
+          {(stage.bracketType === "round_robin" || stage.bracketType === "double_elimination") && stageIndex === 0 && (
             <div className="mt-3">
+              {stage.bracketType === "double_elimination" && (
+                <div className="mb-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs flex items-center gap-2">
+                  <AlertCircle className="size-3 shrink-0" />
+                  {t("gslFormatHint") || "GSL format: Each group runs a mini double-elimination bracket. Recommended: 4 teams per group."}
+                </div>
+              )}
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-xs font-medium text-foreground">
                   {t("groupConfiguration") || "Groups"}

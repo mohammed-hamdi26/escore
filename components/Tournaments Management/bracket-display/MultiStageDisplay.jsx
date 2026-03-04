@@ -93,8 +93,8 @@ function MultiStageDisplay({ bracket, activeStageTab }) {
         </div>
       )}
 
-      {/* SE/DE Rounds */}
-      {activeStage.rounds && (
+      {/* SE/DE Rounds (skip if groups are displayed — DE groups already show per-group brackets) */}
+      {activeStage.rounds && !(activeStage.groups && activeStage.groups.length > 0) && (
         <>
           {activeStage.rounds.winners &&
             activeStage.rounds.winners.length > 0 && (
