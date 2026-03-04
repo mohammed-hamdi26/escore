@@ -340,13 +340,16 @@ export default function TournamentsForm({
         delete dataValues.pointsPerLoss;
         delete dataValues.placementConfig;
 
-        await submit(dataValues);
+        const result = await submit(dataValues);
+        if (result?.success === false) {
+          toast.error(result.error || "An error occurred");
+          return;
+        }
         toast.success(
           formType === "add"
             ? t("The Tournament Added")
             : t("The Tournament Edited")
         );
-        // Navigate back to tournaments list after successful submission
         router.push("/dashboard/tournaments-management");
       } catch (error) {
         // NEXT_REDIRECT means the action succeeded and called redirect()

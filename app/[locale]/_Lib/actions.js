@@ -370,7 +370,7 @@ export async function addTournament(tournamentData) {
     const msg = e.response?.data?.message || "Error in adding tournament";
     const errors = e.response?.data?.errors;
     const details = errors?.map((err) => `${err.field}: ${err.message}`).join(", ");
-    throw new Error(details ? `${msg} — ${details}` : msg);
+    return { success: false, error: details ? `${msg} — ${details}` : msg };
   }
   redirect(`/${locale}/dashboard/tournaments-management`);
 }
@@ -391,7 +391,7 @@ export async function editTournament(tournamentData) {
     const msg = e.response?.data?.message || "Error in updating tournaments";
     const errors = e.response?.data?.errors;
     const details = errors?.map((err) => `${err.field}: ${err.message}`).join(", ");
-    throw new Error(details ? `${msg} — ${details}` : msg);
+    return { success: false, error: details ? `${msg} — ${details}` : msg };
   }
   redirect(`/${locale}/dashboard/tournaments-management`);
 }
