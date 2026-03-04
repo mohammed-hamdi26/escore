@@ -287,7 +287,7 @@ function PlayerDetails({ player }) {
               )}
               {player.marketValue && (
                 <InfoItem
-                  label={t("marketValue") || "Market Value"}
+                  label={t("marketValue") || "Total Prizes"}
                   value={formatCurrency(player.marketValue)}
                   icon={<DollarSign className="size-4" />}
                 />

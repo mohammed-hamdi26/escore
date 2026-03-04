@@ -449,13 +449,11 @@ function PlayerFormRedesign({
             icon={<Trophy className="size-5 text-amber-500" />}
             hint={t("worldRankingHint")}
           />
-          <InputField
+          <CurrencyField
             label={t("marketValue")}
             name="marketValue"
-            type="number"
             placeholder={t("marketValuePlaceholder")}
             formik={formik}
-            icon={<DollarSign className="size-5 text-green-500" />}
             hint={t("marketValueHint")}
           />
         </FormRow>
@@ -583,6 +581,57 @@ function InputField({
           className={`w-full h-12 px-4 ${
             icon ? "pl-11 rtl:pl-4 rtl:pr-11" : ""
           } rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all ${
+            error ? "ring-2 ring-red-500" : ""
+          }`}
+        />
+      </div>
+      {hint && !error && (
+        <p className="text-xs text-muted-foreground">{hint}</p>
+      )}
+      {error && <p className="text-xs text-red-500">{t(error)}</p>}
+    </div>
+  );
+}
+
+// Currency Input Field with formatting
+function CurrencyField({ label, name, placeholder, formik, hint }) {
+  const error = formik.touched[name] && formik.errors[name];
+  const t = useTranslations("playerForm");
+
+  const rawValue = formik.values[name];
+  const displayValue =
+    rawValue !== "" && rawValue !== null && rawValue !== undefined
+      ? Number(rawValue).toLocaleString("en-US")
+      : "";
+
+  const handleChange = (e) => {
+    const stripped = e.target.value.replace(/[^0-9.]/g, "");
+    if (stripped === "") {
+      formik.setFieldValue(name, "");
+    } else {
+      const num = parseFloat(stripped);
+      formik.setFieldValue(name, isNaN(num) ? "" : num);
+    }
+  };
+
+  return (
+    <div className="flex-1 space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">
+        {label}
+      </label>
+      <div className="relative">
+        <div className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 text-green-500 font-bold text-sm">
+          $
+        </div>
+        <input
+          type="text"
+          inputMode="numeric"
+          name={name}
+          value={displayValue}
+          onChange={handleChange}
+          onBlur={formik.handleBlur}
+          placeholder={placeholder}
+          className={`w-full h-12 px-4 pl-9 rtl:pl-4 rtl:pr-9 rounded-xl bg-muted/50 dark:bg-[#1a1d2e] border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-primary/50 transition-all ${
             error ? "ring-2 ring-red-500" : ""
           }`}
         />
