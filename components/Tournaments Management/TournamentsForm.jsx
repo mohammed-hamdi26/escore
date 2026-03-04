@@ -908,7 +908,7 @@ export default function TournamentsForm({
           {t("Reset")}
         </Button>
         <Button
-          disabled={!formik.isValid || formik.isSubmitting}
+          disabled={formType === "add" ? (!formik.isValid || formik.isSubmitting) : formik.isSubmitting}
           type="submit"
           className="h-11 px-8 rounded-xl bg-green-primary hover:bg-green-primary/90 text-white font-medium disabled:opacity-50"
         >
