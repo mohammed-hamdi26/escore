@@ -283,7 +283,7 @@ export default function TournamentsForm({
         amount: p.amount,
       })) || [],
     },
-    validationSchema: validateSchema,
+    validationSchema: formType === "edit" ? undefined : validateSchema,
     onSubmit: async (values) => {
       try {
         // Helper: convert date string to ISO
