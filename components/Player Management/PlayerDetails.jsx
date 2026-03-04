@@ -193,9 +193,8 @@ function PlayerDetails({ player }) {
                             <Image
                               src={getImgUrl(player.photo.light)}
                               alt="Photo Light"
-                              width={0}
-                              height={0}
-                              sizes="100vw"
+                              width={200}
+                              height={200}
                               className="w-full h-full object-cover rounded-lg"
                             />
                           </div>
@@ -208,9 +207,8 @@ function PlayerDetails({ player }) {
                             <Image
                               src={getImgUrl(player.photo.dark)}
                               alt="Photo Dark"
-                              width={0}
-                              height={0}
-                              sizes="100vw"
+                              width={200}
+                              height={200}
                               className="w-full h-full object-cover rounded-lg"
                             />
                           </div>
@@ -232,9 +230,8 @@ function PlayerDetails({ player }) {
                             <Image
                               src={getImgUrl(player.coverImage.light)}
                               alt="Cover Light"
-                              width={0}
-                              height={0}
-                              sizes="100vw"
+                              width={400}
+                              height={225}
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -247,9 +244,8 @@ function PlayerDetails({ player }) {
                             <Image
                               src={getImgUrl(player.coverImage.dark)}
                               alt="Cover Dark"
-                              width={0}
-                              height={0}
-                              sizes="100vw"
+                              width={400}
+                              height={225}
                               className="w-full h-full object-cover"
                             />
                           </div>

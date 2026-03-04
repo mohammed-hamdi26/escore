@@ -136,9 +136,8 @@ function GamesDetails({ game }) {
                         <Image
                           src={getImgUrl(game.logo.light)}
                           alt="Logo Light"
-                          width={0}
-                          height={0}
-                          sizes="100vw"
+                          width={200}
+                          height={200}
                           className="w-full h-full object-contain"
                         />
                       </div>
@@ -151,9 +150,8 @@ function GamesDetails({ game }) {
                         <Image
                           src={getImgUrl(game.logo.dark)}
                           alt="Logo Dark"
-                          width={0}
-                          height={0}
-                          sizes="100vw"
+                          width={200}
+                          height={200}
                           className="w-full h-full object-contain"
                         />
                       </div>
@@ -174,9 +172,8 @@ function GamesDetails({ game }) {
                           <Image
                             src={getImgUrl(game.coverImage.light)}
                             alt="Cover Light"
-                            width={0}
-                            height={0}
-                            sizes="100vw"
+                            width={400}
+                            height={225}
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -189,9 +186,8 @@ function GamesDetails({ game }) {
                           <Image
                             src={getImgUrl(game.coverImage.dark)}
                             alt="Cover Dark"
-                            width={0}
-                            height={0}
-                            sizes="100vw"
+                            width={400}
+                            height={225}
                             className="w-full h-full object-cover"
                           />
                         </div>

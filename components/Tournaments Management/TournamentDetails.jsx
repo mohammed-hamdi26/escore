@@ -282,9 +282,8 @@ function TournamentDetails({ tournament }) {
                           <Image
                             src={getImgUrl(tournament.logo.light)}
                             alt="Logo Light"
-                            width={0}
-                            height={0}
-                            sizes="100vw"
+                            width={200}
+                            height={200}
                             className="w-full h-full object-contain"
                           />
                         </div>
@@ -297,9 +296,8 @@ function TournamentDetails({ tournament }) {
                           <Image
                             src={getImgUrl(tournament.logo.dark)}
                             alt="Logo Dark"
-                            width={0}
-                            height={0}
-                            sizes="100vw"
+                            width={200}
+                            height={200}
                             className="w-full h-full object-contain"
                           />
                         </div>
@@ -321,9 +319,8 @@ function TournamentDetails({ tournament }) {
                           <Image
                             src={getImgUrl(tournament.coverImage.light)}
                             alt="Cover Light"
-                            width={0}
-                            height={0}
-                            sizes="100vw"
+                            width={400}
+                            height={225}
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -336,9 +333,8 @@ function TournamentDetails({ tournament }) {
                           <Image
                             src={getImgUrl(tournament.coverImage.dark)}
                             alt="Cover Dark"
-                            width={0}
-                            height={0}
-                            sizes="100vw"
+                            width={400}
+                            height={225}
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -360,9 +356,8 @@ function TournamentDetails({ tournament }) {
                           <Image
                             src={getImgUrl(tournament.bracketImage.light)}
                             alt="Bracket Light"
-                            width={0}
-                            height={0}
-                            sizes="100vw"
+                            width={400}
+                            height={225}
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -375,9 +370,8 @@ function TournamentDetails({ tournament }) {
                           <Image
                             src={getImgUrl(tournament.bracketImage.dark)}
                             alt="Bracket Dark"
-                            width={0}
-                            height={0}
-                            sizes="100vw"
+                            width={400}
+                            height={225}
                             className="w-full h-full object-cover"
                           />
                         </div>

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { Edit, User, Trash2, Loader2 } from "lucide-react";
+import { Edit, User, Trash2, Loader2, Plus } from "lucide-react";
 import { removePlayerFromTeam } from "@/app/[locale]/_Lib/actions";
 import toast from "react-hot-toast";
 import { getImgUrl } from "@/lib/utils";
@@ -68,13 +68,27 @@ function TeamLineupTable({ players, teamId }) {
     return (
       <div className="text-center py-12 text-[#677185]">
         <User className="w-16 h-16 mx-auto mb-4 opacity-50" />
-        <p>{t("noPlayers")}</p>
+        <p className="mb-4">{t("noPlayers")}</p>
+        <Link href="/dashboard/player-management/add">
+          <Button className="bg-green-primary hover:bg-green-primary/80 gap-2">
+            <Plus className="size-4" />
+            {t("addPlayer") || "Add Player"}
+          </Button>
+        </Link>
       </div>
     );
   }
 
   return (
     <>
+      <div className="flex justify-end mb-4">
+        <Link href="/dashboard/player-management/add">
+          <Button className="bg-green-primary hover:bg-green-primary/80 gap-2">
+            <Plus className="size-4" />
+            {t("addPlayer") || "Add Player"}
+          </Button>
+        </Link>
+      </div>
       <div className="rounded-lg border border-[#2a2f3e] overflow-hidden">
         <table className="w-full">
           <thead className="bg-[#1a1f2e]">

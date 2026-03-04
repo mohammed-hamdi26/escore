@@ -146,9 +146,8 @@ function NewsDetails({ news }) {
                 <Image
                   src={getImgUrl(news.coverImage.light)}
                   alt={news.title}
-                  width={0}
-                  height={0}
-                  sizes="100vw"
+                  width={400}
+                  height={200}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -296,9 +295,8 @@ function NewsDetails({ news }) {
                       <Image
                         src={getImgUrl(news.coverImage.light)}
                         alt="Cover Light"
-                        width={0}
-                        height={0}
-                        sizes="100vw"
+                        width={400}
+                        height={200}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -311,9 +309,8 @@ function NewsDetails({ news }) {
                       <Image
                         src={getImgUrl(news.coverImage.dark)}
                         alt="Cover Dark"
-                        width={0}
-                        height={0}
-                        sizes="100vw"
+                        width={400}
+                        height={200}
                         className="w-full h-full object-cover"
                       />
                     </div>

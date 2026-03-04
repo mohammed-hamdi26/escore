@@ -518,9 +518,8 @@ function EventDetails({
                             <Image
                               src={getImgUrl(event.logo.light)}
                               alt="Logo Light"
-                              width={0}
-                              height={0}
-                              sizes="100vw"
+                              width={200}
+                              height={200}
                               className="w-full h-full object-contain"
                             />
                           </div>
@@ -533,9 +532,8 @@ function EventDetails({
                             <Image
                               src={getImgUrl(event.logo.dark)}
                               alt="Logo Dark"
-                              width={0}
-                              height={0}
-                              sizes="100vw"
+                              width={200}
+                              height={200}
                               className="w-full h-full object-contain"
                             />
                           </div>
@@ -557,9 +555,8 @@ function EventDetails({
                             <Image
                               src={getImgUrl(event.coverImage.light)}
                               alt="Cover Light"
-                              width={0}
-                              height={0}
-                              sizes="100vw"
+                              width={400}
+                              height={225}
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -572,9 +569,8 @@ function EventDetails({
                             <Image
                               src={getImgUrl(event.coverImage.dark)}
                               alt="Cover Dark"
-                              width={0}
-                              height={0}
-                              sizes="100vw"
+                              width={400}
+                              height={225}
                               className="w-full h-full object-cover"
                             />
                           </div>

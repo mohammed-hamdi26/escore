@@ -376,9 +376,8 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                               <Image
                                 src={getImgUrl(club.logo.light)}
                                 alt="Logo Light"
-                                width={0}
-                                height={0}
-                                sizes="100vw"
+                                width={200}
+                                height={200}
                                 className="max-w-full max-h-full object-contain"
                               />
                             </div>
@@ -394,9 +393,8 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                               <Image
                                 src={getImgUrl(club.logo.dark)}
                                 alt="Logo Dark"
-                                width={0}
-                                height={0}
-                                sizes="100vw"
+                                width={200}
+                                height={200}
                                 className="max-w-full max-h-full object-contain"
                               />
                             </div>
@@ -423,9 +421,8 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                               <Image
                                 src={getImgUrl(club.coverImage.light)}
                                 alt="Cover Light"
-                                width={0}
-                                height={0}
-                                sizes="100vw"
+                                width={400}
+                                height={225}
                                 className="w-full h-full object-cover"
                               />
                             </div>
@@ -441,9 +438,8 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                               <Image
                                 src={getImgUrl(club.coverImage.dark)}
                                 alt="Cover Dark"
-                                width={0}
-                                height={0}
-                                sizes="100vw"
+                                width={400}
+                                height={225}
                                 className="w-full h-full object-cover"
                               />
                             </div>
@@ -1050,11 +1046,32 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                         ? t("active") || "Active"
                         : t("inactive") || "Inactive"}
                     </Badge>
+                    <Link href={`/dashboard/teams-management/lineups/${teamId}`}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-blue-400 hover:text-blue-500 hover:bg-blue-500/10"
+                        title={t("lineups") || "Lineups"}
+                      >
+                        <Users className="size-4" />
+                      </Button>
+                    </Link>
+                    <Link href={`/dashboard/teams-management/edit/${teamId}`}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-amber-400 hover:text-amber-500 hover:bg-amber-500/10"
+                        title={t("editTeam") || "Edit Team"}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    </Link>
                     <Link href={`/dashboard/teams-management/view/${teamId}`}>
                       <Button
                         variant="ghost"
                         size="icon"
                         className="size-8 text-green-primary hover:text-green-primary hover:bg-green-primary/10"
+                        title={t("viewTeam") || "View Team"}
                       >
                         <Eye className="size-4" />
                       </Button>
@@ -1068,6 +1085,7 @@ function ClubDetails({ club, games = [], teams = [], players = [] }) {
                           handleRemoveTeam(teamId)
                         }
                         disabled={isLoading}
+                        title={t("removeTeam") || "Remove Team"}
                       >
                         <Trash2 className="size-4" />
                       </Button>
