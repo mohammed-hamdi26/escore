@@ -1184,14 +1184,21 @@ function PrizeDistributionField({ formik, currency }) {
   const updatePrize = (index, field, value) => {
     const updated = [...prizes];
     updated[index] = { ...updated[index], [field]: value };
-    // Auto-correct: if placeEnd < place, clear placeEnd
-    if (field === "placeEnd" && value && updated[index].place && parseInt(value) < parseInt(updated[index].place)) {
-      updated[index].placeEnd = updated[index].place;
-    }
-    if (field === "place" && updated[index].placeEnd && parseInt(updated[index].placeEnd) < parseInt(value)) {
-      updated[index].placeEnd = value;
-    }
     formik.setFieldValue("prizeDistribution", updated);
+  };
+
+  const onPrizeBlur = (index, field) => {
+    const updated = [...prizes];
+    const entry = updated[index];
+    // Auto-correct on blur: if placeEnd < place, set placeEnd = place
+    if (field === "placeEnd" && entry.placeEnd && entry.place && parseInt(entry.placeEnd) < parseInt(entry.place)) {
+      updated[index] = { ...entry, placeEnd: entry.place };
+      formik.setFieldValue("prizeDistribution", updated);
+    }
+    if (field === "place" && entry.placeEnd && parseInt(entry.placeEnd) < parseInt(entry.place)) {
+      updated[index] = { ...entry, placeEnd: entry.place };
+      formik.setFieldValue("prizeDistribution", updated);
+    }
   };
 
   const formatAmount = (num) => {
@@ -1244,6 +1251,7 @@ function PrizeDistributionField({ formik, currency }) {
                   min="1"
                   value={prize.place}
                   onChange={(e) => updatePrize(index, "place", parseInt(e.target.value) || "")}
+                  onBlur={() => onPrizeBlur(index, "place")}
                   className="w-16 h-10 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border border-border/50 text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-primary/50 text-foreground"
                   placeholder="#"
                 />
@@ -1256,6 +1264,7 @@ function PrizeDistributionField({ formik, currency }) {
                     const val = parseInt(e.target.value);
                     updatePrize(index, "placeEnd", val || "");
                   }}
+                  onBlur={() => onPrizeBlur(index, "placeEnd")}
                   className="w-16 h-10 px-2 rounded-lg bg-muted/50 dark:bg-[#1a1d2e] border border-border/50 text-sm text-center focus:outline-none focus:ring-2 focus:ring-green-primary/50 text-foreground placeholder:text-muted-foreground/40"
                   placeholder="To"
                 />
