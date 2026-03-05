@@ -10,7 +10,7 @@ function TournamentsHeader() {
   const pathname = usePathname();
 
   // Hide header on view and standings pages
-  if (pathname.includes("/view/") || pathname.includes("/standings/")) {
+  if (pathname.includes("/view/") || pathname.includes("/standings/") || pathname.includes("/bracket/")) {
     return null;
   }
 

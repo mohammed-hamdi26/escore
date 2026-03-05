@@ -31,7 +31,6 @@ import {
   CalendarRange,
   Swords,
 } from "lucide-react";
-import BracketView from "./BracketView";
 import { getImgUrl } from "@/lib/utils";
 import HtmlContent from "../ui app/HtmlContent";
 
@@ -383,8 +382,21 @@ function TournamentDetails({ tournament }) {
             </div>
           </div>
 
-          {/* Bracket */}
-          <BracketView tournament={tournament} />
+          {/* Bracket - Link to dedicated page */}
+          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Swords className="size-5 text-green-primary" />
+                {t("bracket") || "Bracket"}
+              </h3>
+              <Link href={`/dashboard/tournaments-management/bracket/${tournament.id || tournament._id}`}>
+                <Button className="gap-2 bg-green-primary hover:bg-green-primary/90 text-white">
+                  <Trophy className="size-4" />
+                  {t("manageBracket") || "Manage Bracket"}
+                </Button>
+              </Link>
+            </div>
+          </div>
 
         </div>
 
