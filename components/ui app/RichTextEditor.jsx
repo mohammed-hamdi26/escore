@@ -231,7 +231,13 @@ export default function RichTextEditor({
 
       // Smart auto-direction: detect RTL and apply direction
       if (quillRef.current && source === 'user') {
-        const quill = quillRef.current.getEditor();
+        let quill;
+        try {
+          quill = quillRef.current.getEditor();
+        } catch {
+          return;
+        }
+        if (!quill) return;
         const text = editor.getText();
         const shouldBeRTL = isRTL(text);
 
@@ -267,9 +273,15 @@ export default function RichTextEditor({
 
   // Setup paste handler for HTML/Markdown
   useEffect(() => {
-    if (!quillRef.current) return;
+    if (!quillRef.current || !QuillComponent) return;
 
-    const quill = quillRef.current.getEditor();
+    let quill;
+    try {
+      quill = quillRef.current.getEditor();
+    } catch {
+      // Editor not instantiated yet, retry after mount
+      return;
+    }
     if (!quill) return;
 
     const handlePaste = async (e) => {
