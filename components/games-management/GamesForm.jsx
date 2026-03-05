@@ -107,7 +107,22 @@ export default function GamesForm({
         // isActive is always included
         dataValues.isActive = values.isActive;
 
-        await submitFunction(dataValues);
+        const result = await new Promise((resolve) => {
+          setTimeout(async () => {
+            try {
+              const r = await submitFunction(dataValues);
+              resolve(r);
+            } catch (e) {
+              resolve({ success: false, error: e.message });
+            }
+          }, 0);
+        });
+
+        if (result?.success === false) {
+          toast.error(result?.error || "An error occurred");
+          return;
+        }
+
         typeForm === "add" && formik.resetForm();
         toast.success(
           typeForm === "add"
@@ -115,10 +130,7 @@ export default function GamesForm({
             : t("gameEdited") || "Game updated successfully"
         );
       } catch (error) {
-        // Ignore NEXT_REDIRECT - it's expected behavior for successful form submission
-        if (!error.toString().includes("NEXT_REDIRECT")) {
-          toast.error(error.message || "An error occurred");
-        }
+        toast.error(error.message || "An error occurred");
       }
     },
   });

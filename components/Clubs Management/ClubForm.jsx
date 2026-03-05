@@ -686,27 +686,30 @@ function ClubForm({ formType = "add", submit, club, countries = [] }) {
         delete dataValues.coverImageDark;
         delete dataValues.countryCode;
 
-        await submit(dataValues);
+        const result = await new Promise((resolve) => {
+          setTimeout(async () => {
+            try {
+              const r = await submit(dataValues);
+              resolve(r);
+            } catch (e) {
+              resolve({ success: false, error: e.message });
+            }
+          }, 0);
+        });
+
+        if (result?.success === false) {
+          toast.error(result?.error || t("error") || "An error occurred");
+          setIsSubmitting(false);
+          return;
+        }
+
         toast.success(
           formType === "add"
             ? t("createSuccess") || "Club created successfully"
             : t("updateSuccess") || "Club updated successfully"
         );
       } catch (error) {
-        if (
-          error?.digest?.startsWith("NEXT_REDIRECT") ||
-          error?.digest?.includes("NEXT_REDIRECT") ||
-          error?.toString().includes("NEXT_REDIRECT")
-        ) {
-          toast.success(
-            formType === "add"
-              ? t("createSuccess") || "Club created successfully"
-              : t("updateSuccess") || "Club updated successfully"
-          );
-          throw error;
-        } else {
-          toast.error(error.message || t("error") || "Something went wrong");
-        }
+        toast.error(error.message || t("error") || "Something went wrong");
       } finally {
         setIsSubmitting(false);
       }

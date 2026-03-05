@@ -130,7 +130,22 @@ export default function NewsForm({
         delete dataValues.authorImageLight;
         delete dataValues.authorImageDark;
 
-        await submit(dataValues);
+        const result = await new Promise((resolve) => {
+          setTimeout(async () => {
+            try {
+              const r = await submit(dataValues);
+              resolve(r);
+            } catch (e) {
+              resolve({ success: false, error: e.message });
+            }
+          }, 0);
+        });
+
+        if (result?.success === false) {
+          toast.error(result?.error || "An error occurred");
+          return;
+        }
+
         formType === "add" && formik.resetForm();
         toast.success(
           formType === "add"
@@ -138,9 +153,7 @@ export default function NewsForm({
             : t("newsUpdated") || "News updated successfully"
         );
       } catch (error) {
-        if (!error.toString().includes("NEXT_REDIRECT")) {
-          toast.error(error.message || "An error occurred");
-        }
+        toast.error(error.message || "An error occurred");
       } finally {
         setSubmitting(false);
       }

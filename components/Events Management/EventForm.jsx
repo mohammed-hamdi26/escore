@@ -871,23 +871,30 @@ function EventForm({ event, submit, formType = "add", countries = [] }) {
         delete dataValues.minTop8;
         delete dataValues.mustWinOne;
 
-        await submit(dataValues);
+        const result = await new Promise((resolve) => {
+          setTimeout(async () => {
+            try {
+              const r = await submit(dataValues);
+              resolve(r);
+            } catch (e) {
+              resolve({ success: false, error: e.message });
+            }
+          }, 0);
+        });
+
+        if (result?.success === false) {
+          toast.error(result?.error || t("error") || "An error occurred");
+          setIsSubmitting(false);
+          return;
+        }
+
         toast.success(
           formType === "add"
             ? t("createSuccess") || "Event created successfully"
             : t("updateSuccess") || "Event updated successfully"
         );
       } catch (error) {
-        if (error?.digest?.includes("NEXT_REDIRECT") || error.toString().includes("NEXT_REDIRECT")) {
-          toast.success(
-            formType === "add"
-              ? t("createSuccess") || "Event created successfully"
-              : t("updateSuccess") || "Event updated successfully"
-          );
-          throw error;
-        } else {
-          toast.error(error.message || t("error") || "Something went wrong");
-        }
+        toast.error(error.message || t("error") || "Something went wrong");
       } finally {
         setIsSubmitting(false);
       }

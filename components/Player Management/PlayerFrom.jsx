@@ -126,11 +126,7 @@ function PlayerFrom({
         formType === "add" && formik.resetForm();
         toast.success(successMessage);
       } catch (error) {
-        if (!error.toString().includes("Error: NEXT_REDIRECT")) {
-          toast.error(error.message);
-        } else {
-          toast.success(successMessage);
-        }
+        toast.error(error.message || "An error occurred");
       }
     },
   });

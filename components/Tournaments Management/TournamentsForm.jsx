@@ -421,7 +421,19 @@ export default function TournamentsForm({
         ];
         for (const f of tempFields) delete dataValues[f];
 
-        const result = await submit(dataValues);
+        // Call server action outside React's transition to prevent
+        // Quill componentDidUpdate setState conflict (React error #185)
+        const result = await new Promise((resolve) => {
+          setTimeout(async () => {
+            try {
+              const r = await submit(dataValues);
+              resolve(r);
+            } catch (e) {
+              resolve({ success: false, error: e.message });
+            }
+          }, 0);
+        });
+
         if (result?.success === false) {
           toast.error(result.error || "An error occurred");
           return;
@@ -433,9 +445,6 @@ export default function TournamentsForm({
         );
         router.push("/dashboard/tournaments-management");
       } catch (error) {
-        if (error?.digest?.includes("NEXT_REDIRECT")) {
-          throw error; // Re-throw to let Next.js handle the redirect
-        }
         toast.error(error.message || "An error occurred");
       }
     },

@@ -362,7 +362,21 @@ function NewsFormRedesign({
           originalLanguage: values.originalLanguage || "en",
         };
 
-        await submit(dataValues);
+        const result = await new Promise((resolve) => {
+          setTimeout(async () => {
+            try {
+              const r = await submit(dataValues);
+              resolve(r);
+            } catch (e) {
+              resolve({ success: false, error: e.message });
+            }
+          }, 0);
+        });
+
+        if (result?.success === false) {
+          toast.error(result?.error || t("error"));
+          return;
+        }
 
         if (formType === "add") {
           formik.resetForm();
@@ -370,13 +384,7 @@ function NewsFormRedesign({
 
         toast.success(formType === "add" ? t("addSuccess") : t("editSuccess"));
       } catch (error) {
-        if (!error.toString().includes("NEXT_REDIRECT")) {
-          toast.error(error.message || t("error"));
-        } else {
-          toast.success(
-            formType === "add" ? t("addSuccess") : t("editSuccess")
-          );
-        }
+        toast.error(error.message || t("error"));
       }
     },
   });

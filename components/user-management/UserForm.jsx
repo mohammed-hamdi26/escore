@@ -200,15 +200,7 @@ function UserForm({
         setRes(res);
         setOpen(true);
       } catch (error) {
-        if (!error.toString().includes("Error: NEXT_REDIRECT")) {
-          toast.error(t("An error occurred"));
-        } else {
-          toast.success(
-            formType === "add"
-              ? t("User added successfully")
-              : t("User updated successfully")
-          );
-        }
+        toast.error(error.message || t("An error occurred"));
       }
     },
   });

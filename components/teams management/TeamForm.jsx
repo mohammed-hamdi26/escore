@@ -111,13 +111,7 @@ function TeamForm({
         toast.success(successMessage);
         router.push("/dashboard/teams-management");
       } catch (error) {
-        // NEXT_REDIRECT means the action succeeded and called redirect()
-        if (error?.digest?.includes("NEXT_REDIRECT") || error.toString().includes("NEXT_REDIRECT")) {
-          toast.success(successMessage);
-          throw error; // Re-throw to let Next.js handle the redirect
-        } else {
-          toast.error(error.message);
-        }
+        toast.error(error.message || "An error occurred");
       }
     },
   });

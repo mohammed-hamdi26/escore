@@ -167,13 +167,8 @@ function TeamFormRedesign({
         toast.success(formType === "add" ? t("addSuccess") || "Team added successfully" : t("editSuccess") || "Team updated successfully");
         router.replace("/dashboard/teams-management");
       } catch (error) {
-        // NEXT_REDIRECT means the action succeeded and called redirect()
-        if (error?.digest?.includes("NEXT_REDIRECT") || error.toString().includes("NEXT_REDIRECT")) {
-          toast.success(formType === "add" ? t("addSuccess") || "Team added successfully" : t("editSuccess") || "Team updated successfully");
-          throw error; // Re-throw to let Next.js handle the redirect
-        } else {
-          toast.error(error.message || t("error") || "An error occurred");
-        }
+        toast.error(error.message || t("error") || "An error occurred");
+      }
       }
     },
   });
