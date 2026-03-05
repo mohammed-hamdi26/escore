@@ -5,7 +5,7 @@ import { ZoomIn, ZoomOut, Maximize, RotateCcw } from "lucide-react";
 
 const ZOOM_STEP = 0.1;
 const MIN_ZOOM = 0.5;
-const MAX_ZOOM = 1.5;
+const MAX_ZOOM = 2.0;
 
 function BracketZoomControls({ zoom, onZoomChange, onFitToScreen, onReset }) {
   const t = useTranslations("TournamentDetails");
@@ -26,7 +26,7 @@ function BracketZoomControls({ zoom, onZoomChange, onFitToScreen, onReset }) {
         <ZoomOut className="size-3.5" />
       </button>
 
-      <span className="text-[10px] font-mono text-muted-foreground min-w-[36px] text-center select-none">
+      <span className="text-xs font-mono text-muted-foreground min-w-[36px] text-center select-none">
         {zoomPercent}%
       </span>
 

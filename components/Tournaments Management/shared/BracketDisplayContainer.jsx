@@ -237,7 +237,7 @@ function BracketDisplayContainer({ children, rounds, showMinimap = true }) {
         <div
           ref={containerRef}
           className="overflow-auto rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-muted/5"
-          style={{ maxHeight: "70vh" }}
+          style={{ maxHeight: "calc(100vh - 280px)", minHeight: "400px" }}
           tabIndex={0}
         >
           <div

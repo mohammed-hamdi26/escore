@@ -13,25 +13,25 @@ const STATUS_COLORS = {
 function TeamRow({ team, score, isWinner, isBye, t }) {
   if (isBye) {
     return (
-      <div className="flex items-center justify-between px-3 py-2 opacity-40">
-        <span className="text-xs text-muted-foreground italic">{t("bye") || "BYE"}</span>
-        <span className="text-xs text-muted-foreground">-</span>
+      <div className="flex items-center justify-between px-3 py-2.5 opacity-40">
+        <span className="text-sm text-muted-foreground italic">{t("bye") || "BYE"}</span>
+        <span className="text-sm text-muted-foreground">-</span>
       </div>
     );
   }
 
   if (!team) {
     return (
-      <div className="flex items-center justify-between px-3 py-2 opacity-50">
-        <span className="text-xs text-muted-foreground italic">{t("tbd") || "TBD"}</span>
-        <span className="text-xs text-muted-foreground">-</span>
+      <div className="flex items-center justify-between px-3 py-2.5 opacity-50">
+        <span className="text-sm text-muted-foreground italic">{t("tbd") || "TBD"}</span>
+        <span className="text-sm text-muted-foreground">-</span>
       </div>
     );
   }
 
   return (
     <div
-      className={`flex items-center justify-between px-3 py-2 transition-colors ${
+      className={`flex items-center justify-between px-3 py-2.5 transition-colors ${
         isWinner
           ? "bg-green-500/10"
           : ""
@@ -42,15 +42,15 @@ function TeamRow({ team, score, isWinner, isBye, t }) {
           <img
             src={getImgUrl(team.logo.light, "thumbnail")}
             alt={team.name}
-            className="size-5 rounded object-cover flex-shrink-0"
+            className="size-6 rounded object-cover flex-shrink-0"
           />
         ) : (
-          <div className="size-5 rounded bg-muted flex items-center justify-center flex-shrink-0">
-            <Trophy className="size-3 text-muted-foreground" />
+          <div className="size-6 rounded bg-muted flex items-center justify-center flex-shrink-0">
+            <Trophy className="size-3.5 text-muted-foreground" />
           </div>
         )}
         <span
-          className={`text-xs truncate ${
+          className={`text-sm truncate ${
             isWinner ? "font-bold text-green-500" : "text-foreground"
           }`}
         >
@@ -58,7 +58,7 @@ function TeamRow({ team, score, isWinner, isBye, t }) {
         </span>
       </div>
       <span
-        className={`text-xs font-mono ml-2 ${
+        className={`text-sm font-mono ml-2 ${
           isWinner ? "font-bold text-green-500" : "text-muted-foreground"
         }`}
       >
@@ -81,20 +81,20 @@ function BracketMatchCard({ match, onClick }) {
 
     return (
       <div
-        className={`rounded-lg border overflow-hidden min-w-[180px] max-w-[220px] ${statusColor}`}
+        className={`rounded-lg border overflow-hidden min-w-[200px] max-w-[280px] ${statusColor}`}
       >
         {/* Match header */}
         <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-white/5">
-          <span className="text-[10px] text-muted-foreground font-medium">
+          <span className="text-xs text-muted-foreground font-medium">
             {match.matchLabel || match.round || match.roundName || `R${match.bracketRound}`}
           </span>
           {match.status === "live" && (
-            <span className="text-[10px] text-green-500 font-bold uppercase animate-pulse">
+            <span className="text-xs text-green-500 font-bold uppercase animate-pulse">
               {t("live") || "LIVE"}
             </span>
           )}
           {match.status === "completed" && (
-            <span className="text-[10px] text-purple-500 font-medium">
+            <span className="text-xs text-purple-500 font-medium">
               {t("final") || "Final"}
             </span>
           )}
@@ -109,7 +109,7 @@ function BracketMatchCard({ match, onClick }) {
             return (
               <div key={entity?.id || i} className="flex items-center justify-between px-3 py-1.5">
                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                  <span className={`text-[10px] font-bold w-4 ${
+                  <span className={`text-xs font-bold w-4 ${
                     p.placement === 1 ? "text-yellow-500" :
                     p.placement === 2 ? "text-gray-400" :
                     p.placement === 3 ? "text-orange-600" :
@@ -124,10 +124,10 @@ function BracketMatchCard({ match, onClick }) {
                       <Trophy className="size-2.5 text-muted-foreground" />
                     </div>
                   )}
-                  <span className="text-[11px] text-foreground truncate">{name}</span>
+                  <span className="text-sm text-foreground truncate">{name}</span>
                 </div>
                 {p.points !== undefined && p.points !== null && (
-                  <span className="text-[10px] font-mono text-muted-foreground ml-1">
+                  <span className="text-xs font-mono text-muted-foreground ml-1">
                     {p.points}
                   </span>
                 )}
@@ -139,7 +139,7 @@ function BracketMatchCard({ match, onClick }) {
         {/* More indicator */}
         {remaining > 0 && (
           <div className="px-3 py-1 bg-muted/20 border-t border-white/5">
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               +{remaining} {t("more") || "more"}
             </span>
           </div>
@@ -161,7 +161,7 @@ function BracketMatchCard({ match, onClick }) {
 
   return (
     <div
-      className={`rounded-lg border overflow-hidden min-w-[180px] max-w-[220px] ${statusColor} ${
+      className={`rounded-lg border overflow-hidden min-w-[200px] max-w-[280px] ${statusColor} ${
         onClick ? "cursor-pointer hover:ring-2 hover:ring-green-primary/40 transition-all" : ""
       }`}
       onClick={onClick ? () => onClick(match) : undefined}
@@ -171,7 +171,7 @@ function BracketMatchCard({ match, onClick }) {
     >
       {/* Match header */}
       <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-white/5">
-        <span className="text-[10px] text-muted-foreground font-medium">
+        <span className="text-xs text-muted-foreground font-medium">
           {match.isResetMatch
             ? (t("gfReset") || "GF Reset")
             : match.group
@@ -179,12 +179,12 @@ function BracketMatchCard({ match, onClick }) {
             : match.round || match.roundName || `R${match.bracketRound}`}
         </span>
         {match.status === "live" && (
-          <span className="text-[10px] text-green-500 font-bold uppercase animate-pulse">
+          <span className="text-xs text-green-500 font-bold uppercase animate-pulse">
             {t("live") || "LIVE"}
           </span>
         )}
         {match.status === "completed" && (
-          <span className="text-[10px] text-purple-500 font-medium">
+          <span className="text-xs text-purple-500 font-medium">
             {t("final") || "Final"}
           </span>
         )}
@@ -211,7 +211,7 @@ function BracketMatchCard({ match, onClick }) {
       {/* Best of indicator */}
       {match.bestOf && match.bestOf > 1 && (
         <div className="px-3 py-1 bg-muted/20 border-t border-white/5">
-          <span className="text-[10px] text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             Bo{match.bestOf}
           </span>
         </div>

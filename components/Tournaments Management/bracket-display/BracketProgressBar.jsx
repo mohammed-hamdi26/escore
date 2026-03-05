@@ -93,7 +93,7 @@ function BracketProgressBar({ bracket }) {
   return (
     <div className="mb-5">
       {/* Progress bar */}
-      <div className="w-full h-1.5 rounded-full bg-muted/50 overflow-hidden">
+      <div className="w-full h-2 rounded-full bg-muted/50 overflow-hidden">
         <div
           className="h-full rounded-full bg-green-primary transition-all duration-500 ease-out"
           style={{ width: `${percentage}%` }}
@@ -107,10 +107,10 @@ function BracketProgressBar({ bracket }) {
 
       {/* Stats */}
       <div className="flex items-center justify-between mt-1.5">
-        <span className="text-[11px] text-muted-foreground">
+        <span className="text-xs text-muted-foreground">
           {completed} / {total} {t("matchesCompleted") || "matches completed"}
         </span>
-        <span className="text-[11px] text-muted-foreground">
+        <span className="text-xs text-muted-foreground">
           {percentage}%
         </span>
       </div>

@@ -174,8 +174,8 @@ function BracketHeader({
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h3 className="text-lg font-semibold text-foreground flex items-center gap-2 flex-wrap">
           <Trophy className="size-5 text-green-primary" />
           {t("bracket") || "Bracket"}
           <span className="text-sm font-normal text-muted-foreground ml-2">
@@ -193,8 +193,6 @@ function BracketHeader({
               {bracket.battleRoyaleConfig?.totalRounds || "?"})
             </span>
           )}
-        </h3>
-        <div className="flex items-center gap-2">
           {/* Status badge */}
           <span
             className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -207,7 +205,8 @@ function BracketHeader({
           >
             {t(bracket.bracketStatus) || bracket.bracketStatus}
           </span>
-
+        </h3>
+        <div className="flex items-center gap-2">
           {/* Advance Stage button */}
           {canAdvanceStage && (
             <Button
@@ -216,7 +215,7 @@ function BracketHeader({
               className="gap-1 bg-green-primary hover:bg-green-primary/90 text-white"
             >
               <ArrowRight className="size-3.5" />
-              {t("advanceToNextStage") || "Advance to Next Stage"}
+              <span className="hidden sm:inline">{t("advanceToNextStage") || "Advance to Next Stage"}</span>
             </Button>
           )}
 
@@ -227,7 +226,7 @@ function BracketHeader({
             className="gap-1 border-gray-300 dark:border-gray-600"
           >
             <RefreshCw className="size-3.5" />
-            {t("refresh") || "Refresh"}
+            <span className="hidden sm:inline">{t("refresh") || "Refresh"}</span>
           </Button>
 
           <Button
@@ -237,7 +236,7 @@ function BracketHeader({
             className="gap-1 border-red-500/30 text-red-500 hover:bg-red-500/10"
           >
             <Trash2 className="size-3.5" />
-            {t("deleteBracket") || "Delete"}
+            <span className="hidden sm:inline">{t("deleteBracket") || "Delete"}</span>
           </Button>
         </div>
       </div>

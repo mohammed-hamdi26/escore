@@ -15,7 +15,7 @@ function RoundProgressBadge({ matches }) {
 
   if (completed === total) {
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] text-green-500 font-medium">
+      <span className="inline-flex items-center gap-1 text-xs text-green-500 font-medium">
         <CheckCircle className="size-3" />
         {completed}/{total}
       </span>
@@ -24,7 +24,7 @@ function RoundProgressBadge({ matches }) {
 
   if (completed > 0) {
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] text-amber-500 font-medium">
+      <span className="inline-flex items-center gap-1 text-xs text-amber-500 font-medium">
         <Clock className="size-3" />
         {completed}/{total}
       </span>
@@ -32,7 +32,7 @@ function RoundProgressBadge({ matches }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60 font-medium">
+    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground/60 font-medium">
       <Circle className="size-3" />
       0/{total}
     </span>
@@ -42,18 +42,18 @@ function RoundProgressBadge({ matches }) {
 function BracketRounds({ rounds, onMatchClick }) {
   return (
     <div className="pb-4">
-      <div className="flex gap-8 min-w-fit">
+      <div className="flex gap-4 lg:gap-6 min-w-fit">
         {rounds.map((round) => (
           <div key={`${round.name}-${round.round}`} className="flex flex-col">
             {/* Round Header */}
             <div className="text-center mb-3 flex flex-col items-center gap-1">
-              <span className="text-xs font-medium text-muted-foreground px-3 py-1 rounded-full bg-muted/50">
+              <span className="text-sm font-medium text-muted-foreground px-3 py-1 rounded-full bg-muted/50">
                 {round.name}
               </span>
               <RoundProgressBadge matches={round.matches} />
             </div>
             {/* Matches */}
-            <div className="flex flex-col justify-around flex-1 gap-4">
+            <div className="flex flex-col justify-around flex-1 gap-3">
               {round.matches.map((match) => (
                 <BracketMatchCard key={match.id} match={match} onClick={onMatchClick} />
               ))}

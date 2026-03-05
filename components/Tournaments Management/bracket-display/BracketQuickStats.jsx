@@ -61,11 +61,11 @@ function countBracketStats(bracket) {
 
 function StatCard({ icon: Icon, value, label, color = "text-green-primary" }) {
   return (
-    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-muted/20 dark:bg-[#1a1d2e]/50 min-w-0">
+    <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-muted/20 dark:bg-[#1a1d2e]/50 min-w-0">
       <Icon className={`size-4 flex-shrink-0 ${color}`} />
       <div className="min-w-0">
         <div className="text-sm font-bold text-foreground">{value}</div>
-        <div className="text-[10px] text-muted-foreground truncate">{label}</div>
+        <div className="text-xs text-muted-foreground truncate">{label}</div>
       </div>
     </div>
   );
