@@ -514,6 +514,34 @@ export async function updateMatchResult(id, result) {
   }
 }
 
+// Update match result for auto-generated bracket matches (round robin, single elim, etc.)
+export async function updateBracketMatchResultAction(matchId, tournamentId, data) {
+  const locale = await getLocale();
+  try {
+    const payload = {
+      team1Score: data.team1Score,
+      team2Score: data.team2Score,
+    };
+    // Map winnerId -> winner (generic endpoint uses "winner" field)
+    if (data.winnerId) {
+      payload.winner = data.winnerId;
+    }
+
+    const res = await apiClient.patch(`/matches/${matchId}/result`, payload);
+    revalidatePath(`/${locale}/dashboard/tournaments-management/view/${tournamentId}`);
+    revalidatePath(`/${locale}/dashboard/matches-management`);
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Update bracket match result error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error updating match result";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
 // Update participant results for multi-participant matches
 export async function updateParticipantResults(matchId, participants) {
   "use server";

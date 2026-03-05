@@ -16,6 +16,7 @@ export default function MatchResultDialog({
   match,
   onResultSet,
   participationType,
+  saveAction,
 }) {
   const t = useTranslations("TournamentDetails");
   const isPlayer = participationType === "player";
@@ -135,11 +136,9 @@ export default function MatchResultDialog({
         data.winnerId = entity2Id;
       }
 
-      const result = await setCustomMatchResultAction(
-        tournamentId,
-        matchId,
-        data
-      );
+      const result = saveAction
+        ? await saveAction(matchId, tournamentId, data)
+        : await setCustomMatchResultAction(tournamentId, matchId, data);
       if (result.success) {
         showSuccess(t("resultSaved") || "Match result saved");
         onResultSet();
@@ -492,7 +491,7 @@ export default function MatchResultDialog({
           {/* Footer */}
           <div className="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-700">
             <div>
-              {hasExistingResult && (
+              {hasExistingResult && !saveAction && (
                 <button
                   type="button"
                   onClick={() => setShowClearConfirm(true)}

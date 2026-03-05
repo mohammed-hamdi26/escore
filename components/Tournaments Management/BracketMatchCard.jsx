@@ -68,7 +68,7 @@ function TeamRow({ team, score, isWinner, isBye, t }) {
   );
 }
 
-function BracketMatchCard({ match }) {
+function BracketMatchCard({ match, onClick }) {
   const t = useTranslations("TournamentDetails");
   const statusColor = STATUS_COLORS[match.status] || STATUS_COLORS.scheduled;
 
@@ -161,7 +161,13 @@ function BracketMatchCard({ match }) {
 
   return (
     <div
-      className={`rounded-lg border overflow-hidden min-w-[180px] max-w-[220px] ${statusColor}`}
+      className={`rounded-lg border overflow-hidden min-w-[180px] max-w-[220px] ${statusColor} ${
+        onClick ? "cursor-pointer hover:ring-2 hover:ring-green-primary/40 transition-all" : ""
+      }`}
+      onClick={onClick ? () => onClick(match) : undefined}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(match); } } : undefined}
     >
       {/* Match header */}
       <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-white/5">

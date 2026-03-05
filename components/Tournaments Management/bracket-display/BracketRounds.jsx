@@ -39,7 +39,7 @@ function RoundProgressBadge({ matches }) {
   );
 }
 
-function BracketRounds({ rounds }) {
+function BracketRounds({ rounds, onMatchClick }) {
   return (
     <div className="pb-4">
       <div className="flex gap-8 min-w-fit">
@@ -55,7 +55,7 @@ function BracketRounds({ rounds }) {
             {/* Matches */}
             <div className="flex flex-col justify-around flex-1 gap-4">
               {round.matches.map((match) => (
-                <BracketMatchCard key={match.id} match={match} />
+                <BracketMatchCard key={match.id} match={match} onClick={onMatchClick} />
               ))}
             </div>
           </div>

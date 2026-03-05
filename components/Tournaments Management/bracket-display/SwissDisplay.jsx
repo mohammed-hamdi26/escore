@@ -6,14 +6,27 @@ import { Button } from "../../ui/button";
 import { Play, Loader2 } from "lucide-react";
 import BracketMatchCard from "../BracketMatchCard";
 import ConfirmationDialog from "../shared/ConfirmationDialog";
+import MatchResultDialog from "../MatchResultDialog";
+import { updateBracketMatchResultAction } from "@/app/[locale]/_Lib/actions";
 
-function SwissDisplay({ bracket, onAdvanceRound, advancingRound }) {
+function SwissDisplay({ bracket, onAdvanceRound, advancingRound, tournament, onRefresh, participationType }) {
   const t = useTranslations("TournamentDetails");
   const [showAdvanceConfirm, setShowAdvanceConfirm] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState(null);
 
   if (!bracket.swissRounds || bracket.swissRounds.length === 0) {
     return null;
   }
+
+  const handleMatchClick = tournament ? (match) => {
+    if (!match.team1 && !match.team2 && !match.player1 && !match.player2) return;
+    setSelectedMatch(match);
+  } : undefined;
+
+  const handleResultSet = () => {
+    setSelectedMatch(null);
+    if (onRefresh) onRefresh();
+  };
 
   const currentRoundIndex = (bracket.currentSwissRound || 1) - 1;
   const currentRoundMatches = bracket.swissRounds[currentRoundIndex]?.matches || [];
@@ -86,12 +99,24 @@ function SwissDisplay({ bracket, onAdvanceRound, advancingRound }) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 justify-items-center">
               {round.matches.map((match) => (
-                <BracketMatchCard key={match.id} match={match} />
+                <BracketMatchCard key={match.id} match={match} onClick={handleMatchClick} />
               ))}
             </div>
           </div>
         ))}
       </div>
+
+      {selectedMatch && tournament && (
+        <MatchResultDialog
+          open={!!selectedMatch}
+          onOpenChange={(open) => { if (!open) setSelectedMatch(null); }}
+          tournament={tournament}
+          match={selectedMatch}
+          onResultSet={handleResultSet}
+          participationType={participationType || "team"}
+          saveAction={updateBracketMatchResultAction}
+        />
+      )}
     </div>
   );
 }

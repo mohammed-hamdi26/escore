@@ -305,6 +305,9 @@ function BracketView({ tournament }) {
         <MultiStageDisplay
           bracket={bracket}
           activeStageTab={activeStageTab}
+          tournament={tournament}
+          onRefresh={fetchBracket}
+          participationType={tournament?.participationType || "team"}
         />
       );
     }
@@ -312,13 +315,34 @@ function BracketView({ tournament }) {
     // Single bracket type display
     switch (bracket.bracketType) {
       case "single_elimination":
-        return <SingleElimDisplay bracket={bracket} />;
+        return (
+          <SingleElimDisplay
+            bracket={bracket}
+            tournament={tournament}
+            onRefresh={fetchBracket}
+            participationType={tournament?.participationType || "team"}
+          />
+        );
 
       case "double_elimination":
-        return <DoubleElimDisplay bracket={bracket} />;
+        return (
+          <DoubleElimDisplay
+            bracket={bracket}
+            tournament={tournament}
+            onRefresh={fetchBracket}
+            participationType={tournament?.participationType || "team"}
+          />
+        );
 
       case "round_robin":
-        return <RoundRobinDisplay bracket={bracket} />;
+        return (
+          <RoundRobinDisplay
+            bracket={bracket}
+            tournament={tournament}
+            onRefresh={fetchBracket}
+            participationType={tournament?.participationType || "team"}
+          />
+        );
 
       case "swiss":
         return (
@@ -326,6 +350,9 @@ function BracketView({ tournament }) {
             bracket={bracket}
             onAdvanceRound={handleAdvanceSwissRound}
             advancingRound={advancingRound}
+            tournament={tournament}
+            onRefresh={fetchBracket}
+            participationType={tournament?.participationType || "team"}
           />
         );
 

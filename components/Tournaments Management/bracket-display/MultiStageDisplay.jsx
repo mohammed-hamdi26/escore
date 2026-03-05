@@ -5,10 +5,13 @@ import { useTranslations } from "next-intl";
 import { Layers } from "lucide-react";
 import BracketMatchCard from "../BracketMatchCard";
 import BracketRounds from "./BracketRounds";
+import MatchResultDialog from "../MatchResultDialog";
+import { updateBracketMatchResultAction } from "@/app/[locale]/_Lib/actions";
 
-function MultiStageDisplay({ bracket, activeStageTab }) {
+function MultiStageDisplay({ bracket, activeStageTab, tournament, onRefresh, participationType }) {
   const t = useTranslations("TournamentDetails");
   const [activeGroupTab, setActiveGroupTab] = useState(0);
+  const [selectedMatch, setSelectedMatch] = useState(null);
 
   if (!bracket.stages) return null;
 
@@ -26,6 +29,16 @@ function MultiStageDisplay({ bracket, activeStageTab }) {
       </div>
     );
   }
+
+  const handleMatchClick = tournament ? (match) => {
+    if (!match.team1 && !match.team2 && !match.player1 && !match.player2) return;
+    setSelectedMatch(match);
+  } : undefined;
+
+  const handleResultSet = () => {
+    setSelectedMatch(null);
+    if (onRefresh) onRefresh();
+  };
 
   return (
     <div>
@@ -66,6 +79,7 @@ function MultiStageDisplay({ bracket, activeStageTab }) {
           {activeStage.groups[activeGroupTab] && (
             <BracketRounds
               rounds={activeStage.groups[activeGroupTab].rounds}
+              onMatchClick={handleMatchClick}
             />
           )}
         </div>
@@ -84,7 +98,7 @@ function MultiStageDisplay({ bracket, activeStageTab }) {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 justify-items-center">
                   {round.matches.map((match) => (
-                    <BracketMatchCard key={match.id} match={match} />
+                    <BracketMatchCard key={match.id} match={match} onClick={handleMatchClick} />
                   ))}
                 </div>
               </div>
@@ -102,7 +116,7 @@ function MultiStageDisplay({ bracket, activeStageTab }) {
                 <h4 className="text-sm font-medium text-muted-foreground mb-4">
                   {t("winnersBracket") || "Winners Bracket"}
                 </h4>
-                <BracketRounds rounds={activeStage.rounds.winners} />
+                <BracketRounds rounds={activeStage.rounds.winners} onMatchClick={handleMatchClick} />
               </div>
             )}
           {activeStage.rounds.losers &&
@@ -111,7 +125,7 @@ function MultiStageDisplay({ bracket, activeStageTab }) {
                 <h4 className="text-sm font-medium text-muted-foreground mb-4">
                   {t("losersBracket") || "Losers Bracket"}
                 </h4>
-                <BracketRounds rounds={activeStage.rounds.losers} />
+                <BracketRounds rounds={activeStage.rounds.losers} onMatchClick={handleMatchClick} />
               </div>
             )}
           {activeStage.rounds.grandFinals &&
@@ -123,13 +137,25 @@ function MultiStageDisplay({ bracket, activeStageTab }) {
                 <div className="flex justify-center">
                   <div className="flex flex-col gap-3">
                     {activeStage.rounds.grandFinals.map((match) => (
-                      <BracketMatchCard key={match.id} match={match} />
+                      <BracketMatchCard key={match.id} match={match} onClick={handleMatchClick} />
                     ))}
                   </div>
                 </div>
               </div>
             )}
         </>
+      )}
+
+      {selectedMatch && tournament && (
+        <MatchResultDialog
+          open={!!selectedMatch}
+          onOpenChange={(open) => { if (!open) setSelectedMatch(null); }}
+          tournament={tournament}
+          match={selectedMatch}
+          onResultSet={handleResultSet}
+          participationType={participationType || "team"}
+          saveAction={updateBracketMatchResultAction}
+        />
       )}
     </div>
   );

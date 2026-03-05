@@ -3,10 +3,23 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import BracketRounds from "./BracketRounds";
+import MatchResultDialog from "../MatchResultDialog";
+import { updateBracketMatchResultAction } from "@/app/[locale]/_Lib/actions";
 
-function RoundRobinDisplay({ bracket }) {
+function RoundRobinDisplay({ bracket, tournament, onRefresh, participationType }) {
   const t = useTranslations("TournamentDetails");
   const [activeGroupTab, setActiveGroupTab] = useState(0);
+  const [selectedMatch, setSelectedMatch] = useState(null);
+
+  const handleMatchClick = (match) => {
+    if (!match.team1 && !match.team2 && !match.player1 && !match.player2) return;
+    setSelectedMatch(match);
+  };
+
+  const handleResultSet = () => {
+    setSelectedMatch(null);
+    if (onRefresh) onRefresh();
+  };
 
   if (!bracket.groups || bracket.groups.length === 0) {
     return null;
@@ -53,7 +66,22 @@ function RoundRobinDisplay({ bracket }) {
         ))}
       </div>
       {bracket.groups[activeGroupTab] && (
-        <BracketRounds rounds={bracket.groups[activeGroupTab].rounds} />
+        <BracketRounds
+          rounds={bracket.groups[activeGroupTab].rounds}
+          onMatchClick={tournament ? handleMatchClick : undefined}
+        />
+      )}
+
+      {selectedMatch && tournament && (
+        <MatchResultDialog
+          open={!!selectedMatch}
+          onOpenChange={(open) => { if (!open) setSelectedMatch(null); }}
+          tournament={tournament}
+          match={selectedMatch}
+          onResultSet={handleResultSet}
+          participationType={participationType || "team"}
+          saveAction={updateBracketMatchResultAction}
+        />
       )}
     </div>
   );
