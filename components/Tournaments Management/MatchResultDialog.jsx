@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Trophy, X, Loader2, Minus, Plus, Info, AlertTriangle } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
-import { setCustomMatchResultAction } from "@/app/[locale]/_Lib/actions";
+import { setCustomMatchResultAction, overrideSlotResultAction } from "@/app/[locale]/_Lib/actions";
 import { showSuccess } from "@/lib/bracket-toast";
 import InlineError from "./shared/InlineError";
 import ConfirmationDialog from "./shared/ConfirmationDialog";
@@ -136,9 +136,25 @@ export default function MatchResultDialog({
         data.winnerId = entity2Id;
       }
 
-      const result = saveAction
-        ? await saveAction(matchId, tournamentId, data)
-        : await setCustomMatchResultAction(tournamentId, matchId, data);
+      let result;
+      // If this is a slot without a real Match document, use slot override endpoint
+      if (match._slotId && !match._hasMatch) {
+        if (!data.winnerId) {
+          setError(t("selectWinner") || "A winner must be selected for bracket slots");
+          setSaving(false);
+          return;
+        }
+        const slotData = {
+          winnerId: data.winnerId,
+          score: { p1: data.team1Score, p2: data.team2Score },
+        };
+        result = await overrideSlotResultAction(tournamentId, match._slotId, slotData);
+      } else if (saveAction) {
+        result = await saveAction(matchId, tournamentId, data);
+      } else {
+        result = await setCustomMatchResultAction(tournamentId, matchId, data);
+      }
+
       if (result.success) {
         showSuccess(t("resultSaved") || "Match result saved");
         onResultSet();
