@@ -194,14 +194,7 @@ function PlayerFormRedesign({
         // Navigate back to player list after successful submission
         router.push("/dashboard/player-management");
       } catch (error) {
-        // NEXT_REDIRECT means the action succeeded and called redirect()
-        // We must re-throw it so Next.js can handle the redirect
-        if (error?.digest?.includes("NEXT_REDIRECT") || error.toString().includes("NEXT_REDIRECT")) {
-          toast.success(formType === "add" ? t("addSuccess") : t("editSuccess"));
-          throw error; // Re-throw to let Next.js handle the redirect
-        } else {
-          toast.error(error.message || t("error"));
-        }
+        toast.error(error.message || t("error"));
       }
     },
   });

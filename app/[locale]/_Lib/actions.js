@@ -127,11 +127,16 @@ export async function addPlayer(playerData) {
     const res = await apiClient.post("/players", cleanData);
     console.log("add player", res);
     revalidatePath(`/${locale}/dashboard/player-management`);
+    return { success: true };
   } catch (e) {
     console.log("Player creation error:", e.response?.data || e.message);
-    throw new Error(e.response?.data?.message || "Error in adding player");
+    const errors = e.response?.data?.errors;
+    const errorDetails = errors?.length
+      ? errors.map((err) => `${err.field}: ${err.message}`).join(", ")
+      : "";
+    const message = e.response?.data?.message || "Error in adding player";
+    throw new Error(errorDetails ? `${message} (${errorDetails})` : message);
   }
-  redirect(`/${locale}/dashboard/player-management`);
 }
 export async function editPlayer(playerData) {
   const locale = await getLocale();
@@ -141,11 +146,16 @@ export async function editPlayer(playerData) {
     revalidatePath(
       `${locale}/dashboard/player-management/edit/${cleanData.id}`
     );
+    return { success: true };
   } catch (e) {
     console.log("Player update error:", e.response?.data || e.message);
-    throw new Error(e.response?.data?.message || "Error in updating player");
+    const errors = e.response?.data?.errors;
+    const errorDetails = errors?.length
+      ? errors.map((err) => `${err.field}: ${err.message}`).join(", ")
+      : "";
+    const message = e.response?.data?.message || "Error in updating player";
+    throw new Error(errorDetails ? `${message} (${errorDetails})` : message);
   }
-  redirect(`/${locale}/dashboard/player-management`);
 }
 
 export async function fetchPlayersByTeam(teamId) {
