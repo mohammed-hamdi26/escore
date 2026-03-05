@@ -187,7 +187,18 @@ function PlayerFormRedesign({
           ? Number(values.marketValue)
           : (player ? null : undefined);
 
-        const result = await submit(dataValues);
+        // Call server action outside React's transition to prevent
+        // Quill componentDidUpdate setState conflict (React error #185)
+        const result = await new Promise((resolve) => {
+          setTimeout(async () => {
+            try {
+              const r = await submit(dataValues);
+              resolve(r);
+            } catch (e) {
+              resolve({ success: false, error: e.message });
+            }
+          }, 0);
+        });
 
         if (result?.success) {
           toast.success(formType === "add" ? t("addSuccess") : t("editSuccess"));
