@@ -187,12 +187,14 @@ function PlayerFormRedesign({
           ? Number(values.marketValue)
           : (player ? null : undefined);
 
-        await submit(dataValues);
+        const result = await submit(dataValues);
 
-        toast.success(formType === "add" ? t("addSuccess") : t("editSuccess"));
-
-        // Navigate back to player list after successful submission
-        router.push("/dashboard/player-management");
+        if (result?.success) {
+          toast.success(formType === "add" ? t("addSuccess") : t("editSuccess"));
+          router.push("/dashboard/player-management");
+        } else {
+          toast.error(result?.error || t("error"));
+        }
       } catch (error) {
         toast.error(error.message || t("error"));
       }

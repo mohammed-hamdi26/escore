@@ -124,8 +124,7 @@ export async function addPlayer(playerData) {
   const locale = await getLocale();
   try {
     const cleanData = cleanNullValues(playerData);
-    const res = await apiClient.post("/players", cleanData);
-    console.log("add player", res);
+    await apiClient.post("/players", cleanData);
     revalidatePath(`/${locale}/dashboard/player-management`);
     return { success: true };
   } catch (e) {
@@ -135,14 +134,14 @@ export async function addPlayer(playerData) {
       ? errors.map((err) => `${err.field}: ${err.message}`).join(", ")
       : "";
     const message = e.response?.data?.message || "Error in adding player";
-    throw new Error(errorDetails ? `${message} (${errorDetails})` : message);
+    return { success: false, error: errorDetails ? `${message} (${errorDetails})` : message };
   }
 }
 export async function editPlayer(playerData) {
   const locale = await getLocale();
   try {
     const cleanData = cleanNullValues(playerData);
-    const res = await apiClient.put(`/players/${cleanData.id}`, cleanData);
+    await apiClient.put(`/players/${cleanData.id}`, cleanData);
     revalidatePath(
       `${locale}/dashboard/player-management/edit/${cleanData.id}`
     );
@@ -154,7 +153,7 @@ export async function editPlayer(playerData) {
       ? errors.map((err) => `${err.field}: ${err.message}`).join(", ")
       : "";
     const message = e.response?.data?.message || "Error in updating player";
-    throw new Error(errorDetails ? `${message} (${errorDetails})` : message);
+    return { success: false, error: errorDetails ? `${message} (${errorDetails})` : message };
   }
 }
 
