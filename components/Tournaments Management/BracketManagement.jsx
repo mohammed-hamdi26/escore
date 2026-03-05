@@ -75,7 +75,7 @@ function BracketManagement({ tournament }) {
       </div>
 
       {/* Bracket View - Full Page */}
-      <BracketView tournament={tournament} />
+      <BracketView tournament={tournament} fullPage />
     </div>
   );
 }

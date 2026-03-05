@@ -28,7 +28,7 @@ import BracketProgressBar from "./bracket-display/BracketProgressBar";
 import BracketQuickStats from "./bracket-display/BracketQuickStats";
 import BracketDisplayContainer from "./shared/BracketDisplayContainer";
 
-function BracketView({ tournament }) {
+function BracketView({ tournament, fullPage = false }) {
   const t = useTranslations("TournamentDetails");
   const [bracket, setBracket] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -405,7 +405,7 @@ function BracketView({ tournament }) {
         {bracket.bracketType === "custom" ? (
           renderBracketContent()
         ) : (
-          <BracketDisplayContainer rounds={getMobileRounds()}>
+          <BracketDisplayContainer rounds={getMobileRounds()} fullPage={fullPage}>
             {renderBracketContent()}
           </BracketDisplayContainer>
         )}

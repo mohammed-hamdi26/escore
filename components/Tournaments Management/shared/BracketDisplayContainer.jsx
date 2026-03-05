@@ -10,7 +10,7 @@ import MobileBracketView from "../bracket-display/MobileBracketView";
 
 const VIEW_STORAGE_KEY = "escore-bracket-view-mode";
 
-function BracketDisplayContainer({ children, rounds, showMinimap = true }) {
+function BracketDisplayContainer({ children, rounds, showMinimap = true, fullPage = false }) {
   const t = useTranslations("TournamentDetails");
   const isMobile = useIsMobile();
 
@@ -237,7 +237,10 @@ function BracketDisplayContainer({ children, rounds, showMinimap = true }) {
         <div
           ref={containerRef}
           className="overflow-auto rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-muted/5"
-          style={{ maxHeight: "calc(100vh - 280px)", minHeight: "400px" }}
+          style={{
+            maxHeight: fullPage ? "calc(100vh - 180px)" : "calc(100vh - 280px)",
+            minHeight: fullPage ? "600px" : "400px",
+          }}
           tabIndex={0}
         >
           <div
