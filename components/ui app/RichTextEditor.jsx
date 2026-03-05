@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import { uploadPhoto } from "@/app/[locale]/_Lib/actions";
 
 export default function RichTextEditor({
   formik,
@@ -21,6 +22,52 @@ export default function RichTextEditor({
   const [QuillComponent, setQuillComponent] = useState(null);
   const quillRef = useRef(null);
 
+  const [uploading, setUploading] = useState(false);
+
+  // Upload image file to backend and return URL
+  const uploadImageToServer = useCallback(async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    const result = await uploadPhoto(formData);
+    // result is either { thumbnail, medium, large } or a URL string
+    if (typeof result === "object" && result?.large) {
+      return result.large;
+    }
+    return result;
+  }, []);
+
+  // Custom image handler for toolbar button
+  const imageHandler = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/jpeg,image/png,image/gif,image/webp");
+    input.click();
+
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      const quill = quillRef.current?.getEditor();
+      if (!quill) return;
+
+      setUploading(true);
+      try {
+        const url = await uploadImageToServer(file);
+        if (url) {
+          const range = quill.getSelection(true);
+          quill.insertEmbed(range.index, "image", url);
+          quill.setSelection(range.index + 1);
+          // Trigger change
+          formik?.setFieldValue(name, quill.root.innerHTML);
+        }
+      } catch (err) {
+        console.error("Image upload failed:", err);
+      } finally {
+        setUploading(false);
+      }
+    };
+  }, [uploadImageToServer, formik, name]);
+
   // Quill modules configuration
   const modules = {
     toolbar: {
@@ -35,6 +82,9 @@ export default function RichTextEditor({
         ["link", "image", "video"],
         ["clean"],
       ],
+      handlers: {
+        image: imageHandler,
+      },
     },
     clipboard: {
       matchVisual: false,
@@ -222,9 +272,38 @@ export default function RichTextEditor({
     const quill = quillRef.current.getEditor();
     if (!quill) return;
 
-    const handlePaste = (e) => {
+    const handlePaste = async (e) => {
       const clipboardData = e.clipboardData || window.clipboardData;
       if (!clipboardData) return;
+
+      // Check for pasted images first
+      const items = clipboardData.items;
+      if (items) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf("image") !== -1) {
+            e.preventDefault();
+            e.stopPropagation();
+            const file = items[i].getAsFile();
+            if (!file) return;
+
+            setUploading(true);
+            try {
+              const url = await uploadImageToServer(file);
+              if (url) {
+                const range = quill.getSelection(true);
+                quill.insertEmbed(range.index, "image", url);
+                quill.setSelection(range.index + 1);
+                formik?.setFieldValue(name, quill.root.innerHTML);
+              }
+            } catch (err) {
+              console.error("Paste image upload failed:", err);
+            } finally {
+              setUploading(false);
+            }
+            return;
+          }
+        }
+      }
 
       const pastedText = clipboardData.getData('text/plain');
 
@@ -297,14 +376,43 @@ export default function RichTextEditor({
       }
     };
 
-    // Add paste listener to Quill's root element
+    // Handle dropped images
+    const handleDrop = async (e) => {
+      const files = e.dataTransfer?.files;
+      if (!files || files.length === 0) return;
+
+      const file = files[0];
+      if (!file.type.startsWith("image/")) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      setUploading(true);
+      try {
+        const url = await uploadImageToServer(file);
+        if (url) {
+          const range = quill.getSelection(true);
+          quill.insertEmbed(range.index, "image", url);
+          quill.setSelection(range.index + 1);
+          formik?.setFieldValue(name, quill.root.innerHTML);
+        }
+      } catch (err) {
+        console.error("Drop image upload failed:", err);
+      } finally {
+        setUploading(false);
+      }
+    };
+
+    // Add paste and drop listeners to Quill's root element
     const editorRoot = quill.root;
     editorRoot.addEventListener('paste', handlePaste, true);
+    editorRoot.addEventListener('drop', handleDrop, true);
 
     return () => {
       editorRoot.removeEventListener('paste', handlePaste, true);
+      editorRoot.removeEventListener('drop', handleDrop, true);
     };
-  }, [QuillComponent, formik, name, updateCounts]);
+  }, [QuillComponent, formik, name, updateCounts, uploadImageToServer]);
 
   // Update counts on initial load
   useEffect(() => {
@@ -365,6 +473,14 @@ export default function RichTextEditor({
           </div>
 
         </div>
+
+        {/* Upload indicator */}
+        {uploading && (
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border-b border-green-500/20">
+            <div className="w-3 h-3 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs text-green-500 font-medium">Uploading image...</span>
+          </div>
+        )}
 
         {/* Editor */}
         {QuillComponent ? (
