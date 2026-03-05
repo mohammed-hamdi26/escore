@@ -221,12 +221,15 @@ export default function RichTextEditor({
   // Handle content change with smart RTL detection
   const handleChange = useCallback(
     (content, delta, source, editor) => {
+      // Only update formik on user input, not on prop-driven re-renders
+      // This prevents React error #185 (setState during render/transition)
+      if (source !== 'user') return;
+
       // Quill returns <p><br></p> for empty content
       const isEmpty = content === "<p><br></p>" || content === "<p></p>" || !content;
       const value = isEmpty ? "" : content;
 
       formik?.setFieldValue(name, value);
-      formik?.validateField(name);
       updateCounts(editor.getText());
 
       // Smart auto-direction: detect RTL and apply direction
