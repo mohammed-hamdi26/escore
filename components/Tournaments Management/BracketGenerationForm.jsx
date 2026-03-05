@@ -195,6 +195,7 @@ function BracketGenerationForm({
       bracketType,
       defaultBestOf: bestOf,
       autoAdvance,
+      useSlots: true,
     };
 
     if (bracketType === "round_robin") {
