@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Trophy } from "lucide-react";
 import { showSuccess, showError } from "@/lib/bracket-toast";
+import { transformBracketSlots } from "@/lib/bracket-slot-utils";
 import {
   getBracketAction,
   generateBracketAction,
@@ -67,7 +68,12 @@ function BracketView({ tournament, fullPage = false }) {
     try {
       const result = await getBracketAction(tournamentId);
       if (result.success) {
-        setBracket(result.data);
+        // When bracket uses slots, transform slots into the round format
+        // that display components already expect
+        const data = result.data?.usesSlots
+          ? transformBracketSlots(result.data)
+          : result.data;
+        setBracket(data);
       } else {
         setError(result.error);
       }
