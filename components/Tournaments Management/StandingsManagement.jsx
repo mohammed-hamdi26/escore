@@ -125,6 +125,20 @@ export default function StandingsManagement({ tournament, initialStandings }) {
     });
   }, [standings, racingSort, isRacing]);
 
+  // Group standings by group field (for round robin / group stage tournaments)
+  const groupedStandings = React.useMemo(() => {
+    const hasGroups = sortedStandings.some((s) => s.group);
+    if (!hasGroups) return [{ name: null, standings: sortedStandings }];
+
+    const groupMap = new Map();
+    for (const s of sortedStandings) {
+      const groupName = s.group || "Ungrouped";
+      if (!groupMap.has(groupName)) groupMap.set(groupName, []);
+      groupMap.get(groupName).push(s);
+    }
+    return [...groupMap.entries()].map(([name, items]) => ({ name, standings: items }));
+  }, [sortedStandings]);
+
   // === Actions ===
 
   const handleInitialize = async () => {
@@ -567,7 +581,22 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-white/5">
-                {sortedStandings.map((standing) => {
+                {groupedStandings.map((group) => (
+                  <React.Fragment key={group.name || "all"}>
+                    {group.name && (
+                      <tr className="bg-gray-50 dark:bg-white/5">
+                        <td colSpan="100%" className="px-4 py-2.5">
+                          <span className="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                            <Trophy className="size-4 text-green-primary" />
+                            {group.name}
+                            <span className="text-xs font-normal text-muted-foreground">
+                              ({group.standings.length} {isPlayerBased ? (t("players") || "players") : (t("teams") || "teams")})
+                            </span>
+                          </span>
+                        </td>
+                      </tr>
+                    )}
+                    {group.standings.map((standing) => {
                   const isEditing = editingId === standing.id;
                   const teamLogo = isPlayerBased
                     ? (getImgUrl(standing.player?.photo?.light, "thumbnail") || getImgUrl(standing.player?.photo?.dark, "thumbnail"))
@@ -1095,6 +1124,8 @@ export default function StandingsManagement({ tournament, initialStandings }) {
                     </React.Fragment>
                   );
                 })}
+                  </React.Fragment>
+                ))}
               </tbody>
             </table>
           </div>
