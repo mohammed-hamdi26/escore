@@ -69,6 +69,9 @@ function BracketGenerationForm({
     eliminationRules: [],
   });
 
+  // Match creation mode
+  const [skipMatchCreation, setSkipMatchCreation] = useState(false);
+
   // Custom bracket config
   const [customRounds, setCustomRounds] = useState(1);
   const [customBestOf, setCustomBestOf] = useState(1);
@@ -196,6 +199,7 @@ function BracketGenerationForm({
       defaultBestOf: bestOf,
       autoAdvance,
       useSlots: true,
+      ...(skipMatchCreation && { skipMatchCreation: true }),
     };
 
     if (bracketType === "round_robin") {
@@ -543,6 +547,26 @@ function BracketGenerationForm({
             </div>
           )}
         </div>
+      )}
+
+      {/* Skip Match Creation Option */}
+      {bracketType !== "custom" && !isMultiStage && (
+        <label className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-muted/10 cursor-pointer hover:bg-muted/20 transition-colors">
+          <input
+            type="checkbox"
+            checked={skipMatchCreation}
+            onChange={(e) => setSkipMatchCreation(e.target.checked)}
+            className="size-4 rounded border-gray-300 text-green-primary focus:ring-green-primary"
+          />
+          <div>
+            <p className="text-sm font-medium text-foreground">
+              {t("skipMatchCreation") || "Structure only (no matches)"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {t("skipMatchCreationDesc") || "Generate bracket structure without creating match documents. Matches can be created later manually."}
+            </p>
+          </div>
+        </label>
       )}
 
       {/* Generate Button */}
