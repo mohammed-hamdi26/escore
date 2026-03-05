@@ -162,13 +162,16 @@ function TeamFormRedesign({
           };
         }
 
-        await submit(dataValues);
+        const result = await submit(dataValues);
 
+        if (result?.success === false) {
+          toast.error(result.error || "An error occurred");
+          return;
+        }
         toast.success(formType === "add" ? t("addSuccess") || "Team added successfully" : t("editSuccess") || "Team updated successfully");
         router.replace("/dashboard/teams-management");
       } catch (error) {
         toast.error(error.message || t("error") || "An error occurred");
-      }
       }
     },
   });
