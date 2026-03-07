@@ -94,6 +94,12 @@ function TournamentDetails({ tournament }) {
           <h1 className="text-2xl font-bold text-foreground">{t("title") || "Tournament Details"}</h1>
         </div>
         <div className="flex items-center gap-3">
+          <Link href={`/dashboard/tournaments-management/bracket/${tournament.id || tournament._id}`}>
+            <Button variant="outline" className="gap-2 border-green-primary/30 text-green-primary hover:bg-green-primary/10">
+              <Swords className="size-4" />
+              {t("manageBracket") || "Manage Bracket"}
+            </Button>
+          </Link>
           <Link href={`/dashboard/tournaments-management/standings/${tournament.id || tournament._id}`}>
             <Button variant="outline" className="gap-2 border-green-primary/30 text-green-primary hover:bg-green-primary/10">
               <Trophy className="size-4" />
@@ -379,22 +385,6 @@ function TournamentDetails({ tournament }) {
                   </div>
                 </div>
               )}
-            </div>
-          </div>
-
-          {/* Bracket - Link to dedicated page */}
-          <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <Swords className="size-5 text-green-primary" />
-                {t("bracket") || "Bracket"}
-              </h3>
-              <Link href={`/dashboard/tournaments-management/bracket/${tournament.id || tournament._id}`}>
-                <Button className="gap-2 bg-green-primary hover:bg-green-primary/90 text-white">
-                  <Trophy className="size-4" />
-                  {t("manageBracket") || "Manage Bracket"}
-                </Button>
-              </Link>
             </div>
           </div>
 

@@ -1232,7 +1232,8 @@
     "byDate": "By Date",
     "byStatus": "By Status",
     "selected": "selected",
-    "day": "Day"
+    "day": "Day",
+    "vs": "vs"
   },
   "TournamentsTable": {
     "name": "Tournament",
