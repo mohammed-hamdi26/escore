@@ -1179,7 +1179,20 @@
     "advanceSwissIncomplete": "تحذير: {count} مباراة في الجولة الحالية غير مكتملة. هل تريد توليد الجولة {next} على أي حال؟",
     "advanceBRConfirm": "توليد لوبيات الجولة {next} مع الفرق المتبقية. سيتم إنشاء مباريات جديدة بناءً على الترتيب الحالي.",
     "completeBracketIncomplete": "هناك {incomplete} مباراة بدون نتائج من أصل {total}. هل أنت متأكد من تحديد البراكت كمكتمل؟",
-    "completeBracketAllDone": "جميع المباريات ({total}) لديها نتائج. هل تريد تحديد البراكت كمكتمل؟ لا يمكن التراجع عن هذا."
+    "completeBracketAllDone": "جميع المباريات ({total}) لديها نتائج. هل تريد تحديد البراكت كمكتمل؟ لا يمكن التراجع عن هذا.",
+    "teamsCount": "الفرق",
+    "topPerGroupOnlyGroupStages": "أعلى N لكل مجموعة صالح فقط للمراحل التي تحتوي على مجموعات (دوري المجموعات أو خروج مزدوج)",
+    "gslFormatHint": "نظام GSL: كل مجموعة تعمل ببراكت خروج مزدوج مصغر. يُنصح بـ 4 فرق لكل مجموعة.",
+    "swissQualifyExplain": "الوصول إلى {wins} انتصارات للتأهل إلى المرحلة التالية.",
+    "swissEliminateExplain": "الوصول إلى {losses} هزائم يعني الخروج من البطولة.",
+    "selectGroup": "اختر المجموعة",
+    "skipMatchCreation": "الهيكل فقط (بدون مباريات)",
+    "skipMatchCreationDesc": "إنشاء هيكل البراكت بدون إنشاء مستندات المباريات. يمكن إنشاء المباريات لاحقاً يدوياً.",
+    "bracketManagement": "إدارة البراكت",
+    "addRoundError": "فشل في إضافة الجولة",
+    "completeBracketError": "فشل في إكمال البراكت",
+    "manageBracket": "إدارة البراكت",
+    "noChanges": "لم يتم اكتشاف تغييرات"
   },
   "TournamentsTable": {
     "name": "البطولة",
