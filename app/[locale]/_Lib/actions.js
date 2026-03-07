@@ -1847,6 +1847,128 @@ export async function overrideSlotResultAction(tournamentId, slotId, data) {
   }
 }
 
+export async function getSlotsAction(tournamentId) {
+  try {
+    const res = await apiClient.get(
+      `/tournaments/${tournamentId}/bracket/slots`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Get slots error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error fetching slots",
+    };
+  }
+}
+
+export async function updateSlotAction(tournamentId, slotId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.patch(
+      `/tournaments/${tournamentId}/bracket/slots/${slotId}`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Update slot error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error updating slot";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function batchUpdateSlotsAction(tournamentId, updates) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/tournaments/${tournamentId}/bracket/slots/batch-update`,
+      { updates }
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Batch update slots error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error batch updating slots";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function applyScheduleTemplateAction(tournamentId, template) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/schedule-template`,
+      template
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Apply schedule template error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error applying schedule template";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
+export async function swapSlotParticipantsAction(tournamentId, slotId) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/slots/${slotId}/swap-participants`
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Swap slot participants error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error swapping participants",
+    };
+  }
+}
+
+export async function seedAssignmentsAction(tournamentId, assignments) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(
+      `/tournaments/${tournamentId}/bracket/slots/seed-assignments`,
+      { assignments }
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Seed assignments error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error assigning seeds";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
 // notifications
 export async function sendNotificationAction(data) {
   try {

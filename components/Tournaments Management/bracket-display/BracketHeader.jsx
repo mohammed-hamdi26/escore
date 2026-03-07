@@ -31,6 +31,7 @@ import {
   Eye,
   EyeOff,
   GripVertical,
+  CalendarClock,
 } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 import ConfirmationDialog from "../shared/ConfirmationDialog";
@@ -53,6 +54,8 @@ function BracketHeader({
   onToggleStageVisibility,
   activeStageTab,
   onActiveStageTabChange,
+  showSchedulingPanel,
+  onToggleSchedulingPanel,
 }) {
   const t = useTranslations("TournamentDetails");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -216,6 +219,18 @@ function BracketHeader({
             >
               <ArrowRight className="size-3.5" />
               <span className="hidden sm:inline">{t("advanceToNextStage") || "Advance to Next Stage"}</span>
+            </Button>
+          )}
+
+          {bracket.usesSlots && onToggleSchedulingPanel && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onToggleSchedulingPanel}
+              className={`gap-1 ${showSchedulingPanel ? "border-green-500/50 bg-green-500/10 text-green-600" : "border-gray-300 dark:border-gray-600"}`}
+            >
+              <CalendarClock className="size-3.5" />
+              <span className="hidden sm:inline">{t("scheduleMatches") || "Schedule Matches"}</span>
             </Button>
           )}
 

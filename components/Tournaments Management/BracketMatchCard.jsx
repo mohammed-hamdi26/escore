@@ -1,8 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Trophy } from "lucide-react";
+import { Trophy, Clock } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
+import { format } from "date-fns";
 
 const STATUS_COLORS = {
   scheduled: "border-gray-500/30 bg-gray-500/5",
@@ -208,12 +209,18 @@ function BracketMatchCard({ match, onClick }) {
         />
       </div>
 
-      {/* Best of indicator */}
-      {match.bestOf && match.bestOf > 1 && (
-        <div className="px-3 py-1 bg-muted/20 border-t border-white/5">
-          <span className="text-xs text-muted-foreground">
-            Bo{match.bestOf}
-          </span>
+      {/* Footer: Best-of + scheduled date */}
+      {(match.bestOf > 1 || match.scheduledDate) && (
+        <div className="flex items-center justify-between px-3 py-1 bg-muted/20 border-t border-white/5">
+          {match.bestOf > 1 ? (
+            <span className="text-xs text-muted-foreground">Bo{match.bestOf}</span>
+          ) : <span />}
+          {match.scheduledDate && match.status !== "completed" && (
+            <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+              <Clock className="size-2.5" />
+              {format(new Date(match.scheduledDate), "MMM d, HH:mm")}
+            </span>
+          )}
         </div>
       )}
     </div>

@@ -28,6 +28,8 @@ import BracketSkeleton from "./BracketSkeleton";
 import BracketProgressBar from "./bracket-display/BracketProgressBar";
 import BracketQuickStats from "./bracket-display/BracketQuickStats";
 import BracketDisplayContainer from "./shared/BracketDisplayContainer";
+import MatchSchedulingPanel from "./bracket-display/MatchSchedulingPanel";
+import ScheduleTemplateDialog from "./bracket-display/ScheduleTemplateDialog";
 
 function BracketView({ tournament, fullPage = false }) {
   const t = useTranslations("TournamentDetails");
@@ -45,6 +47,8 @@ function BracketView({ tournament, fullPage = false }) {
   const [confirmingAdvancement, setConfirmingAdvancement] = useState(false);
   const [advancementSeeds, setAdvancementSeeds] = useState([]);
   const [activeStageTab, setActiveStageTab] = useState(0);
+  const [showSchedulingPanel, setShowSchedulingPanel] = useState(false);
+  const [showScheduleTemplate, setShowScheduleTemplate] = useState(false);
 
   const [announcement, setAnnouncement] = useState("");
   const announcementTimer = useRef(null);
@@ -405,9 +409,43 @@ function BracketView({ tournament, fullPage = false }) {
           onToggleStageVisibility={handleToggleStageVisibility}
           activeStageTab={activeStageTab}
           onActiveStageTabChange={setActiveStageTab}
+          showSchedulingPanel={showSchedulingPanel}
+          onToggleSchedulingPanel={() => setShowSchedulingPanel((v) => !v)}
         />
         <BracketQuickStats bracket={bracket} />
         <BracketProgressBar bracket={bracket} />
+
+        {/* Scheduling Panel (collapsible) */}
+        {showSchedulingPanel && bracket.usesSlots && (
+          <div className="mb-6 p-4 rounded-xl border border-green-500/20 bg-green-500/5">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-foreground">
+                {t("scheduleMatches") || "Schedule Matches"}
+              </h4>
+              <button
+                onClick={() => setShowScheduleTemplate(true)}
+                className="text-xs px-3 py-1.5 rounded-md bg-green-600 text-white hover:bg-green-700 font-medium"
+              >
+                {t("autoSchedule") || "Auto Schedule"}
+              </button>
+            </div>
+            <MatchSchedulingPanel
+              tournamentId={tournamentId}
+              bracket={bracket}
+              onRefresh={fetchBracket}
+            />
+          </div>
+        )}
+
+        {/* Schedule Template Dialog */}
+        <ScheduleTemplateDialog
+          tournamentId={tournamentId}
+          bracket={bracket}
+          slotCount={bracket.slots?.filter((s) => !s.isBye)?.length || 0}
+          open={showScheduleTemplate}
+          onOpenChange={setShowScheduleTemplate}
+          onApplied={fetchBracket}
+        />
         {bracket.bracketType === "custom" ? (
           renderBracketContent()
         ) : (
