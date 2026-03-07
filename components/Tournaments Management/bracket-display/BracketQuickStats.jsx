@@ -89,8 +89,8 @@ function BracketQuickStats({ bracket }) {
   const remaining = totalMatches - completedMatches;
   const teamCount = bracket.seeds?.length || bracket.teamCount || 0;
 
-  const typeKey = BRACKET_TYPE_LABELS[bracket.bracketType] || bracket.bracketType;
-  const typeName = t(typeKey) || bracket.bracketType;
+  const typeKey = BRACKET_TYPE_LABELS[bracket.bracketType];
+  const typeName = typeKey ? t(typeKey) : (bracket.bracketType?.replace(/_/g, " ") || "—");
 
   // Current round info
   let currentRound = null;

@@ -243,7 +243,7 @@ function BracketView({ tournament, fullPage = false }) {
 
   // --- Render: No bracket — show generation form ---
 
-  if (!bracket) {
+  if (!bracket || bracket.bracketStatus === "not_generated") {
     return (
       <div className="glass rounded-2xl p-6 border border-transparent dark:border-white/5">
         <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
