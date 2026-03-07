@@ -1196,7 +1196,12 @@
     "addRoundError": "Failed to add round",
     "completeBracketError": "Failed to complete bracket",
     "manageBracket": "Manage Bracket",
-    "noChanges": "No changes detected"
+    "noChanges": "No changes detected",
+    "played": "P",
+    "winsShort": "W",
+    "drawsShort": "D",
+    "lossesShort": "L",
+    "goalDiff": "+/-"
   },
   "TournamentsTable": {
     "name": "Tournament",

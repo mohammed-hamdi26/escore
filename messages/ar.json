@@ -1192,7 +1192,12 @@
     "addRoundError": "فشل في إضافة الجولة",
     "completeBracketError": "فشل في إكمال البراكت",
     "manageBracket": "إدارة البراكت",
-    "noChanges": "لم يتم اكتشاف تغييرات"
+    "noChanges": "لم يتم اكتشاف تغييرات",
+    "played": "لعب",
+    "winsShort": "فوز",
+    "drawsShort": "تعادل",
+    "lossesShort": "خسارة",
+    "goalDiff": "+/-"
   },
   "TournamentsTable": {
     "name": "البطولة",
