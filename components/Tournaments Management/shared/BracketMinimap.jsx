@@ -1,72 +1,112 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useState, useEffect } from "react";
 
 function BracketMinimap({ contentRef, containerRef, zoom }) {
   const minimapRef = useRef(null);
+  const previewRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ contentW: 0, contentH: 0 });
 
-  const MINIMAP_WIDTH = 160;
-  const MINIMAP_HEIGHT = 80;
+  const MINIMAP_WIDTH = 180;
+  const MINIMAP_HEIGHT = 90;
 
-  const getViewportRect = useCallback(() => {
-    if (!contentRef?.current || !containerRef?.current) return null;
+  // Track content dimensions
+  useEffect(() => {
+    if (!contentRef?.current) return;
 
-    const content = contentRef.current;
-    const container = containerRef.current;
+    const updateDimensions = () => {
+      const content = contentRef.current;
+      if (!content) return;
+      setDimensions({
+        contentW: content.scrollWidth,
+        contentH: content.scrollHeight,
+      });
+    };
 
-    const contentW = content.scrollWidth;
-    const contentH = content.scrollHeight;
+    updateDimensions();
 
-    if (contentW === 0 || contentH === 0) return null;
+    const observer = new ResizeObserver(updateDimensions);
+    observer.observe(contentRef.current);
+    return () => observer.disconnect();
+  }, [contentRef, zoom]);
 
-    const scaleX = MINIMAP_WIDTH / contentW;
-    const scaleY = MINIMAP_HEIGHT / contentH;
+  // Clone content into minimap for real preview
+  useEffect(() => {
+    if (!contentRef?.current || !previewRef?.current) return;
+    if (dimensions.contentW === 0 || dimensions.contentH === 0) return;
+
+    const scaleX = MINIMAP_WIDTH / dimensions.contentW;
+    const scaleY = MINIMAP_HEIGHT / dimensions.contentH;
     const scale = Math.min(scaleX, scaleY);
 
-    const viewportW = (container.clientWidth / contentW) * MINIMAP_WIDTH * (1 / Math.max(scaleX / scaleY, 1));
-    const viewportH = (container.clientHeight / contentH) * MINIMAP_HEIGHT * (1 / Math.max(scaleY / scaleX, 1));
+    const preview = previewRef.current;
+    // Clone the bracket content
+    const clone = contentRef.current.cloneNode(true);
+
+    // Remove interactivity from clone
+    clone.querySelectorAll("button, a, input, select, textarea").forEach((el) => {
+      el.style.pointerEvents = "none";
+      el.tabIndex = -1;
+    });
+
+    // Style the clone for minimap
+    clone.style.transform = `scale(${scale})`;
+    clone.style.transformOrigin = "top left";
+    clone.style.width = `${dimensions.contentW}px`;
+    clone.style.height = `${dimensions.contentH}px`;
+    clone.style.position = "absolute";
+    clone.style.top = "0";
+    clone.style.left = "0";
+
+    preview.innerHTML = "";
+    preview.appendChild(clone);
+  }, [contentRef, dimensions, zoom]);
+
+  const getViewportRect = useCallback(() => {
+    if (!containerRef?.current || dimensions.contentW === 0) return null;
+
+    const container = containerRef.current;
+    const scaleX = MINIMAP_WIDTH / dimensions.contentW;
+    const scaleY = MINIMAP_HEIGHT / dimensions.contentH;
+    const scale = Math.min(scaleX, scaleY);
+
+    const viewportW = container.clientWidth * scale;
+    const viewportH = container.clientHeight * scale;
 
     const scrollLeft = container.scrollLeft;
     const scrollTop = container.scrollTop;
-    const maxScrollLeft = contentW - container.clientWidth;
-    const maxScrollTop = contentH - container.clientHeight;
 
-    const vpX = maxScrollLeft > 0
-      ? (scrollLeft / maxScrollLeft) * (MINIMAP_WIDTH - viewportW)
-      : 0;
-    const vpY = maxScrollTop > 0
-      ? (scrollTop / maxScrollTop) * (MINIMAP_HEIGHT - viewportH)
-      : 0;
+    const vpX = scrollLeft * scale;
+    const vpY = scrollTop * scale;
 
     return {
-      x: Math.max(0, vpX),
-      y: Math.max(0, vpY),
+      x: Math.max(0, Math.min(vpX, MINIMAP_WIDTH - viewportW)),
+      y: Math.max(0, Math.min(vpY, MINIMAP_HEIGHT - viewportH)),
       width: Math.min(viewportW, MINIMAP_WIDTH),
       height: Math.min(viewportH, MINIMAP_HEIGHT),
     };
-  }, [contentRef, containerRef]);
+  }, [containerRef, dimensions]);
 
   const handleMinimapClick = useCallback(
     (e) => {
-      if (!containerRef?.current || !contentRef?.current) return;
+      if (!containerRef?.current || dimensions.contentW === 0) return;
 
       const rect = minimapRef.current.getBoundingClientRect();
-      const clickX = (e.clientX - rect.left) / MINIMAP_WIDTH;
-      const clickY = (e.clientY - rect.top) / MINIMAP_HEIGHT;
+      const scaleX = MINIMAP_WIDTH / dimensions.contentW;
+      const scaleY = MINIMAP_HEIGHT / dimensions.contentH;
+      const scale = Math.min(scaleX, scaleY);
+
+      const clickX = (e.clientX - rect.left) / scale;
+      const clickY = (e.clientY - rect.top) / scale;
 
       const container = containerRef.current;
-      const content = contentRef.current;
-
-      const maxScrollLeft = content.scrollWidth - container.clientWidth;
-      const maxScrollTop = content.scrollHeight - container.clientHeight;
-
       container.scrollTo({
-        left: clickX * maxScrollLeft,
-        top: clickY * maxScrollTop,
+        left: clickX - container.clientWidth / 2,
+        top: clickY - container.clientHeight / 2,
         behavior: "smooth",
       });
     },
-    [containerRef, contentRef]
+    [containerRef, dimensions]
   );
 
   const viewport = getViewportRect();
@@ -75,22 +115,25 @@ function BracketMinimap({ contentRef, containerRef, zoom }) {
     <div
       ref={minimapRef}
       onClick={handleMinimapClick}
-      className="relative bg-muted/30 border border-gray-200 dark:border-gray-700 rounded cursor-pointer overflow-hidden"
+      className="relative bg-background/90 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer overflow-hidden shadow-sm"
       style={{ width: MINIMAP_WIDTH, height: MINIMAP_HEIGHT }}
       title="Click to navigate"
     >
-      {/* Content area indicator */}
-      <div className="absolute inset-1 bg-muted/20 rounded-sm" />
+      {/* Scaled-down bracket preview */}
+      <div
+        ref={previewRef}
+        className="absolute inset-0 overflow-hidden pointer-events-none opacity-60"
+      />
 
       {/* Viewport rectangle */}
-      {viewport && (
+      {viewport && viewport.width < MINIMAP_WIDTH * 0.95 && (
         <div
-          className="absolute border-2 border-green-primary/60 bg-green-primary/10 rounded-sm pointer-events-none"
+          className="absolute border-2 border-green-primary bg-green-primary/10 rounded-sm pointer-events-none transition-all duration-100"
           style={{
             left: viewport.x,
             top: viewport.y,
-            width: viewport.width,
-            height: viewport.height,
+            width: Math.max(viewport.width, 8),
+            height: Math.max(viewport.height, 8),
           }}
         />
       )}
