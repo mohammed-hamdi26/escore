@@ -10,12 +10,12 @@ import {
   AlertCircle,
   Loader2,
   Filter,
-  Ban,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { getSlotsAction, updateSlotAction, batchUpdateSlotsAction } from "@/app/[locale]/_Lib/actions";
 import { showSuccess, showError } from "@/lib/bracket-toast";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 
@@ -29,38 +29,32 @@ function formatSlotLabel(slot) {
   return `${stagePrefix}${stagePrefix ? " " : ""}R${slot.round} M${slot.position + 1}`;
 }
 
+function formatRoundLabel(slot) {
+  if (slot.roundLabel) return slot.roundLabel;
+  if (slot.name) return slot.name;
+  const stagePrefix =
+    slot.stage === "losers" ? "Losers " : slot.stage === "grand_finals" ? "Grand Finals" : "";
+  if (stagePrefix === "Grand Finals") return stagePrefix;
+  return `${stagePrefix}Round ${slot.round}`;
+}
+
 function participantName(p) {
   if (!p) return null;
-  return p.name || p.slug || "—";
+  return p.name || p.slug || null;
 }
 
-function slotStatusColor(slot) {
-  if (slot.isBye) return "text-muted-foreground";
-  if (slot.status === "completed") return "text-green-500";
-  if (slot.status === "in_progress") return "text-blue-500";
-  if (slot.scheduledDate) return "text-green-500";
-  return "text-amber-500";
-}
-
-function slotStatusBadge(slot, t) {
-  if (slot.isBye) {
-    return <Badge variant="secondary" className="text-[10px]">{t("bye") || "BYE"}</Badge>;
-  }
-  if (slot.status === "completed") {
-    return <Badge className="bg-green-500/20 text-green-600 border-green-500/30 text-[10px]">{t("completed") || "Completed"}</Badge>;
-  }
-  if (slot.status === "in_progress") {
-    return <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30 text-[10px]">{t("live") || "Live"}</Badge>;
-  }
-  if (slot.scheduledDate) {
-    return <Badge className="bg-green-500/20 text-green-600 border-green-500/30 text-[10px]">{t("scheduled") || "Scheduled"}</Badge>;
-  }
-  return <Badge className="bg-amber-500/20 text-amber-600 border-amber-500/30 text-[10px]">{t("unscheduled") || "Unscheduled"}</Badge>;
+function slotStatusDot(slot) {
+  if (slot.isBye) return "bg-gray-400";
+  if (slot.status === "completed") return "bg-green-500";
+  if (slot.status === "in_progress") return "bg-blue-500 animate-pulse";
+  if (slot.scheduledDate) return "bg-green-500";
+  return "bg-amber-500";
 }
 
 // ── Inline Date Picker Cell ──────────────────────────────────────────
 
 function DateTimeCell({ slot, tournamentId, onUpdated }) {
+  const t = useTranslations("TournamentDetails");
   const [saving, setSaving] = useState(false);
   const [date, setDate] = useState(slot.scheduledDate ? new Date(slot.scheduledDate) : null);
   const [time, setTime] = useState(
@@ -95,7 +89,7 @@ function DateTimeCell({ slot, tournamentId, onUpdated }) {
 
   if (!isEditable) {
     return (
-      <span className="text-xs text-muted-foreground">
+      <span className="text-[11px] text-muted-foreground tabular-nums">
         {date ? format(date, "MMM d, HH:mm") : "—"}
       </span>
     );
@@ -105,17 +99,19 @@ function DateTimeCell({ slot, tournamentId, onUpdated }) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-md hover:bg-muted/50 transition-colors min-w-[120px]"
+          className={`flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-md border transition-colors tabular-nums ${
+            date
+              ? "border-green-500/30 bg-green-500/5 text-green-600 dark:text-green-400 hover:bg-green-500/10"
+              : "border-dashed border-gray-300 dark:border-gray-600 text-muted-foreground hover:border-green-primary/50 hover:bg-muted/30"
+          }`}
           disabled={saving}
         >
           {saving ? (
             <Loader2 className="size-3 animate-spin" />
           ) : (
-            <CalendarIcon className="size-3 text-muted-foreground" />
+            <CalendarIcon className="size-3 shrink-0" />
           )}
-          <span className={date ? "text-foreground" : "text-muted-foreground"}>
-            {date ? format(date, "MMM d, HH:mm") : "Set date..."}
-          </span>
+          <span>{date ? format(date, "MMM d, HH:mm") : (t("selectDate") || "Select date...")}</span>
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
@@ -156,22 +152,28 @@ function ScheduleProgress({ slots, t }) {
   const pct = total > 0 ? Math.round((scheduled / total) * 100) : 0;
 
   return (
-    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-      <div className="flex items-center gap-1.5">
-        <CheckCircle className="size-3.5 text-green-500" />
-        <span>{scheduled}/{total} {t("matchesScheduled") || "scheduled"}</span>
+    <div className="p-3 rounded-xl bg-muted/10 dark:bg-[#1a1d2e]/50 border border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <CheckCircle className={`size-4 ${pct === 100 ? "text-green-500" : "text-muted-foreground"}`} />
+          <span className="text-sm font-medium text-foreground">
+            {scheduled}/{total} {t("matchesScheduled") || "scheduled"}
+          </span>
+        </div>
+        <span className={`text-sm font-bold ${pct === 100 ? "text-green-500" : "text-muted-foreground"}`}>
+          {pct}%
+        </span>
       </div>
-      <div className="flex-1 h-1.5 bg-muted/30 rounded-full overflow-hidden max-w-[200px]">
+      <div className="h-2 bg-muted/30 rounded-full overflow-hidden">
         <div
-          className="h-full bg-green-500 rounded-full transition-all"
+          className={`h-full rounded-full transition-all duration-500 ${pct === 100 ? "bg-green-500" : "bg-green-primary"}`}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span>{pct}%</span>
       {completed > 0 && (
-        <div className="flex items-center gap-1.5">
-          <span>{completed} {t("completed") || "completed"}</span>
-        </div>
+        <p className="text-[11px] text-muted-foreground mt-1.5">
+          {completed} {t("completed") || "completed"}
+        </p>
       )}
     </div>
   );
@@ -193,10 +195,11 @@ function BatchToolbar({ selectedCount, onApply, applying, t }) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+    <div className="flex flex-wrap items-center gap-3 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
       <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
         {selectedCount} {t("selected") || "selected"}
       </span>
+      <div className="h-4 w-px bg-blue-500/20 hidden sm:block" />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-background border border-input hover:bg-muted/50">
@@ -225,6 +228,168 @@ function BatchToolbar({ selectedCount, onApply, applying, t }) {
         {applying && <Loader2 className="size-3 animate-spin" />}
         {t("setDateForSelected") || "Set Date for Selected"}
       </button>
+    </div>
+  );
+}
+
+// ── Match Row ────────────────────────────────────────────────────────
+
+function MatchRow({ slot, tournamentId, isSelected, onToggleSelect, onUpdated, t }) {
+  const isEditable = slot.status !== "completed";
+  const p1 = participantName(slot.participant1);
+  const p2 = participantName(slot.participant2);
+  const p1Won = slot.winnerId && slot.participant1 && String(slot.winnerId) === String(slot.participant1.id);
+  const p2Won = slot.winnerId && slot.participant2 && String(slot.winnerId) === String(slot.participant2.id);
+
+  return (
+    <div
+      className={`flex items-center gap-2 sm:gap-3 px-3 py-2 rounded-lg transition-colors group ${
+        isSelected
+          ? "bg-blue-500/10 border border-blue-500/20"
+          : "hover:bg-muted/20 border border-transparent"
+      }`}
+    >
+      {/* Checkbox */}
+      <div className="w-5 shrink-0 flex items-center justify-center">
+        {isEditable ? (
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={onToggleSelect}
+            className="shrink-0"
+          />
+        ) : (
+          <CheckCircle className="size-3.5 text-green-500" />
+        )}
+      </div>
+
+      {/* Match number */}
+      <span className="text-[10px] text-muted-foreground font-mono w-5 shrink-0 text-center">
+        M{(slot.position || 0) + 1}
+      </span>
+
+      {/* Status dot */}
+      <div className="shrink-0">
+        <div className={`size-2 rounded-full ${slotStatusDot(slot)}`} title={slot.status} />
+      </div>
+
+      {/* Participants — compact */}
+      <div className="flex-1 min-w-0 flex items-center gap-1 text-xs">
+        <span className={`truncate ${p1Won ? "font-bold text-green-600 dark:text-green-400" : p1 ? "text-foreground" : "text-muted-foreground"}`}>
+          {p1 || (t("tbd") || "TBD")}
+        </span>
+        {slot.score && (
+          <span className="text-muted-foreground shrink-0 font-mono text-[10px]">
+            {slot.score.p1}
+          </span>
+        )}
+        <span className="text-muted-foreground/50 shrink-0 text-[10px] mx-0.5">vs</span>
+        {slot.score && (
+          <span className="text-muted-foreground shrink-0 font-mono text-[10px]">
+            {slot.score.p2}
+          </span>
+        )}
+        <span className={`truncate ${p2Won ? "font-bold text-green-600 dark:text-green-400" : p2 ? "text-foreground" : "text-muted-foreground"}`}>
+          {p2 || (t("tbd") || "TBD")}
+        </span>
+      </div>
+
+      {/* Date/time cell */}
+      <div className="shrink-0">
+        <DateTimeCell
+          slot={slot}
+          tournamentId={tournamentId}
+          onUpdated={onUpdated}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ── Round Group ──────────────────────────────────────────────────────
+
+function RoundGroup({ roundKey, label, slots, tournamentId, selected, onToggleSelect, onSelectRound, onUpdated, t }) {
+  const [collapsed, setCollapsed] = useState(false);
+  const total = slots.length;
+  const scheduled = slots.filter((s) => s.scheduledDate).length;
+  const completed = slots.filter((s) => s.status === "completed").length;
+  const allScheduled = scheduled === total;
+  const allCompleted = completed === total;
+
+  const roundSelected = slots.filter((s) => s.status !== "completed").every((s) => selected.has(s.slotId));
+  const someSelected = slots.some((s) => selected.has(s.slotId));
+
+  return (
+    <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      {/* Round header */}
+      <button
+        type="button"
+        onClick={() => setCollapsed(!collapsed)}
+        className="w-full flex items-center gap-2 px-3 py-2.5 bg-muted/20 dark:bg-[#1a1d2e]/50 hover:bg-muted/30 dark:hover:bg-[#1a1d2e]/70 transition-colors"
+      >
+        {/* Expand/collapse chevron */}
+        {collapsed ? (
+          <ChevronRight className="size-3.5 text-muted-foreground shrink-0" />
+        ) : (
+          <ChevronDown className="size-3.5 text-muted-foreground shrink-0" />
+        )}
+
+        {/* Round checkbox */}
+        <div
+          className="shrink-0"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelectRound(slots, !roundSelected);
+          }}
+        >
+          <Checkbox
+            checked={roundSelected && slots.some((s) => s.status !== "completed")}
+            onCheckedChange={() => onSelectRound(slots, !roundSelected)}
+            className="shrink-0"
+          />
+        </div>
+
+        {/* Round title */}
+        <span className="text-xs font-semibold text-foreground flex-1 text-left truncate">
+          {label}
+        </span>
+
+        {/* Counters */}
+        <div className="flex items-center gap-2 shrink-0">
+          {allCompleted ? (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-600 dark:text-green-400 font-medium">
+              {t("completed") || "Completed"}
+            </span>
+          ) : allScheduled ? (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-600 dark:text-green-400 font-medium">
+              {scheduled}/{total}
+            </span>
+          ) : (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-medium">
+              {scheduled}/{total}
+            </span>
+          )}
+          <span className="text-[10px] text-muted-foreground">
+            {total} {total === 1 ? "match" : "matches"}
+          </span>
+        </div>
+      </button>
+
+      {/* Match rows */}
+      {!collapsed && (
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          {slots.map((slot) => (
+            <MatchRow
+              key={slot.slotId}
+              slot={slot}
+              tournamentId={tournamentId}
+              isSelected={selected.has(slot.slotId)}
+              onToggleSelect={() => onToggleSelect(slot.slotId)}
+              onUpdated={onUpdated}
+              t={t}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -292,10 +457,22 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
       const order = { pending: 0, ready: 1, in_progress: 2, completed: 3 };
       result = [...result].sort((a, b) => (order[a.status] || 0) - (order[b.status] || 0));
     }
-    // bracket order is default (by round + position)
 
     return result;
   }, [slots, filterRound, filterGroup, sortBy]);
+
+  // Group slots by round for visual grouping
+  const groupedSlots = useMemo(() => {
+    const map = new Map();
+    for (const slot of filteredSlots) {
+      const key = `${slot.stage || "main"}_${slot.round}_${slot.roundLabel || ""}`;
+      if (!map.has(key)) {
+        map.set(key, { label: formatRoundLabel(slot), slots: [] });
+      }
+      map.get(key).slots.push(slot);
+    }
+    return [...map.entries()];
+  }, [filteredSlots]);
 
   // Selection
   const toggleSelect = (slotId) => {
@@ -303,6 +480,18 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
       const next = new Set(prev);
       if (next.has(slotId)) next.delete(slotId);
       else next.add(slotId);
+      return next;
+    });
+  };
+
+  const selectRound = (roundSlots, shouldSelect) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      for (const s of roundSlots) {
+        if (s.status === "completed") continue;
+        if (shouldSelect) next.add(s.slotId);
+        else next.delete(s.slotId);
+      }
       return next;
     });
   };
@@ -339,8 +528,8 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
   if (loading) {
     return (
       <div className="space-y-3 p-4">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-10 rounded-md bg-muted/30 animate-pulse" />
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-12 rounded-xl bg-muted/30 animate-pulse" />
         ))}
       </div>
     );
@@ -369,7 +558,7 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
           <select
             value={filterRound}
             onChange={(e) => setFilterRound(e.target.value)}
-            className="text-xs px-2 py-1 rounded border border-input bg-background"
+            className="text-xs px-2.5 py-1.5 rounded-lg border border-input bg-background"
           >
             <option value="all">{t("allRounds") || "All Rounds"}</option>
             {rounds.map((r) => (
@@ -385,7 +574,7 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
           <select
             value={filterGroup}
             onChange={(e) => setFilterGroup(e.target.value)}
-            className="text-xs px-2 py-1 rounded border border-input bg-background"
+            className="text-xs px-2.5 py-1.5 rounded-lg border border-input bg-background"
           >
             <option value="all">{t("allGroups") || "All Groups"}</option>
             {groups.map((g) => (
@@ -398,7 +587,7 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="text-xs px-2 py-1 rounded border border-input bg-background"
+          className="text-xs px-2.5 py-1.5 rounded-lg border border-input bg-background"
         >
           <option value="bracket">{t("bracketOrder") || "Bracket Order"}</option>
           <option value="date">{t("byDate") || "By Date"}</option>
@@ -410,7 +599,7 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
         {/* Select all / Deselect */}
         <button
           onClick={selected.size > 0 ? deselectAll : selectAll}
-          className="text-xs px-2 py-1 rounded hover:bg-muted/50 text-muted-foreground"
+          className="text-xs px-2.5 py-1.5 rounded-lg border border-input hover:bg-muted/50 text-muted-foreground transition-colors"
         >
           {selected.size > 0
             ? (t("deselectAll") || "Deselect All")
@@ -428,76 +617,68 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
         />
       )}
 
-      {/* Slot list */}
-      <div className="space-y-1">
-        {filteredSlots.map((slot) => {
-          const isEditable = slot.status !== "completed";
-          return (
-            <div
-              key={slot.slotId}
-              className={`flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 px-3 py-2 rounded-lg transition-colors ${
-                selected.has(slot.slotId)
-                  ? "bg-blue-500/10 border border-blue-500/20"
-                  : "bg-muted/10 hover:bg-muted/20 border border-transparent"
-              }`}
-            >
+      {/* Slot list — grouped by round */}
+      {sortBy === "bracket" ? (
+        <div className="space-y-3">
+          {groupedSlots.map(([key, group]) => (
+            <RoundGroup
+              key={key}
+              roundKey={key}
+              label={group.label}
+              slots={group.slots}
+              tournamentId={tournamentId}
+              selected={selected}
+              onToggleSelect={toggleSelect}
+              onSelectRound={selectRound}
+              onUpdated={fetchSlots}
+              t={t}
+            />
+          ))}
+        </div>
+      ) : (
+        /* Flat list for date/status sort */
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-800 overflow-hidden">
+          {filteredSlots.map((slot) => (
+            <div key={slot.slotId} className="flex items-center gap-2 sm:gap-3 px-3 py-2 hover:bg-muted/10 transition-colors">
               {/* Checkbox */}
-              {isEditable && (
-                <Checkbox
-                  checked={selected.has(slot.slotId)}
-                  onCheckedChange={() => toggleSelect(slot.slotId)}
-                  className="shrink-0"
-                />
-              )}
-              {!isEditable && <div className="w-4 shrink-0" />}
-
-              {/* Slot label */}
-              <div className="min-w-[70px] sm:min-w-[80px] shrink-0">
-                <span className="text-xs font-medium text-foreground">
-                  {formatSlotLabel(slot)}
-                </span>
-                {slot.group && (
-                  <span className="text-[10px] text-muted-foreground block">
-                    {slot.group}
-                  </span>
+              <div className="w-5 shrink-0 flex items-center justify-center">
+                {slot.status !== "completed" ? (
+                  <Checkbox
+                    checked={selected.has(slot.slotId)}
+                    onCheckedChange={() => toggleSelect(slot.slotId)}
+                  />
+                ) : (
+                  <CheckCircle className="size-3.5 text-green-500" />
                 )}
               </div>
 
+              {/* Status dot */}
+              <div className={`size-2 rounded-full shrink-0 ${slotStatusDot(slot)}`} />
+
+              {/* Round label */}
+              <span className="text-[10px] text-muted-foreground font-medium shrink-0 min-w-[60px]">
+                {formatSlotLabel(slot)}
+              </span>
+
               {/* Participants */}
-              <div className="flex-1 min-w-0 order-last sm:order-none w-full sm:w-auto">
-                <div className="flex items-center gap-1.5 text-xs truncate">
-                  <span className={`truncate ${slot.winnerId && slot.participant1 && String(slot.winnerId) === String(slot.participant1.id) ? "font-bold" : ""}`}>
-                    {participantName(slot.participant1) || (t("tbd") || "TBD")}
-                  </span>
-                  <span className="text-muted-foreground shrink-0">{t("vs") || "vs"}</span>
-                  <span className={`truncate ${slot.winnerId && slot.participant2 && String(slot.winnerId) === String(slot.participant2.id) ? "font-bold" : ""}`}>
-                    {participantName(slot.participant2) || (t("tbd") || "TBD")}
-                  </span>
-                  {slot.score && (
-                    <span className="text-muted-foreground shrink-0 ml-1">
-                      ({slot.score.p1}-{slot.score.p2})
-                    </span>
-                  )}
-                </div>
+              <div className="flex-1 min-w-0 flex items-center gap-1 text-xs">
+                <span className={`truncate ${slot.winnerId && slot.participant1 && String(slot.winnerId) === String(slot.participant1.id) ? "font-bold text-green-600 dark:text-green-400" : participantName(slot.participant1) ? "text-foreground" : "text-muted-foreground"}`}>
+                  {participantName(slot.participant1) || (t("tbd") || "TBD")}
+                </span>
+                <span className="text-muted-foreground/50 shrink-0 text-[10px] mx-0.5">vs</span>
+                <span className={`truncate ${slot.winnerId && slot.participant2 && String(slot.winnerId) === String(slot.participant2.id) ? "font-bold text-green-600 dark:text-green-400" : participantName(slot.participant2) ? "text-foreground" : "text-muted-foreground"}`}>
+                  {participantName(slot.participant2) || (t("tbd") || "TBD")}
+                </span>
               </div>
 
-              {/* Status badge */}
-              <div className="shrink-0 hidden sm:block">
-                {slotStatusBadge(slot, t)}
-              </div>
-
-              {/* Date/time cell */}
+              {/* Date */}
               <div className="shrink-0">
-                <DateTimeCell
-                  slot={slot}
-                  tournamentId={tournamentId}
-                  onUpdated={fetchSlots}
-                />
+                <DateTimeCell slot={slot} tournamentId={tournamentId} onUpdated={fetchSlots} />
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
