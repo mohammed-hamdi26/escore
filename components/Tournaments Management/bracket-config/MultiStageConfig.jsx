@@ -242,7 +242,7 @@ function MultiStageConfig({ config, onConfigChange, seeds }) {
               {t("defaultBestOf") || "Best Of"}
             </label>
             <div className="flex gap-2">
-              {[1, 3, 5].map((n) => (
+              {[1, 2, 3, 5, 7, 9].map((n) => (
                 <button
                   key={n}
                   type="button"

@@ -164,7 +164,7 @@ export default function CustomRoundCard({
                 <InlineError error={editNameError} />
               </div>
               <div className="flex gap-1">
-                {[1, 3, 5, 7].map((n) => (
+                {[1, 2, 3, 5, 7, 9].map((n) => (
                   <button
                     key={n}
                     type="button"

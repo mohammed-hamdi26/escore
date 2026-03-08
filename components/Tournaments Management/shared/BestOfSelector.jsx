@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-const BEST_OF_OPTIONS = [1, 3, 5, 7];
+const BEST_OF_OPTIONS = [1, 2, 3, 5, 7, 9];
 
 function BestOfSelector({
   value,
