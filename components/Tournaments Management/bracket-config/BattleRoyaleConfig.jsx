@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
 import InlineError from "../shared/InlineError";
+import HelpTooltip from "../shared/HelpTooltip";
 
 function BattleRoyaleConfig({ config, onConfigChange, totalTeams = 0 }) {
   const t = useTranslations("TournamentDetails");
@@ -94,8 +95,9 @@ function BattleRoyaleConfig({ config, onConfigChange, totalTeams = 0 }) {
         </label>
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">
+            <label className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
               {t("totalRounds") || "Total Rounds"}
+              <HelpTooltip text={t("brTotalRoundsHint") || "Number of Battle Royale rounds. All remaining teams compete each round. More rounds = more data for final standings."} />
             </label>
             <input
               type="number"
@@ -113,8 +115,9 @@ function BattleRoyaleConfig({ config, onConfigChange, totalTeams = 0 }) {
             <InlineError error={fieldErrors.totalRounds} />
           </div>
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">
+            <label className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
               {t("teamsPerLobby") || "Teams per Lobby"}
+              <HelpTooltip text={t("brTeamsPerLobbyHint") || "Maximum teams in a single lobby/match. If there are more teams than this, multiple lobbies are created per round."} />
             </label>
             <input
               type="number"
@@ -132,8 +135,9 @@ function BattleRoyaleConfig({ config, onConfigChange, totalTeams = 0 }) {
             <InlineError error={fieldErrors.teamsPerLobby} />
           </div>
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">
+            <label className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
               {t("totalLobbies") || "Total Lobbies"}
+              <HelpTooltip text={t("brTotalLobbiesHint") || "Override the number of lobbies per round. Leave at 0 to auto-calculate from total teams and teams per lobby."} />
             </label>
             <input
               type="number"
@@ -164,8 +168,9 @@ function BattleRoyaleConfig({ config, onConfigChange, totalTeams = 0 }) {
       {/* Elimination Rules */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="block text-xs text-muted-foreground">
+          <label className="flex items-center gap-1 text-xs text-muted-foreground">
             {t("eliminationRules") || "Elimination Rules"}
+            <HelpTooltip text={t("brEliminationRulesHint") || "Define how many teams are eliminated after each round. Teams are ranked by placement and kills. Without rules, all teams play every round."} />
           </label>
           <button
             type="button"

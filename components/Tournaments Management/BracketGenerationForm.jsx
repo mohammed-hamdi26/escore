@@ -13,6 +13,7 @@ import {
   Eye,
   GripVertical,
   Maximize2,
+  Info,
 } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
 import BracketTypeSelector from "./BracketTypeSelector";
@@ -27,12 +28,31 @@ import MultiStageConfig from "./bracket-config/MultiStageConfig";
 import ConfirmationDialog from "./shared/ConfirmationDialog";
 import BracketPreviewSummary from "./shared/BracketPreviewSummary";
 import BracketPreviewRenderer from "./bracket-display/BracketPreviewRenderer";
+import HelpTooltip from "./shared/HelpTooltip";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+
+// Step card wrapper with number badge and title
+function StepCard({ step, title, hint, children, className = "" }) {
+  return (
+    <div className={`rounded-2xl border border-gray-200 dark:border-gray-700 bg-muted/5 dark:bg-[#0d0f1a] overflow-hidden ${className}`}>
+      <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-200 dark:border-gray-700 bg-muted/20 dark:bg-[#1a1d2e]/50">
+        <span className="flex items-center justify-center size-7 rounded-full bg-green-primary text-white text-xs font-bold shrink-0">
+          {step}
+        </span>
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        {hint && <HelpTooltip text={hint} />}
+      </div>
+      <div className="p-5">
+        {children}
+      </div>
+    </div>
+  );
+}
 
 function BracketGenerationForm({
   tournament,
@@ -455,8 +475,17 @@ function BracketGenerationForm({
     }
   };
 
+  // Step numbering depends on bracket type
+  const getSeedStepNumber = () => (isMultiStage ? 3 : 3);
+  const getGenerateStepNumber = () => {
+    if (bracketType === "custom") return 3;
+    if (isMultiStage && stages[0]?.bracketType === "round_robin") return 3;
+    if (bracketType === "round_robin") return 3;
+    return 4;
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {error && (
         <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-sm flex items-center gap-2">
           <AlertTriangle className="size-4 flex-shrink-0" />
@@ -464,130 +493,164 @@ function BracketGenerationForm({
         </div>
       )}
 
-      {/* Multi-Stage Toggle */}
-      <BracketTypeSelector
-        selectedType={bracketType}
-        onTypeChange={setBracketType}
-        isMultiStage={isMultiStage}
-        onMultiStageChange={setIsMultiStage}
-      />
+      {/* STEP 1: Choose Format */}
+      <StepCard
+        step={1}
+        title={t("stepChooseFormat") || "Choose Format"}
+        hint={t("stepChooseFormatHint") || "Select how the tournament bracket will be structured. Each format determines how teams are paired and eliminated."}
+      >
+        <BracketTypeSelector
+          selectedType={bracketType}
+          onTypeChange={setBracketType}
+          isMultiStage={isMultiStage}
+          onMultiStageChange={setIsMultiStage}
+        />
+      </StepCard>
 
-      {/* Type-Specific Configuration */}
-      {renderTypeConfig()}
+      {/* STEP 2: Configure Settings */}
+      <StepCard
+        step={2}
+        title={t("stepConfigureSettings") || "Configure Settings"}
+        hint={t("stepConfigureSettingsHint") || "Adjust the rules and settings specific to your chosen bracket format."}
+      >
+        {renderTypeConfig()}
+      </StepCard>
 
+      {/* STEP 3: Seed Order (conditional) */}
       {/* Multi-stage seed order (non-RR first stage) */}
       {isMultiStage && stages[0]?.bracketType !== "round_robin" && (
-        <SeedOrderManager
-          seeds={seeds}
-          onSeedsChange={setSeeds}
-          participationType={tournament.participationType}
-          minSeeds={2}
-        />
+        <StepCard
+          step={getSeedStepNumber()}
+          title={t("stepSeedOrder") || "Seed Order"}
+          hint={t("stepSeedOrderHint") || "The seed order determines initial matchups. Seed #1 (top) plays the lowest seed. Drag to reorder based on team strength."}
+        >
+          <SeedOrderManager
+            seeds={seeds}
+            onSeedsChange={setSeeds}
+            participationType={tournament.participationType}
+            minSeeds={2}
+          />
+        </StepCard>
       )}
 
       {/* Single bracket seed order */}
       {showSeedOrder && (
-        <SeedOrderManager
-          seeds={seeds}
-          onSeedsChange={setSeeds}
-          participationType={tournament.participationType}
-          minSeeds={getMinSeeds()}
-        />
-      )}
-
-      {/* Validation Summary */}
-      {validationErrors.length > 0 && (
-        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs space-y-1">
-          <p className="font-medium">
-            {t("fixBeforeGenerating") || `Fix ${validationErrors.length} issue(s) before generating:`}
-          </p>
-          <ul className="space-y-0.5 list-disc list-inside">
-            {validationErrors.map((err, i) => (
-              <li key={i}>{err}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Bracket Preview */}
-      {!isMultiStage && bracketType !== "custom" && (
-        <div className="space-y-2">
-          <button
-            type="button"
-            onClick={() => setShowPreview(!showPreview)}
-            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full"
-          >
-            <Eye className="size-4" />
-            <span>{t("previewBracketStructure") || "Preview Bracket Structure"}</span>
-            {showPreview ? <ChevronUp className="size-4 ml-auto" /> : <ChevronDown className="size-4 ml-auto" />}
-          </button>
-
-          {showPreview && (
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-muted/10">
-              <div className="flex justify-end mb-2">
-                <button
-                  type="button"
-                  onClick={() => setShowFullPreview(true)}
-                  className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
-                  title={t("fullScreenPreview") || "Full screen preview"}
-                >
-                  <Maximize2 className="size-3" />
-                  {t("fullScreen") || "Full Screen"}
-                </button>
-              </div>
-              <BracketPreviewRenderer
-                bracketType={bracketType}
-                teamCount={bracketType === "round_robin" ? groups.flatMap((g) => g.teamIds).length : seeds.length}
-                config={{
-                  grandFinalsReset,
-                  groups,
-                  swissConfig,
-                }}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Skip Match Creation Option */}
-      {bracketType !== "custom" && !isMultiStage && (
-        <label className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-muted/10 cursor-pointer hover:bg-muted/20 transition-colors">
-          <input
-            type="checkbox"
-            checked={skipMatchCreation}
-            onChange={(e) => setSkipMatchCreation(e.target.checked)}
-            className="size-4 rounded border-gray-300 text-green-primary focus:ring-green-primary"
+        <StepCard
+          step={getSeedStepNumber()}
+          title={t("stepSeedOrder") || "Seed Order"}
+          hint={t("stepSeedOrderHint") || "The seed order determines initial matchups. Seed #1 (top) plays the lowest seed. Drag to reorder based on team strength."}
+        >
+          <SeedOrderManager
+            seeds={seeds}
+            onSeedsChange={setSeeds}
+            participationType={tournament.participationType}
+            minSeeds={getMinSeeds()}
           />
-          <div>
-            <p className="text-sm font-medium text-foreground">
-              {t("skipMatchCreation") || "Structure only (no matches)"}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t("skipMatchCreationDesc") || "Generate bracket structure without creating match documents. Matches can be created later manually."}
-            </p>
-          </div>
-        </label>
+        </StepCard>
       )}
 
-      {/* Generate Button */}
-      <Button
-        onClick={handleGenerateClick}
-        disabled={generating || !isFormValid}
-        className="w-full gap-2 bg-green-primary hover:bg-green-primary/90 text-white"
-        title={!isFormValid ? (t("fixBeforeGenerating") || "Fix issues before generating") : undefined}
+      {/* STEP 4: Review & Generate */}
+      <StepCard
+        step={getGenerateStepNumber()}
+        title={t("stepReviewGenerate") || "Review & Generate"}
+        hint={t("stepReviewGenerateHint") || "Preview the bracket structure, adjust options, then generate. This action cannot be undone — the bracket must be deleted to regenerate."}
       >
-        {generating ? (
-          <>
-            <Loader2 className="size-4 animate-spin" />
-            {t("generating") || "Generating..."}
-          </>
-        ) : (
-          <>
-            <Trophy className="size-4" />
-            {t("generateBracketBtn") || "Generate Bracket"}
-          </>
+        {/* Validation Summary */}
+        {validationErrors.length > 0 && (
+          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs space-y-1 mb-4">
+            <p className="font-medium flex items-center gap-1.5">
+              <AlertTriangle className="size-3.5 shrink-0" />
+              {t("fixBeforeGenerating") || `Fix ${validationErrors.length} issue(s) before generating:`}
+            </p>
+            <ul className="space-y-0.5 list-disc list-inside ms-5">
+              {validationErrors.map((err, i) => (
+                <li key={i}>{err}</li>
+              ))}
+            </ul>
+          </div>
         )}
-      </Button>
+
+        {/* Bracket Preview */}
+        {!isMultiStage && bracketType !== "custom" && (
+          <div className="space-y-2 mb-4">
+            <button
+              type="button"
+              onClick={() => setShowPreview(!showPreview)}
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full"
+            >
+              <Eye className="size-4" />
+              <span>{t("previewBracketStructure") || "Preview Bracket Structure"}</span>
+              {showPreview ? <ChevronUp className="size-4 ml-auto" /> : <ChevronDown className="size-4 ml-auto" />}
+            </button>
+
+            {showPreview && (
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-muted/10">
+                <div className="flex justify-end mb-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowFullPreview(true)}
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                    title={t("fullScreenPreview") || "Full screen preview"}
+                  >
+                    <Maximize2 className="size-3" />
+                    {t("fullScreen") || "Full Screen"}
+                  </button>
+                </div>
+                <BracketPreviewRenderer
+                  bracketType={bracketType}
+                  teamCount={bracketType === "round_robin" ? groups.flatMap((g) => g.teamIds).length : seeds.length}
+                  config={{
+                    grandFinalsReset,
+                    groups,
+                    swissConfig,
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Skip Match Creation Option */}
+        {bracketType !== "custom" && !isMultiStage && (
+          <label className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-muted/10 cursor-pointer hover:bg-muted/20 transition-colors mb-4">
+            <input
+              type="checkbox"
+              checked={skipMatchCreation}
+              onChange={(e) => setSkipMatchCreation(e.target.checked)}
+              className="size-4 rounded border-gray-300 text-green-primary focus:ring-green-primary"
+            />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                {t("skipMatchCreation") || "Structure only (no matches)"}
+                <HelpTooltip text={t("skipMatchCreationHint") || "Creates the bracket slots and structure without generating match documents. Useful if you want to set up scheduling first, then create matches later."} />
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t("skipMatchCreationDesc") || "Generate bracket structure without creating match documents. Matches can be created later manually."}
+              </p>
+            </div>
+          </label>
+        )}
+
+        {/* Generate Button */}
+        <Button
+          onClick={handleGenerateClick}
+          disabled={generating || !isFormValid}
+          className="w-full gap-2 bg-green-primary hover:bg-green-primary/90 text-white h-11 text-sm"
+          title={!isFormValid ? (t("fixBeforeGenerating") || "Fix issues before generating") : undefined}
+        >
+          {generating ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              {t("generating") || "Generating..."}
+            </>
+          ) : (
+            <>
+              <Trophy className="size-4" />
+              {t("generateBracketBtn") || "Generate Bracket"}
+            </>
+          )}
+        </Button>
+      </StepCard>
 
       {/* Full-Screen Bracket Preview Dialog */}
       <Dialog open={showFullPreview} onOpenChange={setShowFullPreview}>

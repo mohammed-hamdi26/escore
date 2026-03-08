@@ -3,6 +3,7 @@
 import { useRef, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Layers } from "lucide-react";
+import HelpTooltip from "./shared/HelpTooltip";
 
 // Mini SVG bracket diagrams for visual hint
 const BracketIcon = ({ type, isActive }) => {
@@ -167,8 +168,9 @@ function BracketTypeSelector({
         <div className="flex items-center gap-3">
           <Layers className="size-5 text-green-primary" />
           <div>
-            <label className="block text-sm font-medium text-foreground">
+            <label className="flex items-center gap-1 text-sm font-medium text-foreground">
               {t("multiStage") || "Multi-Stage Tournament"}
+              <HelpTooltip text={t("multiStageHint") || "Enable this for tournaments with multiple phases, like Group Stage followed by Knockout. Each stage can have a different bracket format with automatic advancement between stages."} />
             </label>
             <p className="text-xs text-muted-foreground mt-0.5">
               {t("multiStageDesc") ||

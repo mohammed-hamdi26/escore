@@ -38,8 +38,9 @@ function SingleElimConfig({ config, onConfigChange, availableRounds }) {
     <div className="space-y-4">
       {/* Best Of */}
       <div>
-        <label className="block text-sm font-medium text-foreground mb-2">
+        <label className="flex items-center gap-1 text-sm font-medium text-foreground mb-2">
           {t("defaultBestOf") || "Default Best Of"}
+          <HelpTooltip text={t("bestOfHint") || "The number of games in a match series. Bo1 = single game, Bo3 = best of 3 (first to 2 wins), Bo5 = best of 5 (first to 3 wins)."} />
         </label>
         <div className="flex gap-2">
           {[1, 3, 5, 7].map((n) => (

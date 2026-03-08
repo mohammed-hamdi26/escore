@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import HelpTooltip from "../shared/HelpTooltip";
 
 function CustomBracketConfig({ config, onConfigChange }) {
   const t = useTranslations("TournamentDetails");
@@ -10,8 +11,9 @@ function CustomBracketConfig({ config, onConfigChange }) {
   return (
     <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-foreground mb-2">
+        <label className="flex items-center gap-1 text-sm font-medium text-foreground mb-2">
           {t("numberOfRounds") || "Number of Rounds"}
+          <HelpTooltip text={t("customRoundsHint") || "How many rounds to create. Each round starts with one empty match. You can add more matches to each round after generating."} />
         </label>
         <input
           type="number"
@@ -30,8 +32,9 @@ function CustomBracketConfig({ config, onConfigChange }) {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-foreground mb-2">
+        <label className="flex items-center gap-1 text-sm font-medium text-foreground mb-2">
           {t("defaultBestOf") || "Default Best Of"}
+          <HelpTooltip text={t("bestOfHint") || "The number of games in a match series. Bo1 = single game, Bo3 = best of 3 (first to 2 wins), Bo5 = best of 5 (first to 3 wins)."} />
         </label>
         <div className="flex gap-2">
           {[1, 3, 5, 7].map((n) => (
