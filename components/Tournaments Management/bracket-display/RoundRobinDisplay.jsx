@@ -437,7 +437,6 @@ function RoundRobinDisplay({ bracket, tournament, onRefresh, participationType }
   const [viewMode, setViewMode] = useState("rounds");
 
   const handleMatchClick = (match) => {
-    if (!match.team1 && !match.team2 && !match.player1 && !match.player2) return;
     setSelectedMatch(match);
   };
 

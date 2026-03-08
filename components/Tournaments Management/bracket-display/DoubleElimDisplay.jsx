@@ -12,7 +12,6 @@ function DoubleElimDisplay({ bracket, tournament, onRefresh, participationType }
   const [selectedMatch, setSelectedMatch] = useState(null);
 
   const handleMatchClick = tournament ? (match) => {
-    if (!match.team1 && !match.team2 && !match.player1 && !match.player2) return;
     setSelectedMatch(match);
   } : undefined;
 

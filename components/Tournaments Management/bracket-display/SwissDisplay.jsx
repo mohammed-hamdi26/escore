@@ -19,7 +19,6 @@ function SwissDisplay({ bracket, onAdvanceRound, advancingRound, tournament, onR
   }
 
   const handleMatchClick = tournament ? (match) => {
-    if (!match.team1 && !match.team2 && !match.player1 && !match.player2) return;
     setSelectedMatch(match);
   } : undefined;
 
