@@ -38,9 +38,15 @@ function formatRoundLabel(slot) {
   return `${stagePrefix}Round ${slot.round}`;
 }
 
-function participantName(p) {
+function participantName(slot, which) {
+  // Use enriched info from backend (participant1Info / participant2Info)
+  const info = which === 1 ? slot.participant1Info : slot.participant2Info;
+  if (info?.name) return info.name;
+  // Fallback to inline participant object
+  const p = which === 1 ? slot.participant1 : slot.participant2;
   if (!p) return null;
-  return p.name || p.slug || null;
+  if (typeof p === 'object') return p.name || p.slug || null;
+  return null;
 }
 
 function slotStatusDot(slot) {
@@ -236,10 +242,12 @@ function BatchToolbar({ selectedCount, onApply, applying, t }) {
 
 function MatchRow({ slot, tournamentId, isSelected, onToggleSelect, onUpdated, t }) {
   const isEditable = slot.status !== "completed";
-  const p1 = participantName(slot.participant1);
-  const p2 = participantName(slot.participant2);
-  const p1Won = slot.winnerId && slot.participant1 && String(slot.winnerId) === String(slot.participant1.id);
-  const p2Won = slot.winnerId && slot.participant2 && String(slot.winnerId) === String(slot.participant2.id);
+  const p1 = participantName(slot, 1);
+  const p2 = participantName(slot, 2);
+  const p1Id = slot.participant1Info ? String(slot.participant1) : (slot.participant1?.id || slot.participant1);
+  const p2Id = slot.participant2Info ? String(slot.participant2) : (slot.participant2?.id || slot.participant2);
+  const p1Won = slot.winnerId && p1Id && String(slot.winnerId) === String(p1Id);
+  const p2Won = slot.winnerId && p2Id && String(slot.winnerId) === String(p2Id);
 
   return (
     <div
@@ -662,13 +670,25 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
 
               {/* Participants */}
               <div className="flex-1 min-w-0 flex items-center gap-1 text-xs">
-                <span className={`truncate ${slot.winnerId && slot.participant1 && String(slot.winnerId) === String(slot.participant1.id) ? "font-bold text-green-600 dark:text-green-400" : participantName(slot.participant1) ? "text-foreground" : "text-muted-foreground"}`}>
-                  {participantName(slot.participant1) || (t("tbd") || "TBD")}
-                </span>
-                <span className="text-muted-foreground/50 shrink-0 text-[10px] mx-0.5">vs</span>
-                <span className={`truncate ${slot.winnerId && slot.participant2 && String(slot.winnerId) === String(slot.participant2.id) ? "font-bold text-green-600 dark:text-green-400" : participantName(slot.participant2) ? "text-foreground" : "text-muted-foreground"}`}>
-                  {participantName(slot.participant2) || (t("tbd") || "TBD")}
-                </span>
+                {(() => {
+                  const fp1 = participantName(slot, 1);
+                  const fp2 = participantName(slot, 2);
+                  const fp1Id = slot.participant1Info ? String(slot.participant1) : (slot.participant1?.id || slot.participant1);
+                  const fp2Id = slot.participant2Info ? String(slot.participant2) : (slot.participant2?.id || slot.participant2);
+                  const fp1Won = slot.winnerId && fp1Id && String(slot.winnerId) === String(fp1Id);
+                  const fp2Won = slot.winnerId && fp2Id && String(slot.winnerId) === String(fp2Id);
+                  return (
+                    <>
+                      <span className={`truncate ${fp1Won ? "font-bold text-green-600 dark:text-green-400" : fp1 ? "text-foreground" : "text-muted-foreground"}`}>
+                        {fp1 || (t("tbd") || "TBD")}
+                      </span>
+                      <span className="text-muted-foreground/50 shrink-0 text-[10px] mx-0.5">vs</span>
+                      <span className={`truncate ${fp2Won ? "font-bold text-green-600 dark:text-green-400" : fp2 ? "text-foreground" : "text-muted-foreground"}`}>
+                        {fp2 || (t("tbd") || "TBD")}
+                      </span>
+                    </>
+                  );
+                })()}
               </div>
 
               {/* Date */}
