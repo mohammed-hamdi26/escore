@@ -1928,6 +1928,40 @@ export async function applyScheduleTemplateAction(tournamentId, template) {
   }
 }
 
+export async function updateMatchScheduleAction(matchId, scheduledDate) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.put(`/matches/${matchId}`, { scheduledDate });
+    revalidatePath(`/${locale}/dashboard/tournaments-management`);
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Update match schedule error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error updating match schedule",
+    };
+  }
+}
+
+export async function batchUpdateMatchScheduleAction(updates) {
+  const locale = await getLocale();
+  try {
+    const results = await Promise.all(
+      updates.map(({ matchId, scheduledDate }) =>
+        apiClient.put(`/matches/${matchId}`, { scheduledDate })
+      )
+    );
+    revalidatePath(`/${locale}/dashboard/tournaments-management`);
+    return { success: true, data: results.length };
+  } catch (e) {
+    console.log("Batch update match schedule error:", e.response?.data || e.message);
+    return {
+      success: false,
+      error: e.response?.data?.message || "Error batch updating match schedules",
+    };
+  }
+}
+
 export async function swapSlotParticipantsAction(tournamentId, slotId) {
   const locale = await getLocale();
   try {

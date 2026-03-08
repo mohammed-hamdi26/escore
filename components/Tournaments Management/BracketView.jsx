@@ -416,18 +416,20 @@ function BracketView({ tournament, fullPage = false }) {
         <BracketProgressBar bracket={bracket} />
 
         {/* Scheduling Panel (collapsible) */}
-        {showSchedulingPanel && bracket.usesSlots && (
+        {showSchedulingPanel && (
           <div className="mb-6 p-4 rounded-xl border border-green-500/20 bg-green-500/5">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-sm font-semibold text-foreground">
                 {t("scheduleMatches") || "Schedule Matches"}
               </h4>
-              <button
-                onClick={() => setShowScheduleTemplate(true)}
-                className="text-xs px-3 py-1.5 rounded-md bg-green-600 text-white hover:bg-green-700 font-medium"
-              >
-                {t("autoSchedule") || "Auto Schedule"}
-              </button>
+              {bracket.usesSlots && (
+                <button
+                  onClick={() => setShowScheduleTemplate(true)}
+                  className="text-xs px-3 py-1.5 rounded-md bg-green-600 text-white hover:bg-green-700 font-medium"
+                >
+                  {t("autoSchedule") || "Auto Schedule"}
+                </button>
+              )}
             </div>
             <MatchSchedulingPanel
               tournamentId={tournamentId}

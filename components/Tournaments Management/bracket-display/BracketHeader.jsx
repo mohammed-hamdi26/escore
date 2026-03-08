@@ -222,7 +222,7 @@ function BracketHeader({
             </Button>
           )}
 
-          {bracket.usesSlots && onToggleSchedulingPanel && (
+          {onToggleSchedulingPanel && (
             <Button
               variant="outline"
               size="sm"

@@ -13,7 +13,13 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
-import { getSlotsAction, updateSlotAction, batchUpdateSlotsAction } from "@/app/[locale]/_Lib/actions";
+import {
+  getSlotsAction,
+  updateSlotAction,
+  batchUpdateSlotsAction,
+  updateMatchScheduleAction,
+  batchUpdateMatchScheduleAction,
+} from "@/app/[locale]/_Lib/actions";
 import { showSuccess, showError } from "@/lib/bracket-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -45,7 +51,7 @@ function participantName(slot, which) {
   // Fallback to inline participant object
   const p = which === 1 ? slot.participant1 : slot.participant2;
   if (!p) return null;
-  if (typeof p === 'object') return p.name || p.slug || null;
+  if (typeof p === 'object') return p.name || p.slug || p.nickname || null;
   return null;
 }
 
@@ -57,9 +63,102 @@ function slotStatusDot(slot) {
   return "bg-amber-500";
 }
 
+/**
+ * Extract matches from bracket data and convert to slot-like format
+ * for non-slot brackets (multi-stage, old brackets)
+ */
+function extractMatchesAsSlots(bracket) {
+  const slots = [];
+
+  const convertMatch = (match, stage, roundNum, group) => {
+    if (!match || match.isBye) return;
+    slots.push({
+      slotId: match.id,
+      matchId: match.id,
+      round: match.bracketRound || roundNum || 1,
+      position: match.bracketPosition || 0,
+      stage: match.bracketStage || stage || "winners",
+      group: match.group || group || undefined,
+      stageOrder: match.stageOrder,
+      status: match.status || "scheduled",
+      isBye: match.isBye || false,
+      scheduledDate: match.scheduledDate || null,
+      bestOf: match.bestOf || 1,
+      roundLabel: match.round || undefined,
+      participant1: match.team1 || match.player1 || null,
+      participant2: match.team2 || match.player2 || null,
+      participant1Info: match.team1 ? { name: match.team1.name } : match.player1 ? { name: match.player1.nickname } : null,
+      participant2Info: match.team2 ? { name: match.team2.name } : match.player2 ? { name: match.player2.nickname } : null,
+      winnerId: match.result?.winner || match.result?.playerWinner || null,
+      score: match.result ? { p1: match.result.team1Score, p2: match.result.team2Score } : null,
+      _isMatchBased: true,
+    });
+  };
+
+  const processRounds = (rounds, stage) => {
+    if (!rounds) return;
+    for (const round of rounds) {
+      if (round.matches) {
+        for (const match of round.matches) {
+          convertMatch(match, stage, round.round);
+        }
+      }
+    }
+  };
+
+  // Multi-stage: extract from stages
+  if (bracket.isMultiStage && bracket.stages) {
+    for (const stg of bracket.stages) {
+      if (!stg.isGenerated) continue;
+      if (stg.groups) {
+        for (const grp of stg.groups) {
+          for (const round of grp.rounds || []) {
+            if (round.matches) {
+              for (const match of round.matches) {
+                convertMatch(match, match.bracketStage || "group_stage", round.round, grp.name);
+              }
+            }
+          }
+        }
+      }
+      if (stg.swissRounds) processRounds(stg.swissRounds, "swiss");
+      if (stg.rounds?.winners) processRounds(stg.rounds.winners, "winners");
+      if (stg.rounds?.losers) processRounds(stg.rounds.losers, "losers");
+      if (stg.rounds?.grandFinals) {
+        for (const match of stg.rounds.grandFinals) {
+          convertMatch(match, "grand_finals");
+        }
+      }
+    }
+  } else {
+    // Single bracket type
+    if (bracket.groups) {
+      for (const grp of bracket.groups) {
+        for (const round of grp.rounds || []) {
+          if (round.matches) {
+            for (const match of round.matches) {
+              convertMatch(match, "group_stage", round.round, grp.name);
+            }
+          }
+        }
+      }
+    }
+    if (bracket.swissRounds) processRounds(bracket.swissRounds, "swiss");
+    if (bracket.rounds?.winners) processRounds(bracket.rounds.winners, "winners");
+    if (bracket.rounds?.losers) processRounds(bracket.rounds.losers, "losers");
+    if (bracket.rounds?.grandFinals) {
+      for (const match of bracket.rounds.grandFinals) {
+        convertMatch(match, "grand_finals");
+      }
+    }
+  }
+
+  return slots;
+}
+
 // ── Inline Date Picker Cell ──────────────────────────────────────────
 
-function DateTimeCell({ slot, tournamentId, onUpdated }) {
+function DateTimeCell({ slot, tournamentId, onUpdated, useMatchApi }) {
   const t = useTranslations("TournamentDetails");
   const [saving, setSaving] = useState(false);
   const [date, setDate] = useState(slot.scheduledDate ? new Date(slot.scheduledDate) : null);
@@ -78,9 +177,14 @@ function DateTimeCell({ slot, tournamentId, onUpdated }) {
     const isoDate = dt.toISOString();
 
     setSaving(true);
-    const res = await updateSlotAction(tournamentId, slot.slotId, {
-      scheduledDate: isoDate,
-    });
+    let res;
+    if (useMatchApi) {
+      res = await updateMatchScheduleAction(slot.slotId, isoDate);
+    } else {
+      res = await updateSlotAction(tournamentId, slot.slotId, {
+        scheduledDate: isoDate,
+      });
+    }
     setSaving(false);
 
     if (res.success) {
@@ -91,12 +195,12 @@ function DateTimeCell({ slot, tournamentId, onUpdated }) {
     } else {
       showError(res.error);
     }
-  }, [tournamentId, slot.slotId, onUpdated]);
+  }, [tournamentId, slot.slotId, onUpdated, useMatchApi]);
 
   if (!isEditable) {
     return (
       <span className="text-[11px] text-muted-foreground tabular-nums">
-        {date ? format(date, "MMM d, HH:mm") : "—"}
+        {date ? format(date, "MMM d, HH:mm") : "\u2014"}
       </span>
     );
   }
@@ -240,7 +344,7 @@ function BatchToolbar({ selectedCount, onApply, applying, t }) {
 
 // ── Match Row ────────────────────────────────────────────────────────
 
-function MatchRow({ slot, tournamentId, isSelected, onToggleSelect, onUpdated, t }) {
+function MatchRow({ slot, tournamentId, isSelected, onToggleSelect, onUpdated, useMatchApi, t }) {
   const isEditable = slot.status !== "completed";
   const p1 = participantName(slot, 1);
   const p2 = participantName(slot, 2);
@@ -307,6 +411,7 @@ function MatchRow({ slot, tournamentId, isSelected, onToggleSelect, onUpdated, t
           slot={slot}
           tournamentId={tournamentId}
           onUpdated={onUpdated}
+          useMatchApi={useMatchApi}
         />
       </div>
     </div>
@@ -315,7 +420,7 @@ function MatchRow({ slot, tournamentId, isSelected, onToggleSelect, onUpdated, t
 
 // ── Round Group ──────────────────────────────────────────────────────
 
-function RoundGroup({ roundKey, label, slots, tournamentId, selected, onToggleSelect, onSelectRound, onUpdated, t }) {
+function RoundGroup({ roundKey, label, slots, tournamentId, selected, onToggleSelect, onSelectRound, onUpdated, useMatchApi, t }) {
   const [collapsed, setCollapsed] = useState(false);
   const total = slots.length;
   const scheduled = slots.filter((s) => s.scheduledDate).length;
@@ -393,6 +498,7 @@ function RoundGroup({ roundKey, label, slots, tournamentId, selected, onToggleSe
               isSelected={selected.has(slot.slotId)}
               onToggleSelect={() => onToggleSelect(slot.slotId)}
               onUpdated={onUpdated}
+              useMatchApi={useMatchApi}
               t={t}
             />
           ))}
@@ -411,26 +517,48 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
   const [selected, setSelected] = useState(new Set());
   const [applying, setApplying] = useState(false);
 
+  // Determine if we should use slot API or match-based fallback
+  const useMatchApi = !bracket.usesSlots;
+
   // Filters
   const [filterRound, setFilterRound] = useState("all");
   const [filterGroup, setFilterGroup] = useState("all");
   const [sortBy, setSortBy] = useState("bracket"); // bracket | date | status
 
-  // Fetch slots
+  // Fetch slots or extract matches
   const fetchSlots = useCallback(async () => {
     setLoading(true);
-    const res = await getSlotsAction(tournamentId);
-    if (res.success) {
-      setSlots(res.data || []);
+
+    if (bracket.usesSlots) {
+      // Slot-based: fetch from API
+      const res = await getSlotsAction(tournamentId);
+      if (res.success) {
+        setSlots(res.data || []);
+      } else {
+        showError(res.error);
+      }
     } else {
-      showError(res.error);
+      // Match-based: extract from bracket data
+      const matchSlots = extractMatchesAsSlots(bracket);
+      setSlots(matchSlots);
     }
+
     setLoading(false);
-  }, [tournamentId]);
+  }, [tournamentId, bracket]);
 
   useEffect(() => {
     fetchSlots();
   }, [fetchSlots]);
+
+  // For match-based mode, refetch bracket data to get updated dates
+  const handleUpdated = useCallback(async () => {
+    if (useMatchApi) {
+      // Need to refresh bracket data to get updated scheduledDate
+      onRefresh?.();
+    } else {
+      await fetchSlots();
+    }
+  }, [useMatchApi, onRefresh, fetchSlots]);
 
   // Derived filter options
   const rounds = useMemo(() => {
@@ -462,7 +590,7 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
         return new Date(a.scheduledDate) - new Date(b.scheduledDate);
       });
     } else if (sortBy === "status") {
-      const order = { pending: 0, ready: 1, in_progress: 2, completed: 3 };
+      const order = { pending: 0, ready: 1, scheduled: 1, in_progress: 2, completed: 3 };
       result = [...result].sort((a, b) => (order[a.status] || 0) - (order[b.status] || 0));
     }
 
@@ -473,9 +601,12 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
   const groupedSlots = useMemo(() => {
     const map = new Map();
     for (const slot of filteredSlots) {
-      const key = `${slot.stage || "main"}_${slot.round}_${slot.roundLabel || ""}`;
+      const key = `${slot.stage || "main"}_${slot.round}_${slot.roundLabel || ""}_${slot.group || ""}`;
       if (!map.has(key)) {
-        map.set(key, { label: formatRoundLabel(slot), slots: [] });
+        const label = slot.group
+          ? `${slot.group} - ${formatRoundLabel(slot)}`
+          : formatRoundLabel(slot);
+        map.set(key, { label, slots: [] });
       }
       map.get(key).slots.push(slot);
     }
@@ -513,22 +644,39 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
 
   // Batch date apply
   const handleBatchApply = async (isoDate) => {
-    const updates = [...selected].map((slotId) => ({
-      slotId,
-      scheduledDate: isoDate,
-    }));
-
     setApplying(true);
-    const res = await batchUpdateSlotsAction(tournamentId, updates);
-    setApplying(false);
 
-    if (res.success) {
-      showSuccess(`${updates.length} ${t("matchesScheduled") || "matches scheduled"}`);
-      setSelected(new Set());
-      await fetchSlots();
-      onRefresh?.();
+    if (useMatchApi) {
+      const updates = [...selected].map((matchId) => ({
+        matchId,
+        scheduledDate: isoDate,
+      }));
+      const res = await batchUpdateMatchScheduleAction(updates);
+      setApplying(false);
+
+      if (res.success) {
+        showSuccess(`${updates.length} ${t("matchesScheduled") || "matches scheduled"}`);
+        setSelected(new Set());
+        onRefresh?.();
+      } else {
+        showError(res.error);
+      }
     } else {
-      showError(res.error);
+      const updates = [...selected].map((slotId) => ({
+        slotId,
+        scheduledDate: isoDate,
+      }));
+      const res = await batchUpdateSlotsAction(tournamentId, updates);
+      setApplying(false);
+
+      if (res.success) {
+        showSuccess(`${updates.length} ${t("matchesScheduled") || "matches scheduled"}`);
+        setSelected(new Set());
+        await fetchSlots();
+        onRefresh?.();
+      } else {
+        showError(res.error);
+      }
     }
   };
 
@@ -547,7 +695,7 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
     return (
       <div className="flex flex-col items-center justify-center py-8 text-muted-foreground gap-2">
         <AlertCircle className="size-8" />
-        <p className="text-sm">{t("noSlotsAvailable") || "No slots available for scheduling"}</p>
+        <p className="text-sm">{t("noSlotsAvailable") || "No matches available for scheduling"}</p>
       </div>
     );
   }
@@ -638,7 +786,8 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
               selected={selected}
               onToggleSelect={toggleSelect}
               onSelectRound={selectRound}
-              onUpdated={fetchSlots}
+              onUpdated={handleUpdated}
+              useMatchApi={useMatchApi}
               t={t}
             />
           ))}
@@ -693,7 +842,7 @@ export default function MatchSchedulingPanel({ tournamentId, bracket, onRefresh 
 
               {/* Date */}
               <div className="shrink-0">
-                <DateTimeCell slot={slot} tournamentId={tournamentId} onUpdated={fetchSlots} />
+                <DateTimeCell slot={slot} tournamentId={tournamentId} onUpdated={handleUpdated} useMatchApi={useMatchApi} />
               </div>
             </div>
           ))}
