@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Layers } from "lucide-react";
+import { Layers, ArrowLeftRight } from "lucide-react";
+import toast from "react-hot-toast";
 import BracketMatchCard from "../BracketMatchCard";
 import BracketRounds from "./BracketRounds";
 import MatchResultDialog from "../MatchResultDialog";
-import { updateBracketMatchResultAction } from "@/app/[locale]/_Lib/actions";
+import { updateBracketMatchResultAction, reassignParticipantsAction } from "@/app/[locale]/_Lib/actions";
 
 function MultiStageDisplay({ bracket, activeStageTab, tournament, onRefresh, participationType }) {
   const t = useTranslations("TournamentDetails");
   const [activeGroupTab, setActiveGroupTab] = useState(0);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [reassignMode, setReassignMode] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState(null);
+  const [reassignLoading, setReassignLoading] = useState(false);
 
   if (!bracket.stages) return null;
 
@@ -34,6 +38,42 @@ function MultiStageDisplay({ bracket, activeStageTab, tournament, onRefresh, par
     setSelectedMatch(match);
   } : undefined;
 
+  const handleParticipantClick = async (slotId, field, team) => {
+    if (reassignLoading) return;
+
+    if (selectedParticipant?.slotId === slotId && selectedParticipant?.field === field) {
+      setSelectedParticipant(null);
+      return;
+    }
+
+    if (!selectedParticipant) {
+      setSelectedParticipant({ slotId, field, team });
+      return;
+    }
+
+    setReassignLoading(true);
+    try {
+      const result = await reassignParticipantsAction(tournament.id, {
+        slot1Id: selectedParticipant.slotId,
+        slot1Field: selectedParticipant.field,
+        slot2Id: slotId,
+        slot2Field: field,
+      });
+
+      if (result.success) {
+        toast.success(t("reassignSuccess"));
+        if (onRefresh) onRefresh();
+      } else {
+        toast.error(result.error || t("reassignError"));
+      }
+    } catch {
+      toast.error(t("reassignError"));
+    } finally {
+      setReassignLoading(false);
+      setSelectedParticipant(null);
+    }
+  };
+
   const handleResultSet = () => {
     setSelectedMatch(null);
     if (onRefresh) onRefresh();
@@ -44,41 +84,83 @@ function MultiStageDisplay({ bracket, activeStageTab, tournament, onRefresh, par
       {/* RR Groups */}
       {activeStage.groups && activeStage.groups.length > 0 && (
         <div className="mb-6">
-          {/* Mobile: dropdown */}
-          <div className="sm:hidden mb-4">
-            <select
-              value={activeGroupTab}
-              onChange={(e) => setActiveGroupTab(Number(e.target.value))}
-              className="w-full px-3 py-2 rounded-lg bg-background border border-gray-300 dark:border-gray-600 text-foreground text-sm"
-              aria-label={t("selectGroup") || "Select group"}
-            >
+          <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+            {/* Mobile: dropdown */}
+            <div className="sm:hidden flex-1">
+              <select
+                value={activeGroupTab}
+                onChange={(e) => { setActiveGroupTab(Number(e.target.value)); setSelectedParticipant(null); }}
+                className="w-full px-3 py-2 rounded-lg bg-background border border-gray-300 dark:border-gray-600 text-foreground text-sm"
+                aria-label={t("selectGroup") || "Select group"}
+              >
+                {activeStage.groups.map((group, index) => (
+                  <option key={index} value={index}>{group.name}</option>
+                ))}
+              </select>
+            </div>
+            {/* Tablet/Desktop: tabs */}
+            <div className="hidden sm:flex gap-2 overflow-x-auto" role="tablist">
               {activeStage.groups.map((group, index) => (
-                <option key={index} value={index}>{group.name}</option>
+                <button
+                  key={index}
+                  role="tab"
+                  aria-selected={activeGroupTab === index}
+                  onClick={() => { setActiveGroupTab(index); setSelectedParticipant(null); }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap min-h-[40px] ${
+                    activeGroupTab === index
+                      ? "bg-green-primary text-white"
+                      : "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  {group.name}
+                </button>
               ))}
-            </select>
-          </div>
-          {/* Tablet/Desktop: tabs */}
-          <div className="hidden sm:flex gap-2 mb-4 overflow-x-auto" role="tablist">
-            {activeStage.groups.map((group, index) => (
+            </div>
+            {/* Reassign Toggle */}
+            {tournament && (
               <button
-                key={index}
-                role="tab"
-                aria-selected={activeGroupTab === index}
-                onClick={() => setActiveGroupTab(index)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap min-h-[40px] ${
-                  activeGroupTab === index
-                    ? "bg-green-primary text-white"
-                    : "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+                onClick={() => { setReassignMode(!reassignMode); setSelectedParticipant(null); }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                  reassignMode
+                    ? "bg-amber-500/20 border-amber-500/40 text-amber-500"
+                    : "bg-muted/20 border-white/5 text-muted-foreground hover:text-foreground hover:bg-muted/40"
                 }`}
               >
-                {group.name}
+                <ArrowLeftRight className="size-3.5" />
+                {reassignMode ? t("exitReassignMode") : t("reassignTeams")}
               </button>
-            ))}
+            )}
           </div>
+
+          {/* Reassign Mode Banner */}
+          {reassignMode && (
+            <div className="mb-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center gap-2">
+              <ArrowLeftRight className={`size-4 text-amber-500 shrink-0 ${reassignLoading ? "animate-spin" : ""}`} />
+              <span className="text-xs text-amber-500">
+                {reassignLoading
+                  ? "..."
+                  : selectedParticipant
+                  ? `${t("reassignSelectSecond")} — ${selectedParticipant.team?.name}`
+                  : t("reassignSelectFirst")}
+              </span>
+              {selectedParticipant && !reassignLoading && (
+                <button
+                  onClick={() => setSelectedParticipant(null)}
+                  className="ms-auto text-xs text-amber-500/70 hover:text-amber-500 underline"
+                >
+                  {t("reassignCancel")}
+                </button>
+              )}
+            </div>
+          )}
+
           {activeStage.groups[activeGroupTab] && (
             <BracketRounds
               rounds={activeStage.groups[activeGroupTab].rounds}
               onMatchClick={handleMatchClick}
+              reassignMode={reassignMode}
+              selectedParticipant={selectedParticipant}
+              onParticipantClick={handleParticipantClick}
             />
           )}
         </div>

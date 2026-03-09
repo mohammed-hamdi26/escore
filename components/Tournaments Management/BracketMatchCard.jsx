@@ -11,7 +11,9 @@ const STATUS_COLORS = {
   completed: "border-purple-500/30 bg-purple-500/5",
 };
 
-function TeamRow({ team, score, isWinner, isBye, t }) {
+function TeamRow({ team, score, isWinner, isBye, t, reassignMode, isSelected, isCompleted, onReassignClick }) {
+  const canReassign = reassignMode && !isCompleted && team;
+
   if (isBye) {
     return (
       <div className="flex items-center justify-between px-3 py-2.5 opacity-40">
@@ -36,7 +38,14 @@ function TeamRow({ team, score, isWinner, isBye, t }) {
         isWinner
           ? "bg-green-500/10"
           : ""
+      } ${
+        canReassign ? "cursor-pointer hover:bg-amber-500/10" : ""
+      } ${
+        isSelected ? "ring-2 ring-inset ring-amber-500 bg-amber-500/15" : ""
+      } ${
+        reassignMode && isCompleted ? "opacity-40" : ""
       }`}
+      onClick={canReassign && onReassignClick ? (e) => { e.stopPropagation(); onReassignClick(); } : undefined}
     >
       <div className="flex items-center gap-2 min-w-0 flex-1">
         {team.logo?.light ? (
@@ -69,7 +78,7 @@ function TeamRow({ team, score, isWinner, isBye, t }) {
   );
 }
 
-function BracketMatchCard({ match, onClick }) {
+function BracketMatchCard({ match, onClick, reassignMode, selectedParticipant, onParticipantClick }) {
   const t = useTranslations("TournamentDetails");
   const statusColor = STATUS_COLORS[match.status] || STATUS_COLORS.scheduled;
 
@@ -160,15 +169,20 @@ function BracketMatchCard({ match, onClick }) {
   const isTeam2Winner =
     winnerId && match.team2 && winnerId === (match.team2.id || match.team2._id);
 
+  const isCompleted = match.status === "completed" || winnerId;
+  const canCardClick = !reassignMode && onClick;
+  const isT1Selected = selectedParticipant?.slotId === match._slotId && selectedParticipant?.field === "participant1";
+  const isT2Selected = selectedParticipant?.slotId === match._slotId && selectedParticipant?.field === "participant2";
+
   return (
     <div
       className={`rounded-lg border overflow-hidden min-w-[200px] max-w-[280px] ${statusColor} ${
-        onClick ? "cursor-pointer hover:ring-2 hover:ring-green-primary/40 transition-all" : ""
+        canCardClick ? "cursor-pointer hover:ring-2 hover:ring-green-primary/40 transition-all" : ""
       }`}
-      onClick={onClick ? () => onClick(match) : undefined}
-      role={onClick ? "button" : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(match); } } : undefined}
+      onClick={canCardClick ? () => onClick(match) : undefined}
+      role={canCardClick ? "button" : undefined}
+      tabIndex={canCardClick ? 0 : undefined}
+      onKeyDown={canCardClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(match); } } : undefined}
     >
       {/* Match header */}
       <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-white/5">
@@ -199,6 +213,10 @@ function BracketMatchCard({ match, onClick }) {
           isWinner={isTeam1Winner}
           isBye={false}
           t={t}
+          reassignMode={reassignMode}
+          isSelected={isT1Selected}
+          isCompleted={isCompleted}
+          onReassignClick={onParticipantClick ? () => onParticipantClick(match._slotId, "participant1", match.team1) : undefined}
         />
         <TeamRow
           team={match.team2}
@@ -206,6 +224,10 @@ function BracketMatchCard({ match, onClick }) {
           isWinner={isTeam2Winner}
           isBye={match.isBye}
           t={t}
+          reassignMode={reassignMode}
+          isSelected={isT2Selected}
+          isCompleted={isCompleted}
+          onReassignClick={onParticipantClick ? () => onParticipantClick(match._slotId, "participant2", match.team2) : undefined}
         />
       </div>
 
