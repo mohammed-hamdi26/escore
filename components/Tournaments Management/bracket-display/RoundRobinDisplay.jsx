@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Trophy, Users, CheckCircle, Clock, Circle, ChevronDown } from "lucide-react";
+import { Trophy, Users, CheckCircle, Clock, Circle, ChevronDown, ArrowLeftRight } from "lucide-react";
 import { getImgUrl } from "@/lib/utils";
+import toast from "react-hot-toast";
 import MatchResultDialog from "../MatchResultDialog";
-import { updateBracketMatchResultAction } from "@/app/[locale]/_Lib/actions";
+import { updateBracketMatchResultAction, reassignParticipantsAction } from "@/app/[locale]/_Lib/actions";
 
 // ── Standings Table ──────────────────────────────────────────────
 
@@ -167,7 +168,7 @@ function GroupStandings({ group, t }) {
 
 // ── Match Card (inline, simpler than BracketMatchCard) ───────────
 
-function RRMatchCard({ match, onClick, t }) {
+function RRMatchCard({ match, onClick, t, reassignMode, selectedParticipant, onParticipantClick }) {
   const winnerId = match.result?.winner?.id || match.result?.winner?._id || match.result?.winner;
   const s1 = match.result?.team1Score;
   const s2 = match.result?.team2Score;
@@ -181,7 +182,10 @@ function RRMatchCard({ match, onClick, t }) {
   const isT1Winner = winnerId && t1Id && winnerId === t1Id;
   const isT2Winner = winnerId && t2Id && winnerId === t2Id;
 
-  const canClick = onClick && (t1 || t2);
+  const canClick = !reassignMode && onClick && (t1 || t2);
+  const canReassign = reassignMode && !isCompleted;
+  const isT1Selected = selectedParticipant?.slotId === match._slotId && selectedParticipant?.field === "participant1";
+  const isT2Selected = selectedParticipant?.slotId === match._slotId && selectedParticipant?.field === "participant2";
 
   return (
     <div
@@ -211,10 +215,20 @@ function RRMatchCard({ match, onClick, t }) {
       }
     >
       {/* Team 1 */}
+      {/* Team 1 */}
       <div
         className={`flex items-center justify-between px-3 py-2.5 ${
           isT1Winner ? "bg-green-500/10" : ""
+        } ${
+          canReassign && t1 ? "cursor-pointer hover:bg-amber-500/10 transition-colors" : ""
+        } ${
+          isT1Selected ? "ring-2 ring-inset ring-amber-500 bg-amber-500/15" : ""
+        } ${
+          reassignMode && isCompleted ? "opacity-40" : ""
         }`}
+        onClick={canReassign && t1 && onParticipantClick
+          ? (e) => { e.stopPropagation(); onParticipantClick(match._slotId, "participant1", t1); }
+          : undefined}
       >
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {t1?.logo?.light ? (
@@ -252,7 +266,16 @@ function RRMatchCard({ match, onClick, t }) {
       <div
         className={`flex items-center justify-between px-3 py-2.5 ${
           isT2Winner ? "bg-green-500/10" : ""
+        } ${
+          canReassign && t2 ? "cursor-pointer hover:bg-amber-500/10 transition-colors" : ""
+        } ${
+          isT2Selected ? "ring-2 ring-inset ring-amber-500 bg-amber-500/15" : ""
+        } ${
+          reassignMode && isCompleted ? "opacity-40" : ""
         }`}
+        onClick={canReassign && t2 && onParticipantClick
+          ? (e) => { e.stopPropagation(); onParticipantClick(match._slotId, "participant2", t2); }
+          : undefined}
       >
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {t2?.logo?.light ? (
@@ -302,7 +325,7 @@ function RRMatchCard({ match, onClick, t }) {
 
 // ── Round Column ─────────────────────────────────────────────────
 
-function RoundColumn({ round, groupName, onMatchClick, t }) {
+function RoundColumn({ round, groupName, onMatchClick, t, reassignMode, selectedParticipant, onParticipantClick }) {
   // Strip group name prefix from round name (e.g., "Group A - Round 1" -> "Round 1")
   const cleanName = round.name?.replace(new RegExp(`^${groupName}\\s*[-–]\\s*`, "i"), "") || round.name;
 
@@ -346,6 +369,9 @@ function RoundColumn({ round, groupName, onMatchClick, t }) {
             match={match}
             onClick={onMatchClick}
             t={t}
+            reassignMode={reassignMode}
+            selectedParticipant={selectedParticipant}
+            onParticipantClick={onParticipantClick}
           />
         ))}
       </div>
@@ -435,9 +461,51 @@ function RoundRobinDisplay({ bracket, tournament, onRefresh, participationType }
   const [activeGroupTab, setActiveGroupTab] = useState(0);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [viewMode, setViewMode] = useState("rounds");
+  const [reassignMode, setReassignMode] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState(null);
+  const [reassignLoading, setReassignLoading] = useState(false);
 
   const handleMatchClick = (match) => {
     setSelectedMatch(match);
+  };
+
+  const handleParticipantClick = async (slotId, field, team) => {
+    if (reassignLoading) return;
+
+    // Clicking the same participant → deselect
+    if (selectedParticipant?.slotId === slotId && selectedParticipant?.field === field) {
+      setSelectedParticipant(null);
+      return;
+    }
+
+    // No participant selected yet → select this one
+    if (!selectedParticipant) {
+      setSelectedParticipant({ slotId, field, team });
+      return;
+    }
+
+    // Second participant clicked → perform swap
+    setReassignLoading(true);
+    try {
+      const result = await reassignParticipantsAction(tournament.id, {
+        slot1Id: selectedParticipant.slotId,
+        slot1Field: selectedParticipant.field,
+        slot2Id: slotId,
+        slot2Field: field,
+      });
+
+      if (result.success) {
+        toast.success(t("reassignSuccess"));
+        if (onRefresh) onRefresh();
+      } else {
+        toast.error(result.error || t("reassignError"));
+      }
+    } catch {
+      toast.error(t("reassignError"));
+    } finally {
+      setReassignLoading(false);
+      setSelectedParticipant(null);
+    }
   };
 
   const handleResultSet = () => {
@@ -471,7 +539,7 @@ function RoundRobinDisplay({ bracket, tournament, onRefresh, participationType }
                 key={index}
                 role="tab"
                 aria-selected={activeGroupTab === index}
-                onClick={() => setActiveGroupTab(index)}
+                onClick={() => { setActiveGroupTab(index); setSelectedParticipant(null); }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                   activeGroupTab === index
                     ? "bg-green-primary text-white shadow-sm shadow-green-primary/20"
@@ -489,7 +557,7 @@ function RoundRobinDisplay({ bracket, tournament, onRefresh, participationType }
         <div className="sm:hidden relative flex-1">
           <select
             value={activeGroupTab}
-            onChange={(e) => setActiveGroupTab(Number(e.target.value))}
+            onChange={(e) => { setActiveGroupTab(Number(e.target.value)); setSelectedParticipant(null); }}
             className="w-full px-3 py-2.5 rounded-lg bg-muted/20 border border-white/5 text-foreground text-sm font-medium appearance-none pe-8"
             aria-label={t("selectGroup") || "Select group"}
           >
@@ -502,8 +570,45 @@ function RoundRobinDisplay({ bracket, tournament, onRefresh, participationType }
           <ChevronDown className="size-4 absolute end-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground" />
         </div>
 
-        <ViewToggle view={viewMode} onChange={setViewMode} t={t} />
+        <div className="flex items-center gap-2">
+          {tournament && (
+            <button
+              onClick={() => { setReassignMode(!reassignMode); setSelectedParticipant(null); }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                reassignMode
+                  ? "bg-amber-500/20 border-amber-500/40 text-amber-500"
+                  : "bg-muted/20 border-white/5 text-muted-foreground hover:text-foreground hover:bg-muted/40"
+              }`}
+            >
+              <ArrowLeftRight className="size-3.5" />
+              {reassignMode ? t("exitReassignMode") : t("reassignTeams")}
+            </button>
+          )}
+          <ViewToggle view={viewMode} onChange={setViewMode} t={t} />
+        </div>
       </div>
+
+      {/* Reassign Mode Banner */}
+      {reassignMode && (
+        <div className="mb-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center gap-2">
+          <ArrowLeftRight className={`size-4 text-amber-500 shrink-0 ${reassignLoading ? "animate-spin" : ""}`} />
+          <span className="text-xs text-amber-500">
+            {reassignLoading
+              ? "..."
+              : selectedParticipant
+              ? `${t("reassignSelectSecond")} — ${selectedParticipant.team?.name}`
+              : t("reassignSelectFirst")}
+          </span>
+          {selectedParticipant && !reassignLoading && (
+            <button
+              onClick={() => setSelectedParticipant(null)}
+              className="ms-auto text-xs text-amber-500/70 hover:text-amber-500 underline"
+            >
+              {t("reassignCancel")}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Active Group Content */}
       {activeGroup && (
@@ -523,6 +628,9 @@ function RoundRobinDisplay({ bracket, tournament, onRefresh, participationType }
                     groupName={activeGroup.name}
                     onMatchClick={tournament ? handleMatchClick : undefined}
                     t={t}
+                    reassignMode={reassignMode}
+                    selectedParticipant={selectedParticipant}
+                    onParticipantClick={handleParticipantClick}
                   />
                 ))}
               </div>

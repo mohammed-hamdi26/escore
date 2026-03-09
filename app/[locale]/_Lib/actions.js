@@ -1981,6 +1981,28 @@ export async function swapSlotParticipantsAction(tournamentId, slotId) {
   }
 }
 
+export async function reassignParticipantsAction(tournamentId, data) {
+  const locale = await getLocale();
+  try {
+    const res = await apiClient.post(
+      `/tournaments/${tournamentId}/bracket/slots/reassign-participants`,
+      data
+    );
+    revalidatePath(
+      `/${locale}/dashboard/tournaments-management/view/${tournamentId}`
+    );
+    return { success: true, data: res.data?.data };
+  } catch (e) {
+    console.log("Reassign participants error:", e.response?.data || e.message);
+    const msg = e.response?.data?.message || "Error reassigning participants";
+    const errors = e.response?.data?.errors;
+    const detail = errors?.length
+      ? `${msg}: ${errors.map((err) => `${err.field} - ${err.message}`).join(", ")}`
+      : msg;
+    return { success: false, error: detail };
+  }
+}
+
 export async function seedAssignmentsAction(tournamentId, assignments) {
   const locale = await getLocale();
   try {
