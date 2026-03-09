@@ -21,9 +21,9 @@ export async function getTournaments(searchParams = {}) {
     // Event linking
     if (searchParams.excludeEventLinked !== undefined) params.set("excludeEventLinked", searchParams.excludeEventLinked);
 
-    // Sorting
-    if (searchParams.sortBy) params.set("sortBy", searchParams.sortBy);
-    if (searchParams.sortOrder) params.set("sortOrder", searchParams.sortOrder);
+    // Sorting (default: startDate descending)
+    params.set("sortBy", searchParams.sortBy || "startDate");
+    params.set("sortOrder", searchParams.sortOrder || "desc");
 
     const queryString = params.toString();
     const url = queryString ? `/tournaments?${queryString}` : "/tournaments";
