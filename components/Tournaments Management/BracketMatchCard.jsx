@@ -171,8 +171,13 @@ function BracketMatchCard({ match, onClick, reassignMode, selectedParticipant, o
 
   const isCompleted = match.status === "completed" || winnerId;
   const canCardClick = !reassignMode && onClick;
-  const isT1Selected = selectedParticipant?.slotId === match._slotId && selectedParticipant?.field === "participant1";
-  const isT2Selected = selectedParticipant?.slotId === match._slotId && selectedParticipant?.field === "participant2";
+  // Support both slot-based (RR) and match-based (multi-stage) selection
+  const matchKey = match._slotId || match.id || match._id;
+  const selKey = selectedParticipant?.slotId || selectedParticipant?.matchId;
+  const selT1Field = match._slotId ? "participant1" : "team1";
+  const selT2Field = match._slotId ? "participant2" : "team2";
+  const isT1Selected = selKey === matchKey && selectedParticipant?.field === selT1Field;
+  const isT2Selected = selKey === matchKey && selectedParticipant?.field === selT2Field;
 
   return (
     <div
@@ -216,7 +221,7 @@ function BracketMatchCard({ match, onClick, reassignMode, selectedParticipant, o
           reassignMode={reassignMode}
           isSelected={isT1Selected}
           isCompleted={isCompleted}
-          onReassignClick={onParticipantClick ? () => onParticipantClick(match._slotId, "participant1", match.team1) : undefined}
+          onReassignClick={onParticipantClick ? () => onParticipantClick(matchKey, selT1Field, match.team1) : undefined}
         />
         <TeamRow
           team={match.team2}
@@ -227,7 +232,7 @@ function BracketMatchCard({ match, onClick, reassignMode, selectedParticipant, o
           reassignMode={reassignMode}
           isSelected={isT2Selected}
           isCompleted={isCompleted}
-          onReassignClick={onParticipantClick ? () => onParticipantClick(match._slotId, "participant2", match.team2) : undefined}
+          onReassignClick={onParticipantClick ? () => onParticipantClick(matchKey, selT2Field, match.team2) : undefined}
         />
       </div>
 

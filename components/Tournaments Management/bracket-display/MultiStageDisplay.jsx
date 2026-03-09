@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import BracketMatchCard from "../BracketMatchCard";
 import BracketRounds from "./BracketRounds";
 import MatchResultDialog from "../MatchResultDialog";
-import { updateBracketMatchResultAction, reassignParticipantsAction } from "@/app/[locale]/_Lib/actions";
+import { updateBracketMatchResultAction, reassignMatchParticipantsAction } from "@/app/[locale]/_Lib/actions";
 
 function MultiStageDisplay({ bracket, activeStageTab, tournament, onRefresh, participationType }) {
   const t = useTranslations("TournamentDetails");
@@ -38,26 +38,26 @@ function MultiStageDisplay({ bracket, activeStageTab, tournament, onRefresh, par
     setSelectedMatch(match);
   } : undefined;
 
-  const handleParticipantClick = async (slotId, field, team) => {
+  const handleParticipantClick = async (matchId, field, team) => {
     if (reassignLoading) return;
 
-    if (selectedParticipant?.slotId === slotId && selectedParticipant?.field === field) {
+    if (selectedParticipant?.matchId === matchId && selectedParticipant?.field === field) {
       setSelectedParticipant(null);
       return;
     }
 
     if (!selectedParticipant) {
-      setSelectedParticipant({ slotId, field, team });
+      setSelectedParticipant({ matchId, field, team });
       return;
     }
 
     setReassignLoading(true);
     try {
-      const result = await reassignParticipantsAction(tournament.id, {
-        slot1Id: selectedParticipant.slotId,
-        slot1Field: selectedParticipant.field,
-        slot2Id: slotId,
-        slot2Field: field,
+      const result = await reassignMatchParticipantsAction(tournament.id, {
+        match1Id: selectedParticipant.matchId,
+        match1Field: selectedParticipant.field,
+        match2Id: matchId,
+        match2Field: field,
       });
 
       if (result.success) {
